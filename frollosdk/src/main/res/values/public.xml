@@ -1,0 +1,3 @@
+<resources>
+    <public /> <!-- Make all resources private by adding an empty <public /> tag. -->
+</resources>

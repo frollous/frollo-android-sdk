@@ -12,21 +12,26 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles 'lib-proguard-rules.txt'
     }
     buildTypes {
+        // TODO: Signing
+        // TODO: Build flavours
+        // TODO: Configure proguard
+        // TODO: Make sure to test release version after obfuscation, especially serializable classes
         release {
+            debuggable false
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            //consumerProguardFiles 'lib-proguard-rules.txt'
+        }
+        debug {
+            debuggable true
         }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    // TODO: Signing
-    // TODO: Build flavours
-    // TODO: Configure proguard
 }
 
 dependencies {

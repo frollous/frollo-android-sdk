@@ -5,12 +5,6 @@ buildscript {
     ext.lifecycle_version = '2.0.0'
     ext.retrofit_version = '2.3.0'
     ext.dagger_version = '2.16'
-    //ext.android_room_version='1.1.1'
-    //ext.javax_annotation_version = '10.0-b28'
-    //ext.rxjava_version = '2.1.0'
-    //ext.spongycastle_version = '1.58.0.0'
-    //ext.debug_db_version = '1.0.4'
-    //ext.apache_commons_version = '3.6'
 
     repositories {
         google()

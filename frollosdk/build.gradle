@@ -4,14 +4,14 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    resourcePrefix "frollosdk_" // Define resource prefix to prevent resource names conflicts
+    //resourcePrefix "frollosdk_" // Define resource prefix to prevent resource names conflicts
     compileSdkVersion 28
     defaultConfig {
         minSdkVersion 23 // Android 6.0 (Marshmallow)
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         // TODO: Signing
@@ -37,9 +37,27 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    testImplementation "junit:junit:$junit_version"
-    androidTestImplementation "com.android.support.test:runner:$test_runner_version"
+    // Android Test
+    testImplementation "junit:junit:4.12"
+    androidTestImplementation "androidx.test:runner:1.1.0"
+    // JavaX Annotations
+    compileOnly "org.glassfish:javax.annotation:10.0-b28"
+    // Android Arch Components
+    implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
+    // Timber Logging
+    implementation "com.jakewharton.timber:timber:4.7.1"
+    // Anko (https://github.com/Kotlin/anko)
+    implementation "org.jetbrains.anko:anko:0.10.7"
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    // Dagger2
+    implementation "com.google.dagger:dagger:$dagger_version"
+    kapt "com.google.dagger:dagger-compiler:$dagger_version"
+    implementation "com.google.dagger:dagger-android-support:$dagger_version"
+    kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 }
 repositories {
     mavenCentral()

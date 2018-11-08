@@ -3,7 +3,7 @@ package us.frollo.frollosdk
 import android.app.Application
 import timber.log.Timber
 import us.frollo.frollosdk.auth.Authentication
-import us.frollo.frollosdk.base.api.Resource
+import us.frollo.frollosdk.core.SdkError
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.di.Injector
 
@@ -14,22 +14,20 @@ object FrolloSDK {
 
     lateinit var serverUrl: String
 
-    fun setup(app: Application, params: SetupParams, callback: ((Resource<Boolean>) -> Unit)) {
-        callback(Resource.loading(false))
+    @Throws(IllegalArgumentException::class, IllegalStateException::class)
+    fun setup(app: Application, params: SetupParams, callback: ((SdkError?) -> Unit)) {
+        if (setup) throw IllegalStateException("SDK already setup")
+        if (params.serverUrl.isBlank()) throw IllegalArgumentException("Server URL cannot be empty")
 
+        serverUrl = params.serverUrl
+
+        registerTimber()
         initializeDagger(app)
 
-        if (params.serverUrl.isBlank()) {
-            callback(Resource.error("Server URL cannot be empty", false))
-            return
-        }
-
-        this.serverUrl = params.serverUrl
         authentication = Authentication()
-        registerTimber()
 
         setup = true
-        callback(Resource.success( true))
+        callback(null)
     }
 
     private fun initializeDagger(app: Application) {
@@ -42,12 +40,12 @@ object FrolloSDK {
         }
     }
 
-    @Throws(UninitializedPropertyAccessException::class)
+    @Throws(IllegalAccessException::class)
     fun getAuthentication(): Authentication {
         if (setup) {
             return authentication
         } else {
-            throw UninitializedPropertyAccessException()
+            throw IllegalAccessException("SDK not setup")
         }
     }
 }

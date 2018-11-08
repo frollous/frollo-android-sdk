@@ -17,12 +17,8 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        FrolloSDK.setup(application, SetupParams.Builder().serverUrl("https://api-sandbox.frollo.us").build()) {
-            when (it.status) {
-                Resource.Status.SUCCESS -> login()
-                Resource.Status.ERROR -> Log.d("MainActivity", "Setup failed")
-                Resource.Status.LOADING -> Log.d("MainActivity", "Setup in progress")
-            }
+        FrolloSDK.setup(application, SetupParams.Builder().serverUrl("https://api-sandbox.frollo.us").build()) { error ->
+            if (error == null) login()
         }
     }
 

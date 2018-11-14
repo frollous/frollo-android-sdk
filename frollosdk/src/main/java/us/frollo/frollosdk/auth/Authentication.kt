@@ -11,8 +11,8 @@ import javax.inject.Inject
 
 class Authentication {
 
-    @Inject lateinit var di: DeviceInfo
-    @Inject lateinit var repo: UserRepo
+    @Inject internal lateinit var di: DeviceInfo
+    @Inject internal lateinit var repo: UserRepo
 
     init {
         Injector.component.inject(this)

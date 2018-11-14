@@ -8,6 +8,8 @@ import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.auth.AuthType
 import us.frollo.frollosdk.base.api.Resource
 import us.frollo.frollosdk.core.SetupParams
+import us.frollo.frollosdk.error.APIError
+import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.model.api.user.UserResponse
 
 class MainActivity : AppCompatActivity() {
@@ -33,7 +35,10 @@ class MainActivity : AppCompatActivity() {
                 val user = it.data as UserResponse
                 Log.d("MainActivity", "Hello ${ user.firstName }")
             }
-            Resource.Status.ERROR -> Log.d("MainActivity", "Error logging in: " + it.message)
+            Resource.Status.ERROR -> Log.d("MainActivity", "Error logging in: " +
+                    if (it.error is APIError) (it.error as APIError).statusCode
+                    else (it.error as FrolloSDKError).localizedDescription
+            )
             Resource.Status.LOADING -> Log.d("MainActivity", "Logging in...")
         }
     }

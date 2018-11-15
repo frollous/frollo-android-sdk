@@ -1,6 +1,7 @@
 package us.frollo.frollosdk.model.api.shared
 
 import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.extensions.serializedName
 
 enum class APIErrorCode {
     @SerializedName("F0001") INVALID_VALUE,
@@ -20,5 +21,11 @@ enum class APIErrorCode {
     @SerializedName("F0400") ALREADY_EXISTS,
     @SerializedName("F9000") AGGREGATOR_ERROR,
     @SerializedName("F9998") UNKNOWN_SERVER,
-    @SerializedName("F9999") INTERNAL_EXCEPTION
+    @SerializedName("F9999") INTERNAL_EXCEPTION;
+
+    //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
+    override fun toString(): String =
+    //Try to get the annotation value if available instead of using plain .toString()
+    //Fallback to super.toString() in case annotation is not present/available
+            serializedName() ?: super.toString()
 }

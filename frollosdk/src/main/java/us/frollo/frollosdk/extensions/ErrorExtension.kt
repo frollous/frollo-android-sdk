@@ -7,13 +7,11 @@ import us.frollo.frollosdk.model.api.shared.APIErrorResponse
 import us.frollo.frollosdk.model.api.shared.APIErrorResponseWrapper
 
 fun String.toAPIErrorResponse(): APIErrorResponse? {
-    try {
-        val error = Gson().fromJson<APIErrorResponseWrapper>(this)
-        return error.apiErrorResponse
+    return try {
+        Gson().fromJson<APIErrorResponseWrapper>(this).apiErrorResponse
     } catch (e: Exception) {
-        e.printStackTrace()
+        null
     }
-    return null
 }
 
 fun Int.toAPIErrorType(errorCode: APIErrorCode?): APIErrorType {

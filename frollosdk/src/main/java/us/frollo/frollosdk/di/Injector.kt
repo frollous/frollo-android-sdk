@@ -2,7 +2,7 @@ package us.frollo.frollosdk.di
 
 import android.app.Application
 
-object Injector {
+internal object Injector {
     lateinit var component: SdkComponent
 
     fun buildComponent(app: Application) {

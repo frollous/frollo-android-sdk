@@ -6,7 +6,7 @@ import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import us.frollo.frollosdk.model.api.shared.APIErrorResponse
 import us.frollo.frollosdk.model.api.shared.APIErrorResponseWrapper
 
-fun String.toAPIErrorResponse(): APIErrorResponse? {
+internal fun String.toAPIErrorResponse(): APIErrorResponse? {
     return try {
         Gson().fromJson<APIErrorResponseWrapper>(this).apiErrorResponse
     } catch (e: Exception) {

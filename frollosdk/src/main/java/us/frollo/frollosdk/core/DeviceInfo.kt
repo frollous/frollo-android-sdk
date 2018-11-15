@@ -4,7 +4,7 @@ import android.app.Application
 import android.os.Build
 import android.provider.Settings
 
-class DeviceInfo(app: Application) {
+internal class DeviceInfo(app: Application) {
     private val context = app.applicationContext
 
     val deviceId: String

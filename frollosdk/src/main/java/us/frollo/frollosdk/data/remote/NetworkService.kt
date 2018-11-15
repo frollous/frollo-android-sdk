@@ -10,7 +10,7 @@ import us.frollo.frollosdk.base.api.LiveDataCallAdapterFactory
 import us.frollo.frollosdk.core.SystemInfo
 import java.util.concurrent.TimeUnit
 
-class NetworkService(si: SystemInfo) : IApiProvider {
+internal class NetworkService(si: SystemInfo) : IApiProvider {
     //Have a local instance instead of DI because this class should be used exclusively within NetworkService
     //and should have a single instance per service instance
     private val serviceHelper = NetworkServiceHelper(si)

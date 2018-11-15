@@ -6,7 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import timber.log.Timber
 
-class SystemInfo(private val app: Application) {
+internal class SystemInfo(private val app: Application) {
     private val packageInfo: PackageInfo?
         get() = try {
             app.packageManager.getPackageInfo(app.packageName, 0)

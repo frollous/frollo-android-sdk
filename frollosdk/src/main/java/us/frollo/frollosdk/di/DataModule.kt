@@ -9,7 +9,7 @@ import us.frollo.frollosdk.data.repo.UserRepo
 import javax.inject.Singleton
 
 @Module
-class DataModule {
+internal class DataModule {
     @Provides
     @Singleton
     fun provideServiceCreator(si: SystemInfo): IApiProvider = NetworkService(si)

@@ -6,7 +6,7 @@ import us.frollo.frollosdk.data.remote.ApiResponse
 import us.frollo.frollosdk.model.api.user.UserLoginRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
 
-interface UserApi {
+internal interface UserApi {
     companion object {
         const val URL_LOGIN = "/api/v1/user/login"
     }

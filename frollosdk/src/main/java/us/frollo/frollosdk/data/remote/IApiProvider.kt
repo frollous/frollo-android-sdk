@@ -1,5 +1,5 @@
 package us.frollo.frollosdk.data.remote
 
-interface IApiProvider {
+internal interface IApiProvider {
     fun <T> create(service: Class<T>): T
 }

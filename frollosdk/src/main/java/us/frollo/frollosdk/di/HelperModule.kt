@@ -8,7 +8,7 @@ import us.frollo.frollosdk.core.SystemInfo
 import javax.inject.Singleton
 
 @Module
-class HelperModule {
+internal class HelperModule {
     @Provides
     @Singleton
     fun provideSystemInfo(app: Application) = SystemInfo(app)

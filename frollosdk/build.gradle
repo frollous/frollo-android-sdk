@@ -16,12 +16,12 @@ android {
     buildTypes {
         // TODO: Signing
         // TODO: Build flavours
-        // TODO: Configure proguard
+        // TODO: Configure proguard - debugging crash logs might be a problem due to obfuscation
         // TODO: Make sure to test release version after obfuscation, especially serializable classes
         release {
             debuggable false
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            //minifyEnabled true
+            //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             //consumerProguardFiles 'lib-proguard-rules.txt'
         }
         debug {

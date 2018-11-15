@@ -5,7 +5,7 @@ import timber.log.Timber
 import java.io.IOException
 import java.util.regex.Pattern
 
-class ApiResponse<T> {
+internal class ApiResponse<T> {
     var code: Int = 500
     var body: T? = null
     var errorMessage: String? = null

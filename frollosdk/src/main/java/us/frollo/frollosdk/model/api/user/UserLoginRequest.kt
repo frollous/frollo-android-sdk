@@ -3,7 +3,7 @@ package us.frollo.frollosdk.model.api.user
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.auth.AuthType
 
-data class UserLoginRequest(
+internal data class UserLoginRequest(
         @SerializedName("auth_type") val authType: AuthType,
         @SerializedName("device_id") val deviceId: String,
         @SerializedName("device_name") val deviceName: String,

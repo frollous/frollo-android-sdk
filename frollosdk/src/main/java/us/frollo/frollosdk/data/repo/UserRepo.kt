@@ -7,13 +7,15 @@ import us.frollo.frollosdk.base.api.Resource
 import us.frollo.frollosdk.data.remote.IApiProvider
 import us.frollo.frollosdk.data.remote.api.UserApi
 import us.frollo.frollosdk.model.api.user.UserLoginRequest
-import us.frollo.frollosdk.model.api.user.UserResponse
+import us.frollo.frollosdk.model.coredata.user.User
 
-class UserRepo(service: IApiProvider) {
+internal class UserRepo(service: IApiProvider) {
     private val userApi: UserApi = service.create(UserApi::class.java)
 
-    fun loginUser(request: UserLoginRequest): LiveData<Resource<UserResponse>> =
+    fun loginUser(request: UserLoginRequest): LiveData<Resource<User>> =
             Transformations.map(userApi.login(request)) {
-                Resource.fromApiResponse(it)
-            }.apply { (this as? MutableLiveData<Resource<UserResponse>>)?.value = Resource.loading(null) }
+                Resource.fromApiResponse(it).map { res ->
+                    res?.let { model -> User(model.id, model.firstName) }
+                }
+            }.apply { (this as? MutableLiveData<Resource<User>>)?.value = Resource.loading(null) }
 }

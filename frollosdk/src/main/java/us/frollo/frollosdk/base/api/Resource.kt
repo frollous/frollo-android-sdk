@@ -16,11 +16,11 @@ class Resource<out T> private constructor(val status: Status, val data: T? = nul
     fun <Y> map(function: (T?) -> Y?): Resource<Y> = Resource(status, function(data), error)
 
     companion object {
-        fun <T> success(data: T?): Resource<T> = Resource(Status.SUCCESS, data, null)
-        fun <T> error(error: FrolloSDKError?, data: T? = null): Resource<T> = Resource(Status.ERROR, data, error)
-        fun <T> loading(data: T?): Resource<T> = Resource(Status.LOADING, data, null)
+        internal fun <T> success(data: T?): Resource<T> = Resource(Status.SUCCESS, data, null)
+        internal fun <T> error(error: FrolloSDKError?, data: T? = null): Resource<T> = Resource(Status.ERROR, data, error)
+        internal fun <T> loading(data: T?): Resource<T> = Resource(Status.LOADING, data, null)
 
-        fun <T> fromApiResponse(response: ApiResponse<T>): Resource<T> =
+        internal fun <T> fromApiResponse(response: ApiResponse<T>): Resource<T> =
                 if (response.isSuccessful) success(response.body)
                 else {
                     val msg = response.errorMessage

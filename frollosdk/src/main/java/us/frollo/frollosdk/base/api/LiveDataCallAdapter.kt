@@ -13,7 +13,7 @@ import java.lang.reflect.Type
  * A Retrofit adapter that converts the [Call] into a [LiveData] of [ApiResponse].
  * @param <R>
  */
-class LiveDataCallAdapter<R>(private val responseType: Type) : CallAdapter<R, LiveData<ApiResponse<R>>> {
+internal class LiveDataCallAdapter<R>(private val responseType: Type) : CallAdapter<R, LiveData<ApiResponse<R>>> {
 
     override fun adapt(call: Call<R>?): LiveData<ApiResponse<R>> {
         val liveData = MutableLiveData<ApiResponse<R>>()
@@ -27,25 +27,6 @@ class LiveDataCallAdapter<R>(private val responseType: Type) : CallAdapter<R, Li
             }
         })
         return liveData
-
-        /*return object : LiveData<ApiResponse<R>>() {
-            var started = AtomicBoolean(false)
-            override fun onActive() {
-                super.onActive()
-
-                if (started.compareAndSet(false, true)) {
-                    call?.enqueue(object : Callback<R> {
-                        override fun onResponse(call: Call<R>?, response: Response<R>?) {
-                            postValue(ApiResponse(response))
-                        }
-
-                        override fun onFailure(call: Call<R>?, t: Throwable?) {
-                            postValue(ApiResponse(t))
-                        }
-                    })
-                }
-            }
-        }*/
     }
 
     override fun responseType(): Type = responseType

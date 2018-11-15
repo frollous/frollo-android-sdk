@@ -8,7 +8,7 @@ import javax.inject.Singleton
 
 @Singleton
 @Component(modules = [AppModule::class, HelperModule::class, DataModule::class])
-interface SdkComponent {
+internal interface SdkComponent {
     @Component.Builder
     interface Builder {
         @BindsInstance

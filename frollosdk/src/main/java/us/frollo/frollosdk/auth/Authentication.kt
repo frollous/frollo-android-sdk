@@ -6,7 +6,7 @@ import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.data.repo.UserRepo
 import us.frollo.frollosdk.di.Injector
 import us.frollo.frollosdk.model.api.user.UserLoginRequest
-import us.frollo.frollosdk.model.api.user.UserResponse
+import us.frollo.frollosdk.model.coredata.user.User
 import javax.inject.Inject
 
 class Authentication {
@@ -18,7 +18,7 @@ class Authentication {
         Injector.component.inject(this)
     }
 
-    fun loginUser(method: AuthType, email: String? = null, password: String? = null, userId: String? = null, userToken: String? = null): LiveData<Resource<UserResponse>> {
+    fun loginUser(method: AuthType, email: String? = null, password: String? = null, userId: String? = null, userToken: String? = null): LiveData<Resource<User>> {
         return repo.loginUser(UserLoginRequest(
                 email = email,
                 password = password,

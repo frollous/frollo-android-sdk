@@ -3,7 +3,7 @@ package us.frollo.frollosdk.model.api.user
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.user.*
 
-data class UserResponse(
+internal data class UserResponse(
         @SerializedName("id") val id: Int,
         @SerializedName("first_name") var firstName: String,
         @SerializedName("email") var email: String,

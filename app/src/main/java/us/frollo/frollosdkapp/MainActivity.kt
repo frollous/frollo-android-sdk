@@ -10,7 +10,7 @@ import us.frollo.frollosdk.base.api.Resource
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.error.APIError
 import us.frollo.frollosdk.error.FrolloSDKError
-import us.frollo.frollosdk.model.api.user.UserResponse
+import us.frollo.frollosdk.model.coredata.user.User
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,10 +29,10 @@ class MainActivity : AppCompatActivity() {
         liveData.observe(this, observer)
     }
 
-    private val observer = Observer<Resource<UserResponse>> {
+    private val observer = Observer<Resource<User>> {
         when (it?.status) {
             Resource.Status.SUCCESS -> {
-                val user = it.data as UserResponse
+                val user = it.data as User
                 Log.d("MainActivity", "Hello ${ user.firstName }")
             }
             Resource.Status.ERROR -> Log.d("MainActivity", "Error logging in: " +

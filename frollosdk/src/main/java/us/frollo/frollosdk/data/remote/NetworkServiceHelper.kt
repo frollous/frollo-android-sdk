@@ -5,7 +5,7 @@ import us.frollo.frollosdk.core.SystemInfo
 /**
  * This class wraps the rules for interacting with the Frollo API such as the headers used, API version and so on
  */
-class NetworkServiceHelper(private val systemInfo: SystemInfo) {
+internal class NetworkServiceHelper(private val systemInfo: SystemInfo) {
     companion object {
         const val HEADER_USER_AGENT = "User-Agent"
         private const val API_VERSION = "1.16"

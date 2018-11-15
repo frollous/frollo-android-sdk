@@ -7,7 +7,7 @@ import us.frollo.frollosdk.data.remote.ApiResponse
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
-object LiveDataCallAdapterFactory : CallAdapter.Factory() {
+internal object LiveDataCallAdapterFactory : CallAdapter.Factory() {
     override fun get(returnType: Type?, annotations: Array<out Annotation>?, retrofit: Retrofit?): CallAdapter<*, *>? {
         if (returnType != null && getRawType(returnType) != LiveData::class.java) {
             return null

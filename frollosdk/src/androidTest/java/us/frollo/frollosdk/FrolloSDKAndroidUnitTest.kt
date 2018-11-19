@@ -25,7 +25,7 @@ class FrolloSDKAndroidUnitTest {
     @Test
     fun testGetAuthenticationFail() {
         try {
-            FrolloSDK.getAuthentication()
+            FrolloSDK.authentication
         } catch (e: IllegalAccessException) {
             Assert.assertEquals("SDK not setup", e.localizedMessage)
         }
@@ -36,7 +36,7 @@ class FrolloSDKAndroidUnitTest {
         FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { error ->
             Assert.assertNull(error)
             Assert.assertEquals(url, FrolloSDK.serverUrl)
-            Assert.assertNotNull(FrolloSDK.getAuthentication())
+            Assert.assertNotNull(FrolloSDK.authentication)
         }
     }
 

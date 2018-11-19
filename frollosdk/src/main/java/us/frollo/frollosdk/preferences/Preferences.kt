@@ -5,11 +5,22 @@ import android.content.Context
 internal class Preferences(context: Context) {
     companion object {
         private const val PREFERENCES = "pref_frollosdk"
-        private const val KEY_USER_LOGGED_IN = "key_user_logged_in"
-        private const val KEY_APP_VERSION_LAST = "key_app_version_last"
+        private const val KEY_SDK_VERSION = "key_frollosdk_version_current"
+        private const val KEY_SDK_VERSION_HISTORY = "key_frollosdk_version_history"
+        private const val KEY_USER_LOGGED_IN = "key_frollosdk_user_logged_in"
     }
 
     private val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+
+    /** SDK Version */
+    var sdkVersion: String?
+        get() = preferences.getString(KEY_SDK_VERSION, null)
+        set(value) = preferences.edit().putString(KEY_SDK_VERSION, value).apply()
+
+    /** SDK Version History */
+    var sdkVersionHistory: MutableList<String>
+        get() = preferences.getString(KEY_SDK_VERSION_HISTORY, null)?.split(",")?.toMutableList() ?: mutableListOf()
+        set(value) = preferences.edit().putString(KEY_SDK_VERSION_HISTORY, value.joinToString(",")).apply()
 
     /** User Logged In */
     var loggedIn: Boolean

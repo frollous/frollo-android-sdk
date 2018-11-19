@@ -8,12 +8,22 @@ import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.core.SystemInfo
 import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.error.FrolloSDKError
+import us.frollo.frollosdk.preferences.Preferences
+import us.frollo.frollosdk.version.Version
 
 object FrolloSDK {
 
-    private var setup = false
+    val setup: Boolean
+        get() = _setup
+
+    val authentication: Authentication
+        get() =_authentication ?: throw IllegalAccessException("SDK not setup")
+
+    private var _setup = false
+    private var _authentication: Authentication? = null
+    private lateinit var preferences: Preferences
+    private lateinit var version: Version
     private lateinit var network: NetworkService
-    private lateinit var authentication: Authentication
 
     internal lateinit var app: Application
     internal lateinit var serverUrl: String
@@ -22,31 +32,27 @@ object FrolloSDK {
     fun setup(application: Application, params: SetupParams, callback: ((FrolloSDKError?) -> Unit)) {
         registerTimber()
 
-        if (setup) throw IllegalStateException("SDK already setup")
+        if (_setup) throw IllegalStateException("SDK already setup")
         if (params.serverUrl.isBlank()) throw IllegalArgumentException("Server URL cannot be empty")
 
         this.app = application
         serverUrl = params.serverUrl
 
+        preferences = Preferences(application.applicationContext)
+        version = Version(preferences)
         network = NetworkService(SystemInfo(application))
-        authentication = Authentication(DeviceInfo(application.applicationContext), network)
+        _authentication = Authentication(DeviceInfo(application.applicationContext), network)
 
-        setup = true
+        if (version.migrationNeeded()) {
+            version.migrateVersion()
+        }
+
+        _setup = true
         callback(null)
     }
 
     private fun registerTimber() {
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
-    }
-
-    @Throws(IllegalAccessException::class)
-    fun getAuthentication(): Authentication {
-        if (setup) {
-            return authentication
-        } else {
-            throw IllegalAccessException("SDK not setup")
-        }
+        // TODO: May be handle more levels during Logging task
+        Timber.plant(Timber.DebugTree())
     }
 }

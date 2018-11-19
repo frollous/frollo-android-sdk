@@ -1,4 +1,4 @@
-package us.frollo.frollosdk.base.api
+package us.frollo.frollosdk.base
 
 import androidx.lifecycle.LiveData
 import retrofit2.CallAdapter

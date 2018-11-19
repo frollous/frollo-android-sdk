@@ -4,7 +4,8 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    //resourcePrefix "frollosdk_" // Define resource prefix to prevent resource names conflicts
+    // Uncomment below line to define resource prefix to prevent resource names conflicts
+    //resourcePrefix "frollosdk_"
     compileSdkVersion 28
     defaultConfig {
         minSdkVersion 23 // Android 6.0 (Marshmallow)
@@ -55,11 +56,6 @@ dependencies {
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
-    // Dagger2
-    implementation "com.google.dagger:dagger:$dagger_version"
-    kapt "com.google.dagger:dagger-compiler:$dagger_version"
-    implementation "com.google.dagger:dagger-android-support:$dagger_version"
-    kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 }
 repositories {
     mavenCentral()

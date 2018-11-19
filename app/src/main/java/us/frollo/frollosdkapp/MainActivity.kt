@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.auth.AuthType
-import us.frollo.frollosdk.base.api.Resource
+import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.error.APIError
 import us.frollo.frollosdk.error.FrolloSDKError

@@ -1,0 +1,34 @@
+{
+    "avd_list": [
+        {
+          "avd_name": "Test-Emulator-API26-Pixel",
+
+          "create_avd_package": "system-images;android-26;google_apis;x86",
+          "create_avd_device": "pixel",
+          "create_avd_tag": "google_apis",
+          "create_avd_abi": "x86",
+          "create_avd_additional_options": "",
+          "create_avd_hardware_config_filepath": "",
+
+          "launch_avd_port": "",
+          "launch_avd_snapshot_filepath": "",
+          "launch_avd_launch_binary_name": "emulator",
+          "launch_avd_additional_options": "-gpu on"
+        },
+        {
+          "avd_name": "Test-Emulator-API23-Pixel-XL",
+
+          "create_avd_package": "system-images;android-23;google_apis;x86",
+          "create_avd_device": "pixel_xl",
+          "create_avd_tag": "google_apis",
+          "create_avd_abi": "x86",
+          "create_avd_additional_options": "",
+          "create_avd_hardware_config_filepath": "",
+
+          "launch_avd_port": "",
+          "launch_avd_snapshot_filepath": "",
+          "launch_avd_launch_binary_name": "emulator",
+          "launch_avd_additional_options": "-gpu on"
+        }
+    ]
+}

@@ -16,23 +16,26 @@
 default_platform(:android)
 
 platform :android do
+
   desc "Runs all the tests"
   lane :test do
-    gradle(task: "test")
+      gradle(task: "test")
+
+      automated_test_emulator_run(
+        AVD_setup_path: "fastlane/AVD/AVD_setup.json",
+        gradle_task: "connectedAndroidTest"
+      )
+
+      slack(message: "Frollo Android SDK Successfully Integrated!",
+            default_payloads: [:git_branch, :lane, :test_result],
+            success: true)
   end
 
-  desc "Submit a new Beta Build to Crashlytics Beta"
-  lane :beta do
-    gradle(task: "clean assembleRelease")
-    crashlytics
-  
-    # sh "your_script.sh"
-    # You can also use other beta testing services here
-  end
+end
 
-  desc "Deploy a new version to the Google Play"
-  lane :deploy do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store
-  end
+def on_error(exception)
+       slack(
+           message: "Frollo Android SDK integration failed with exception : #{exception}",
+           success: false,
+       )
 end

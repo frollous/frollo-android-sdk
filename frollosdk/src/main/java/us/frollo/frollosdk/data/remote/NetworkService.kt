@@ -6,11 +6,11 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.base.api.LiveDataCallAdapterFactory
+import us.frollo.frollosdk.base.LiveDataCallAdapterFactory
 import us.frollo.frollosdk.core.SystemInfo
 import java.util.concurrent.TimeUnit
 
-internal class NetworkService(si: SystemInfo) : IApiProvider {
+class NetworkService(si: SystemInfo) : IApiProvider {
     //Have a local instance instead of DI because this class should be used exclusively within NetworkService
     //and should have a single instance per service instance
     private val serviceHelper = NetworkServiceHelper(si)

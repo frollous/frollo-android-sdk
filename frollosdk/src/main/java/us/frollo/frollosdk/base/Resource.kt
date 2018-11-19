@@ -1,4 +1,4 @@
-package us.frollo.frollosdk.base.api
+package us.frollo.frollosdk.base
 
 import us.frollo.frollosdk.data.remote.ApiResponse
 import us.frollo.frollosdk.error.APIError

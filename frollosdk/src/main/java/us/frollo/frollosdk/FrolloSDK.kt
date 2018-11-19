@@ -3,51 +3,56 @@ package us.frollo.frollosdk
 import android.app.Application
 import timber.log.Timber
 import us.frollo.frollosdk.auth.Authentication
+import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.SetupParams
-import us.frollo.frollosdk.di.Injector
+import us.frollo.frollosdk.core.SystemInfo
+import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.error.FrolloSDKError
+import us.frollo.frollosdk.preferences.Preferences
+import us.frollo.frollosdk.version.Version
 
 object FrolloSDK {
 
-    private var setup = false
-    private lateinit var authentication: Authentication
+    val setup: Boolean
+        get() = _setup
 
-    internal lateinit var serverUrl: String
+    val authentication: Authentication
+        get() =_authentication ?: throw IllegalAccessException("SDK not setup")
+
+    private var _setup = false
+    private var _authentication: Authentication? = null
+    private lateinit var preferences: Preferences
+    private lateinit var version: Version
+    private lateinit var network: NetworkService
+
     internal lateinit var app: Application
+    internal lateinit var serverUrl: String
 
     @Throws(IllegalArgumentException::class, IllegalStateException::class)
     fun setup(application: Application, params: SetupParams, callback: ((FrolloSDKError?) -> Unit)) {
-        if (setup) throw IllegalStateException("SDK already setup")
+        registerTimber()
+
+        if (_setup) throw IllegalStateException("SDK already setup")
         if (params.serverUrl.isBlank()) throw IllegalArgumentException("Server URL cannot be empty")
 
         this.app = application
         serverUrl = params.serverUrl
 
-        registerTimber()
-        initializeDagger(app)
+        preferences = Preferences(application.applicationContext)
+        version = Version(preferences)
+        network = NetworkService(SystemInfo(application))
+        _authentication = Authentication(DeviceInfo(application.applicationContext), network)
 
-        authentication = Authentication()
+        if (version.migrationNeeded()) {
+            version.migrateVersion()
+        }
 
-        setup = true
+        _setup = true
         callback(null)
     }
 
-    private fun initializeDagger(app: Application) {
-        Injector.buildComponent(app)
-    }
-
     private fun registerTimber() {
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
-    }
-
-    @Throws(IllegalAccessException::class)
-    fun getAuthentication(): Authentication {
-        if (setup) {
-            return authentication
-        } else {
-            throw IllegalAccessException("SDK not setup")
-        }
+        // TODO: May be handle more levels during Logging task
+        Timber.plant(Timber.DebugTree())
     }
 }

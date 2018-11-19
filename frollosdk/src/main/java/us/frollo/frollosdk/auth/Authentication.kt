@@ -1,25 +1,21 @@
 package us.frollo.frollosdk.auth
 
 import androidx.lifecycle.LiveData
-import us.frollo.frollosdk.base.api.Resource
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.DeviceInfo
-import us.frollo.frollosdk.data.repo.UserRepo
-import us.frollo.frollosdk.di.Injector
+import us.frollo.frollosdk.data.remote.NetworkService
+import us.frollo.frollosdk.data.remote.endpoints.UserEndpoint
 import us.frollo.frollosdk.model.api.user.UserLoginRequest
 import us.frollo.frollosdk.model.coredata.user.User
-import javax.inject.Inject
 
-class Authentication {
+class Authentication(private val di: DeviceInfo, network: NetworkService) {
 
-    @Inject internal lateinit var di: DeviceInfo
-    @Inject internal lateinit var repo: UserRepo
-
-    init {
-        Injector.component.inject(this)
-    }
+    private val userEndpoint: UserEndpoint = network.create(UserEndpoint::class.java)
 
     fun loginUser(method: AuthType, email: String? = null, password: String? = null, userId: String? = null, userToken: String? = null): LiveData<Resource<User>> {
-        return repo.loginUser(UserLoginRequest(
+        val request = UserLoginRequest(
                 email = email,
                 password = password,
                 deviceId = di.deviceId,
@@ -28,6 +24,12 @@ class Authentication {
                 authType = method,
                 userId = userId,
                 userToken = userToken
-        ))
+        )
+
+        return Transformations.map(userEndpoint.login(request)) {
+            Resource.fromApiResponse(it).map { res ->
+                res?.let { model -> User(model.id, model.firstName) }
+            }
+        }.apply { (this as? MutableLiveData<Resource<User>>)?.value = Resource.loading(null) }
     }
 }

@@ -4,18 +4,18 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    //resourcePrefix "frollosdk_" // Define resource prefix to prevent resource names conflicts
+    // Uncomment below line to define resource prefix to prevent resource names conflicts
+    //resourcePrefix "frollosdk_"
     compileSdkVersion 28
     defaultConfig {
         minSdkVersion 23 // Android 6.0 (Marshmallow)
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         // TODO: Signing
-        // TODO: Build flavours
         // TODO: Configure proguard - debugging crash logs might be a problem due to obfuscation
         // TODO: Make sure to test release version after obfuscation, especially serializable classes
         release {
@@ -48,7 +48,7 @@ dependencies {
     // JavaX Annotations
     compileOnly "org.glassfish:javax.annotation:10.0-b28"
     // Android Arch Components
-    implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-livedata:2.0.0"
     // Timber Logging
     implementation "com.jakewharton.timber:timber:4.7.1"
     // Anko (https://github.com/Kotlin/anko)
@@ -56,11 +56,8 @@ dependencies {
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
-    // Dagger2
-    implementation "com.google.dagger:dagger:$dagger_version"
-    kapt "com.google.dagger:dagger-compiler:$dagger_version"
-    implementation "com.google.dagger:dagger-android-support:$dagger_version"
-    kapt "com.google.dagger:dagger-android-processor:$dagger_version"
+    // Android Debug Database
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
 }
 repositories {
     mavenCentral()

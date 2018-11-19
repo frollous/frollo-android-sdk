@@ -1,19 +1,18 @@
 package us.frollo.frollosdk.core
 
-import android.app.Application
+import android.content.Context
 import android.os.Build
 import android.provider.Settings
 
-internal class DeviceInfo(app: Application) {
-    private val context = app.applicationContext
+class DeviceInfo(private val context: Context) {
 
-    val deviceId: String
+    internal val deviceId: String
         get() = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
 
-    val deviceName: String
+    internal val deviceName: String
         get() = Settings.System.getString(context.contentResolver, Settings.Global.DEVICE_NAME) ?: Build.MODEL
 
-    val deviceType: String
+    internal val deviceType: String
         get() = if (Build.MODEL.startsWith(Build.MANUFACTURER)) {
             capitalize(Build.MODEL)
         } else {

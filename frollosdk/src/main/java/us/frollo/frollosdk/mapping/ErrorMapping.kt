@@ -1,7 +1,8 @@
-package us.frollo.frollosdk.extensions
+package us.frollo.frollosdk.mapping
 
 import com.google.gson.Gson
 import us.frollo.frollosdk.error.APIErrorType
+import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import us.frollo.frollosdk.model.api.shared.APIErrorResponse
 import us.frollo.frollosdk.model.api.shared.APIErrorResponseWrapper

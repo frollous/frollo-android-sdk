@@ -8,7 +8,7 @@ import us.frollo.frollosdk.core.SystemInfo
 internal class NetworkServiceHelper(private val systemInfo: SystemInfo) {
     companion object {
         const val HEADER_USER_AGENT = "User-Agent"
-        private const val API_VERSION = "1.16"
+        private const val API_VERSION = "1.17"
     }
 
     /**

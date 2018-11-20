@@ -6,6 +6,7 @@ import us.frollo.frollosdk.auth.Authentication
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.core.SystemInfo
+import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.preferences.Preferences
@@ -24,6 +25,7 @@ object FrolloSDK {
     private lateinit var preferences: Preferences
     private lateinit var version: Version
     private lateinit var network: NetworkService
+    private lateinit var database: SDKDatabase
 
     internal lateinit var app: Application
     internal lateinit var serverUrl: String
@@ -39,9 +41,10 @@ object FrolloSDK {
         serverUrl = params.serverUrl
 
         preferences = Preferences(application.applicationContext)
+        database = SDKDatabase.getInstance(application)
         version = Version(preferences)
         network = NetworkService(SystemInfo(application))
-        _authentication = Authentication(DeviceInfo(application.applicationContext), network)
+        _authentication = Authentication(DeviceInfo(application.applicationContext), network, database)
 
         if (version.migrationNeeded()) {
             version.migrateVersion()

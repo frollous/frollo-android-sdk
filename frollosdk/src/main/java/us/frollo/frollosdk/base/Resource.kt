@@ -3,7 +3,7 @@ package us.frollo.frollosdk.base
 import us.frollo.frollosdk.data.remote.ApiResponse
 import us.frollo.frollosdk.error.APIError
 import us.frollo.frollosdk.error.FrolloSDKError
-import us.frollo.frollosdk.extensions.toAPIErrorResponse
+import us.frollo.frollosdk.mapping.toAPIErrorResponse
 
 class Resource<out T> private constructor(val status: Status, val data: T? = null, val error: FrolloSDKError? = null) {
     enum class Status {

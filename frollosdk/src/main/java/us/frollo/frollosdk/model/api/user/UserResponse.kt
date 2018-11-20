@@ -1,33 +1,42 @@
 package us.frollo.frollosdk.model.api.user
 
+import androidx.room.*
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.user.*
 
+/**
+ * Declaring the column info allows for the renaming of variables without implementing a
+ * database migration, as the column name would not change.
+ */
+@Entity(tableName = "user",
+        indices = [Index("user_id")])
 internal data class UserResponse(
-        @SerializedName("id") val id: Int,
-        @SerializedName("first_name") var firstName: String,
-        @SerializedName("email") var email: String,
-        @SerializedName("email_verified") val emailVerified: Boolean,
-        @SerializedName("status") var status: UserStatus,
-        @SerializedName("primary_currency") val primaryCurrency: String,
-        @SerializedName("valid_password") val valid_password: Boolean,
-        @SerializedName("register_complete") val register_complete: Boolean,
+        @PrimaryKey
+        @ColumnInfo(name = "user_id") @SerializedName("id") val userId: Int,
+        @ColumnInfo(name = "first_name") @SerializedName("first_name") val firstName: String,
+        @ColumnInfo(name = "email") @SerializedName("email") val email: String,
+        @ColumnInfo(name = "email_verified") @SerializedName("email_verified") val emailVerified: Boolean,
+        @ColumnInfo(name = "status") @SerializedName("status") val status: UserStatus,
+        @ColumnInfo(name = "primary_currency") @SerializedName("primary_currency") val primaryCurrency: String,
+        @ColumnInfo(name = "valid_password") @SerializedName("valid_password") val validPassword: Boolean,
+        @ColumnInfo(name = "register_complete") @SerializedName("register_complete") val registerComplete: Boolean,
+        @ColumnInfo(name = "registration_date") @SerializedName("registration_date") val registrationDate: String,
 
-        @SerializedName("facebook_id") val facebookId: String?,
-        @SerializedName("attribution") val attribution: Attribution?,
-        @SerializedName("last_name") var lastName: String?,
-        @SerializedName("gender") var gender: Gender?,
-        @SerializedName("address") var currentAddress: Address?,
-        @SerializedName("previous_address") var previousAddress: Address?,
-        @SerializedName("household_size") var householdSize: Int?,
-        @SerializedName("marital_status") var householdType: HouseholdType?,
-        @SerializedName("occupation") var occupation: Occupation?,
-        @SerializedName("industry") var industry: Industry?,
-        @SerializedName("date_of_birth") var dateOfBirth: String?,
-        @SerializedName("driver_license") var driverLicense: String?,
-        @SerializedName("features") var features: List<FeatureFlag>?,
+        @ColumnInfo(name = "facebook_id") @SerializedName("facebook_id") val facebookId: String?,
+        @ColumnInfo(name = "attribution") @SerializedName("attribution") val attribution: Attribution?,
+        @ColumnInfo(name = "last_name") @SerializedName("last_name") val lastName: String?,
+        @ColumnInfo(name = "gender") @SerializedName("gender") val gender: Gender?,
+        @Embedded(prefix = "c_address_") @SerializedName("address") val currentAddress: Address?,
+        @Embedded(prefix = "p_address_") @SerializedName("previous_address") val previousAddress: Address?,
+        @ColumnInfo(name = "household_size") @SerializedName("household_size") val householdSize: Int?,
+        @ColumnInfo(name = "marital_status") @SerializedName("marital_status") val householdType: HouseholdType?,
+        @ColumnInfo(name = "occupation") @SerializedName("occupation") val occupation: Occupation?,
+        @ColumnInfo(name = "industry") @SerializedName("industry") val industry: Industry?,
+        @ColumnInfo(name = "date_of_birth") @SerializedName("date_of_birth") val dateOfBirth: String?,
+        @ColumnInfo(name = "driver_license") @SerializedName("driver_license") val driverLicense: String?,
+        @ColumnInfo(name = "features") @SerializedName("features") val features: List<FeatureFlag>?,
 
-        @SerializedName("refresh_token") var refreshToken: String? = null,
-        @SerializedName("access_token") var accessToken: String? = null,
-        @SerializedName("access_token_exp") var accessTokenExp: Long? = null
+        @ColumnInfo(name = "refresh_token") @SerializedName("refresh_token") val refreshToken: String? = null,
+        @ColumnInfo(name = "access_token") @SerializedName("access_token") val accessToken: String? = null,
+        @ColumnInfo(name = "access_token_exp") @SerializedName("access_token_exp") val accessTokenExp: Long? = null
 )

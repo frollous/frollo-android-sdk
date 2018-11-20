@@ -1,7 +1,7 @@
 package us.frollo.frollosdk.error
 
-import us.frollo.frollosdk.extensions.toAPIErrorResponse
-import us.frollo.frollosdk.extensions.toAPIErrorType
+import us.frollo.frollosdk.mapping.toAPIErrorResponse
+import us.frollo.frollosdk.mapping.toAPIErrorType
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import us.frollo.frollosdk.model.api.shared.APIErrorResponse
 

@@ -1,10 +1,11 @@
 package us.frollo.frollosdk.model.coredata.user
 
+import androidx.room.ColumnInfo
 import com.google.gson.annotations.SerializedName
 
 data class Address(
-        @SerializedName("line_1") var lineOne: String?,
-        @SerializedName("line_2") var lineTwo: String?,
-        @SerializedName("suburb") var suburb: String?,
-        @SerializedName("postcode") var postcode: String?
+        @ColumnInfo(name = "line_1") @SerializedName("line_1") var lineOne: String?,
+        @ColumnInfo(name = "line_2") @SerializedName("line_2") var lineTwo: String?,
+        @ColumnInfo(name = "suburb") @SerializedName("suburb") var suburb: String?,
+        @ColumnInfo(name = "postcode") @SerializedName("postcode") var postcode: String?
 )

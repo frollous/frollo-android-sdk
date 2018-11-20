@@ -49,14 +49,16 @@ dependencies {
     compileOnly "org.glassfish:javax.annotation:10.0-b28"
     // Android Arch Components
     implementation "androidx.lifecycle:lifecycle-livedata:2.0.0"
+    implementation "androidx.room:room-runtime:2.0.0"
+    kapt "androidx.room:room-compiler:2.0.0"
     // Timber Logging
     implementation "com.jakewharton.timber:timber:4.7.1"
     // Anko (https://github.com/Kotlin/anko)
     implementation "org.jetbrains.anko:anko:0.10.7"
     // Retrofit
-    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
-    // Android Debug Database
+    implementation "com.squareup.retrofit2:retrofit:2.3.0"
+    implementation "com.squareup.retrofit2:converter-gson:2.3.0"
+    // Android Debug SDKDatabase
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
 }
 repositories {

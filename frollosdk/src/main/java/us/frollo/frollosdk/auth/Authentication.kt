@@ -3,14 +3,17 @@ package us.frollo.frollosdk.auth
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import org.jetbrains.anko.doAsync
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.DeviceInfo
+import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.data.remote.endpoints.UserEndpoint
+import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.api.user.UserLoginRequest
 import us.frollo.frollosdk.model.coredata.user.User
 
-class Authentication(private val di: DeviceInfo, network: NetworkService) {
+class Authentication(private val di: DeviceInfo, network: NetworkService, private val db: SDKDatabase) {
 
     private val userEndpoint: UserEndpoint = network.create(UserEndpoint::class.java)
 
@@ -27,8 +30,11 @@ class Authentication(private val di: DeviceInfo, network: NetworkService) {
         )
 
         return Transformations.map(userEndpoint.login(request)) {
-            Resource.fromApiResponse(it).map { res ->
-                res?.let { model -> User(model.id, model.firstName) }
+            Resource.fromApiResponse(it).map { response ->
+                response?.let { model ->
+                    doAsync { db.users().insert(model) }
+                    model.toUser()
+                }
             }
         }.apply { (this as? MutableLiveData<Resource<User>>)?.value = Resource.loading(null) }
     }

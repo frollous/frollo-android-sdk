@@ -27,15 +27,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun login() {
-        val liveData = FrolloSDK.authentication.loginUser(AuthType.EMAIL, "deepak@frollo.us", "pass1234")
-        liveData.observe(this, observer)
+        FrolloSDK.authentication.loginUser(AuthType.EMAIL, "deepak@frollo.us", "pass1234").observe(this, observer)
     }
 
     private val observer = Observer<Resource<User>> {
         when (it?.status) {
             Resource.Status.SUCCESS -> {
-                val user = it.data as User
-                Timber.d("Hello ${ user.firstName }")
+                val user = FrolloSDK.authentication.user
+                Timber.d("Hello ${ user?.firstName }")
             }
             Resource.Status.ERROR -> Timber.d("Error logging in: " +
                     if (it.error is APIError) (it.error as APIError).statusCode

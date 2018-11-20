@@ -11,9 +11,24 @@ import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.data.remote.endpoints.UserEndpoint
 import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.api.user.UserLoginRequest
+import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.coredata.user.User
+import us.frollo.frollosdk.preferences.Preferences
 
-class Authentication(private val di: DeviceInfo, network: NetworkService, private val db: SDKDatabase) {
+class Authentication(private val di: DeviceInfo, network: NetworkService, private val db: SDKDatabase, private val pref: Preferences) {
+
+    /*
+     * Fetches synchronously from DB. Do not call this from main thread.
+     */
+    var user: User? = null
+        get() = fetchUser()
+
+    var userLiveData: LiveData<Resource<User>>? = null
+        get() = fetchUserAsLiveData()
+
+    var loggedIn: Boolean
+        get() = pref.loggedIn
+        private set(value) { pref.loggedIn = value }
 
     private val userEndpoint: UserEndpoint = network.create(UserEndpoint::class.java)
 
@@ -31,11 +46,31 @@ class Authentication(private val di: DeviceInfo, network: NetworkService, privat
 
         return Transformations.map(userEndpoint.login(request)) {
             Resource.fromApiResponse(it).map { response ->
-                response?.let { model ->
-                    doAsync { db.users().insert(model) }
-                    model.toUser()
-                }
+                handleUserResponse(response)
+                response?.toUser()
             }
         }.apply { (this as? MutableLiveData<Resource<User>>)?.value = Resource.loading(null) }
+    }
+
+    private fun fetchUser() = db.users().load().toUser()
+
+    private fun fetchUserAsLiveData(): LiveData<Resource<User>> =
+            Transformations.map(db.users().loadAsLiveData()) {
+                Resource.success(it.toUser())
+            }.apply { (this as? MutableLiveData<Resource<User>>)?.value = Resource.loading(null) }
+
+    private fun handleUserResponse(userResponse: UserResponse?) {
+        userResponse?.let {
+            loggedIn = true
+            it.features?.let { features -> pref.features = features }
+            doAsync {
+                db.users().insert(it)
+                // TODO: Notify user updated
+            }
+        }
+    }
+
+    internal fun reset() {
+        // TODO: To be implemented
     }
 }

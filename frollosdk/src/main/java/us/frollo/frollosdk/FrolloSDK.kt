@@ -44,7 +44,7 @@ object FrolloSDK {
         database = SDKDatabase.getInstance(application)
         version = Version(preferences)
         network = NetworkService(SystemInfo(application))
-        _authentication = Authentication(DeviceInfo(application.applicationContext), network, database)
+        _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
 
         if (version.migrationNeeded()) {
             version.migrateVersion()

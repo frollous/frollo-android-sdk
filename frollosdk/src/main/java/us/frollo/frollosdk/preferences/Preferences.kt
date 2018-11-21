@@ -12,6 +12,8 @@ class Preferences(context: Context) {
         private const val KEY_SDK_VERSION_HISTORY = "key_frollosdk_version_history"
         private const val KEY_USER_LOGGED_IN = "key_frollosdk_user_logged_in"
         private const val KEY_USER_FEATURES = "key_frollosdk_user_features"
+        private const val KEY_ENCRYPTED_REFRESH_TOKEN = "key_encrypted_refresh_token"
+        private const val KEY_ENCRYPTED_ACCESS_TOKEN = "key_encrypted_access_token"
     }
 
     private val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
@@ -37,7 +39,19 @@ class Preferences(context: Context) {
         get() = preferences.getString(KEY_USER_FEATURES, null)?.let { Converters.instance.stringToListOfFeatureFlag(it) } ?: mutableListOf()
         set(value) = preferences.edit().putString(KEY_USER_FEATURES, Converters.instance.stringFromListOfFeatureFlag(value)).apply()
 
-    internal fun resetAll() {
+    /** Encrypted Refresh Token */
+    internal var encryptedRefreshToken: String?
+        get() = preferences.getString(KEY_ENCRYPTED_REFRESH_TOKEN, null)
+        set(value) = preferences.edit().putString(KEY_ENCRYPTED_REFRESH_TOKEN, value).apply()
+    internal fun resetEncryptedRefreshToken() = preferences.edit().remove(KEY_ENCRYPTED_REFRESH_TOKEN).apply()
+
+    /** Encrypted Access Token */
+    internal var encryptedAccessToken: String?
+        get() = preferences.getString(KEY_ENCRYPTED_ACCESS_TOKEN, null)
+        set(value) = preferences.edit().putString(KEY_ENCRYPTED_ACCESS_TOKEN, value).apply()
+    internal fun resetEncryptedAccessToken() = preferences.edit().remove(KEY_ENCRYPTED_ACCESS_TOKEN).apply()
+
+    internal fun reset() {
         preferences.edit().clear().apply()
     }
 

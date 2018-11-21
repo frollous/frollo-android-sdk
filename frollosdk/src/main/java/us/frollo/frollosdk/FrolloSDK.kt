@@ -9,6 +9,7 @@ import us.frollo.frollosdk.core.SystemInfo
 import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.error.FrolloSDKError
+import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.version.Version
 
@@ -22,6 +23,7 @@ object FrolloSDK {
 
     private var _setup = false
     private var _authentication: Authentication? = null
+    private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
     private lateinit var network: NetworkService
@@ -40,10 +42,12 @@ object FrolloSDK {
         this.app = application
         serverUrl = params.serverUrl
 
+        keyStore = Keystore()
+        keyStore.setup()
         preferences = Preferences(application.applicationContext)
         database = SDKDatabase.getInstance(application)
         version = Version(preferences)
-        network = NetworkService(SystemInfo(application))
+        network = NetworkService(SystemInfo(application), keyStore, preferences)
         _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
 
         if (version.migrationNeeded()) {
@@ -57,5 +61,23 @@ object FrolloSDK {
     private fun registerTimber() {
         // TODO: May be handle more levels during Logging task
         Timber.plant(Timber.DebugTree())
+    }
+
+    fun logout() {
+        authentication.logoutUser()
+        reset()
+    }
+
+    internal fun forcedLogout() {
+        reset()
+    }
+
+    fun reset() {
+        // TODO: Pause scheduled refreshing
+        authentication.reset()
+        keyStore.reset()
+        preferences.reset()
+        database.reset()
+        // TODO: Need to send any notify anything?
     }
 }

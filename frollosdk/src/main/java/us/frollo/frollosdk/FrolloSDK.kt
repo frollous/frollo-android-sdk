@@ -42,12 +42,18 @@ object FrolloSDK {
         this.app = application
         serverUrl = params.serverUrl
 
+        // 1. Setup Keystore
         keyStore = Keystore()
         keyStore.setup()
+        // 2. Setup Preferences
         preferences = Preferences(application.applicationContext)
+        // 3. Setup Database
         database = SDKDatabase.getInstance(application)
+        // 4. Setup Version Manager
         version = Version(preferences)
+        // 5. Setup Network Stack
         network = NetworkService(SystemInfo(application), keyStore, preferences)
+        // 6. Setup Authentication
         _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
 
         if (version.migrationNeeded()) {

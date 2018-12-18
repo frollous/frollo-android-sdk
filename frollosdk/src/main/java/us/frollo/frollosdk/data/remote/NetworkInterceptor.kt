@@ -3,15 +3,16 @@ package us.frollo.frollosdk.data.remote
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
-import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_API_VERSION
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_AUTHORIZATION
+import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_BUNDLE_ID
+import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_DEVICE_VERSION
+import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_SOFTWARE_VERSION
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_USER_AGENT
 import us.frollo.frollosdk.data.remote.endpoints.TokenEndpoint.Companion.URL_TOKEN_REFRESH
 import us.frollo.frollosdk.data.remote.endpoints.UserEndpoint.Companion.URL_LOGIN
 import us.frollo.frollosdk.data.remote.endpoints.UserEndpoint.Companion.URL_REGISTER
 import us.frollo.frollosdk.data.remote.endpoints.UserEndpoint.Companion.URL_USER_RESET
-import us.frollo.frollosdk.error.APIError
-import us.frollo.frollosdk.error.APIErrorType.*
 import java.io.IOException
 
 internal class NetworkInterceptor(private val helper: NetworkHelper) : Interceptor {
@@ -25,7 +26,7 @@ internal class NetworkInterceptor(private val helper: NetworkHelper) : Intercept
         if (!request.url().toString().contains(URL_LOGIN)) {
             addRequestAuthorizationHeader(request, builder)
         }
-        addRequestUserAgentHeader(builder)
+        addAdditionalHeaders(builder)
 
         val req = builder.build()
 
@@ -51,26 +52,16 @@ internal class NetworkInterceptor(private val helper: NetworkHelper) : Intercept
         }
     }
 
-    private fun addRequestUserAgentHeader(builder: Request.Builder) {
-        builder.removeHeader(HEADER_USER_AGENT) //Hack: Remove default User-Agent when present
-                .addHeader(HEADER_USER_AGENT, helper.userAgent)
+    private fun addAdditionalHeaders(builder: Request.Builder) {
+        builder.removeHeader(HEADER_API_VERSION).addHeader(HEADER_API_VERSION, NetworkHelper.API_VERSION)
+        builder.removeHeader(HEADER_BUNDLE_ID).addHeader(HEADER_BUNDLE_ID, helper.bundleId)
+        builder.removeHeader(HEADER_DEVICE_VERSION).addHeader(HEADER_DEVICE_VERSION, helper.deviceVersion)
+        builder.removeHeader(HEADER_SOFTWARE_VERSION).addHeader(HEADER_SOFTWARE_VERSION, helper.softwareVersion)
+        builder.removeHeader(HEADER_USER_AGENT).addHeader(HEADER_USER_AGENT, helper.userAgent)
     }
 
     private fun handleFailure(response: Response) {
         when (response.code()) {
-            401 -> {
-                response.body()?.string()?.let { body ->
-                    val apiError = APIError(response.code(), body)
-                    when (apiError.type) {
-                        INVALID_REFRESH_TOKEN, SUSPENDED_DEVICE, SUSPENDED_USER, OTHER_AUTHORISATION -> {
-                            FrolloSDK.forcedLogout()
-                        }
-                        else -> {
-                            // Do nothing
-                        }
-                    }
-                }
-            }
             429 -> {
                 // TODO: Handle rate limit
             }

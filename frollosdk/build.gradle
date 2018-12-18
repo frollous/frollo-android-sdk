@@ -8,7 +8,7 @@ android {
     //resourcePrefix "frollosdk_"
     compileSdkVersion 28
     defaultConfig {
-        minSdkVersion 23 // Android 6.0 (Marshmallow)
+        minSdkVersion 24 // Android 7.0 (Nougat)
         targetSdkVersion 28
         versionCode 1
         versionName "1.0.0"
@@ -42,9 +42,9 @@ dependencies {
     // Testing
     testImplementation "junit:junit:4.12"
     testImplementation 'org.mockito:mockito-core:2.7.6'
-    androidTestImplementation "androidx.test:runner:1.1.0"
-    androidTestImplementation "androidx.test:rules:1.1.0"
-    androidTestImplementation "androidx.test:core:1.0.0"
+    androidTestImplementation "androidx.test:runner:1.1.1"
+    androidTestImplementation "androidx.test:rules:1.1.1"
+    androidTestImplementation "androidx.test:core:1.1.0"
     // JavaX Annotations
     compileOnly "org.glassfish:javax.annotation:10.0-b28"
     // Android Arch Components

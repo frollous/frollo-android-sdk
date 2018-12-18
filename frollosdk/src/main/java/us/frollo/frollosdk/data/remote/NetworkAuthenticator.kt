@@ -1,6 +1,7 @@
 package us.frollo.frollosdk.data.remote
 
 import okhttp3.*
+import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_AUTHORIZATION
 import us.frollo.frollosdk.error.APIError
 import us.frollo.frollosdk.error.APIErrorType
@@ -20,19 +21,29 @@ import us.frollo.frollosdk.error.APIErrorType
 internal class NetworkAuthenticator(private val network: NetworkService) : Authenticator {
 
     override fun authenticate(route: Route, response: Response): Request? {
-        if (response.request().header(HEADER_AUTHORIZATION) != null) {
+        // TODO: Review this
+        /*if (response.request().header(HEADER_AUTHORIZATION) != null) {
             return null // Give up, we've already failed to authenticate.
-        }
+        }*/
 
         var newRequest: Request? = null
         response.body()?.string()?.let { body ->
             val apiError = APIError(response.code(), body)
-            if (apiError.type == APIErrorType.INVALID_ACCESS_TOKEN) {
-                val newToken = network.refreshTokens()
-                newRequest = response.request().newBuilder()
-                        .header(HEADER_AUTHORIZATION, "Bearer $newToken")
-                        .build()
+            when (apiError.type) {
+                APIErrorType.INVALID_ACCESS_TOKEN -> {
+                    val newToken = network.refreshTokens()
+                    newRequest = response.request().newBuilder()
+                            .header(HEADER_AUTHORIZATION, "Bearer $newToken")
+                            .build()
+                }
+                APIErrorType.INVALID_REFRESH_TOKEN, APIErrorType.SUSPENDED_DEVICE, APIErrorType.SUSPENDED_USER, APIErrorType.OTHER_AUTHORISATION -> {
+                    FrolloSDK.forcedLogout()
+                }
+                else -> {
+                    // Do nothing
+                }
             }
+
         }
         return newRequest
     }

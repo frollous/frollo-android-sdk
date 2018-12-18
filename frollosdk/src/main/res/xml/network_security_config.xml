@@ -6,4 +6,11 @@
             <certificates src="user" />
         </trust-anchors>
     </debug-overrides>
+    <domain-config>
+        <domain includeSubdomains="true">frollo.us</domain>
+        <pin-set>
+            <pin digest="SHA-256">XysGYqMH3Ml0kZoh6zTTaTzR4wYBGgUWfvbxgh4V4QA=</pin>
+            <pin digest="SHA-256">UgMkdW5Xlo5dOndGZIdWLSrMu7DD3gwmnyqSOg+gz3I=</pin>
+        </pin-set>
+    </domain-config>
 </network-security-config>

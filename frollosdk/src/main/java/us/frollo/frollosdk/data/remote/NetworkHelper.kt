@@ -13,7 +13,12 @@ internal class NetworkHelper(private val systemInfo: SystemInfo, private val aut
     companion object {
         internal const val HEADER_AUTHORIZATION = "Authorization"
         internal const val HEADER_USER_AGENT = "User-Agent"
-        private const val API_VERSION = "1.17"
+        internal const val HEADER_BUNDLE_ID = "X-Bundle-Id"
+        internal const val HEADER_SOFTWARE_VERSION = "X-Software-Version"
+        internal const val HEADER_DEVICE_VERSION = "X-Device-Version"
+        internal const val HEADER_API_VERSION = "X-Api-Version"
+        internal const val HEADER_BACKGROUND = "X-Background"
+        internal const val API_VERSION = "2.0"
     }
 
     internal val accessToken: String
@@ -22,11 +27,17 @@ internal class NetworkHelper(private val systemInfo: SystemInfo, private val aut
     internal val refreshToken: String
         get() = "Bearer ${authToken.getRefreshToken()}"
 
-    /**
-     * Creates the User-Agent header value for standard API requests.
-     * @return a [String] with actual values to "Bundle Identifier|Software Version|Build|OS Version|API"
-     */
-    // "us.frollo.frollosdk|v1.0.0|b777|Android8.1.0|API1.11"
+    internal val bundleId: String
+        get() = BuildConfig.APPLICATION_ID
+
+    internal val softwareVersion: String
+        get() = "V${BuildConfig.VERSION_NAME}-B${BuildConfig.VERSION_CODE}"
+
+    internal val deviceVersion: String
+        get() = "Android${systemInfo.osVersionName}"
+
+    //TODO: Check with Edd if we have to send "SDK" instead of "V" for version string
+    // "us.frollo.frollosdk|V1.0.0|B777|Android8.1.0|API2.0"
     internal val userAgent: String
         get() = "${BuildConfig.APPLICATION_ID}|V${BuildConfig.VERSION_NAME}|B${BuildConfig.VERSION_CODE}|Android${systemInfo.osVersionName}|API$API_VERSION"
 

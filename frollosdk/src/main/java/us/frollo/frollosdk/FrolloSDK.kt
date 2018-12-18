@@ -81,7 +81,7 @@ object FrolloSDK {
     fun reset() {
         // TODO: Pause scheduled refreshing
         authentication.reset()
-        keyStore.reset()
+        //keyStore.reset() // Keystore reset maybe not required
         preferences.reset()
         database.reset()
         // TODO: Need to send any notify anything?

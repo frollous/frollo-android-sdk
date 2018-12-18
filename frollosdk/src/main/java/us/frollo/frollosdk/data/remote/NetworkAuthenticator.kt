@@ -20,14 +20,14 @@ import us.frollo.frollosdk.error.APIErrorType
  */
 internal class NetworkAuthenticator(private val network: NetworkService) : Authenticator {
 
-    override fun authenticate(route: Route, response: Response): Request? {
+    override fun authenticate(route: Route?, response: Response?): Request? {
         // TODO: Review this
-        /*if (response.request().header(HEADER_AUTHORIZATION) != null) {
+        /*if (response?.request().header(HEADER_AUTHORIZATION) != null) {
             return null // Give up, we've already failed to authenticate.
         }*/
 
         var newRequest: Request? = null
-        response.body()?.string()?.let { body ->
+        response?.body()?.string()?.let { body ->
             val apiError = APIError(response.code(), body)
             when (apiError.type) {
                 APIErrorType.INVALID_ACCESS_TOKEN -> {

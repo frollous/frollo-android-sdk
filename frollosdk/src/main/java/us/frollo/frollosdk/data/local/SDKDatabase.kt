@@ -8,7 +8,6 @@ import androidx.room.TypeConverters
 import us.frollo.frollosdk.data.local.dao.UserDao
 import us.frollo.frollosdk.model.api.user.UserResponse
 
-// TODO: PLAN FOR CONTINGENCY (DB CORRUPTED)
 @Database(entities = [
     UserResponse::class
 ], version = 1, exportSchema = true)
@@ -31,7 +30,7 @@ abstract class SDKDatabase : RoomDatabase() {
         private fun create(app: Application): SDKDatabase =
                 Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
                         .allowMainThreadQueries()
-                        //.fallbackToDestructiveMigration()
+                        .fallbackToDestructiveMigration()
                         //.addMigrations(MIGRATION_1_2)
                         .build()
         /**

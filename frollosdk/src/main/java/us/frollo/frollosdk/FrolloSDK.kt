@@ -5,7 +5,6 @@ import timber.log.Timber
 import us.frollo.frollosdk.auth.Authentication
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.SetupParams
-import us.frollo.frollosdk.core.SystemInfo
 import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.error.FrolloSDKError
@@ -52,7 +51,7 @@ object FrolloSDK {
         // 4. Setup Version Manager
         version = Version(preferences)
         // 5. Setup Network Stack
-        network = NetworkService(SystemInfo(application), keyStore, preferences)
+        network = NetworkService(keyStore, preferences)
         // 6. Setup Authentication
         _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
 

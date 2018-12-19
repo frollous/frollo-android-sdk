@@ -8,17 +8,16 @@ import retrofit2.converter.gson.GsonConverterFactory
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.auth.AuthToken
 import us.frollo.frollosdk.base.LiveDataCallAdapterFactory
-import us.frollo.frollosdk.core.SystemInfo
 import us.frollo.frollosdk.data.remote.endpoints.TokenEndpoint
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.api.user.TokenResponse
 import us.frollo.frollosdk.preferences.Preferences
 import java.util.concurrent.TimeUnit
 
-class NetworkService(si: SystemInfo, keystore: Keystore, pref: Preferences) : IApiProvider {
+class NetworkService(keystore: Keystore, pref: Preferences) : IApiProvider {
 
     private val authToken = AuthToken(keystore, pref)
-    private val helper = NetworkHelper(si, authToken)
+    private val helper = NetworkHelper(authToken)
     private val interceptor = NetworkInterceptor(helper)
     private val authenticator = NetworkAuthenticator(this)
 

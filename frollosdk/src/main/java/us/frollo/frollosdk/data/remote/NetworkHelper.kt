@@ -1,14 +1,14 @@
 package us.frollo.frollosdk.data.remote
 
+import android.os.Build
 import us.frollo.frollosdk.BuildConfig
 import us.frollo.frollosdk.auth.AuthToken
 import us.frollo.frollosdk.auth.otp.OTP
-import us.frollo.frollosdk.core.SystemInfo
 
 /**
  * This class wraps the rules for interacting with the Frollo API such as the headers used, API version and so on
  */
-internal class NetworkHelper(private val systemInfo: SystemInfo, private val authToken: AuthToken) {
+internal class NetworkHelper(private val authToken: AuthToken) {
 
     companion object {
         internal const val HEADER_AUTHORIZATION = "Authorization"
@@ -34,12 +34,12 @@ internal class NetworkHelper(private val systemInfo: SystemInfo, private val aut
         get() = "V${BuildConfig.VERSION_NAME}-B${BuildConfig.VERSION_CODE}"
 
     internal val deviceVersion: String
-        get() = "Android${systemInfo.osVersionName}"
+        get() = "Android${Build.VERSION.RELEASE}"
 
     //TODO: Check with Edd if we have to send "SDK" instead of "V" for version string
     // "us.frollo.frollosdk|V1.0.0|B777|Android8.1.0|API2.0"
     internal val userAgent: String
-        get() = "${BuildConfig.APPLICATION_ID}|V${BuildConfig.VERSION_NAME}|B${BuildConfig.VERSION_CODE}|Android${systemInfo.osVersionName}|API$API_VERSION"
+        get() = "${BuildConfig.APPLICATION_ID}|V${BuildConfig.VERSION_NAME}|B${BuildConfig.VERSION_CODE}|Android${Build.VERSION.RELEASE}|API$API_VERSION"
 
     /**
      * Returns the temporary otp token formatted and ready for header authorization for registering the user.

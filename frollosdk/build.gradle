@@ -39,25 +39,36 @@ dependencies {
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
     // Testing
     testImplementation "junit:junit:4.12"
-    testImplementation 'org.mockito:mockito-core:2.7.6'
     androidTestImplementation "androidx.test:runner:1.1.1"
     androidTestImplementation "androidx.test:rules:1.1.1"
     androidTestImplementation "androidx.test:core:1.1.0"
+
     // JavaX Annotations
     compileOnly "org.glassfish:javax.annotation:10.0-b28"
+
     // Android Arch Components
     implementation "androidx.lifecycle:lifecycle-livedata:2.0.0"
     implementation "androidx.room:room-runtime:2.0.0"
     kapt "androidx.room:room-compiler:2.0.0"
+
     // Timber Logging
     implementation "com.jakewharton.timber:timber:4.7.1"
+
     // Anko (https://github.com/Kotlin/anko)
     implementation "org.jetbrains.anko:anko:0.10.7"
+
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:2.3.0"
     implementation "com.squareup.retrofit2:converter-gson:2.3.0"
+    androidTestImplementation "com.squareup.retrofit2:retrofit-mock:2.3.0"
+
+    // OkHttp
+    //implementation "com.squareup.okhttp3:okhttp:3.12.0"
+    testImplementation "com.squareup.okhttp3:mockwebserver:3.9.0"
+
     // Android Debug SDKDatabase
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
 }

@@ -14,7 +14,7 @@ import us.frollo.frollosdk.version.Version
 
 object FrolloSDK {
 
-    val setup: Boolean
+    val isSetup: Boolean
         get() = _setup
 
     val authentication: Authentication
@@ -29,7 +29,6 @@ object FrolloSDK {
     private lateinit var database: SDKDatabase
 
     internal lateinit var app: Application
-    internal lateinit var serverUrl: String
 
     @Throws(IllegalArgumentException::class, IllegalStateException::class)
     fun setup(application: Application, params: SetupParams, callback: ((FrolloSDKError?) -> Unit)) {
@@ -39,7 +38,6 @@ object FrolloSDK {
         if (params.serverUrl.isBlank()) throw IllegalArgumentException("Server URL cannot be empty")
 
         this.app = application
-        serverUrl = params.serverUrl
 
         // 1. Setup Keystore
         keyStore = Keystore()
@@ -51,7 +49,7 @@ object FrolloSDK {
         // 4. Setup Version Manager
         version = Version(preferences)
         // 5. Setup Network Stack
-        network = NetworkService(keyStore, preferences)
+        network = NetworkService(params.serverUrl, keyStore, preferences)
         // 6. Setup Authentication
         _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
 

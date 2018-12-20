@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        if (!FrolloSDK.setup) {
+        if (!FrolloSDK.isSetup) {
             FrolloSDK.setup(application, SetupParams.Builder().serverUrl("https://api-sandbox.frollo.us").build()) { error ->
                 if (error == null) login()
             }

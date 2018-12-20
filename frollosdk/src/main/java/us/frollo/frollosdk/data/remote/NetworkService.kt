@@ -14,7 +14,7 @@ import us.frollo.frollosdk.model.api.user.TokenResponse
 import us.frollo.frollosdk.preferences.Preferences
 import java.util.concurrent.TimeUnit
 
-class NetworkService(keystore: Keystore, pref: Preferences) : IApiProvider {
+class NetworkService(private val serverUrl: String, keystore: Keystore, pref: Preferences) : IApiProvider {
 
     private val authToken = AuthToken(keystore, pref)
     private val helper = NetworkHelper(authToken)
@@ -43,7 +43,7 @@ class NetworkService(keystore: Keystore, pref: Preferences) : IApiProvider {
 
         val builder = Retrofit.Builder()
                 .client(httpClient)
-                .baseUrl(FrolloSDK.serverUrl)
+                .baseUrl(serverUrl)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(LiveDataCallAdapterFactory)
 

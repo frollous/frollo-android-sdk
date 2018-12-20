@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.test.platform.app.InstrumentationRegistry
 
 import org.junit.After
-import org.junit.Assert
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import us.frollo.frollosdk.core.SetupParams
@@ -24,28 +24,46 @@ class FrolloSDKAndroidUnitTest {
 
     @Test
     fun testGetAuthenticationFail() {
+        assertFalse(FrolloSDK.isSetup)
         try {
             FrolloSDK.authentication
         } catch (e: IllegalAccessException) {
-            Assert.assertEquals("SDK not setup", e.localizedMessage)
+            assertEquals("SDK not setup", e.localizedMessage)
         }
     }
 
     @Test
     fun testSetupSuccess() {
+        assertFalse(FrolloSDK.isSetup)
         FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { error ->
-            Assert.assertNull(error)
-            Assert.assertEquals(url, FrolloSDK.serverUrl)
-            Assert.assertNotNull(FrolloSDK.authentication)
+            assertNull(error)
+            assertNotNull(FrolloSDK.authentication)
         }
+        assertTrue(FrolloSDK.isSetup)
     }
 
     @Test
     fun testSetupFailEmptyServerUrl() {
+        assertFalse(FrolloSDK.isSetup)
         try {
             FrolloSDK.setup(app, SetupParams.Builder().serverUrl(" ").build()) { }
         } catch (e: IllegalArgumentException) {
-            Assert.assertEquals("Server URL cannot be empty", e.localizedMessage)
+            assertEquals("Server URL cannot be empty", e.localizedMessage)
         }
+    }
+
+    @Test
+    fun testLogout() {
+        //TODO: to be implemented
+    }
+
+    @Test
+    fun testForcedLogout() {
+        //TODO: to be implemented
+    }
+
+    @Test
+    fun testReset() {
+        //TODO: to be implemented
     }
 }

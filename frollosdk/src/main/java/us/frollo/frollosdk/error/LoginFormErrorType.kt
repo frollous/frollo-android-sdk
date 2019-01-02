@@ -11,6 +11,6 @@ enum class LoginFormErrorType(@StringRes val textResource: Int) {
     VALIDATION_FAILED( R.string.Error_LoginForm_ValidationFailedFormat),
     UNKNOWN(R.string.Error_LoginForm_UnknownError);
 
-    fun toLocalizedString(context: Context, vararg params: String): String =
-            context.resources.getString(textResource, params)
+    fun toLocalizedString(context: Context, arg1: String? = null): String =
+            context.resources.getString(textResource, arg1)
 }

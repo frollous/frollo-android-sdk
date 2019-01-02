@@ -27,6 +27,6 @@ enum class APIErrorType(@StringRes val textResource: Int) {
 
     UNKNOWN(R.string.Error_API_UnknownError);
 
-    fun toLocalizedString(context: Context, vararg params: String): String =
-            context.resources.getString(textResource, params)
+    fun toLocalizedString(context: Context, arg1: String? = null): String =
+            context.resources.getString(textResource, arg1)
 }

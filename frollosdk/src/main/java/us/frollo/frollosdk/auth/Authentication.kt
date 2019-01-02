@@ -57,7 +57,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
         }.apply { (this as? MutableLiveData<Resource<User>>)?.value = Resource.loading(null) }
     }
 
-    private fun fetchUser() = db.users().load().toUser()
+    private fun fetchUser() = db.users().load()?.toUser()
 
     private fun fetchUserAsLiveData(): LiveData<Resource<User>> =
             Transformations.map(db.users().loadAsLiveData()) {

@@ -1,6 +1,7 @@
 package us.frollo.frollosdk
 
 import android.app.Application
+import com.jakewharton.threetenabp.AndroidThreeTen
 import timber.log.Timber
 import us.frollo.frollosdk.auth.Authentication
 import us.frollo.frollosdk.core.DeviceInfo
@@ -39,18 +40,20 @@ object FrolloSDK {
 
         this.app = application
 
-        // 1. Setup Keystore
+        // 1. Initialize ThreeTenABP
+        initializeThreeTenABP()
+        // 2. Setup Keystore
         keyStore = Keystore()
         keyStore.setup()
-        // 2. Setup Preferences
+        // 3. Setup Preferences
         preferences = Preferences(application.applicationContext)
-        // 3. Setup Database
+        // 4. Setup Database
         database = SDKDatabase.getInstance(application)
-        // 4. Setup Version Manager
+        // 5. Setup Version Manager
         version = Version(preferences)
-        // 5. Setup Network Stack
+        // 6. Setup Network Stack
         network = NetworkService(params.serverUrl, keyStore, preferences)
-        // 6. Setup Authentication
+        // 7. Setup Authentication
         _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
 
         if (version.migrationNeeded()) {
@@ -64,6 +67,10 @@ object FrolloSDK {
     private fun registerTimber() {
         // TODO: May be handle more levels during Logging task
         Timber.plant(Timber.DebugTree())
+    }
+
+    private fun initializeThreeTenABP() {
+        AndroidThreeTen.init(app)
     }
 
     fun logout() {

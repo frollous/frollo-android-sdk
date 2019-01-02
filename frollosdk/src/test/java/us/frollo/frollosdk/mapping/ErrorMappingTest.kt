@@ -1,4 +1,4 @@
-package us.frollo.frollosdk.extensions
+package us.frollo.frollosdk.mapping
 
 import org.junit.Assert
 import org.junit.Test
@@ -7,7 +7,7 @@ import us.frollo.frollosdk.mapping.toAPIErrorResponse
 import us.frollo.frollosdk.mapping.toAPIErrorType
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
 
-class ErrorExtensionTest {
+class ErrorMappingTest {
 
     @Test
     fun testStringToAPIErrorResponseSuccess() {

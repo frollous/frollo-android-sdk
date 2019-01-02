@@ -13,7 +13,7 @@ import javax.crypto.spec.IvParameterSpec
 class Keystore {
 
     companion object {
-        private const val KEY_ALIAS = "FrolloKey"
+        private const val KEY_ALIAS = "FrolloSDKKey"
         private const val KEYSTORE_PROVIDER = "AndroidKeyStore"
         private const val TRANSFORMATION_AES = "AES/CBC/PKCS7Padding"
     }
@@ -23,12 +23,20 @@ class Keystore {
 
     private val mKeyStore = KeyStore.getInstance(KEYSTORE_PROVIDER)
 
+    internal var isSetup = false
+
     internal fun setup() {
-        mKeyStore.load(null)
-        generateKeys()
+        try {
+            mKeyStore.load(null)
+            generateKeys()
+            isSetup = true
+        } catch (e: Exception) {
+            Timber.d("Failed to load KeyStore")
+            e.printStackTrace()
+        }
     }
 
-    internal fun generateKeys() {
+    private fun generateKeys() {
         if (!mKeyStore.containsAlias(KEY_ALIAS)) aesKey()
     }
 
@@ -101,6 +109,7 @@ class Keystore {
     internal fun reset() {
         try {
             mKeyStore.deleteEntry(KEY_ALIAS)
+            isSetup = false
         } catch (e: Exception) {
             Timber.d("KeyStore Error: Delete key failed")
             e.printStackTrace()

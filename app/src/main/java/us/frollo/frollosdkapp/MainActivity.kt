@@ -33,8 +33,10 @@ class MainActivity : AppCompatActivity() {
     private val observer = Observer<Resource<User>> {
         when (it?.status) {
             Resource.Status.SUCCESS -> {
-                val user = FrolloSDK.authentication.user
-                Timber.d("Hello ${ user?.firstName }")
+                val user = it.data
+                Timber.d("*** Hello ${ user?.firstName }")
+                Thread.sleep(1000) // TODO: Review Hack to wait for the DB to load before calling fetchUser()
+                fetchUser()
             }
             Resource.Status.ERROR -> Timber.d("Error logging in: " +
                     if (it.error is APIError) (it.error as APIError).statusCode
@@ -42,5 +44,11 @@ class MainActivity : AppCompatActivity() {
             )
             Resource.Status.LOADING -> Timber.d("Logging in...")
         }
+    }
+
+    private fun fetchUser() {
+        val user = FrolloSDK.authentication.user
+        Timber.d("*** Name: ${ user?.firstName } ${ user?.lastName }")
+        Timber.d("*** Email: ${ user?.email }")
     }
 }

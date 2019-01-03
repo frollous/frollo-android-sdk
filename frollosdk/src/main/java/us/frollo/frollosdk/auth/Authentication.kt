@@ -50,9 +50,9 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
             Resource.fromApiResponse(it).map { response ->
                 val tokens = response?.fetchTokens()
                 tokens?.let { tokenResponse ->  network.handleTokens(tokenResponse) }
-                val user = response?.stripTokens()
-                handleUserResponse(user)
-                user?.toUser()
+                val userResponse = response?.stripTokens()
+                handleUserResponse(userResponse)
+                userResponse?.toUser()
             }
         }.apply { (this as? MutableLiveData<Resource<User>>)?.value = Resource.loading(null) }
     }

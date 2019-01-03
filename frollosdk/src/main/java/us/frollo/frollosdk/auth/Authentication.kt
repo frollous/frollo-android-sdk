@@ -9,6 +9,9 @@ import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.data.remote.endpoints.UserEndpoint
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.fetchTokens
 import us.frollo.frollosdk.extensions.stripTokens
 import us.frollo.frollosdk.mapping.toUser
@@ -19,12 +22,9 @@ import us.frollo.frollosdk.preferences.Preferences
 
 class Authentication(private val di: DeviceInfo, private val network: NetworkService, private val db: SDKDatabase, private val pref: Preferences) {
 
-    /*
-     * Fetches synchronously from DB. Do not call this from main thread.
-     */
     var user: User? = null
-        get() = fetchUser()
 
+    //TODO: Review - This returns a new LiveData object on each call. Maybe the app should implement a MediatorLiveData and change source in ViewModel.
     var userLiveData: LiveData<Resource<User>>? = null
         get() = fetchUserAsLiveData()
 
@@ -46,28 +46,55 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
                 userToken = userToken
         )
 
-        return Transformations.map(userEndpoint.login(request)) {
-            Resource.fromApiResponse(it).map { response ->
-                val tokens = response?.fetchTokens()
-                tokens?.let { tokenResponse ->  network.handleTokens(tokenResponse) }
-                val userResponse = response?.stripTokens()
-                handleUserResponse(userResponse)
-                userResponse?.toUser()
+        return if (request.valid()) {
+            Transformations.map(userEndpoint.login(request)) {
+                Resource.fromApiResponse(it).map { response ->
+                    val tokens = response?.fetchTokens()
+                    tokens?.let { tokenResponse -> network.handleTokens(tokenResponse) }
+
+                    val userResponse = response?.stripTokens()
+                    handleUserResponse(userResponse)
+
+                    user = userResponse?.toUser()
+                    user
+                }
+            }.apply { (this as? MutableLiveData<Resource<User>>)?.value = Resource.loading(null) }
+        } else {
+            MutableLiveData<Resource<User>>().apply {
+                value = Resource.error(DataError(type = DataErrorType.API, subType = DataErrorSubType.INVALID_DATA))
             }
-        }.apply { (this as? MutableLiveData<Resource<User>>)?.value = Resource.loading(null) }
+        }
     }
 
-    private fun fetchUser() = db.users().load()?.toUser()
+    fun refreshUser() {
+        // TODO: To be implemented
+        // TODO: update "user" variable
+    }
+
+    fun updateUser() {
+        // TODO: To be implemented
+        // TODO: update "user" variable
+    }
+
+    fun deleteUser() {
+        // TODO: To be implemented
+    }
+
+    fun logoutUser() {
+        // TODO: To be implemented
+    }
 
     private fun fetchUserAsLiveData(): LiveData<Resource<User>> =
             Transformations.map(db.users().loadAsLiveData()) {
-                Resource.success(it.toUser())
+                Resource.success(it?.toUser())
             }.apply { (this as? MutableLiveData<Resource<User>>)?.value = Resource.loading(null) }
 
     private fun handleUserResponse(userResponse: UserResponse?) {
         userResponse?.let {
             loggedIn = true
+
             it.features?.let { features -> pref.features = features }
+
             doAsync {
                 db.users().insert(it)
                 // TODO: Notify user updated
@@ -75,12 +102,9 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
         }
     }
 
-    fun logoutUser() {
-        // TODO: To be implemented
-    }
-
     internal fun reset() {
         loggedIn = false
+        user = null
         network.reset()
     }
 }

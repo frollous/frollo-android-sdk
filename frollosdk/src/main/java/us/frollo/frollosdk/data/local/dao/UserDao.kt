@@ -13,7 +13,7 @@ internal interface UserDao {
     fun load(): UserResponse?
 
     @Query("SELECT * FROM user LIMIT 1")
-    fun loadAsLiveData(): LiveData<UserResponse>
+    fun loadAsLiveData(): LiveData<UserResponse?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: UserResponse)

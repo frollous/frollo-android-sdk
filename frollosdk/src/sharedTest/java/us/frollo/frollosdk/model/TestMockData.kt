@@ -1,10 +1,12 @@
 package us.frollo.frollosdk.model
 
+import us.frollo.frollosdk.auth.AuthType
+import us.frollo.frollosdk.model.api.user.UserLoginRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.coredata.user.*
 import us.frollo.frollosdk.testutils.*
 
-internal fun testDataUserResponse() : UserResponse {
+internal fun getTestUserResponse() : UserResponse {
     val name = randomUUID()
 
     return UserResponse(
@@ -33,4 +35,18 @@ internal fun testDataUserResponse() : UserResponse {
                 refreshToken = "AValidRefreshTokenFromHost",
                 accessToken = "AValidAccessTokenFromHost",
                 accessTokenExp = 1721259268)
+}
+
+internal fun getTestUserLoginRequest(type: AuthType) : UserLoginRequest {
+    val name = randomUUID()
+
+    return UserLoginRequest(
+            authType = type,
+            deviceId = randomString(8),
+            deviceName = randomString(8),
+            deviceType = randomString(8),
+            email = "$name@frollo.us",
+            password = randomString(8),
+            userId = randomNumber().toString(),
+            userToken = randomString(8))
 }

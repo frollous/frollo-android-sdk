@@ -2,13 +2,13 @@ package us.frollo.frollosdk.extensions
 
 import org.junit.Assert
 import org.junit.Test
-import us.frollo.frollosdk.model.testDataUserResponse
+import us.frollo.frollosdk.model.getTestUserResponse
 
 class ModelExtensionTest {
 
     @Test
     fun testUserResponseStripTokens() {
-        val originalResponse = testDataUserResponse()
+        val originalResponse = getTestUserResponse()
         val strippedResponse = originalResponse.stripTokens()
         Assert.assertNull(strippedResponse.refreshToken)
         Assert.assertNull(strippedResponse.accessToken)
@@ -17,7 +17,7 @@ class ModelExtensionTest {
 
     @Test
     fun testUserResponseFetchTokens() {
-        val originalResponse = testDataUserResponse()
+        val originalResponse = getTestUserResponse()
         val tokenResponse = originalResponse.fetchTokens()
         Assert.assertEquals(originalResponse.refreshToken, tokenResponse.refreshToken)
         Assert.assertEquals(originalResponse.accessToken, tokenResponse.accessToken)

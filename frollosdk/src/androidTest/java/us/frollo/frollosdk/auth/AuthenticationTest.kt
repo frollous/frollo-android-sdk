@@ -20,6 +20,9 @@ import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.data.remote.api.UserAPI
 import us.frollo.frollosdk.error.APIError
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.mapping.toUser
@@ -116,7 +119,7 @@ class AuthenticationTest {
     }
 
     @Test
-    fun testLoginUser() {
+    fun testLoginUserEmail() {
         val body = readStringFromJson(app, R.raw.user_details_complete)
         val mockedResponse = MockResponse()
                 .setResponseCode(200)
@@ -167,6 +170,19 @@ class AuthenticationTest {
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_LOGIN, request.path)
+    }
+
+    @Test
+    fun testInvalidLoginData() {
+        val testObserver = authentication.loginUser(AuthType.FACEBOOK).test()
+        testObserver.assertHasValue()
+        assertEquals(Resource.Status.ERROR, testObserver.value().status)
+        assertNotNull(testObserver.value().error)
+        assertNull(authentication.user)
+
+        val error = testObserver.value().error as DataError
+        assertEquals(error.type, DataErrorType.API)
+        assertEquals(error.subType, DataErrorSubType.INVALID_DATA)
     }
 
     @Test

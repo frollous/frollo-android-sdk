@@ -11,7 +11,7 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 
-import us.frollo.frollosdk.model.getTestUserResponse
+import us.frollo.frollosdk.model.testUserResponseData
 
 class SDKDatabaseTest {
 
@@ -39,7 +39,7 @@ class SDKDatabaseTest {
         var user = db.users().load()
         assertNull(user)
 
-        val dataIn = getTestUserResponse()
+        val dataIn = testUserResponseData()
         db.users().insert(dataIn)
 
         val dataOut = db.users().load()
@@ -62,7 +62,7 @@ class SDKDatabaseTest {
 
     @Test
     fun testDatabaseReset() {
-        db.users().insert(getTestUserResponse())
+        db.users().insert(testUserResponseData())
         assertNotNull(db.users().load())
 
         db.reset()

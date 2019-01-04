@@ -9,8 +9,8 @@ internal data class UserLoginRequest(
         @SerializedName("device_name") val deviceName: String,
         @SerializedName("device_type") val deviceType: String,
 
-        @SerializedName("email") val email: String?,
-        @SerializedName("password") val password: String?,
+        @SerializedName("email") val email: String? = null,
+        @SerializedName("password") val password: String? = null,
         @SerializedName("user_id") val userId: String? = null,
         @SerializedName("user_token") val userToken: String? = null) {
 

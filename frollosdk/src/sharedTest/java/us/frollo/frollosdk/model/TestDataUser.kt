@@ -6,7 +6,7 @@ import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.coredata.user.*
 import us.frollo.frollosdk.testutils.*
 
-internal fun getTestUserResponse() : UserResponse {
+internal fun testUserResponseData() : UserResponse {
     val name = randomUUID()
 
     return UserResponse(
@@ -37,16 +37,46 @@ internal fun getTestUserResponse() : UserResponse {
                 accessTokenExp = 1721259268)
 }
 
-internal fun getTestUserLoginRequest(type: AuthType) : UserLoginRequest {
+internal fun testEmailLoginData() : UserLoginRequest {
     val name = randomUUID()
 
     return UserLoginRequest(
-            authType = type,
+            authType = AuthType.EMAIL,
             deviceId = randomString(8),
             deviceName = randomString(8),
-            deviceType = randomString(8),
+            deviceType = "Android",
             email = "$name@frollo.us",
-            password = randomString(8),
+            password = randomString(8))
+}
+
+internal fun testFacebookLoginData() : UserLoginRequest {
+    val name = randomUUID()
+
+    return UserLoginRequest(
+            authType = AuthType.FACEBOOK,
+            deviceId = randomString(8),
+            deviceName = randomString(8),
+            deviceType = "Android",
+            email = "$name@frollo.us",
             userId = randomNumber().toString(),
             userToken = randomString(8))
+}
+
+internal fun testVoltLoginData() : UserLoginRequest {
+    return UserLoginRequest(
+            authType = AuthType.VOLT,
+            deviceId = randomString(8),
+            deviceName = randomString(8),
+            deviceType = "Android",
+            userId = randomNumber().toString(),
+            userToken = randomString(8))
+}
+
+internal fun testInvalidLoginData() : UserLoginRequest {
+    return UserLoginRequest(
+            authType = AuthType.FACEBOOK,
+            deviceId = randomString(8),
+            deviceName = randomString(8),
+            deviceType = "Android",
+            userId = randomNumber().toString())
 }

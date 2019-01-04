@@ -8,7 +8,7 @@ import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkService
-import us.frollo.frollosdk.data.remote.endpoints.UserEndpoint
+import us.frollo.frollosdk.data.remote.api.UserAPI
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
@@ -23,16 +23,18 @@ import us.frollo.frollosdk.preferences.Preferences
 class Authentication(private val di: DeviceInfo, private val network: NetworkService, private val db: SDKDatabase, private val pref: Preferences) {
 
     var user: User? = null
+        private set
 
     //TODO: Review - This returns a new LiveData object on each call. Maybe the app should implement a MediatorLiveData and change source in ViewModel.
     var userLiveData: LiveData<Resource<User>>? = null
         get() = fetchUserAsLiveData()
+        private set
 
     var loggedIn: Boolean
         get() = pref.loggedIn
         private set(value) { pref.loggedIn = value }
 
-    private val userEndpoint: UserEndpoint = network.create(UserEndpoint::class.java)
+    private val userAPI: UserAPI = network.create(UserAPI::class.java)
 
     fun loginUser(method: AuthType, email: String? = null, password: String? = null, userId: String? = null, userToken: String? = null): LiveData<Resource<User>> {
         val request = UserLoginRequest(
@@ -47,7 +49,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
         )
 
         return if (request.valid()) {
-            Transformations.map(userEndpoint.login(request)) {
+            Transformations.map(userAPI.login(request)) {
                 Resource.fromApiResponse(it).map { response ->
                     val tokens = response?.fetchTokens()
                     tokens?.let { tokenResponse -> network.handleTokens(tokenResponse) }

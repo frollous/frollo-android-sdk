@@ -1,7 +1,12 @@
 package us.frollo.frollosdk.testutils
 
+import android.content.Context
+import androidx.annotation.RawRes
 import us.frollo.frollosdk.extensions.toString
+import java.io.InputStream
 import java.util.*
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 internal fun randomNumber() = Random().nextInt()
 
@@ -15,4 +20,26 @@ internal fun randomString(length: Int) : String {
             .map { kotlin.random.Random.nextInt(0, charPool.size) }
             .map(charPool::get)
             .joinToString("")
+}
+
+@Throws(Exception::class)
+fun convertStreamToString(inputStream: InputStream): String {
+    val reader = BufferedReader(InputStreamReader(inputStream))
+    val sb = StringBuilder()
+    var line = reader.readLine()
+    while (line != null) {
+        sb.append(line).append("\n")
+        line = reader.readLine()
+    }
+    reader.close()
+    return sb.toString()
+}
+
+@Throws(Exception::class)
+fun readStringFromJson(context: Context, @RawRes resId: Int): String {
+    val stream = context.resources.openRawResource(resId)
+    val ret = convertStreamToString(stream)
+    //Make sure you close all streams.
+    stream.close()
+    return ret
 }

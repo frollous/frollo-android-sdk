@@ -1,0 +1,41 @@
+{
+  "id": 12345,
+  "first_name": "Jacob",
+  "last_name": "Frollo",
+  "email": "jacob@frollo.us",
+  "email_verified": true,
+  "status": "active",
+  "primary_currency": "AUD",
+  "gender": "male",
+  "date_of_birth": "1990-01",
+  "address": {
+    "line_1": "41 McLaren Street",
+    "line_2": "Frollo Level 1",
+    "postcode": "2060",
+    "suburb": "North Sydney"
+  },
+  "previous_address": {
+    "line_1": "Bay 9 Middlemiss St",
+    "line_2": "Frollo Unit 13",
+    "postcode": "2060",
+    "suburb": "Lavender Bay"
+  },
+  "marital_status": "single",
+  "occupation": "community_and_personal_service_workers",
+  "industry": "electricity_gas_water_and_waste_services",
+  "household_size": 2,
+  "features": [{
+    "feature": "aggregation",
+    "enabled": true
+  }],
+  "facebook_id": "1234567890",
+  "register_complete": true,
+  "registration_date": "2019-01-01",
+  "valid_password": true,
+  "attribution": {
+    "network": "Organic"
+  },
+  "refresh_token": "sdjfnlasdjknfldskjngdflskjgnldsjkfnoa;nfeiansvijnasdvijda;nfgi;ej",
+  "access_token": "sdjfnlasdjknfldskjngdflskjgnldsjkfnoa;nfeiansvijnasdvijda;nfgi;ej",
+  "access_token_exp": 1939911061
+}

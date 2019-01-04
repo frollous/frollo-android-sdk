@@ -9,10 +9,10 @@ import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_BUNDLE_ID
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_DEVICE_VERSION
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_SOFTWARE_VERSION
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_USER_AGENT
-import us.frollo.frollosdk.data.remote.endpoints.TokenEndpoint.Companion.URL_TOKEN_REFRESH
-import us.frollo.frollosdk.data.remote.endpoints.UserEndpoint.Companion.URL_LOGIN
-import us.frollo.frollosdk.data.remote.endpoints.UserEndpoint.Companion.URL_REGISTER
-import us.frollo.frollosdk.data.remote.endpoints.UserEndpoint.Companion.URL_USER_RESET
+import us.frollo.frollosdk.data.remote.api.TokenAPI.Companion.URL_TOKEN_REFRESH
+import us.frollo.frollosdk.data.remote.api.UserAPI.Companion.URL_LOGIN
+import us.frollo.frollosdk.data.remote.api.UserAPI.Companion.URL_REGISTER
+import us.frollo.frollosdk.data.remote.api.UserAPI.Companion.URL_USER_RESET
 import java.io.IOException
 
 internal class NetworkInterceptor(private val helper: NetworkHelper) : Interceptor {

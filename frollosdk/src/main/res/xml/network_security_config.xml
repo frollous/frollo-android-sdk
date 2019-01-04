@@ -13,4 +13,8 @@
             <pin digest="SHA-256">UgMkdW5Xlo5dOndGZIdWLSrMu7DD3gwmnyqSOg+gz3I=</pin>
         </pin-set>
     </domain-config>
+    <!-- TODO: Review if below breaks the SSL Pinning -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+    </domain-config>
 </network-security-config>

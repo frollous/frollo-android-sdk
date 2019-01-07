@@ -2,6 +2,7 @@ package us.frollo.frollosdk.extensions
 
 import org.junit.Assert
 import org.junit.Test
+import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.testUserResponseData
 
 class ModelExtensionTest {
@@ -22,5 +23,12 @@ class ModelExtensionTest {
         Assert.assertEquals(originalResponse.refreshToken, tokenResponse.refreshToken)
         Assert.assertEquals(originalResponse.accessToken, tokenResponse.accessToken)
         Assert.assertEquals(originalResponse.accessTokenExp, tokenResponse.accessTokenExp)
+    }
+
+    @Test
+    fun testUserUpdateRequest() {
+        val user = testUserResponseData().toUser()
+        val request = user.updateRequest()
+        Assert.assertEquals(user.firstName, request.firstName)
     }
 }

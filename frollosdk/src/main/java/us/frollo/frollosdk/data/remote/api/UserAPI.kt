@@ -12,7 +12,7 @@ internal interface UserAPI {
         const val URL_LOGIN = "/api/v1/user/login/"
         const val URL_REGISTER = "/api/v1/user/register/"
         const val URL_USER_RESET = "/api/v1/user/reset/"
-        const val URL_USER_DETAILS = "/api/v1/user/details"
+        const val URL_USER_DETAILS = "/api/v1/user/details/"
     }
 
     @POST(URL_LOGIN)

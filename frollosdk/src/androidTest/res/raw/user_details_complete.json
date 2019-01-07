@@ -31,6 +31,7 @@
   "facebook_id": "1234567890",
   "register_complete": true,
   "registration_date": "2019-01-01",
+  "mobile_number": "0411111111",
   "valid_password": true,
   "attribution": {
     "network": "Organic"

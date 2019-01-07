@@ -22,6 +22,7 @@ internal fun testUserResponseData() : UserResponse {
                 facebookId = randomNumber().toString(),
                 attribution = Attribution(adGroup = randomString(8), campaign = randomString(8), creative = randomString(8), network = randomString(8)),
                 lastName = randomUUID(),
+                mobileNumber = "0411111111",
                 gender = Gender.MALE,
                 currentAddress = Address(lineOne = "41 McLaren Street", lineTwo = "Frollo Level 1", suburb = "North Sydney", postcode = "2060"),
                 previousAddress = Address(lineOne = "Bay 9 Middlemiss St", lineTwo = "Frollo Unit 13", suburb = "Lavender Bay", postcode = "2060"),

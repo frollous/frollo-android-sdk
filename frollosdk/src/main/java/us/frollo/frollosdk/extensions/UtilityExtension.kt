@@ -1,9 +1,12 @@
 package us.frollo.frollosdk.extensions
 
+import android.content.Intent
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import okhttp3.Response
+import us.frollo.frollosdk.FrolloSDK
 import java.nio.charset.Charset
 
 /* Kotlin extensions */
@@ -46,3 +49,9 @@ internal val Response.clonedBodyString : String?
         // in IllegalStateException: closed
         return buffer?.clone()?.readString(Charset.forName("UTF-8"))
     }
+
+internal fun notify(action: String) {
+    val broadcastManager = LocalBroadcastManager.getInstance(FrolloSDK.app)
+    val intent = Intent(action)
+    broadcastManager.sendBroadcast(intent)
+}

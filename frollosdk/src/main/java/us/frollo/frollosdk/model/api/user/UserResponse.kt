@@ -25,6 +25,7 @@ internal data class UserResponse(
         @ColumnInfo(name = "facebook_id") @SerializedName("facebook_id") val facebookId: String?,
         @ColumnInfo(name = "attribution") @SerializedName("attribution") val attribution: Attribution?,
         @ColumnInfo(name = "last_name") @SerializedName("last_name") val lastName: String?,
+        @ColumnInfo(name = "mobile_number") @SerializedName("mobile_number") var mobileNumber: String?,
         @ColumnInfo(name = "gender") @SerializedName("gender") val gender: Gender?,
         @Embedded(prefix = "c_address_") @SerializedName("address") val currentAddress: Address?,
         @Embedded(prefix = "p_address_") @SerializedName("previous_address") val previousAddress: Address?,

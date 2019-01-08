@@ -18,33 +18,46 @@ class NetworkAuthenticatorTest {
 
     @Test
     fun testTokensPersist() {
+        //TODO: to be implemented
     }
 
     @Test
     fun testForceRefreshingAccessTokens() {
+        //TODO: to be implemented
     }
 
     @Test
     fun testForceRefreshingInvalidAccessTokens() {
+        //TODO: to be implemented
     }
 
     @Test
     fun testPreemptiveAccessTokenRefresh() {
+        //TODO: to be implemented
     }
 
     @Test
     fun testInvalidAccessTokenRefresh() {
+        //TODO: to be implemented
     }
 
     @Test
     fun testInvalidRefreshTokenFails() {
+        //TODO: to be implemented
     }
 
     @Test
     fun testRequestsGetRetriedAfterRefreshingAccessToken() {
+        //TODO: to be implemented
     }
 
     @Test
     fun testRequestsGetCancelledAfterRefreshingAccessTokenFails() {
+        //TODO: to be implemented
+    }
+
+    @Test
+    fun testAuthenticationRetries() {
+        //TODO: to be implemented
     }
 }

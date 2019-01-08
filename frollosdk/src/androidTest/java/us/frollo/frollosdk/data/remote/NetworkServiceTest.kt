@@ -42,6 +42,7 @@ class NetworkServiceTest {
     @After
     fun tearDown() {
         mockServer.shutdown()
+        network.reset()
         preferences.reset()
     }
 

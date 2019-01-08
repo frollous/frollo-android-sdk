@@ -12,7 +12,7 @@ import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_USER_AGENT
 import us.frollo.frollosdk.data.remote.api.TokenAPI.Companion.URL_TOKEN_REFRESH
 import us.frollo.frollosdk.data.remote.api.UserAPI.Companion.URL_LOGIN
 import us.frollo.frollosdk.data.remote.api.UserAPI.Companion.URL_REGISTER
-import us.frollo.frollosdk.data.remote.api.UserAPI.Companion.URL_USER_RESET
+import us.frollo.frollosdk.data.remote.api.UserAPI.Companion.URL_PASSWORD_RESET
 import java.io.IOException
 
 internal class NetworkInterceptor(private val helper: NetworkHelper) : Interceptor {
@@ -41,7 +41,7 @@ internal class NetworkInterceptor(private val helper: NetworkHelper) : Intercept
     private fun addRequestAuthorizationHeader(request: Request, builder: Request.Builder) {
         val url = request.url().toString()
         if (request.headers().get(HEADER_AUTHORIZATION) == null) {
-            if (url.contains(URL_REGISTER) || url.contains(URL_USER_RESET)) {
+            if (url.contains(URL_REGISTER) || url.contains(URL_PASSWORD_RESET)) {
                 builder.addHeader(HEADER_AUTHORIZATION, helper.otp)
             } else if (url.contains(URL_TOKEN_REFRESH)) {
                 builder.addHeader(HEADER_AUTHORIZATION, helper.refreshToken)

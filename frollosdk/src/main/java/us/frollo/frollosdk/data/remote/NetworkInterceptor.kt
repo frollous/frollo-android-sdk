@@ -3,6 +3,7 @@ package us.frollo.frollosdk.data.remote
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
+import timber.log.Timber
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_API_VERSION
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_AUTHORIZATION
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_BUNDLE_ID
@@ -17,6 +18,12 @@ import java.io.IOException
 
 internal class NetworkInterceptor(private val helper: NetworkHelper) : Interceptor {
 
+    companion object {
+        private const val MAX_RATE_LIMIT_COUNT = 10
+    }
+
+    private var rateLimitCount = 0
+
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
@@ -30,10 +37,23 @@ internal class NetworkInterceptor(private val helper: NetworkHelper) : Intercept
 
         val req = builder.build()
 
-        val response = chain.proceed(req)
+        var response = chain.proceed(req)
 
-        if (!response.isSuccessful)
-            handleFailure(response)
+        //TODO: Review 429 Rate Limiting
+        if (!response.isSuccessful && response.code() == 429) {
+            Timber.d("Error Response 429: Too many requests. Backoff!")
+
+            // wait & retry
+            try {
+                rateLimitCount = Math.min(rateLimitCount + 1, MAX_RATE_LIMIT_COUNT)
+                val sleepTime = (rateLimitCount * 3) * 1000L
+                Thread.sleep(sleepTime)
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
+
+            response = chain.proceed(chain.request())
+        }
 
         return response
     }
@@ -58,13 +78,5 @@ internal class NetworkInterceptor(private val helper: NetworkHelper) : Intercept
         builder.removeHeader(HEADER_DEVICE_VERSION).addHeader(HEADER_DEVICE_VERSION, helper.deviceVersion)
         builder.removeHeader(HEADER_SOFTWARE_VERSION).addHeader(HEADER_SOFTWARE_VERSION, helper.softwareVersion)
         builder.removeHeader(HEADER_USER_AGENT).addHeader(HEADER_USER_AGENT, helper.userAgent)
-    }
-
-    private fun handleFailure(response: Response) {
-        when (response.code()) {
-            429 -> {
-                // TODO: Handle rate limit
-            }
-        }
     }
 }

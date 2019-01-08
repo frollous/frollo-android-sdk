@@ -1,11 +1,14 @@
 package us.frollo.frollosdk.data.remote
 
 import android.app.Application
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
+import com.jraska.livedata.test
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 
 import org.junit.Assert.*
+import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.data.remote.api.TokenAPI
@@ -14,9 +17,13 @@ import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.testEmailLoginData
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
+import us.frollo.frollosdk.testutils.TestAPI
+import us.frollo.frollosdk.testutils.get429Response
 import us.frollo.frollosdk.testutils.readStringFromJson
 
 class NetworkInterceptorTest {
+
+    @get:Rule val testRule = InstantTaskExecutorRule()
 
     private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
 
@@ -25,6 +32,7 @@ class NetworkInterceptorTest {
     private lateinit var preferences: Preferences
     private lateinit var network: NetworkService
     private lateinit var userAPI: UserAPI
+    private lateinit var testAPI: TestAPI
 
     private fun initSetup(url: String) {
         mockServer = MockWebServer()
@@ -37,6 +45,7 @@ class NetworkInterceptorTest {
         preferences = Preferences(app)
         network = NetworkService(baseUrl.toString(), keystore, preferences)
         userAPI = network.create(UserAPI::class.java)
+        testAPI = network.create(TestAPI::class.java)
     }
 
     private fun tearDown() {
@@ -152,6 +161,16 @@ class NetworkInterceptorTest {
 
     @Test
     fun testRateLimitRetries() {
-        //TODO: to be implemented
+        initSetup(UserAPI.URL_USER_DETAILS)
+
+        mockServer.enqueue(get429Response())
+        mockServer.enqueue(MockResponse().setResponseCode(200))
+
+        val response = testAPI.testData().execute()
+        assertTrue(response.isSuccessful)
+        assertNull(response.body())
+        assertEquals(2, mockServer.requestCount)
+
+        tearDown()
     }
 }

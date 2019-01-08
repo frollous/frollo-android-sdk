@@ -7,6 +7,7 @@ import java.io.InputStream
 import java.util.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import okhttp3.mockwebserver.MockResponse
 
 internal fun randomNumber() = Random().nextInt()
 
@@ -42,4 +43,9 @@ fun readStringFromJson(context: Context, @RawRes resId: Int): String {
     //Make sure you close all streams.
     stream.close()
     return ret
+}
+
+fun get429Response(): MockResponse {
+    return MockResponse().setResponseCode(429)
+            .setBody("{\"error\":\"too_many_requests\", \"reason\":\"example reason\"}\r\n")
 }

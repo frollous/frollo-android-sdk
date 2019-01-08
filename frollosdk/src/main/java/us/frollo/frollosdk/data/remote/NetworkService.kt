@@ -16,25 +16,19 @@ import java.util.concurrent.TimeUnit
 class NetworkService(private val serverUrl: String, keystore: Keystore, pref: Preferences) : IApiProvider {
 
     private val authToken = AuthToken(keystore, pref)
-    private val helper = NetworkHelper(authToken)
-    private val interceptor = NetworkInterceptor(helper)
-    private val authenticator = NetworkAuthenticator(this)
-
-    private var retrofit: Retrofit
-
-    init {
-        retrofit = createRetrofit()
-    }
+    private var retrofit = createRetrofit()
 
     private fun createRetrofit(): Retrofit {
+        val helper = NetworkHelper(authToken)
+
         val gson = GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .enableComplexMapKeySerialization()
                 .create()
 
         val httpClient = OkHttpClient.Builder()
-                .addInterceptor(interceptor)
-                .authenticator(authenticator)
+                .addInterceptor(NetworkInterceptor(helper))
+                .authenticator(NetworkAuthenticator(this))
                 .build()
 
         val builder = Retrofit.Builder()

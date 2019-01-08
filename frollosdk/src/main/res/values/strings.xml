@@ -1,4 +1,5 @@
 <resources>
+    <string name="Error_API_AccountLocked">User account has been locked due to too many incorrect login attempts. Please try again after one hour.</string>
     <string name="Error_API_BadRequest">The request sent to the server was malformed</string>
     <string name="Error_API_DeprecatedError">This version of the app is no longer supported. Please upgrade to the latest version to continue</string>
     <string name="Error_API_InvalidAccessToken">Invalid access token. Use the refresh token to get a valid one</string>

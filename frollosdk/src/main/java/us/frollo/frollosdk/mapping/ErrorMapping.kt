@@ -31,6 +31,7 @@ fun Int.toAPIErrorType(errorCode: APIErrorCode?): APIErrorType {
                 APIErrorCode.INVALID_USERNAME_PASSWORD -> APIErrorType.INVALID_USERNAME_PASSWORD
                 APIErrorCode.SUSPENDED_DEVICE -> APIErrorType.SUSPENDED_DEVICE
                 APIErrorCode.SUSPENDED_USER -> APIErrorType.SUSPENDED_USER
+                APIErrorCode.ACCOUNT_LOCKED -> APIErrorType.ACCOUNT_LOCKED
                 else -> APIErrorType.OTHER_AUTHORISATION
             }
         }

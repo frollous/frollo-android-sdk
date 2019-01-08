@@ -46,7 +46,7 @@ internal class NetworkInterceptor(private val helper: NetworkHelper) : Intercept
             } else if (url.contains(URL_TOKEN_REFRESH)) {
                 builder.addHeader(HEADER_AUTHORIZATION, helper.refreshToken)
             } else {
-                //TODO: Validate and then append accessToken
+                //TODO: Validate and then append accessToken (refer iOS)
                 builder.addHeader(HEADER_AUTHORIZATION, helper.accessToken)
             }
         }

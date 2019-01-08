@@ -23,6 +23,7 @@ enum class APIErrorType(@StringRes val textResource: Int) {
     INVALID_USERNAME_PASSWORD(R.string.Error_API_InvalidUsernamePassword),
     SUSPENDED_DEVICE(R.string.Error_API_SuspendedDevice),
     SUSPENDED_USER(R.string.Error_API_SuspendedUser),
+    ACCOUNT_LOCKED(R.string.Error_API_AccountLocked),
     OTHER_AUTHORISATION(R.string.Error_API_UnknownAuthorisation),
 
     UNKNOWN(R.string.Error_API_UnknownError);

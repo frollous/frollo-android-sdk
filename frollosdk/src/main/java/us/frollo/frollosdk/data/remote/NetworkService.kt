@@ -33,9 +33,6 @@ class NetworkService(private val serverUrl: String, keystore: Keystore, pref: Pr
                 .create()
 
         val httpClient = OkHttpClient.Builder()
-                .connectTimeout(1, TimeUnit.MINUTES)
-                .readTimeout(1, TimeUnit.MINUTES)
-                .writeTimeout(1, TimeUnit.MINUTES)
                 .addInterceptor(interceptor)
                 .authenticator(authenticator)
                 .build()

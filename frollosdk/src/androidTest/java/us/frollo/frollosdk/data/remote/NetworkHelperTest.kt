@@ -51,6 +51,14 @@ class NetworkHelperTest {
     }
 
     @Test
+    fun testAccessTokenExpiry() {
+        val networkHelper = NetworkHelper(authToken)
+        assertEquals(-1, networkHelper.accessTokenExpiry)
+        preferences.accessTokenExpiry = 14529375950
+        assertEquals(14529375950, networkHelper.accessTokenExpiry)
+    }
+
+    @Test
     fun testBundleId() {
         val networkHelper = NetworkHelper(authToken)
         assertNotNull(networkHelper.bundleId)

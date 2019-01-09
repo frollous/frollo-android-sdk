@@ -87,7 +87,7 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
     }
 
     private fun appendRefreshToken(builder: Request.Builder) {
-        helper.refreshToken?.let { builder.addHeader(HEADER_AUTHORIZATION, it) }
+        builder.addHeader(HEADER_AUTHORIZATION, helper.refreshToken)
     }
 
     fun authenticateRequest(request: Request): Request {
@@ -97,19 +97,14 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
     }
 
     private fun validateAndAppendAccessToken(builder: Request.Builder) {
-        var accessToken = helper.accessToken
+        if (!validAccessToken())
+            network.refreshTokens()
 
-        if (!validAccessToken()) {
-            accessToken = network.refreshTokens()
-        }
-
-        accessToken?.let {
-            builder.addHeader(HEADER_AUTHORIZATION, it)
-        }
+        builder.addHeader(HEADER_AUTHORIZATION, helper.accessToken)
     }
 
     private fun validAccessToken(): Boolean {
-        if (helper.accessToken == null || helper.accessTokenExpiry == -1L)
+        if (helper.accessTokenExpiry == -1L)
             return false
 
         val expiryDate = LocalDateTime.ofEpochSecond(helper.accessTokenExpiry, 0, ZoneOffset.UTC)

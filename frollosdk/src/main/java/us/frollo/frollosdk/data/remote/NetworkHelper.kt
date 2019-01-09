@@ -22,10 +22,10 @@ internal class NetworkHelper(private val authToken: AuthToken) {
         internal const val API_VERSION_PATH = "/api/v2"
     }
 
-    internal val accessToken: String?
+    internal val accessToken: String
         get() = "Bearer ${authToken.getAccessToken()}"
 
-    internal val refreshToken: String?
+    internal val refreshToken: String
         get() = "Bearer ${authToken.getRefreshToken()}"
 
     internal val accessTokenExpiry: Long

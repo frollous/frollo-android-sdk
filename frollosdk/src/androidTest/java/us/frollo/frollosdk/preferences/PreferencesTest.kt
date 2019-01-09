@@ -81,6 +81,13 @@ class PreferencesTest {
     }
 
     @Test
+    fun testAccessTokenExpiry() {
+        assertEquals(-1, preferences.accessTokenExpiry)
+        preferences.accessTokenExpiry = 14529375950
+        assertEquals(14529375950, preferences.accessTokenExpiry)
+    }
+
+    @Test
     fun testReset() {
         preferences.reset()
         assertNull(preferences.sdkVersion)
@@ -89,5 +96,6 @@ class PreferencesTest {
         assertTrue(preferences.features.isEmpty())
         assertNull(preferences.encryptedRefreshToken)
         assertNull(preferences.encryptedAccessToken)
+        assertEquals(preferences.accessTokenExpiry, -1)
     }
 }

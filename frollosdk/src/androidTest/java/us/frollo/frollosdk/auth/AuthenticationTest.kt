@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.gson.Gson
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -13,6 +14,8 @@ import org.junit.Test
 
 import org.junit.Assert.*
 import org.junit.Rule
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.DeviceInfo
@@ -59,6 +62,8 @@ class AuthenticationTest {
         val network = NetworkService(baseUrl.toString(), keyStore, preferences)
 
         authentication = Authentication(DeviceInfo(app), network, database, preferences)
+
+        AndroidThreeTen.init(app)
     }
 
     private fun tearDown() {
@@ -66,7 +71,6 @@ class AuthenticationTest {
         authentication.reset()
         preferences.reset()
     }
-
 
     @Test
     fun testGetUser() {
@@ -216,6 +220,8 @@ class AuthenticationTest {
     fun testRefreshUser() {
         initSetup(UserAPI.URL_USER_DETAILS)
 
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
         val body = readStringFromJson(app, R.raw.user_details_complete)
         val mockedResponse = MockResponse()
                 .setResponseCode(200)
@@ -246,6 +252,8 @@ class AuthenticationTest {
     fun testUpdateUser() {
         initSetup(UserAPI.URL_USER_DETAILS)
 
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
         val body = readStringFromJson(app, R.raw.user_details_complete)
         val mockedResponse = MockResponse()
                 .setResponseCode(200)
@@ -275,6 +283,8 @@ class AuthenticationTest {
     @Test
     fun testUpdateAttribution() {
         initSetup(UserAPI.URL_USER_DETAILS)
+
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
         val mockedResponse = MockResponse()

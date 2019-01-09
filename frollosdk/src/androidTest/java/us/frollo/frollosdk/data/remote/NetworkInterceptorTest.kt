@@ -3,13 +3,16 @@ package us.frollo.frollosdk.data.remote
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
-import com.jraska.livedata.test
+import com.jakewharton.threetenabp.AndroidThreeTen
+import okhttp3.Request
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.data.remote.api.TokenAPI
 import us.frollo.frollosdk.data.remote.api.UserAPI
@@ -46,6 +49,8 @@ class NetworkInterceptorTest {
         network = NetworkService(baseUrl.toString(), keystore, preferences)
         userAPI = network.create(UserAPI::class.java)
         testAPI = network.create(TestAPI::class.java)
+
+        AndroidThreeTen.init(app)
     }
 
     private fun tearDown() {
@@ -60,6 +65,7 @@ class NetworkInterceptorTest {
 
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
         val mockedResponse = MockResponse()
@@ -97,6 +103,7 @@ class NetworkInterceptorTest {
 
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
         val mockedResponse = MockResponse()
@@ -163,6 +170,8 @@ class NetworkInterceptorTest {
     fun testRateLimitRetries() {
         initSetup(UserAPI.URL_USER_DETAILS)
 
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
         mockServer.enqueue(get429Response())
         mockServer.enqueue(MockResponse().setResponseCode(200))
 
@@ -170,6 +179,46 @@ class NetworkInterceptorTest {
         assertTrue(response.isSuccessful)
         assertNull(response.body())
         assertEquals(2, mockServer.requestCount)
+
+        tearDown()
+    }
+
+    @Test
+    fun testAuthenticateRequestAppendExistingAccessToken() {
+        initSetup(UserAPI.URL_USER_DETAILS)
+
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        val request = network.authenticateRequest(Request.Builder()
+                .url("https://api.example.com")
+                .build())
+        assertNotNull(request)
+        assertEquals("Bearer ExistingAccessToken", request.header("Authorization"))
+
+        tearDown()
+    }
+
+    @Test
+    fun testAuthenticateRequestAppendRefreshedAccessToken() {
+        initSetup(UserAPI.URL_USER_DETAILS)
+
+        val body = readStringFromJson(app, R.raw.refresh_token_valid)
+        val mockedResponse = MockResponse()
+                .setResponseCode(200)
+                .setBody(body)
+        mockServer.enqueue(mockedResponse)
+
+        preferences.encryptedAccessToken = keystore.encrypt("InvalidAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) - 900
+
+        val request = network.authenticateRequest(Request.Builder()
+                .url("https://api.example.com")
+                .build())
+        assertNotNull(request)
+        assertEquals("Bearer AValidAccessTokenFromHost", request.header("Authorization"))
 
         tearDown()
     }

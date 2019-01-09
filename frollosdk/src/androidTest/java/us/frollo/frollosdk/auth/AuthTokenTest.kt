@@ -50,14 +50,24 @@ class AuthTokenTest {
     }
 
     @Test
+    fun testAccessTokenExpiry() {
+        assertEquals(-1, authToken.getAccessTokenExpiry())
+        preferences.accessTokenExpiry = 14529375950
+        assertEquals(14529375950, authToken.getAccessTokenExpiry())
+    }
+
+    @Test
     fun testSaveTokens() {
         assertNull(authToken.getRefreshToken())
         assertNull(authToken.getAccessToken())
-        authToken.saveTokens(TokenResponse(refreshToken = "DummyRefreshToken", accessToken = "DummyAccessToken", accessTokenExp = 1234567890))
+        assertEquals(-1, authToken.getAccessTokenExpiry())
+        authToken.saveTokens(TokenResponse(refreshToken = "DummyRefreshToken", accessToken = "DummyAccessToken", accessTokenExp = 14529375950))
         assertEquals("DummyAccessToken", authToken.getAccessToken())
         assertEquals("DummyRefreshToken", authToken.getRefreshToken())
+        assertEquals(14529375950, authToken.getAccessTokenExpiry())
         assertEquals("DummyAccessToken", keyStore.decrypt(preferences.encryptedAccessToken))
         assertEquals("DummyRefreshToken", keyStore.decrypt(preferences.encryptedRefreshToken))
+        assertEquals(14529375950, preferences.accessTokenExpiry)
     }
 
     @Test
@@ -67,5 +77,7 @@ class AuthTokenTest {
         assertNull(authToken.getRefreshToken())
         assertNull(preferences.encryptedAccessToken)
         assertNull(preferences.encryptedRefreshToken)
+        assertEquals(-1, authToken.getAccessTokenExpiry())
+        assertEquals(-1, preferences.accessTokenExpiry)
     }
 }

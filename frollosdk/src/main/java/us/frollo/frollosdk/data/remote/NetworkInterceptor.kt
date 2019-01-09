@@ -3,6 +3,8 @@ package us.frollo.frollosdk.data.remote
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZoneOffset
 import timber.log.Timber
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_API_VERSION
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_AUTHORIZATION
@@ -16,10 +18,11 @@ import us.frollo.frollosdk.data.remote.api.UserAPI.Companion.URL_REGISTER
 import us.frollo.frollosdk.data.remote.api.UserAPI.Companion.URL_PASSWORD_RESET
 import java.io.IOException
 
-internal class NetworkInterceptor(private val helper: NetworkHelper) : Interceptor {
+internal class NetworkInterceptor(private val network: NetworkService, private val helper: NetworkHelper) : Interceptor {
 
     companion object {
         private const val MAX_RATE_LIMIT_COUNT = 10
+        private const val TIME_INTERVAL_5_MINUTES = 300L //seconds
     }
 
     private var rateLimitCount = 0
@@ -62,12 +65,11 @@ internal class NetworkInterceptor(private val helper: NetworkHelper) : Intercept
         val url = request.url().toString()
         if (request.headers().get(HEADER_AUTHORIZATION) == null) {
             if (url.contains(URL_REGISTER) || url.contains(URL_PASSWORD_RESET)) {
-                builder.addHeader(HEADER_AUTHORIZATION, helper.otp)
+                appendOTP(builder)
             } else if (url.contains(URL_TOKEN_REFRESH)) {
-                builder.addHeader(HEADER_AUTHORIZATION, helper.refreshToken)
+                appendRefreshToken(builder)
             } else {
-                //TODO: Validate and then append accessToken (refer iOS)
-                builder.addHeader(HEADER_AUTHORIZATION, helper.accessToken)
+                validateAndAppendAccessToken(builder)
             }
         }
     }
@@ -78,5 +80,42 @@ internal class NetworkInterceptor(private val helper: NetworkHelper) : Intercept
         builder.removeHeader(HEADER_DEVICE_VERSION).addHeader(HEADER_DEVICE_VERSION, helper.deviceVersion)
         builder.removeHeader(HEADER_SOFTWARE_VERSION).addHeader(HEADER_SOFTWARE_VERSION, helper.softwareVersion)
         builder.removeHeader(HEADER_USER_AGENT).addHeader(HEADER_USER_AGENT, helper.userAgent)
+    }
+
+    private fun appendOTP(builder: Request.Builder) {
+        builder.addHeader(HEADER_AUTHORIZATION, helper.otp)
+    }
+
+    private fun appendRefreshToken(builder: Request.Builder) {
+        helper.refreshToken?.let { builder.addHeader(HEADER_AUTHORIZATION, it) }
+    }
+
+    fun authenticateRequest(request: Request): Request {
+        val builder = request.newBuilder()
+        validateAndAppendAccessToken(builder)
+        return builder.build()
+    }
+
+    private fun validateAndAppendAccessToken(builder: Request.Builder) {
+        var accessToken = helper.accessToken
+
+        if (!validAccessToken()) {
+            accessToken = network.refreshTokens()
+        }
+
+        accessToken?.let {
+            builder.addHeader(HEADER_AUTHORIZATION, it)
+        }
+    }
+
+    private fun validAccessToken(): Boolean {
+        if (helper.accessToken == null || helper.accessTokenExpiry == -1L)
+            return false
+
+        val expiryDate = LocalDateTime.ofEpochSecond(helper.accessTokenExpiry, 0, ZoneOffset.UTC)
+        val adjustedExpiryDate = expiryDate.plusSeconds(-TIME_INTERVAL_5_MINUTES)
+        val nowDate = LocalDateTime.now(ZoneOffset.UTC)
+
+        return nowDate.isBefore(adjustedExpiryDate)
     }
 }

@@ -3,8 +3,8 @@ package us.frollo.frollosdk.auth
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import okhttp3.Request
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.ACTION.ACTION_USER_UPDATED
 import us.frollo.frollosdk.core.DeviceInfo
@@ -110,6 +110,9 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     fun deleteUser() {
         // TODO: To be implemented
     }
+
+    fun authenticateRequest(request: Request) =
+            network.authenticateRequest(request)
 
     fun logoutUser() {
         // TODO: To be implemented

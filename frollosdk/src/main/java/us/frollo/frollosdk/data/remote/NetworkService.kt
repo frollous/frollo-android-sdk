@@ -3,6 +3,7 @@ package us.frollo.frollosdk.data.remote
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import us.frollo.frollosdk.auth.AuthToken
@@ -11,23 +12,22 @@ import us.frollo.frollosdk.data.remote.api.TokenAPI
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.api.user.TokenResponse
 import us.frollo.frollosdk.preferences.Preferences
-import java.util.concurrent.TimeUnit
 
 class NetworkService(private val serverUrl: String, keystore: Keystore, pref: Preferences) : IApiProvider {
 
     private val authToken = AuthToken(keystore, pref)
+    private val helper = NetworkHelper(authToken)
+    private val interceptor = NetworkInterceptor(this, helper)
     private var retrofit = createRetrofit()
 
     private fun createRetrofit(): Retrofit {
-        val helper = NetworkHelper(authToken)
-
         val gson = GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .enableComplexMapKeySerialization()
                 .create()
 
         val httpClient = OkHttpClient.Builder()
-                .addInterceptor(NetworkInterceptor(helper))
+                .addInterceptor(interceptor)
                 .authenticator(NetworkAuthenticator(this))
                 .build()
 
@@ -59,6 +59,10 @@ class NetworkService(private val serverUrl: String, keystore: Keystore, pref: Pr
 
     internal fun handleTokens(tokenResponse: TokenResponse) {
         authToken.saveTokens(tokenResponse)
+    }
+
+    internal fun authenticateRequest(request: Request): Request {
+        return interceptor.authenticateRequest(request)
     }
 
     internal fun reset() {

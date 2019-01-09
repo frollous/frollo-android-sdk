@@ -14,7 +14,7 @@ class Preferences(context: Context) {
         private const val KEY_USER_FEATURES = "key_frollosdk_user_features"
         private const val KEY_ENCRYPTED_REFRESH_TOKEN = "key_encrypted_refresh_token"
         private const val KEY_ENCRYPTED_ACCESS_TOKEN = "key_encrypted_access_token"
-        //TODO: Store Access Token Expiry
+        private const val KEY_ACCESS_TOKEN_EXPIRY = "key_access_token_expiry"
     }
 
     private val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
@@ -51,6 +51,12 @@ class Preferences(context: Context) {
         get() = preferences.getString(KEY_ENCRYPTED_ACCESS_TOKEN, null)
         set(value) = preferences.edit().putString(KEY_ENCRYPTED_ACCESS_TOKEN, value).apply()
     internal fun resetEncryptedAccessToken() = preferences.edit().remove(KEY_ENCRYPTED_ACCESS_TOKEN).apply()
+
+    /** Access Token Expiry */
+    internal var accessTokenExpiry: Long
+        get() = preferences.getLong(KEY_ACCESS_TOKEN_EXPIRY, -1)
+        set(value) = preferences.edit().putLong(KEY_ACCESS_TOKEN_EXPIRY, value).apply()
+    internal fun resetAccessTokenExpiry() = preferences.edit().remove(KEY_ACCESS_TOKEN_EXPIRY).apply()
 
     internal fun reset() {
         preferences.edit().clear().apply()

@@ -5,8 +5,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import okhttp3.Request
+import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
 
 import org.junit.Assert.*
 import org.junit.Rule
@@ -37,10 +39,10 @@ class NetworkInterceptorTest {
     private lateinit var userAPI: UserAPI
     private lateinit var testAPI: TestAPI
 
-    private fun initSetup(url: String) {
+    private fun initSetup() {
         mockServer = MockWebServer()
         mockServer.start()
-        val baseUrl = mockServer.url(url)
+        val baseUrl = mockServer.url("/")
 
         FrolloSDK.app = app
         keystore = Keystore()
@@ -61,17 +63,22 @@ class NetworkInterceptorTest {
 
     @Test
     fun testRequestHeaders() {
-        initSetup(UserAPI.URL_USER_DETAILS)
+        initSetup()
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_USER_DETAILS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.user_details_complete))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        val body = readStringFromJson(app, R.raw.user_details_complete)
-        val mockedResponse = MockResponse()
-                .setResponseCode(200)
-                .setBody(body)
-        mockServer.enqueue(mockedResponse)
 
         userAPI.fetchUser()
 
@@ -99,17 +106,22 @@ class NetworkInterceptorTest {
 
     @Test
     fun testAccessTokenHeaderAppendedToHostRequests() {
-        initSetup(UserAPI.URL_USER_DETAILS)
+        initSetup()
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_USER_DETAILS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.user_details_complete))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        val body = readStringFromJson(app, R.raw.user_details_complete)
-        val mockedResponse = MockResponse()
-                .setResponseCode(200)
-                .setBody(body)
-        mockServer.enqueue(mockedResponse)
 
         userAPI.fetchUser()
 
@@ -122,13 +134,18 @@ class NetworkInterceptorTest {
 
     @Test
     fun testRefreshTokenHeaderAppendedToRefreshRequests() {
-        initSetup(TokenAPI.URL_TOKEN_REFRESH)
+        initSetup()
 
-        val body = readStringFromJson(app, R.raw.refresh_token_valid)
-        val mockedResponse = MockResponse()
-                .setResponseCode(200)
-                .setBody(body)
-        mockServer.enqueue(mockedResponse)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == TokenAPI.URL_TOKEN_REFRESH) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.refresh_token_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         preferences.encryptedAccessToken = keystore.encrypt("InvalidAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
@@ -144,13 +161,18 @@ class NetworkInterceptorTest {
 
     @Test
     fun testNoHeaderAppendedToLoginRequest() {
-        initSetup(UserAPI.URL_LOGIN)
+        initSetup()
 
-        val body = readStringFromJson(app, R.raw.user_details_complete)
-        val mockedResponse = MockResponse()
-                .setResponseCode(200)
-                .setBody(body)
-        mockServer.enqueue(mockedResponse)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_LOGIN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.user_details_complete))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         userAPI.login(testEmailLoginData())
 
@@ -168,7 +190,7 @@ class NetworkInterceptorTest {
 
     @Test
     fun testRateLimitRetries() {
-        initSetup(UserAPI.URL_USER_DETAILS)
+        initSetup()
 
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
@@ -185,7 +207,7 @@ class NetworkInterceptorTest {
 
     @Test
     fun testAuthenticateRequestAppendExistingAccessToken() {
-        initSetup(UserAPI.URL_USER_DETAILS)
+        initSetup()
 
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
@@ -202,13 +224,18 @@ class NetworkInterceptorTest {
 
     @Test
     fun testAuthenticateRequestAppendRefreshedAccessToken() {
-        initSetup(UserAPI.URL_USER_DETAILS)
+        initSetup()
 
-        val body = readStringFromJson(app, R.raw.refresh_token_valid)
-        val mockedResponse = MockResponse()
-                .setResponseCode(200)
-                .setBody(body)
-        mockServer.enqueue(mockedResponse)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == TokenAPI.URL_TOKEN_REFRESH) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.refresh_token_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         preferences.encryptedAccessToken = keystore.encrypt("InvalidAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")

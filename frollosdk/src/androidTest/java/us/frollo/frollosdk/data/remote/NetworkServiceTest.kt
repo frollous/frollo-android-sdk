@@ -4,8 +4,10 @@ import android.app.Application
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import okhttp3.Request
+import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -34,7 +36,7 @@ class NetworkServiceTest {
     fun setUp() {
         mockServer = MockWebServer()
         mockServer.start()
-        val baseUrl = mockServer.url(TokenAPI.URL_TOKEN_REFRESH)
+        val baseUrl = mockServer.url("/")
 
         FrolloSDK.app = app
         keystore = Keystore()
@@ -67,11 +69,16 @@ class NetworkServiceTest {
 
     @Test
     fun testForceRefreshingAccessTokens() {
-        val body = readStringFromJson(app, R.raw.refresh_token_valid)
-        val mockedResponse = MockResponse()
-                .setResponseCode(200)
-                .setBody(body)
-        mockServer.enqueue(mockedResponse)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == TokenAPI.URL_TOKEN_REFRESH) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.refresh_token_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         preferences.encryptedAccessToken = keystore.encrypt("InvalidAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ValidRefreshToken")

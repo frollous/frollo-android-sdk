@@ -6,10 +6,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.gson.Gson
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
+import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.junit.After
-import org.junit.Before
+import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -48,10 +48,10 @@ class AuthenticationTest {
     private lateinit var mockServer: MockWebServer
     private lateinit var preferences: Preferences
 
-    private fun initSetup(url: String) {
+    private fun initSetup() {
         mockServer = MockWebServer()
         mockServer.start()
-        val baseUrl = mockServer.url(url)
+        val baseUrl = mockServer.url("/")
 
         FrolloSDK.app = app
 
@@ -74,13 +74,19 @@ class AuthenticationTest {
 
     @Test
     fun testGetUser() {
-        initSetup(UserAPI.URL_LOGIN)
+        initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        val mockedResponse = MockResponse()
-                .setResponseCode(200)
-                .setBody(body)
-        mockServer.enqueue(mockedResponse)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_LOGIN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         assertNull(authentication.user)
 
@@ -96,13 +102,19 @@ class AuthenticationTest {
 
     @Test
     fun testGetUserLiveData() {
-        initSetup(UserAPI.URL_LOGIN)
+        initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        val mockedResponse = MockResponse()
-                .setResponseCode(200)
-                .setBody(body)
-        mockServer.enqueue(mockedResponse)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_LOGIN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         val testObserver = authentication.loginUser(AuthType.EMAIL, "deepak@frollo.us", "pass1234").test()
         testObserver.awaitNextValue()
@@ -119,13 +131,19 @@ class AuthenticationTest {
 
     @Test
     fun testGetLoggedIn() {
-        initSetup(UserAPI.URL_LOGIN)
+        initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        val mockedResponse = MockResponse()
-                .setResponseCode(200)
-                .setBody(body)
-        mockServer.enqueue(mockedResponse)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_LOGIN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         assertFalse(authentication.loggedIn)
 
@@ -139,13 +157,19 @@ class AuthenticationTest {
 
     @Test
     fun testLoginUserEmail() {
-        initSetup(UserAPI.URL_LOGIN)
+        initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        val mockedResponse = MockResponse()
-                .setResponseCode(200)
-                .setBody(body)
-        mockServer.enqueue(mockedResponse)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_LOGIN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         val testObserver = authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password").test()
 
@@ -169,13 +193,19 @@ class AuthenticationTest {
 
     @Test
     fun testInvalidLoginUser() {
-        initSetup(UserAPI.URL_LOGIN)
+        initSetup()
 
         val body = readStringFromJson(app, R.raw.error_invalid_username_password)
-        val mockedResponse = MockResponse()
-                .setResponseCode(401)
-                .setBody(body)
-        mockServer.enqueue(mockedResponse)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_LOGIN) {
+                    return MockResponse()
+                            .setResponseCode(401)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         val testObserver = authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "wrong_password").test()
 
@@ -201,7 +231,7 @@ class AuthenticationTest {
 
     @Test
     fun testInvalidLoginData() {
-        initSetup(UserAPI.URL_LOGIN)
+        initSetup()
 
         val testObserver = authentication.loginUser(AuthType.FACEBOOK).test()
         testObserver.assertHasValue()
@@ -218,15 +248,21 @@ class AuthenticationTest {
 
     @Test
     fun testRefreshUser() {
-        initSetup(UserAPI.URL_USER_DETAILS)
+        initSetup()
 
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        val mockedResponse = MockResponse()
-                .setResponseCode(200)
-                .setBody(body)
-        mockServer.enqueue(mockedResponse)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_USER_DETAILS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         val testObserver = authentication.refreshUser().test()
 
@@ -250,15 +286,21 @@ class AuthenticationTest {
 
     @Test
     fun testUpdateUser() {
-        initSetup(UserAPI.URL_USER_DETAILS)
+        initSetup()
 
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        val mockedResponse = MockResponse()
-                .setResponseCode(200)
-                .setBody(body)
-        mockServer.enqueue(mockedResponse)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_USER_DETAILS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         val testObserver = authentication.updateUser(testUserResponseData().toUser()).test()
 
@@ -282,15 +324,21 @@ class AuthenticationTest {
 
     @Test
     fun testUpdateAttribution() {
-        initSetup(UserAPI.URL_USER_DETAILS)
+        initSetup()
 
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        val mockedResponse = MockResponse()
-                .setResponseCode(200)
-                .setBody(body)
-        mockServer.enqueue(mockedResponse)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_USER_DETAILS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         val testObserver = authentication.updateAttribution(Attribution(campaign = randomString(8))).test()
 
@@ -329,13 +377,19 @@ class AuthenticationTest {
 
     @Test
     fun testReset() {
-        initSetup(UserAPI.URL_USER_DETAILS)
+        initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        val mockedResponse = MockResponse()
-                .setResponseCode(200)
-                .setBody(body)
-        mockServer.enqueue(mockedResponse)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_LOGIN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         val testObserver = authentication.loginUser(AuthType.EMAIL, "deepak@frollo.us", "pass1234").test()
         testObserver.awaitNextValue()

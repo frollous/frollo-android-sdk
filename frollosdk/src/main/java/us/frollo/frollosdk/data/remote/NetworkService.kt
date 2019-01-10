@@ -13,7 +13,7 @@ import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.api.user.TokenResponse
 import us.frollo.frollosdk.preferences.Preferences
 
-class NetworkService(private val serverUrl: String, keystore: Keystore, pref: Preferences) : IApiProvider {
+class NetworkService(internal val serverUrl: String, keystore: Keystore, pref: Preferences) : IApiProvider {
 
     private val authToken = AuthToken(keystore, pref)
     private val helper = NetworkHelper(authToken)

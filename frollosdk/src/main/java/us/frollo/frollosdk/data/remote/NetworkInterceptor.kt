@@ -1,5 +1,6 @@
 package us.frollo.frollosdk.data.remote
 
+import android.net.Uri
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
@@ -32,11 +33,10 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
         val request = chain.request()
         val builder = request.newBuilder()
 
-        // Add Header Auth for all requests except LOGIN
-        if (!request.url().toString().contains(URL_LOGIN)) {
-            addRequestAuthorizationHeader(request, builder)
+        if (request?.url()?.host() == Uri.parse(network.serverUrl).host) { // Precautionary check to not append headers for any external requests
+            addAuthorizationHeader(request, builder)
+            addAdditionalHeaders(builder)
         }
-        addAdditionalHeaders(builder)
 
         val req = builder.build()
 
@@ -61,14 +61,15 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
         return response
     }
 
-    private fun addRequestAuthorizationHeader(request: Request, builder: Request.Builder) {
+    private fun addAuthorizationHeader(request: Request, builder: Request.Builder) {
         val url = request.url().toString()
         if (request.headers().get(HEADER_AUTHORIZATION) == null) {
             if (url.contains(URL_REGISTER) || url.contains(URL_PASSWORD_RESET)) {
+                // OTP auth header for register & password reset
                 appendOTP(builder)
             } else if (url.contains(URL_TOKEN_REFRESH)) {
                 appendRefreshToken(builder)
-            } else {
+            } else if (!url.contains(URL_LOGIN)) { // No auth header for login
                 validateAndAppendAccessToken(builder)
             }
         }

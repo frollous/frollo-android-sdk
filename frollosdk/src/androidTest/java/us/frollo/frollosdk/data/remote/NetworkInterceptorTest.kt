@@ -184,11 +184,6 @@ class NetworkInterceptorTest {
     }
 
     @Test
-    fun testNoHeaderAppendedToExternalHostRequests() {
-        //TODO: to be implemented
-    }
-
-    @Test
     fun testRateLimitRetries() {
         initSetup()
 

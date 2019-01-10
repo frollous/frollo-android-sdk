@@ -41,6 +41,7 @@ internal class NetworkAuthenticator(private val network: NetworkService) : Authe
                     else FrolloSDK.forcedLogout()
                 }
                 APIErrorType.INVALID_REFRESH_TOKEN, APIErrorType.SUSPENDED_DEVICE, APIErrorType.SUSPENDED_USER, APIErrorType.OTHER_AUTHORISATION -> {
+                    network.reset()
                     FrolloSDK.forcedLogout()
                 }
                 else -> {

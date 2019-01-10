@@ -66,7 +66,7 @@ class NetworkServiceTest {
     }
 
     @Test
-    fun testRefreshTokens() {
+    fun testForceRefreshingAccessTokens() {
         val body = readStringFromJson(app, R.raw.refresh_token_valid)
         val mockedResponse = MockResponse()
                 .setResponseCode(200)
@@ -76,7 +76,9 @@ class NetworkServiceTest {
         preferences.encryptedAccessToken = keystore.encrypt("InvalidAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ValidRefreshToken")
         preferences.accessTokenExpiry = 14529375950
+
         val newAccessToken = network.refreshTokens()
+
         assertEquals("AValidAccessTokenFromHost", newAccessToken)
         assertEquals("AValidAccessTokenFromHost", keystore.decrypt(preferences.encryptedAccessToken))
         assertEquals("AValidRefreshTokenFromHost", keystore.decrypt(preferences.encryptedRefreshToken))
@@ -84,6 +86,11 @@ class NetworkServiceTest {
 
         val request = mockServer.takeRequest()
         assertEquals(TokenAPI.URL_TOKEN_REFRESH, request.path)
+    }
+
+    @Test
+    fun testForceRefreshingInvalidAccessTokens() {
+        //TODO: to be implemented
     }
 
     @Test

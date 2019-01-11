@@ -153,13 +153,15 @@ class NetworkAuthenticatorTest {
         val testObserver = userAPI.fetchUser().test()
         testObserver.awaitValue()
 
-        assertEquals(2, mockServer.requestCount)
+        assertEquals(1, mockServer.requestCount)
         testObserver.assertHasValue()
         val value = Resource.fromApiResponse(testObserver.value())
         assertEquals(Resource.Status.ERROR, value.status)
         assertNotNull(value.error)
-        assertTrue(value.error is APIError)
-        assertEquals(APIErrorType.INVALID_REFRESH_TOKEN, (value.error as APIError).type)
+        assertTrue(value.error is DataError)
+        assertEquals(DataErrorType.AUTHENTICATION, (value.error as DataError).type)
+        assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (value.error as DataError).subType)
+
         assertNull(preferences.encryptedAccessToken)
         assertNull(preferences.encryptedRefreshToken)
         assertEquals(-1, preferences.accessTokenExpiry)

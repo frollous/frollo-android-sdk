@@ -125,6 +125,8 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
 
         helper.authAccessToken?.let {
             builder.addHeader(HEADER_AUTHORIZATION, it)
+        } ?: run {
+            throw DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_ACCESS_TOKEN)
         }
     }
 

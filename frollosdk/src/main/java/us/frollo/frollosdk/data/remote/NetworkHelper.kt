@@ -56,5 +56,5 @@ internal class NetworkHelper(private val authToken: AuthToken) {
      * @return "Bearer xxx.yyy.zzz"
      */
     internal val otp: String
-        get() = "Bearer ${OTP().otp()}"
+        get() = "Bearer ${OTP.generateOTP(BuildConfig.APPLICATION_ID)}"
 }

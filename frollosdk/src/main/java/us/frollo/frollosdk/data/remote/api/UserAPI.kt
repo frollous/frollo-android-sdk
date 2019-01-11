@@ -5,6 +5,7 @@ import retrofit2.http.*
 import us.frollo.frollosdk.data.remote.ApiResponse
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.API_VERSION_PATH
 import us.frollo.frollosdk.model.api.user.UserLoginRequest
+import us.frollo.frollosdk.model.api.user.UserRegisterRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 
@@ -16,8 +17,8 @@ internal interface UserAPI {
         const val URL_USER_DETAILS = "$API_VERSION_PATH/user/details/"
     }
 
-    //@POST(URL_REGISTER)
-    //fun register(@Body request: UserRegisterRequest): LiveData<ApiResponse<UserResponse>>
+    @POST(URL_REGISTER)
+    fun register(@Body request: UserRegisterRequest): LiveData<ApiResponse<UserResponse>>
 
     @POST(URL_LOGIN)
     fun login(@Body request: UserLoginRequest): LiveData<ApiResponse<UserResponse>>

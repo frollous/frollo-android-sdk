@@ -28,7 +28,9 @@ class MainActivity : AppCompatActivity() {
 
         if (!FrolloSDK.isSetup) {
             FrolloSDK.setup(application, SetupParams.Builder().serverUrl("https://api-sandbox.frollo.us").build()) { error ->
-                if (error == null) login()
+                if (error == null)
+                    login()
+                    //register()
             }
         }
     }
@@ -82,4 +84,25 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    /*private fun register() {
+        FrolloSDK.authentication.registerUser(
+                firstName = "test first",
+                lastName = "test last",
+                mobileNumber = "0411111111",
+                postcode = "2050",
+                dateOfBirth = Date(),
+                email = "testtest@frollo.us",
+                password = "pass1234").observe(this) {
+            when (it?.status) {
+                Resource.Status.SUCCESS -> Timber.d("*** Welcome ${ it.data?.firstName }")
+                Resource.Status.ERROR -> Timber.d("Error registering: " +
+                        if (it.error is APIError) (it.error as APIError).debugDescription
+                        else if (it.error is DataError) (it.error as DataError).debugDescription
+                        else (it.error as FrolloSDKError).debugDescription
+                )
+                Resource.Status.LOADING -> Timber.d("Registering...")
+            }
+        }
+    }*/
 }

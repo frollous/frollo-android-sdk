@@ -79,13 +79,14 @@ object FrolloSDK {
     }
 
     internal fun forcedLogout() {
-        reset()
+        //if (authentication.loggedIn) // TODO: This is creating problem for tests. Refactor and enable later.
+            reset()
     }
 
     fun reset() {
         // TODO: Pause scheduled refreshing
+        // NOTE: Keystore reset is not required as we do not store any data in there. Just keys.
         authentication.reset()
-        //keyStore.reset() // Keystore reset maybe not required
         preferences.reset()
         database.reset()
         // TODO: Need to send any notify anything?

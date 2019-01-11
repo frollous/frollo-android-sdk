@@ -14,17 +14,17 @@ import us.frollo.frollosdk.data.remote.api.UserAPI
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
-import us.frollo.frollosdk.extensions.fetchTokens
-import us.frollo.frollosdk.extensions.notify
-import us.frollo.frollosdk.extensions.stripTokens
-import us.frollo.frollosdk.extensions.updateRequest
+import us.frollo.frollosdk.extensions.*
 import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.api.user.UserLoginRequest
+import us.frollo.frollosdk.model.api.user.UserRegisterRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
+import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.coredata.user.User
 import us.frollo.frollosdk.preferences.Preferences
+import java.util.*
 
 class Authentication(private val di: DeviceInfo, private val network: NetworkService, private val db: SDKDatabase, private val pref: Preferences) {
 
@@ -44,15 +44,14 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
 
     fun loginUser(method: AuthType, email: String? = null, password: String? = null, userId: String? = null, userToken: String? = null): LiveData<Resource<User>> {
         val request = UserLoginRequest(
-                email = email,
-                password = password,
                 deviceId = di.deviceId,
                 deviceName = di.deviceName,
                 deviceType = di.deviceType,
+                email = email,
+                password = password,
                 authType = method,
                 userId = userId,
-                userToken = userToken
-        )
+                userToken = userToken)
 
         return if (request.valid()) {
             Transformations.map(userAPI.login(request)) {
@@ -72,6 +71,33 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
                 value = Resource.error(DataError(type = DataErrorType.API, subType = DataErrorSubType.INVALID_DATA))
             }
         }
+    }
+
+    fun registerUser(firstName: String, lastName: String? = null, mobileNumber: String? = null, postcode: String? = null, dateOfBirth: Date? = null, email: String, password: String): LiveData<Resource<User>> {
+        val request = UserRegisterRequest(
+                deviceId = di.deviceId,
+                deviceName = di.deviceName,
+                deviceType = di.deviceType,
+                firstName = firstName,
+                lastName = lastName,
+                email = email,
+                password = password,
+                currentAddress = if (postcode?.isNotBlank() == true) Address(postcode = postcode) else null,
+                mobileNumber = mobileNumber,
+                dateOfBirth = dateOfBirth?.toString("yyyy-MM"))
+
+        return Transformations.map(userAPI.register(request)) {
+            Resource.fromApiResponse(it).map { response ->
+                val tokens = response?.fetchTokens()
+                tokens?.let { tokenResponse -> network.handleTokens(tokenResponse) }
+
+                val userResponse = response?.stripTokens()
+                handleUserResponse(userResponse)
+
+                updateLocalData(userResponse)
+                user
+            }
+        }.apply { (this as? MutableLiveData<Resource<User>>)?.value = Resource.loading(null) }
     }
 
     fun refreshUser(): LiveData<Resource<User>> {

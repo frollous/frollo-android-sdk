@@ -16,10 +16,7 @@ import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.*
 import us.frollo.frollosdk.mapping.toUser
-import us.frollo.frollosdk.model.api.user.UserLoginRequest
-import us.frollo.frollosdk.model.api.user.UserRegisterRequest
-import us.frollo.frollosdk.model.api.user.UserResponse
-import us.frollo.frollosdk.model.api.user.UserUpdateRequest
+import us.frollo.frollosdk.model.api.user.*
 import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.coredata.user.User
@@ -99,6 +96,11 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
             }
         }.apply { (this as? MutableLiveData<Resource<User>>)?.value = Resource.loading(null) }
     }
+
+    fun resetPassword(email: String): LiveData<Resource<Void>> =
+            Transformations.map(userAPI.resetPassword(UserResetPasswordRequest(email))) {
+                Resource.fromApiResponse(it)
+            }
 
     fun refreshUser(): LiveData<Resource<User>> {
         return Transformations.map(userAPI.fetchUser()) {

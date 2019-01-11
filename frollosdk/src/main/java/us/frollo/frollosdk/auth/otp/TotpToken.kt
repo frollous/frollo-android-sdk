@@ -30,7 +30,7 @@ import java.util.TimeZone
  * http://tools.ietf.org/html/draft-mraihi-totp-timebased-00
  *
  */
-class TotpToken(name: String, serial: String, seed: String, private val mTimeStep: Int, otpLength: Int) : HotpToken(name, serial, seed, 0, otpLength) {
+internal class TotpToken(name: String, serial: String, seed: String, private val mTimeStep: Int, otpLength: Int) : HotpToken(name, serial, seed, 0, otpLength) {
 
     override fun getTimeStep(): Int {
         return mTimeStep

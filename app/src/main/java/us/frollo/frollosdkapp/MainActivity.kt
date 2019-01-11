@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
                 if (error == null)
                     login()
                     //register()
+                    //resetPassword()
             }
         }
     }
@@ -102,6 +103,20 @@ class MainActivity : AppCompatActivity() {
                         else (it.error as FrolloSDKError).debugDescription
                 )
                 Resource.Status.LOADING -> Timber.d("Registering...")
+            }
+        }
+    }*/
+
+    /*private fun resetPassword() {
+        FrolloSDK.authentication.resetPassword(email = "testtest@frollo.us").observe(this) {
+            when (it?.status) {
+                Resource.Status.SUCCESS -> Timber.d("*** Password is reset")
+                Resource.Status.ERROR -> Timber.d("Error resetting password: " +
+                        if (it.error is APIError) (it.error as APIError).debugDescription
+                        else if (it.error is DataError) (it.error as DataError).debugDescription
+                        else (it.error as FrolloSDKError).debugDescription
+                )
+                Resource.Status.LOADING -> Timber.d("Resetting password...")
             }
         }
     }*/

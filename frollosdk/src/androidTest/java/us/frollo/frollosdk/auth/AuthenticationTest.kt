@@ -35,6 +35,7 @@ import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.randomString
 import us.frollo.frollosdk.testutils.readStringFromJson
+import java.util.*
 
 class AuthenticationTest {
 
@@ -242,6 +243,51 @@ class AuthenticationTest {
         val error = testObserver.value().error as DataError
         assertEquals(error.type, DataErrorType.API)
         assertEquals(error.subType, DataErrorSubType.INVALID_DATA)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRegisterUser() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.user_details_complete)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_REGISTER) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val testObserver = authentication.registerUser(
+                firstName = "Frollo",
+                lastName = "User",
+                mobileNumber = "0412345678",
+                postcode = "2060",
+                dateOfBirth = Date(),
+                email = "user@frollo.us",
+                password = "password").test()
+
+        testObserver.assertHasValue()
+        assertEquals(Resource.Status.LOADING, testObserver.value().status)
+        assertNull(testObserver.value().data)
+
+        testObserver.awaitNextValue()
+
+        testObserver.assertHasValue()
+        val expectedResponse = Gson().fromJson<UserResponse>(body)
+        assertEquals(Resource.Status.SUCCESS, testObserver.value().status)
+        assertNotNull(testObserver.value().data)
+        assertEquals(expectedResponse.toUser(), testObserver.value().data)
+        assertTrue(authentication.loggedIn)
+        assertNotNull(authentication.user)
+
+        val request = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_REGISTER, request.path)
 
         tearDown()
     }

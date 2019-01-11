@@ -2,6 +2,7 @@ package us.frollo.frollosdk.model
 
 import us.frollo.frollosdk.auth.AuthType
 import us.frollo.frollosdk.model.api.user.UserLoginRequest
+import us.frollo.frollosdk.model.api.user.UserRegisterRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.coredata.user.*
 import us.frollo.frollosdk.testutils.*
@@ -80,4 +81,20 @@ internal fun testInvalidLoginData() : UserLoginRequest {
             deviceName = randomString(8),
             deviceType = "Android",
             userId = randomNumber().toString())
+}
+
+internal fun testValidRegisterData() : UserRegisterRequest {
+    val name = randomUUID()
+    return UserRegisterRequest(
+            deviceId = randomString(8),
+            deviceName = randomString(8),
+            deviceType = "Android",
+            firstName = name,
+            lastName = randomUUID(),
+            mobileNumber = "0411111111",
+            currentAddress = Address(postcode = "2060"),
+            dateOfBirth = "1990-01",
+            email = "$name@frollo.us",
+            password = randomString(8)
+    )
 }

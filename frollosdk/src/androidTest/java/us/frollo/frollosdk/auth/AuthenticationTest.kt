@@ -448,6 +448,32 @@ class AuthenticationTest {
     }
 
     @Test
+    fun testResetPassword() {
+        initSetup()
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_PASSWORD_RESET) {
+                    return MockResponse()
+                            .setResponseCode(202)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val testObserver = authentication.resetPassword(email = "user@frollo.us").test()
+        testObserver.awaitNextValue()
+
+        testObserver.assertHasValue()
+        assertEquals(Resource.Status.SUCCESS, testObserver.value().status)
+
+        val request = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_PASSWORD_RESET, request.path)
+
+        tearDown()
+    }
+
+    @Test
     fun testForcedLogoutIfMissingRefreshToken() {
         initSetup()
 

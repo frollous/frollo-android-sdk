@@ -22,6 +22,7 @@ import us.frollo.frollosdk.data.remote.api.TokenAPI
 import us.frollo.frollosdk.data.remote.api.UserAPI
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.testEmailLoginData
+import us.frollo.frollosdk.model.testResetPasswordData
 import us.frollo.frollosdk.model.testValidRegisterData
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.BuildConfig
@@ -128,7 +129,28 @@ class NetworkInterceptorTest {
 
     @Test
     fun testOTPHeaderAppendedToResetPasswordRequest() {
-        //TODO: to be implemented
+        initSetup()
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_PASSWORD_RESET) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val bearer = "Bearer ${OTP.generateOTP("us.frollo.frollosdk")}"
+        userAPI.resetPassword(testResetPasswordData())
+
+        val request = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_PASSWORD_RESET, request.path)
+        val authHeader = request.getHeader("Authorization")
+        assertNotNull(authHeader)
+        assertEquals(bearer, authHeader)
+
+        tearDown()
     }
 
     @Test

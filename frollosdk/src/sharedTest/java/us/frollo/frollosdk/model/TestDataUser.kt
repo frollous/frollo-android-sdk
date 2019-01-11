@@ -3,6 +3,7 @@ package us.frollo.frollosdk.model
 import us.frollo.frollosdk.auth.AuthType
 import us.frollo.frollosdk.model.api.user.UserLoginRequest
 import us.frollo.frollosdk.model.api.user.UserRegisterRequest
+import us.frollo.frollosdk.model.api.user.UserResetPasswordRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.coredata.user.*
 import us.frollo.frollosdk.testutils.*
@@ -98,3 +99,6 @@ internal fun testValidRegisterData() : UserRegisterRequest {
             password = randomString(8)
     )
 }
+
+internal fun testResetPasswordData() =
+        UserResetPasswordRequest(email = "${randomUUID()}@frollo.us")

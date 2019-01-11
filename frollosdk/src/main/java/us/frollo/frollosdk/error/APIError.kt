@@ -16,7 +16,7 @@ class APIError(val statusCode: Int, errorMessage: String) : FrolloSDKError(error
         get() = errorResponse?.errorCode
 
     // Error message returned by the API if available
-    val message : String?
+    override val message : String?
         get() = errorResponse?.errorMessage
 
     private var errorResponse: APIErrorResponse? = null

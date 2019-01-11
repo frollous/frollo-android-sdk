@@ -16,6 +16,7 @@ import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.data.remote.api.TokenAPI
 import us.frollo.frollosdk.data.remote.api.UserAPI
 import us.frollo.frollosdk.keystore.Keystore
@@ -44,7 +45,8 @@ class NetworkInterceptorTest {
         mockServer.start()
         val baseUrl = mockServer.url("/")
 
-        FrolloSDK.app = app
+        if (!FrolloSDK.isSetup) FrolloSDK.setup(app, SetupParams.Builder().serverUrl(baseUrl.toString()).build()) {}
+
         keystore = Keystore()
         keystore.setup()
         preferences = Preferences(app)
@@ -187,6 +189,8 @@ class NetworkInterceptorTest {
     fun testRateLimitRetries() {
         initSetup()
 
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         mockServer.enqueue(get429Response())

@@ -1,6 +1,11 @@
 package us.frollo.frollosdk.error
 
-class DataError(val type: DataErrorType, val subType: DataErrorSubType) : FrolloSDKError() {
+import com.google.gson.annotations.SerializedName
+
+data class DataError(
+        @SerializedName("type") val type: DataErrorType,
+        @SerializedName("sub_type") val subType: DataErrorSubType
+) : FrolloSDKError() {
 
     override val localizedDescription : String
         get() = if (subType.type == type) subType.toLocalizedString(context)

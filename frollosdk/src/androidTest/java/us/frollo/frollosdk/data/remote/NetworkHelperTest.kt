@@ -37,17 +37,17 @@ class NetworkHelperTest {
     @Test
     fun testAccessToken() {
         val networkHelper = NetworkHelper(authToken)
-        assertEquals("Bearer null", networkHelper.accessToken)
+        assertNull(networkHelper.authAccessToken)
         preferences.encryptedAccessToken = keystore.encrypt("DummyAccessToken")
-        assertEquals("Bearer DummyAccessToken", networkHelper.accessToken)
+        assertEquals("Bearer DummyAccessToken", networkHelper.authAccessToken)
     }
 
     @Test
     fun testRefreshToken() {
         val networkHelper = NetworkHelper(authToken)
-        assertEquals("Bearer null", networkHelper.refreshToken)
+        assertNull(networkHelper.authRefreshToken)
         preferences.encryptedRefreshToken = keystore.encrypt("DummyRefreshToken")
-        assertEquals("Bearer DummyRefreshToken", networkHelper.refreshToken)
+        assertEquals("Bearer DummyRefreshToken", networkHelper.authRefreshToken)
     }
 
     @Test

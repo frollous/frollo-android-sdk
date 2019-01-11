@@ -7,6 +7,7 @@ import okhttp3.Response
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import timber.log.Timber
+import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_API_VERSION
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_AUTHORIZATION
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_BUNDLE_ID
@@ -17,6 +18,10 @@ import us.frollo.frollosdk.data.remote.api.TokenAPI.Companion.URL_TOKEN_REFRESH
 import us.frollo.frollosdk.data.remote.api.UserAPI.Companion.URL_LOGIN
 import us.frollo.frollosdk.data.remote.api.UserAPI.Companion.URL_REGISTER
 import us.frollo.frollosdk.data.remote.api.UserAPI.Companion.URL_PASSWORD_RESET
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
+import us.frollo.frollosdk.extensions.toJson
 import java.io.IOException
 
 internal class NetworkInterceptor(private val network: NetworkService, private val helper: NetworkHelper) : Interceptor {
@@ -33,9 +38,15 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
         val request = chain.request()
         val builder = request.newBuilder()
 
-        if (request?.url()?.host() == Uri.parse(network.serverUrl).host) { // Precautionary check to not append headers for any external requests
-            addAuthorizationHeader(request, builder)
-            addAdditionalHeaders(builder)
+        try {
+            if (request?.url()?.host() == Uri.parse(network.serverUrl).host) { // Precautionary check to not append headers for any external requests
+                addAuthorizationHeader(request, builder)
+                addAdditionalHeaders(builder)
+            }
+        } catch (error: DataError) {
+            if (error.type == DataErrorType.AUTHENTICATION && error.subType == DataErrorSubType.MISSING_REFRESH_TOKEN)
+                FrolloSDK.forcedLogout()
+            throw IOException(error.toJson())
         }
 
         val req = builder.build()
@@ -87,8 +98,13 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
         builder.addHeader(HEADER_AUTHORIZATION, helper.otp)
     }
 
+    @Throws(DataError::class)
     private fun appendRefreshToken(builder: Request.Builder) {
-        builder.addHeader(HEADER_AUTHORIZATION, helper.refreshToken)
+        helper.authRefreshToken?.let {
+            builder.addHeader(HEADER_AUTHORIZATION, it)
+        } ?: run {
+            throw DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_REFRESH_TOKEN)
+        }
     }
 
     fun authenticateRequest(request: Request): Request {
@@ -97,11 +113,19 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
         return builder.build()
     }
 
+    @Throws(DataError::class)
     private fun validateAndAppendAccessToken(builder: Request.Builder) {
+        if (helper.authRefreshToken == null) {
+            Timber.d("No valid refresh token when trying to refresh access token.")
+            throw DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_REFRESH_TOKEN)
+        }
+
         if (!validAccessToken())
             network.refreshTokens()
 
-        builder.addHeader(HEADER_AUTHORIZATION, helper.accessToken)
+        helper.authAccessToken?.let {
+            builder.addHeader(HEADER_AUTHORIZATION, it)
+        }
     }
 
     private fun validAccessToken(): Boolean {

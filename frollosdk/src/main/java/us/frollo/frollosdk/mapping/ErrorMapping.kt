@@ -2,6 +2,7 @@ package us.frollo.frollosdk.mapping
 
 import com.google.gson.Gson
 import us.frollo.frollosdk.error.APIErrorType
+import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import us.frollo.frollosdk.model.api.shared.APIErrorResponse
@@ -44,5 +45,14 @@ fun Int.toAPIErrorType(errorCode: APIErrorCode?): APIErrorType {
         501 -> APIErrorType.NOT_IMPLEMENTED
         502 -> APIErrorType.MAINTENANCE
         else -> APIErrorType.UNKNOWN
+    }
+}
+
+internal fun String.toDataError(): DataError? {
+    return try {
+        val error = Gson().fromJson<DataError>(this)
+        if (error.type != null) error else null // This check is needed because Gson().fromJson() can return object with null values for its members
+    } catch (e: Exception) {
+        null
     }
 }

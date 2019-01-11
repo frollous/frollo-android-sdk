@@ -83,13 +83,11 @@ object FrolloSDK {
     }
 
     fun reset() {
-        if (authentication.loggedIn) { // Call reset only once
-            // TODO: Pause scheduled refreshing
-            authentication.reset()
-            //keyStore.reset() // Keystore reset maybe not required
-            preferences.reset()
-            database.reset()
-            // TODO: Need to send any notify anything?
-        }
+        // TODO: Pause scheduled refreshing
+        authentication.reset()
+        //keyStore.reset() // Keystore reset maybe not required
+        preferences.reset()
+        database.reset()
+        // TODO: Need to send any notify anything?
     }
 }

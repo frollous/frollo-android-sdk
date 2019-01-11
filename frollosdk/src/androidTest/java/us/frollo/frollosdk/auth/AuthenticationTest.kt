@@ -6,6 +6,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.gson.Gson
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
+import okhttp3.Request
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -19,13 +20,11 @@ import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.DeviceInfo
+import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.data.remote.api.UserAPI
-import us.frollo.frollosdk.error.APIError
-import us.frollo.frollosdk.error.DataError
-import us.frollo.frollosdk.error.DataErrorSubType
-import us.frollo.frollosdk.error.DataErrorType
+import us.frollo.frollosdk.error.*
 import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.mapping.toUser
@@ -47,19 +46,20 @@ class AuthenticationTest {
 
     private lateinit var mockServer: MockWebServer
     private lateinit var preferences: Preferences
+    private lateinit var keystore: Keystore
 
     private fun initSetup() {
         mockServer = MockWebServer()
         mockServer.start()
         val baseUrl = mockServer.url("/")
 
-        FrolloSDK.app = app
+        if (!FrolloSDK.isSetup) FrolloSDK.setup(app, SetupParams.Builder().serverUrl(baseUrl.toString()).build()) {}
 
-        val keyStore = Keystore()
-        keyStore.setup()
+        keystore = Keystore()
+        keystore.setup()
         preferences = Preferences(app)
         val database = SDKDatabase.getInstance(app)
-        val network = NetworkService(baseUrl.toString(), keyStore, preferences)
+        val network = NetworkService(baseUrl.toString(), keystore, preferences)
 
         authentication = Authentication(DeviceInfo(app), network, database, preferences)
 
@@ -250,6 +250,8 @@ class AuthenticationTest {
     fun testRefreshUser() {
         initSetup()
 
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
@@ -288,6 +290,8 @@ class AuthenticationTest {
     fun testUpdateUser() {
         initSetup()
 
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
@@ -326,6 +330,8 @@ class AuthenticationTest {
     fun testUpdateAttribution() {
         initSetup()
 
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
@@ -362,17 +368,91 @@ class AuthenticationTest {
 
     @Test
     fun testUserLoggedOutOn401() {
-        //TODO: to be implemented
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.error_suspended_device)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_USER_DETAILS) {
+                    return MockResponse()
+                            .setResponseCode(401)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        val testObserver = authentication.refreshUser().test()
+        testObserver.awaitNextValue()
+
+        assertEquals(Resource.Status.ERROR, testObserver.value().status)
+        assertNotNull(testObserver.value().error)
+        assertTrue(testObserver.value().error is APIError)
+        assertEquals(APIErrorType.SUSPENDED_DEVICE, (testObserver.value().error as APIError).type)
+
+        assertNull(preferences.encryptedAccessToken)
+        assertNull(preferences.encryptedRefreshToken)
+        assertEquals(-1, preferences.accessTokenExpiry)
+
+        tearDown()
     }
 
     @Test
     fun testForcedLogoutIfMissingRefreshToken() {
-        //TODO: to be implemented
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.user_details_complete)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_USER_DETAILS
+                        || request?.path == UserAPI.URL_LOGIN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        val testObserver = authentication.refreshUser().test()
+        testObserver.awaitNextValue()
+
+        assertEquals(Resource.Status.ERROR, testObserver.value().status)
+        assertNotNull(testObserver.value().error)
+        assertTrue(testObserver.value().error is DataError)
+        assertEquals(DataErrorType.AUTHENTICATION, (testObserver.value().error as DataError).type)
+        assertEquals(DataErrorSubType.MISSING_REFRESH_TOKEN, (testObserver.value().error as DataError).subType)
+
+        assertNull(preferences.encryptedAccessToken)
+        assertNull(preferences.encryptedRefreshToken)
+        assertEquals(-1, preferences.accessTokenExpiry)
+
+        tearDown()
     }
 
     @Test
     fun testAuthenticatingRequestManually() {
-        //TODO: to be implemented
+        initSetup()
+
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        val request = authentication.authenticateRequest(Request.Builder()
+                .url("http://api.example.com/")
+                .build())
+        assertNotNull(request)
+        assertEquals("http://api.example.com/", request.url().toString())
+        assertEquals("Bearer ExistingAccessToken", request.header("Authorization"))
+
+        tearDown()
     }
 
     @Test

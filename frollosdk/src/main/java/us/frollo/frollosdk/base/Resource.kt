@@ -4,6 +4,7 @@ import us.frollo.frollosdk.data.remote.ApiResponse
 import us.frollo.frollosdk.error.APIError
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.mapping.toAPIErrorResponse
+import us.frollo.frollosdk.mapping.toDataError
 
 class Resource<out T> private constructor(val status: Status, val data: T? = null, val error: FrolloSDKError? = null) {
     enum class Status {
@@ -25,8 +26,10 @@ class Resource<out T> private constructor(val status: Status, val data: T? = nul
                 else {
                     val msg = response.errorMessage
                     if (msg != null) {
-                        val errResponse = msg.toAPIErrorResponse()
-                        if (errResponse != null)
+                        val dataError = msg.toDataError()
+                        if (dataError != null)
+                            error(dataError)
+                        else if (msg.toAPIErrorResponse() != null)
                             error(APIError(response.code, msg))
                         else
                             error(FrolloSDKError(response.errorMessage))

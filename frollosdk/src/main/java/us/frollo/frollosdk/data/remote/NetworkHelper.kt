@@ -22,11 +22,17 @@ internal class NetworkHelper(private val authToken: AuthToken) {
         internal const val API_VERSION_PATH = "/api/v2"
     }
 
-    internal val accessToken: String
-        get() = "Bearer ${authToken.getAccessToken()}"
+    internal val authAccessToken: String?
+        get() {
+            val token = authToken.getAccessToken()
+            return if (token == null) null else "Bearer $token"
+        }
 
-    internal val refreshToken: String
-        get() = "Bearer ${authToken.getRefreshToken()}"
+    internal val authRefreshToken: String?
+        get() {
+            val token = authToken.getRefreshToken()
+            return if (token == null) null else "Bearer $token"
+        }
 
     internal val accessTokenExpiry: Long
         get() = authToken.getAccessTokenExpiry()
@@ -51,5 +57,4 @@ internal class NetworkHelper(private val authToken: AuthToken) {
      */
     internal val otp: String
         get() = "Bearer ${OTP().otp()}"
-
 }

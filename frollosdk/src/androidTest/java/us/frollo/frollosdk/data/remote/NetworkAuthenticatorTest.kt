@@ -19,8 +19,7 @@ import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.data.remote.api.TokenAPI
 import us.frollo.frollosdk.data.remote.api.UserAPI
-import us.frollo.frollosdk.error.APIError
-import us.frollo.frollosdk.error.APIErrorType
+import us.frollo.frollosdk.error.*
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
@@ -270,8 +269,9 @@ class NetworkAuthenticatorTest {
         value = Resource.fromApiResponse(testObserver2.value())
         assertEquals(Resource.Status.ERROR, value.status)
         assertNotNull(value.error)
-        assertTrue(value.error is APIError)
-        assertEquals(APIErrorType.INVALID_ACCESS_TOKEN, (value.error as APIError).type)
+        assertTrue(value.error is DataError)
+        assertEquals(DataErrorType.AUTHENTICATION, (value.error as DataError).type)
+        assertEquals(DataErrorSubType.MISSING_REFRESH_TOKEN, (value.error as DataError).subType)
 
         val testObserver3 = userAPI.fetchUser().test()
         testObserver3.awaitValue()
@@ -279,8 +279,9 @@ class NetworkAuthenticatorTest {
         value = Resource.fromApiResponse(testObserver3.value())
         assertEquals(Resource.Status.ERROR, value.status)
         assertNotNull(value.error)
-        assertTrue(value.error is APIError)
-        assertEquals(APIErrorType.INVALID_ACCESS_TOKEN, (value.error as APIError).type)
+        assertTrue(value.error is DataError)
+        assertEquals(DataErrorType.AUTHENTICATION, (value.error as DataError).type)
+        assertEquals(DataErrorSubType.MISSING_REFRESH_TOKEN, (value.error as DataError).subType)
 
         tearDown()
     }

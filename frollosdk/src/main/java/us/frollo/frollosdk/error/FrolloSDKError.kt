@@ -4,7 +4,7 @@ import android.content.Context
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.R
 
-open class FrolloSDKError(errorMessage: String? = null) {
+open class FrolloSDKError(errorMessage: String? = null) : Error(errorMessage) {
 
     protected val context: Context = FrolloSDK.app.applicationContext
 

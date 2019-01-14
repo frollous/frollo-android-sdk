@@ -83,7 +83,7 @@ object FrolloSDK {
     }
 
     internal fun forcedLogout() {
-        //if (authentication.loggedIn) // TODO: This is creating problem for tests. Refactor and enable later.
+        if (authentication.loggedIn)
             reset()
     }
 

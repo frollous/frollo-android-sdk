@@ -43,8 +43,4 @@ abstract class SDKDatabase : RoomDatabase() {
             }
         }*/
     }
-
-    internal fun reset() {
-        users().clear()
-    }
 }

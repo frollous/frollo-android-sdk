@@ -54,7 +54,7 @@ class NetworkAuthenticatorTest {
     private fun tearDown() {
         mockServer.shutdown()
         network.reset()
-        preferences.reset()
+        preferences.resetAll()
     }
 
     @Test

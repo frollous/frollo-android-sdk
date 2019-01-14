@@ -24,7 +24,7 @@ class PreferencesTest {
 
     @After
     fun tearDown() {
-        preferences.reset()
+        preferences.resetAll()
         keyStore.reset()
     }
 
@@ -89,9 +89,13 @@ class PreferencesTest {
 
     @Test
     fun testReset() {
+        preferences.sdkVersion = "1.0.0"
+        preferences.sdkVersionHistory = mutableListOf("1.0.0")
+
         preferences.reset()
-        assertNull(preferences.sdkVersion)
-        assertTrue(preferences.sdkVersionHistory.isEmpty())
+
+        assertNotNull(preferences.sdkVersion)
+        assertTrue(preferences.sdkVersionHistory.isNotEmpty())
         assertFalse(preferences.loggedIn)
         assertTrue(preferences.features.isEmpty())
         assertNull(preferences.encryptedRefreshToken)

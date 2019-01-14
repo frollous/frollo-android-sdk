@@ -72,8 +72,8 @@ class AuthenticationTest {
     private fun tearDown() {
         mockServer.shutdown()
         authentication.reset()
-        preferences.reset()
-        database.reset()
+        preferences.resetAll()
+        database.clearAllTables()
     }
 
     @Test
@@ -386,6 +386,42 @@ class AuthenticationTest {
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_USER_DETAILS, request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testLogoutUser() {
+        initSetup()
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_LOGOUT) {
+                    return MockResponse()
+                            .setResponseCode(204)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        authentication.logoutUser { error ->
+            assertNull(error)
+
+            assertFalse(authentication.loggedIn)
+            assertNull(preferences.encryptedAccessToken)
+            assertNull(preferences.encryptedRefreshToken)
+            assertEquals(-1, preferences.accessTokenExpiry)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_LOGOUT, request.path)
 
         wait(3)
 

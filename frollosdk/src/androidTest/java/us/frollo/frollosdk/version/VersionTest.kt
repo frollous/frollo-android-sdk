@@ -21,7 +21,7 @@ class VersionTest {
 
     @After
     fun tearDown() {
-        preferences.reset()
+        preferences.resetAll()
     }
 
     @Test

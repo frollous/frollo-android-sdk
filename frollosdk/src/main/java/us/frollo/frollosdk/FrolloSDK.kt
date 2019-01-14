@@ -3,9 +3,11 @@ package us.frollo.frollosdk
 import android.app.Application
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import timber.log.Timber
 import us.frollo.frollosdk.auth.Authentication
 import us.frollo.frollosdk.core.DeviceInfo
+import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkService
@@ -74,9 +76,10 @@ object FrolloSDK {
         AndroidThreeTen.init(app)
     }
 
-    fun logout() {
-        authentication.logoutUser()
-        reset()
+    fun logout(completion: OnFrolloSDKCompletionListener? = null) {
+        authentication.logoutUser {
+            reset(completion)
+        }
     }
 
     internal fun forcedLogout() {
@@ -84,12 +87,13 @@ object FrolloSDK {
             reset()
     }
 
-    fun reset() {
+    fun reset(completion: OnFrolloSDKCompletionListener? = null) {
         // TODO: Pause scheduled refreshing
         // NOTE: Keystore reset is not required as we do not store any data in there. Just keys.
         authentication.reset()
         preferences.reset()
-        doAsync { database.reset() }
+        database.clearAllTables()
+        completion?.invoke(null)
         // TODO: Need to send any notify anything?
     }
 }

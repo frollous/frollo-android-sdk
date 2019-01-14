@@ -11,6 +11,7 @@ internal interface UserAPI {
         const val URL_REGISTER = "$API_VERSION_PATH/user/register/"
         const val URL_PASSWORD_RESET = "$API_VERSION_PATH/user/reset/"
         const val URL_USER_DETAILS = "$API_VERSION_PATH/user/details/"
+        const val URL_LOGOUT = "$API_VERSION_PATH/user/logout/"
     }
 
     @POST(URL_REGISTER)
@@ -27,4 +28,7 @@ internal interface UserAPI {
 
     @POST(URL_PASSWORD_RESET)
     fun resetPassword(@Body request: UserResetPasswordRequest): Call<Void>
+
+    @PUT(URL_LOGOUT)
+    fun logout(): Call<Void>
 }

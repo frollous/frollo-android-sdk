@@ -39,6 +39,7 @@ class Preferences(context: Context) {
     internal var features: List<FeatureFlag>
         get() = preferences.getString(KEY_USER_FEATURES, null)?.let { Converters.instance.stringToListOfFeatureFlag(it) } ?: mutableListOf()
         set(value) = preferences.edit().putString(KEY_USER_FEATURES, Converters.instance.stringFromListOfFeatureFlag(value)).apply()
+    internal fun resetFeatures() = preferences.edit().remove(KEY_USER_FEATURES).apply()
 
     /** Encrypted Refresh Token */
     internal var encryptedRefreshToken: String?
@@ -59,6 +60,14 @@ class Preferences(context: Context) {
     internal fun resetAccessTokenExpiry() = preferences.edit().remove(KEY_ACCESS_TOKEN_EXPIRY).apply()
 
     internal fun reset() {
+        resetLoggedIn()
+        resetFeatures()
+        resetEncryptedRefreshToken()
+        resetEncryptedAccessToken()
+        resetAccessTokenExpiry()
+    }
+
+    internal fun resetAll() {
         preferences.edit().clear().apply()
     }
 

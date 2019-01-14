@@ -30,7 +30,7 @@ class NetworkHelperTest {
     @After
     fun tearDown() {
         keystore.reset()
-        preferences.reset()
+        preferences.resetAll()
         authToken.clearTokens()
     }
 

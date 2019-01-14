@@ -127,8 +127,15 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     fun authenticateRequest(request: Request) =
             network.authenticateRequest(request)
 
-    fun logoutUser() {
-        // TODO: To be implemented
+    internal fun logoutUser(completion: OnFrolloSDKCompletionListener? = null) {
+        userAPI.logout().enqueue { _, error ->
+            if (error != null)
+                Timber.d(error.localizedDescription)
+
+            reset()
+
+            completion?.invoke(error)
+        }
     }
 
     private fun handleUserResponse(userResponse: UserResponse?, completion: OnFrolloSDKCompletionListener? = null) {

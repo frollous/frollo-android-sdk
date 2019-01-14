@@ -26,7 +26,7 @@ class AuthTokenTest {
 
     @After
     fun tearDown() {
-        preferences.reset()
+        preferences.resetAll()
         keyStore.reset()
         authToken.clearTokens()
     }

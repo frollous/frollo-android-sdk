@@ -54,18 +54,4 @@ class SDKDatabaseTest {
         testObserver3.awaitValue()
         assertNull(testObserver3.value())
     }
-
-    @Test
-    fun testDatabaseReset() {
-        db.users().insert(testUserResponseData())
-        val testObserver = db.users().load().test()
-        testObserver.awaitValue()
-        assertNotNull(testObserver.value())
-
-        db.reset()
-
-        val testObserver2 = db.users().load().test()
-        testObserver2.awaitValue()
-        assertNull(testObserver2.value())
-    }
 }

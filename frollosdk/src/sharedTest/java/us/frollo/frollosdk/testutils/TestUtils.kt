@@ -49,3 +49,7 @@ fun get429Response(): MockResponse {
     return MockResponse().setResponseCode(429)
             .setBody("{\"error\":\"too_many_requests\", \"reason\":\"example reason\"}\r\n")
 }
+
+fun wait(seconds: Int) {
+    Thread.sleep(seconds * 1000L)
+}

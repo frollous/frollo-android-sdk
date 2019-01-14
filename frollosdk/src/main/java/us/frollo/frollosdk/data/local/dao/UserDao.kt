@@ -10,13 +10,7 @@ import us.frollo.frollosdk.model.api.user.UserResponse
 @Dao
 internal interface UserDao {
     @Query("SELECT * FROM user LIMIT 1")
-    fun load(): UserResponse?
-
-    @Query("SELECT * FROM user LIMIT 1")
-    fun loadAsLiveData(): LiveData<UserResponse?>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg models: UserResponse)
+    fun load(): LiveData<UserResponse?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(model: UserResponse): Long

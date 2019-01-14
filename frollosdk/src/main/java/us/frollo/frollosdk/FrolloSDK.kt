@@ -2,6 +2,7 @@ package us.frollo.frollosdk
 
 import android.app.Application
 import com.jakewharton.threetenabp.AndroidThreeTen
+import org.jetbrains.anko.doAsync
 import timber.log.Timber
 import us.frollo.frollosdk.auth.Authentication
 import us.frollo.frollosdk.core.DeviceInfo
@@ -19,7 +20,7 @@ object FrolloSDK {
         get() = _setup
 
     val authentication: Authentication
-        get() =_authentication ?: throw IllegalAccessException("SDK not setup")
+        get() =_authentication ?: throw FrolloSDKError("SDK not setup")
 
     private var _setup = false
     private var _authentication: Authentication? = null
@@ -31,12 +32,12 @@ object FrolloSDK {
 
     internal lateinit var app: Application
 
-    @Throws(IllegalArgumentException::class, IllegalStateException::class)
+    @Throws(FrolloSDKError::class)
     fun setup(application: Application, params: SetupParams, callback: ((FrolloSDKError?) -> Unit)) {
         registerTimber()
 
-        if (_setup) throw IllegalStateException("SDK already setup")
-        if (params.serverUrl.isBlank()) throw IllegalArgumentException("Server URL cannot be empty")
+        if (_setup) throw FrolloSDKError("SDK already setup")
+        if (params.serverUrl.isBlank()) throw FrolloSDKError("Server URL cannot be empty")
 
         this.app = application
 
@@ -61,7 +62,7 @@ object FrolloSDK {
         }
 
         _setup = true
-        callback(null)
+        callback.invoke(null)
     }
 
     private fun registerTimber() {
@@ -88,7 +89,7 @@ object FrolloSDK {
         // NOTE: Keystore reset is not required as we do not store any data in there. Just keys.
         authentication.reset()
         preferences.reset()
-        database.reset()
+        doAsync { database.reset() }
         // TODO: Need to send any notify anything?
     }
 }

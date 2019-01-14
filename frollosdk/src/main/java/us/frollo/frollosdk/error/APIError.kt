@@ -25,10 +25,10 @@ class APIError(val statusCode: Int, errorMessage: String) : FrolloSDKError(error
         errorResponse = errorMessage.toAPIErrorResponse()
     }
 
-    override val localizedDescription: String
+    override val localizedDescription: String?
         get() = type.toLocalizedString(context)
 
-    override val debugDescription: String
+    override val debugDescription: String?
         get() {
             var debug = "APIError: Type [${ type.name }] HTTP Status Code: $statusCode "
             errorCode?.let { debug = debug.plus("$it: ") }

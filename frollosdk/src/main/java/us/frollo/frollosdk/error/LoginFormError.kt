@@ -4,13 +4,13 @@ class LoginFormError(val type: LoginFormErrorType, val fieldName: String) : Frol
 
     var additionalError: String? = null
 
-    override val localizedDescription: String
+    override val localizedDescription: String?
         get() {
             var description = type.toLocalizedString(context, fieldName)
             additionalError?.let { description = description.plus(" $it") }
             return description
         }
 
-    override val debugDescription: String
+    override val debugDescription: String?
         get() = "LoginFormError: ${ type.name }: $localizedDescription"
 }

@@ -8,6 +8,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import us.frollo.frollosdk.core.SetupParams
+import us.frollo.frollosdk.error.FrolloSDKError
 
 class FrolloSDKAndroidUnitTest {
 
@@ -16,6 +17,7 @@ class FrolloSDKAndroidUnitTest {
 
     @Before
     fun setUp() {
+        FrolloSDK.app = app
     }
 
     @After
@@ -27,7 +29,7 @@ class FrolloSDKAndroidUnitTest {
         assertFalse(FrolloSDK.isSetup)
         try {
             FrolloSDK.authentication
-        } catch (e: IllegalAccessException) {
+        } catch (e: FrolloSDKError) {
             assertEquals("SDK not setup", e.localizedMessage)
         }
     }
@@ -47,7 +49,7 @@ class FrolloSDKAndroidUnitTest {
         assertFalse(FrolloSDK.isSetup)
         try {
             FrolloSDK.setup(app, SetupParams.Builder().serverUrl(" ").build()) { }
-        } catch (e: IllegalArgumentException) {
+        } catch (e: FrolloSDKError) {
             assertEquals("Server URL cannot be empty", e.localizedMessage)
         }
     }

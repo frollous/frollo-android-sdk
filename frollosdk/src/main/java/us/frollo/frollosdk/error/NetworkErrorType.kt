@@ -9,6 +9,6 @@ enum class NetworkErrorType(@StringRes val textResource: Int) {
     INVALID_SSL(R.string.Error_Network_InvalidSSL),
     UNKNOWN(R.string.Error_Network_UnknownError);
 
-    fun toLocalizedString(context: Context, arg1: String? = null): String =
-            context.resources.getString(textResource, arg1)
+    fun toLocalizedString(context: Context?, arg1: String? = null): String? =
+            context?.resources?.getString(textResource, arg1)
 }

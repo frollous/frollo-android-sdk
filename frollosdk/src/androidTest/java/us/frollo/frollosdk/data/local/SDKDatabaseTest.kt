@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
+import com.jraska.livedata.test
 import org.junit.After
 import org.junit.Before
 
@@ -15,8 +16,7 @@ import us.frollo.frollosdk.model.testUserResponseData
 
 class SDKDatabaseTest {
 
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule val testRule = InstantTaskExecutorRule()
 
     private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
     private lateinit var db: SDKDatabase
@@ -36,37 +36,36 @@ class SDKDatabaseTest {
     @Test
     fun testUserDao() {
         assertNotNull(db)
-        var user = db.users().load()
-        assertNull(user)
+
+        val testObserver = db.users().load().test()
+        testObserver.awaitValue()
+        assertNull(testObserver.value())
 
         val dataIn = testUserResponseData()
         db.users().insert(dataIn)
 
-        val dataOut = db.users().load()
-        assertNotNull(dataOut)
-        assertEquals(dataIn.userId, dataOut?.userId)
-
-        /*val liveData = db.users().loadAsLiveData()
-        assertNotNull(liveData)
-        val lifecycleRegistry = LifecycleRegistry(mock(LifecycleOwner::class.java))
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-        val lifecycle = lifecycleRegistry as Lifecycle
-        liveData.observe({lifecycle}) {
-            assertEquals(dataIn.userId, it?.userId)
-        }*/
+        val testObserver2 = db.users().load().test()
+        testObserver2.awaitValue()
+        assertNotNull(testObserver2.value())
+        assertEquals(dataIn.userId, testObserver2.value()?.userId)
 
         db.users().clear()
-        user = db.users().load()
-        assertNull(user)
+        val testObserver3 = db.users().load().test()
+        testObserver3.awaitValue()
+        assertNull(testObserver3.value())
     }
 
     @Test
     fun testDatabaseReset() {
         db.users().insert(testUserResponseData())
-        assertNotNull(db.users().load())
+        val testObserver = db.users().load().test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value())
 
         db.reset()
 
-        assertNull(db.users().load())
+        val testObserver2 = db.users().load().test()
+        testObserver2.awaitValue()
+        assertNull(testObserver2.value())
     }
 }

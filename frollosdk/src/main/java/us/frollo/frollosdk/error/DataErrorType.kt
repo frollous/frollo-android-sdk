@@ -10,6 +10,6 @@ enum class DataErrorType(@StringRes val textResource: Int) {
     DATABASE(R.string.Error_Data_Database_UnknownError),
     UNKNOWN(R.string.Error_Generic_UnknownError);
 
-    fun toLocalizedString(context: Context, arg1: String? = null): String =
-            context.resources.getString(textResource, arg1)
+    fun toLocalizedString(context: Context?, arg1: String? = null): String? =
+            context?.resources?.getString(textResource, arg1)
 }

@@ -29,6 +29,7 @@ abstract class SDKDatabase : RoomDatabase() {
 
         private fun create(app: Application): SDKDatabase =
                 Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
+                        .allowMainThreadQueries() // Needed for some tests
                         .fallbackToDestructiveMigration()
                         //.addMigrations(MIGRATION_1_2)
                         .build()

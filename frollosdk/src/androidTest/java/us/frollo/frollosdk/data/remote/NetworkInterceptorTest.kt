@@ -20,12 +20,12 @@ import us.frollo.frollosdk.auth.otp.OTP
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.data.remote.api.TokenAPI
 import us.frollo.frollosdk.data.remote.api.UserAPI
+import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.testEmailLoginData
 import us.frollo.frollosdk.model.testResetPasswordData
 import us.frollo.frollosdk.model.testValidRegisterData
 import us.frollo.frollosdk.preferences.Preferences
-import us.frollo.frollosdk.test.BuildConfig
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.TestAPI
 import us.frollo.frollosdk.testutils.get429Response
@@ -86,7 +86,7 @@ class NetworkInterceptorTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        userAPI.fetchUser()
+        userAPI.fetchUser().enqueue { _, _ -> }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_USER_DETAILS, request.path)
@@ -116,7 +116,7 @@ class NetworkInterceptorTest {
         })
 
         val bearer = "Bearer ${OTP.generateOTP("us.frollo.frollosdk")}"
-        userAPI.register(testValidRegisterData())
+        userAPI.register(testValidRegisterData()).enqueue { _, _ -> }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_REGISTER, request.path)
@@ -142,7 +142,7 @@ class NetworkInterceptorTest {
         })
 
         val bearer = "Bearer ${OTP.generateOTP("us.frollo.frollosdk")}"
-        userAPI.resetPassword(testResetPasswordData())
+        userAPI.resetPassword(testResetPasswordData()).enqueue { _, _ -> }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_PASSWORD_RESET, request.path)
@@ -172,7 +172,7 @@ class NetworkInterceptorTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        userAPI.fetchUser()
+        userAPI.fetchUser().enqueue { _, _ -> }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_USER_DETAILS, request.path)
@@ -223,7 +223,7 @@ class NetworkInterceptorTest {
             }
         })
 
-        userAPI.login(testEmailLoginData())
+        userAPI.login(testEmailLoginData()).enqueue { _, _ -> }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_LOGIN, request.path)

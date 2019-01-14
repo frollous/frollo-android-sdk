@@ -18,6 +18,6 @@ enum class DataErrorSubType(val type: DataErrorType, @StringRes val textResource
 
     UNKNOWN(DataErrorType.UNKNOWN, R.string.Error_Generic_UnknownError);
 
-    fun toLocalizedString(context: Context, arg1: String? = null): String =
-            context.resources.getString(textResource, arg1)
+    fun toLocalizedString(context: Context?, arg1: String? = null): String? =
+            context?.resources?.getString(textResource, arg1)
 }

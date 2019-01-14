@@ -18,7 +18,6 @@ import org.junit.Rule
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.data.local.SDKDatabase
@@ -35,6 +34,7 @@ import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.randomString
 import us.frollo.frollosdk.testutils.readStringFromJson
+import us.frollo.frollosdk.testutils.wait
 import java.util.*
 
 class AuthenticationTest {
@@ -48,6 +48,7 @@ class AuthenticationTest {
     private lateinit var mockServer: MockWebServer
     private lateinit var preferences: Preferences
     private lateinit var keystore: Keystore
+    private lateinit var database: SDKDatabase
 
     private fun initSetup() {
         mockServer = MockWebServer()
@@ -55,11 +56,12 @@ class AuthenticationTest {
         val baseUrl = mockServer.url("/")
 
         if (!FrolloSDK.isSetup) FrolloSDK.setup(app, SetupParams.Builder().serverUrl(baseUrl.toString()).build()) {}
+        FrolloSDK.app = app
 
         keystore = Keystore()
         keystore.setup()
         preferences = Preferences(app)
-        val database = SDKDatabase.getInstance(app)
+        database = SDKDatabase.getInstance(app)
         val network = NetworkService(baseUrl.toString(), keystore, preferences)
 
         authentication = Authentication(DeviceInfo(app), network, database, preferences)
@@ -71,10 +73,11 @@ class AuthenticationTest {
         mockServer.shutdown()
         authentication.reset()
         preferences.reset()
+        database.reset()
     }
 
     @Test
-    fun testGetUser() {
+    fun testFetchUser() {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
@@ -89,43 +92,22 @@ class AuthenticationTest {
             }
         })
 
-        assertNull(authentication.user)
+        val testObserver = authentication.fetchUser().test()
+        testObserver.awaitValue()
+        assertNull(testObserver.value().data)
 
-        val testObserver = authentication.loginUser(AuthType.EMAIL, "deepak@frollo.us", "pass1234").test()
-        testObserver.awaitNextValue()
+        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password") { error ->
+            assertNull(error)
 
-        assertNotNull(authentication.user)
-        val expectedResponse = Gson().fromJson<UserResponse>(body)
-        assertEquals(expectedResponse.toUser(), authentication.user)
+            val testObserver2 = authentication.fetchUser().test()
+            testObserver2.awaitValue()
+            assertNotNull(testObserver2.value().data)
 
-        tearDown()
-    }
+            val expectedResponse = Gson().fromJson<UserResponse>(body)
+            assertEquals(expectedResponse.toUser(), testObserver2.value().data)
+        }
 
-    @Test
-    fun testGetUserLiveData() {
-        initSetup()
-
-        val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_LOGIN) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        val testObserver = authentication.loginUser(AuthType.EMAIL, "deepak@frollo.us", "pass1234").test()
-        testObserver.awaitNextValue()
-
-        val testObserver2 = authentication.userLiveData?.test()
-        testObserver2?.assertHasValue()
-        val expectedResponse = Gson().fromJson<UserResponse>(body)
-        assertEquals(Resource.Status.SUCCESS, testObserver2?.value()?.status)
-        assertNotNull(testObserver2?.value()?.data)
-        assertEquals(expectedResponse.toUser(), testObserver2?.value()?.data)
+        wait(3)
 
         tearDown()
     }
@@ -148,10 +130,12 @@ class AuthenticationTest {
 
         assertFalse(authentication.loggedIn)
 
-        val testObserver = authentication.loginUser(AuthType.EMAIL, "deepak@frollo.us", "pass1234").test()
-        testObserver.awaitNextValue()
+        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password") { error ->
+            assertNull(error)
+            assertTrue(authentication.loggedIn)
+        }
 
-        assertTrue(authentication.loggedIn)
+        wait(3)
 
         tearDown()
     }
@@ -172,22 +156,22 @@ class AuthenticationTest {
             }
         })
 
-        val testObserver = authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password").test()
+        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password") { error ->
+            assertNull(error)
 
-        testObserver.assertHasValue()
-        assertEquals(Resource.Status.LOADING, testObserver.value().status)
-        assertNull(testObserver.value().data)
+            val testObserver = authentication.fetchUser().test()
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
 
-        testObserver.awaitNextValue()
-
-        testObserver.assertHasValue()
-        val expectedResponse = Gson().fromJson<UserResponse>(body)
-        assertEquals(Resource.Status.SUCCESS, testObserver.value().status)
-        assertNotNull(testObserver.value().data)
-        assertEquals(expectedResponse.toUser(), testObserver.value().data)
+            val expectedResponse = Gson().fromJson<UserResponse>(body)
+            assertEquals(expectedResponse.toUser(), testObserver.value().data)
+            assertTrue(authentication.loggedIn)
+        }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_LOGIN, request.path)
+
+        wait(3)
 
         tearDown()
     }
@@ -208,24 +192,21 @@ class AuthenticationTest {
             }
         })
 
-        val testObserver = authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "wrong_password").test()
+        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "wrong_password") { error ->
+            assertNotNull(error)
 
-        testObserver.assertHasValue()
-        assertEquals(Resource.Status.LOADING, testObserver.value().status)
-        assertNull(testObserver.value().data)
+            val testObserver = authentication.fetchUser().test()
+            testObserver.awaitValue()
+            assertNull(testObserver.value().data)
 
-        testObserver.awaitNextValue()
-
-        testObserver.assertHasValue()
-        assertEquals(Resource.Status.ERROR, testObserver.value().status)
-        assertNotNull(testObserver.value().error)
-        assertNull(authentication.user)
-
-        val error = testObserver.value().error as APIError
-        assertEquals(error.statusCode, 401)
+            assertEquals(401, (error as APIError).statusCode)
+            assertFalse(authentication.loggedIn)
+        }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_LOGIN, request.path)
+
+        wait(3)
 
         tearDown()
     }
@@ -234,15 +215,18 @@ class AuthenticationTest {
     fun testInvalidLoginData() {
         initSetup()
 
-        val testObserver = authentication.loginUser(AuthType.FACEBOOK).test()
-        testObserver.assertHasValue()
-        assertEquals(Resource.Status.ERROR, testObserver.value().status)
-        assertNotNull(testObserver.value().error)
-        assertNull(authentication.user)
+        authentication.loginUser(AuthType.FACEBOOK) { error ->
+            assertNotNull(error)
 
-        val error = testObserver.value().error as DataError
-        assertEquals(error.type, DataErrorType.API)
-        assertEquals(error.subType, DataErrorSubType.INVALID_DATA)
+            val testObserver = authentication.fetchUser().test()
+            testObserver.awaitValue()
+            assertNull(testObserver.value().data)
+
+            assertEquals((error as DataError).type, DataErrorType.API)
+            assertEquals(error.subType, DataErrorSubType.INVALID_DATA)
+        }
+
+        wait(3)
 
         tearDown()
     }
@@ -263,31 +247,30 @@ class AuthenticationTest {
             }
         })
 
-        val testObserver = authentication.registerUser(
+        authentication.registerUser(
                 firstName = "Frollo",
                 lastName = "User",
                 mobileNumber = "0412345678",
                 postcode = "2060",
                 dateOfBirth = Date(),
                 email = "user@frollo.us",
-                password = "password").test()
+                password = "password") { error ->
 
-        testObserver.assertHasValue()
-        assertEquals(Resource.Status.LOADING, testObserver.value().status)
-        assertNull(testObserver.value().data)
+            assertNull(error)
 
-        testObserver.awaitNextValue()
+            val testObserver = authentication.fetchUser().test()
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
 
-        testObserver.assertHasValue()
-        val expectedResponse = Gson().fromJson<UserResponse>(body)
-        assertEquals(Resource.Status.SUCCESS, testObserver.value().status)
-        assertNotNull(testObserver.value().data)
-        assertEquals(expectedResponse.toUser(), testObserver.value().data)
-        assertTrue(authentication.loggedIn)
-        assertNotNull(authentication.user)
+            val expectedResponse = Gson().fromJson<UserResponse>(body)
+            assertEquals(expectedResponse.toUser(), testObserver.value().data)
+            assertTrue(authentication.loggedIn)
+        }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_REGISTER, request.path)
+
+        wait(3)
 
         tearDown()
     }
@@ -312,22 +295,21 @@ class AuthenticationTest {
             }
         })
 
-        val testObserver = authentication.refreshUser().test()
+        authentication.refreshUser { error ->
+            assertNull(error)
 
-        testObserver.assertHasValue()
-        assertEquals(Resource.Status.LOADING, testObserver.value().status)
-        assertNull(testObserver.value().data)
+            val testObserver = authentication.fetchUser().test()
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
 
-        testObserver.awaitNextValue()
-
-        testObserver.assertHasValue()
-        val expectedResponse = Gson().fromJson<UserResponse>(body)
-        assertEquals(Resource.Status.SUCCESS, testObserver.value().status)
-        assertNotNull(testObserver.value().data)
-        assertEquals(expectedResponse.toUser(), testObserver.value().data)
+            val expectedResponse = Gson().fromJson<UserResponse>(body)
+            assertEquals(expectedResponse.toUser(), testObserver.value().data)
+        }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_USER_DETAILS, request.path)
+
+        wait(3)
 
         tearDown()
     }
@@ -352,22 +334,21 @@ class AuthenticationTest {
             }
         })
 
-        val testObserver = authentication.updateUser(testUserResponseData().toUser()).test()
+        authentication.updateUser(testUserResponseData().toUser()) { error ->
+            assertNull(error)
 
-        testObserver.assertHasValue()
-        assertEquals(Resource.Status.LOADING, testObserver.value().status)
-        assertNull(testObserver.value().data)
+            val testObserver = authentication.fetchUser().test()
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
 
-        testObserver.awaitNextValue()
-
-        testObserver.assertHasValue()
-        val expectedResponse = Gson().fromJson<UserResponse>(body)
-        assertEquals(Resource.Status.SUCCESS, testObserver.value().status)
-        assertNotNull(testObserver.value().data)
-        assertEquals(expectedResponse.toUser(), testObserver.value().data)
+            val expectedResponse = Gson().fromJson<UserResponse>(body)
+            assertEquals(expectedResponse.toUser(), testObserver.value().data)
+        }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_USER_DETAILS, request.path)
+
+        wait(3)
 
         tearDown()
     }
@@ -392,22 +373,21 @@ class AuthenticationTest {
             }
         })
 
-        val testObserver = authentication.updateAttribution(Attribution(campaign = randomString(8))).test()
+        authentication.updateAttribution(Attribution(campaign = randomString(8))) { error ->
+            assertNull(error)
 
-        testObserver.assertHasValue()
-        assertEquals(Resource.Status.LOADING, testObserver.value().status)
-        assertNull(testObserver.value().data)
+            val testObserver = authentication.fetchUser().test()
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
 
-        testObserver.awaitNextValue()
-
-        testObserver.assertHasValue()
-        val expectedResponse = Gson().fromJson<UserResponse>(body)
-        assertEquals(Resource.Status.SUCCESS, testObserver.value().status)
-        assertNotNull(testObserver.value().data)
-        assertEquals(expectedResponse.toUser(), testObserver.value().data)
+            val expectedResponse = Gson().fromJson<UserResponse>(body)
+            assertEquals(expectedResponse.toUser(), testObserver.value().data)
+        }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_USER_DETAILS, request.path)
+
+        wait(3)
 
         tearDown()
     }
@@ -432,17 +412,19 @@ class AuthenticationTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        val testObserver = authentication.refreshUser().test()
-        testObserver.awaitNextValue()
+        authentication.refreshUser { error ->
+            assertNotNull(error)
 
-        assertEquals(Resource.Status.ERROR, testObserver.value().status)
-        assertNotNull(testObserver.value().error)
-        assertTrue(testObserver.value().error is APIError)
-        assertEquals(APIErrorType.SUSPENDED_DEVICE, (testObserver.value().error as APIError).type)
+            assertTrue(error is APIError)
+            assertEquals(APIErrorType.SUSPENDED_DEVICE, (error as APIError).type)
 
-        assertNull(preferences.encryptedAccessToken)
-        assertNull(preferences.encryptedRefreshToken)
-        assertEquals(-1, preferences.accessTokenExpiry)
+            assertFalse(authentication.loggedIn)
+            assertNull(preferences.encryptedAccessToken)
+            assertNull(preferences.encryptedRefreshToken)
+            assertEquals(-1, preferences.accessTokenExpiry)
+        }
+
+        wait(3)
 
         tearDown()
     }
@@ -461,14 +443,14 @@ class AuthenticationTest {
             }
         })
 
-        val testObserver = authentication.resetPassword(email = "user@frollo.us").test()
-        testObserver.awaitNextValue()
-
-        testObserver.assertHasValue()
-        assertEquals(Resource.Status.SUCCESS, testObserver.value().status)
+        authentication.resetPassword(email = "user@frollo.us") { error ->
+            assertNull(error)
+        }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_PASSWORD_RESET, request.path)
+
+        wait(3)
 
         tearDown()
     }
@@ -493,18 +475,20 @@ class AuthenticationTest {
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        val testObserver = authentication.refreshUser().test()
-        testObserver.awaitNextValue()
+        authentication.refreshUser { error ->
+            assertNotNull(error)
 
-        assertEquals(Resource.Status.ERROR, testObserver.value().status)
-        assertNotNull(testObserver.value().error)
-        assertTrue(testObserver.value().error is DataError)
-        assertEquals(DataErrorType.AUTHENTICATION, (testObserver.value().error as DataError).type)
-        assertEquals(DataErrorSubType.MISSING_REFRESH_TOKEN, (testObserver.value().error as DataError).subType)
+            assertTrue(error is DataError)
+            assertEquals(DataErrorType.AUTHENTICATION, (error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_REFRESH_TOKEN, error.subType)
 
-        assertNull(preferences.encryptedAccessToken)
-        assertNull(preferences.encryptedRefreshToken)
-        assertEquals(-1, preferences.accessTokenExpiry)
+            assertFalse(authentication.loggedIn)
+            assertNull(preferences.encryptedAccessToken)
+            assertNull(preferences.encryptedRefreshToken)
+            assertEquals(-1, preferences.accessTokenExpiry)
+        }
+
+        wait(3)
 
         tearDown()
     }
@@ -543,16 +527,38 @@ class AuthenticationTest {
             }
         })
 
-        val testObserver = authentication.loginUser(AuthType.EMAIL, "deepak@frollo.us", "pass1234").test()
-        testObserver.awaitNextValue()
+        authentication.loginUser(AuthType.EMAIL, "deepak@frollo.us", "pass1234") { error ->
+            assertNull(error)
 
-        assertTrue(authentication.loggedIn)
+            assertTrue(authentication.loggedIn)
 
-        authentication.reset()
+            authentication.reset()
 
-        assertFalse(authentication.loggedIn)
-        assertNull(authentication.user)
+            assertFalse(authentication.loggedIn)
+            assertNull(preferences.encryptedAccessToken)
+            assertNull(preferences.encryptedRefreshToken)
+            assertEquals(-1, preferences.accessTokenExpiry)
+        }
+
+        wait(3)
 
         tearDown()
     }
+
+    /*
+     * Example test for livedata observer
+     *
+     * @get:Rule val testRule = InstantTaskExecutorRule()
+     *
+     * @Test
+     * fun testLivedata() {
+     *     val testObserver = yourFunctionToGetLiveData().test() //com.jraska.livedata.test
+     *     testObserver.awaitNextValue()
+     *
+     *     testObserver.assertHasValue()
+     *     assertEquals(Resource.Status.SUCCESS, testObserver.value().status)
+     *     assertEquals(expectedValue, testObserver.value().data)
+     * }
+     *
+     */
 }

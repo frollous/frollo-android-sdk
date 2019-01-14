@@ -1,8 +1,7 @@
 package us.frollo.frollosdk.data.remote.api
 
-import androidx.lifecycle.LiveData
+import retrofit2.Call
 import retrofit2.http.*
-import us.frollo.frollosdk.data.remote.ApiResponse
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.API_VERSION_PATH
 import us.frollo.frollosdk.model.api.user.*
 
@@ -15,17 +14,17 @@ internal interface UserAPI {
     }
 
     @POST(URL_REGISTER)
-    fun register(@Body request: UserRegisterRequest): LiveData<ApiResponse<UserResponse>>
+    fun register(@Body request: UserRegisterRequest): Call<UserResponse>
 
     @POST(URL_LOGIN)
-    fun login(@Body request: UserLoginRequest): LiveData<ApiResponse<UserResponse>>
+    fun login(@Body request: UserLoginRequest): Call<UserResponse>
 
     @GET(URL_USER_DETAILS)
-    fun fetchUser(): LiveData<ApiResponse<UserResponse>>
+    fun fetchUser(): Call<UserResponse>
 
     @PUT(URL_USER_DETAILS)
-    fun updateUser(@Body request: UserUpdateRequest): LiveData<ApiResponse<UserResponse>>
+    fun updateUser(@Body request: UserUpdateRequest): Call<UserResponse>
 
     @POST(URL_PASSWORD_RESET)
-    fun resetPassword(@Body request: UserResetPasswordRequest): LiveData<ApiResponse<Void>>
+    fun resetPassword(@Body request: UserResetPasswordRequest): Call<Void>
 }

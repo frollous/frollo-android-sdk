@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 
         FrolloSDK.authentication.loginUser(
                 method = AuthType.EMAIL,
-                email = "testtest1@frollo.us",
+                email = "deepak@frollo.us",
                 password = "pass1234") { error ->
 
             if (error != null) handleError(error)
@@ -143,10 +143,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun deleteUser() {
         userLiveData?.removeObservers(this)
-        FrolloSDK.deleteUser { error ->
+        /*FrolloSDK.deleteUser { error ->
             if (error != null) handleError(error)
             else Timber.d("*** User deleted")
-        }
+        }*/
     }
 
     private fun handleError(error: FrolloSDKError) {

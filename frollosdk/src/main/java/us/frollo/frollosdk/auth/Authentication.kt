@@ -56,6 +56,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
             userAPI.login(request).enqueue { response, error ->
                 if (error != null) {
                     Timber.d(error.localizedDescription)
+                    completion.invoke(error)
                 } else {
                     response?.fetchTokens()?.let { network.handleTokens(it) }
                     handleUserResponse(response?.stripTokens(), completion)
@@ -85,6 +86,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
         userAPI.register(request).enqueue { response, error ->
             if (error != null) {
                 Timber.d(error.localizedDescription)
+                completion.invoke(error)
             } else {
                 response?.fetchTokens()?.let { network.handleTokens(it) }
                 handleUserResponse(response?.stripTokens(), completion)
@@ -101,22 +103,49 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
 
     fun refreshUser(completion: OnFrolloSDKCompletionListener? = null) {
         userAPI.fetchUser().enqueue { response, error ->
-            if (error != null) Timber.d(error.localizedDescription)
+            if (error != null) {
+                Timber.d(error.localizedDescription)
+                completion?.invoke(error)
+            }
             else handleUserResponse(response, completion)
         }
     }
 
     fun updateUser(user: User, completion: OnFrolloSDKCompletionListener) {
         userAPI.updateUser(user.updateRequest()).enqueue { response, error ->
-            if (error != null) Timber.d(error.localizedDescription)
+            if (error != null) {
+                Timber.d(error.localizedDescription)
+                completion.invoke(error)
+            }
             else handleUserResponse(response, completion)
         }
     }
 
     fun updateAttribution(attribution: Attribution, completion: OnFrolloSDKCompletionListener) {
         userAPI.updateUser(UserUpdateRequest(attribution = attribution)).enqueue { response, error ->
-            if (error != null) Timber.d(error.localizedDescription)
+            if (error != null) {
+                Timber.d(error.localizedDescription)
+                completion.invoke(error)
+            }
             else handleUserResponse(response, completion)
+        }
+    }
+
+    fun changePassword(currentPassword: String?, newPassword: String, completion: OnFrolloSDKCompletionListener) {
+        val request = UserChangePasswordRequest(
+                currentPassword = currentPassword, // currentPassword can be for Facebook login only
+                newPassword = newPassword)
+
+        if (request.valid()) {
+            userAPI.changePassword(request).enqueue { _, error ->
+                if (error != null) {
+                    Timber.d(error.localizedDescription)
+                }
+
+                completion.invoke(error)
+            }
+        } else {
+            completion.invoke(DataError(type = DataErrorType.API, subType = DataErrorSubType.PASSWORD_TOO_SHORT))
         }
     }
 

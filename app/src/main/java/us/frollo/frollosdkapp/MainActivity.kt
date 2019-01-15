@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         btn_refresh_user.setOnClickListener { refreshUser() }
         btn_update_user.setOnClickListener { user?.let(::updateUser) }
         btn_reset_password.setOnClickListener { resetPassword() }
+        btn_change_password.setOnClickListener { changePassword() }
         btn_logout.setOnClickListener { FrolloSDK.logout() }
     }
 
@@ -121,11 +122,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun changePassword() {
+        FrolloSDK.authentication.changePassword(currentPassword = "pass1234", newPassword = "P123") { error ->
+            if (error != null) handleError(error)
+            else Timber.d("*** Password is changed")
+        }
+    }
+
     private fun handleError(error: FrolloSDKError) {
         when (error) {
-            is APIError -> Timber.d("Error resetting in: ${error.errorCode}")
-            is DataError -> Timber.d("Error resetting in: ${error.type}")
-            else -> Timber.d("Error resetting in: ${error.debugDescription}")
+            is APIError -> Timber.d("*** Error: ${error.errorCode} - ${error.localizedDescription}")
+            is DataError -> Timber.d("*** Error: ${error.type} - ${error.localizedDescription}")
+            else -> Timber.d("*** Error: ${error.localizedDescription}")
         }
     }
 }

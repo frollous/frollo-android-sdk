@@ -5,6 +5,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import us.frollo.frollosdk.data.remote.ApiResponse
 import us.frollo.frollosdk.error.APIError
+import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.mapping.toAPIErrorResponse
 import us.frollo.frollosdk.mapping.toDataError
@@ -34,7 +35,7 @@ internal fun <T> handleFailure(errorResponse: ApiResponse<T>, completion: (T?, F
         val dataError = msg.toDataError()
 
         if (dataError != null)
-            completion.invoke(null, dataError)
+            completion.invoke(null, DataError(dataError.type, dataError.subType)) // Re-create new DataError as the json converter does has the context object
         else if (msg.toAPIErrorResponse() != null)
             completion.invoke(null, APIError(errorResponse.code, msg))
         else

@@ -33,6 +33,7 @@ import us.frollo.frollosdk.model.testUserResponseData
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.randomString
+import us.frollo.frollosdk.testutils.randomUUID
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.wait
 import java.util.*
@@ -466,6 +467,68 @@ class AuthenticationTest {
     }
 
     @Test
+    fun testChangePassword() {
+        initSetup()
+
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_CHANGE_PASSWORD) {
+                    return MockResponse()
+                            .setResponseCode(204)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        authentication.changePassword(currentPassword = randomUUID(), newPassword = randomUUID()) { error ->
+            assertNull(error)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_CHANGE_PASSWORD, request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testChangePasswordFailsIfTooShort() {
+        initSetup()
+
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_CHANGE_PASSWORD) {
+                    return MockResponse()
+                            .setResponseCode(204)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        authentication.changePassword(currentPassword = randomUUID(), newPassword = "1234") { error ->
+            assertNotNull(error)
+
+            assertEquals(DataErrorType.API, (error as DataError).type)
+            assertEquals(DataErrorSubType.PASSWORD_TOO_SHORT, error.subType)
+        }
+
+        assertEquals(0, mockServer.requestCount)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testResetPassword() {
         initSetup()
 
@@ -508,6 +571,7 @@ class AuthenticationTest {
             }
         })
 
+        preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 

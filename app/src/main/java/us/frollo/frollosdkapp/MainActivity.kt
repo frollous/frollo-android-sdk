@@ -6,6 +6,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
@@ -23,6 +25,7 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
 
     private var user: User? = null
+    private var userLiveData: LiveData<Resource<User>>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +49,8 @@ class MainActivity : AppCompatActivity() {
         btn_update_user.setOnClickListener { user?.let(::updateUser) }
         btn_reset_password.setOnClickListener { resetPassword() }
         btn_change_password.setOnClickListener { changePassword() }
-        btn_logout.setOnClickListener { FrolloSDK.logout() }
+        btn_delete_user.setOnClickListener { deleteUser() }
+        btn_logout.setOnClickListener { logout() }
     }
 
     private fun login() {
@@ -54,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 
         FrolloSDK.authentication.loginUser(
                 method = AuthType.EMAIL,
-                email = "deepak@frollo.us",
+                email = "testtest1@frollo.us",
                 password = "pass1234") { error ->
 
             if (error != null) handleError(error)
@@ -63,7 +67,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchUser() {
-        FrolloSDK.authentication.fetchUser().observe(this) {
+        userLiveData = FrolloSDK.authentication.fetchUser()
+        userLiveData?.observe(this) {
             when (it?.status) {
                 Resource.Status.SUCCESS -> {
                     user = it.data
@@ -126,6 +131,21 @@ class MainActivity : AppCompatActivity() {
         FrolloSDK.authentication.changePassword(currentPassword = "pass1234", newPassword = "P123") { error ->
             if (error != null) handleError(error)
             else Timber.d("*** Password is changed")
+        }
+    }
+
+    private fun logout() {
+        userLiveData?.removeObservers(this)
+        FrolloSDK.logout {
+            Timber.d("*** User logged out")
+        }
+    }
+
+    private fun deleteUser() {
+        userLiveData?.removeObservers(this)
+        FrolloSDK.deleteUser { error ->
+            if (error != null) handleError(error)
+            else Timber.d("*** User deleted")
         }
     }
 

@@ -149,12 +149,25 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
         }
     }
 
-    fun deleteUser() {
-        // TODO: To be implemented
+    internal fun deleteUser(completion: OnFrolloSDKCompletionListener) {
+        userAPI.deleteUser().enqueue { _, error ->
+            if (error != null) Timber.d(error.localizedDescription)
+            else reset()
+
+            completion.invoke(error)
+        }
+    }
+
+    fun refreshTokens() {
+        network.refreshTokens()
     }
 
     fun authenticateRequest(request: Request) =
             network.authenticateRequest(request)
+
+    fun updateDevice() {
+        // TODO: To be implemented
+    }
 
     internal fun logoutUser(completion: OnFrolloSDKCompletionListener? = null) {
         userAPI.logout().enqueue { _, error ->

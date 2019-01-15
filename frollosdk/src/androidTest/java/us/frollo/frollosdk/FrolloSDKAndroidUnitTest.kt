@@ -65,6 +65,11 @@ class FrolloSDKAndroidUnitTest {
     }
 
     @Test
+    fun testDeleteUser() {
+        //TODO: to be implemented
+    }
+
+    @Test
     fun testReset() {
         //TODO: to be implemented
     }

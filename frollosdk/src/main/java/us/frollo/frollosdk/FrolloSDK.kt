@@ -82,6 +82,13 @@ object FrolloSDK {
         }
     }
 
+    fun deleteUser(completion: OnFrolloSDKCompletionListener? = null) {
+        authentication.deleteUser { error ->
+            if (error != null) completion?.invoke(error)
+            else reset(completion)
+        }
+    }
+
     internal fun forcedLogout() {
         if (authentication.loggedIn)
             reset()

@@ -13,6 +13,7 @@ internal interface UserAPI {
         const val URL_USER_DETAILS = "$API_VERSION_PATH/user/details/"
         const val URL_LOGOUT = "$API_VERSION_PATH/user/logout/"
         const val URL_CHANGE_PASSWORD = "$API_VERSION_PATH/user"
+        const val URL_DELETE_USER = "$API_VERSION_PATH/user"
     }
 
     @POST(URL_REGISTER)
@@ -32,6 +33,9 @@ internal interface UserAPI {
 
     @PUT(URL_CHANGE_PASSWORD)
     fun changePassword(@Body request: UserChangePasswordRequest): Call<Void>
+
+    @DELETE(URL_DELETE_USER)
+    fun deleteUser(): Call<Void>
 
     @PUT(URL_LOGOUT)
     fun logout(): Call<Void>

@@ -529,6 +529,42 @@ class AuthenticationTest {
     }
 
     @Test
+    fun testDeleteUser() {
+        initSetup()
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_DELETE_USER) {
+                    return MockResponse()
+                            .setResponseCode(204)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        authentication.deleteUser { error ->
+            assertNull(error)
+
+            assertFalse(authentication.loggedIn)
+            assertNull(preferences.encryptedAccessToken)
+            assertNull(preferences.encryptedRefreshToken)
+            assertEquals(-1, preferences.accessTokenExpiry)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_DELETE_USER, request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testResetPassword() {
         initSetup()
 

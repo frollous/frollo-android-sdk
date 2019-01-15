@@ -17,21 +17,20 @@
  * along with Android Token.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package us.frollo.frollosdk.auth.otp;
+package us.frollo.frollosdk.auth.otp
 
-public interface IToken {
+internal interface IToken {
+    fun getName(): String
 
-	public String getName();
+    fun getSerialNumber(): String
 
-	public String getSerialNumber();
+    fun getTokenType(): Int
 
-	public int getTokenType();
+    fun generateOtp(): String
 
-	public String generateOtp();
+    fun getId(): Long
 
-	public long getId();
+    fun setId(id: Long)
 
-	public void setId(long id);
-
-	public int getTimeStep();
+    fun getTimeStep(): Int
 }

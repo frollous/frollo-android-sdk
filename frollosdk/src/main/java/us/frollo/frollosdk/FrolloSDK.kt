@@ -6,12 +6,14 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import timber.log.Timber
 import us.frollo.frollosdk.auth.Authentication
+import us.frollo.frollosdk.core.ACTION.ACTION_USER_LOGGED_OUT
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.error.FrolloSDKError
+import us.frollo.frollosdk.extensions.notify
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.version.Version
@@ -114,6 +116,7 @@ object FrolloSDK {
         preferences.reset()
         database.clearAllTables()
         completion?.invoke(null)
-        // TODO: Need to send any notify anything?
+
+        notify(ACTION_USER_LOGGED_OUT)
     }
 }

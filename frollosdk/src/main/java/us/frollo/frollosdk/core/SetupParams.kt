@@ -5,7 +5,7 @@ import android.util.Log
 data class SetupParams(val serverUrl: String, val logLevel: Int) {
 
     class Builder {
-        private lateinit var serverUrl: String
+        private var serverUrl = ""
         private var logLevel = Log.ERROR
 
         fun serverUrl(serverUrl: String) = apply { this.serverUrl = serverUrl }

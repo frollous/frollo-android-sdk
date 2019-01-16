@@ -22,7 +22,7 @@ object FrolloSDK {
         get() = _setup
 
     val authentication: Authentication
-        get() =_authentication ?: throw FrolloSDKError("SDK not setup")
+        get() =_authentication ?: throw IllegalAccessException("SDK not setup")
 
     private var _setup = false
     private var _authentication: Authentication? = null
@@ -36,12 +36,12 @@ object FrolloSDK {
 
     @Throws(FrolloSDKError::class)
     fun setup(application: Application, params: SetupParams, callback: ((FrolloSDKError?) -> Unit)) {
+        this.app = application
+
         registerTimber()
 
         if (_setup) throw FrolloSDKError("SDK already setup")
         if (params.serverUrl.isBlank()) throw FrolloSDKError("Server URL cannot be empty")
-
-        this.app = application
 
         // 1. Initialize ThreeTenABP
         initializeThreeTenABP()
@@ -104,7 +104,10 @@ object FrolloSDK {
             reset()
     }
 
+    @Throws(IllegalAccessException::class)
     fun reset(completion: OnFrolloSDKCompletionListener? = null) {
+        if (!_setup) throw IllegalAccessException("SDK not setup")
+
         // TODO: Pause scheduled refreshing
         // NOTE: Keystore reset is not required as we do not store any data in there. Just keys.
         authentication.reset()

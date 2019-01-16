@@ -59,4 +59,10 @@
         android:layout_height="wrap_content"
         android:text="Logout"/>
 
+    <Button
+        android:id="@+id/btn_device_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Device Update"/>
+
 </LinearLayout>

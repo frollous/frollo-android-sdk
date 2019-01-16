@@ -8,7 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import us.frollo.frollosdk.auth.AuthToken
 import us.frollo.frollosdk.base.LiveDataCallAdapterFactory
-import us.frollo.frollosdk.data.remote.api.TokenAPI
+import us.frollo.frollosdk.data.remote.api.DeviceAPI
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.api.user.TokenResponse
 import us.frollo.frollosdk.preferences.Preferences
@@ -47,7 +47,7 @@ class NetworkService(internal val serverUrl: String, keystore: Keystore, pref: P
      * @return The new authentication token to be used
      */
     internal fun refreshTokens(): String? {
-        val tokenEndpoint = create(TokenAPI::class.java)
+        val tokenEndpoint = create(DeviceAPI::class.java)
         val response = tokenEndpoint.refreshTokens().execute()
         return if (response.isSuccessful) {
             response.body()?.let { handleTokens(it) }

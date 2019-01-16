@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         btn_change_password.setOnClickListener { changePassword() }
         btn_delete_user.setOnClickListener { deleteUser() }
         btn_logout.setOnClickListener { logout() }
+        btn_device_update.setOnClickListener { updateDevice() }
     }
 
     private fun login() {
@@ -147,6 +148,10 @@ class MainActivity : AppCompatActivity() {
             if (error != null) handleError(error)
             else Timber.d("*** User deleted")
         }*/
+    }
+
+    private fun updateDevice() {
+        FrolloSDK.refreshData()
     }
 
     private fun handleError(error: FrolloSDKError) {

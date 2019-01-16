@@ -15,7 +15,7 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.core.SetupParams
-import us.frollo.frollosdk.data.remote.api.TokenAPI
+import us.frollo.frollosdk.data.remote.api.DeviceAPI
 import us.frollo.frollosdk.data.remote.api.UserAPI
 import us.frollo.frollosdk.error.*
 import us.frollo.frollosdk.extensions.enqueue
@@ -63,7 +63,7 @@ class NetworkAuthenticatorTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == TokenAPI.URL_TOKEN_REFRESH) {
+                if (request?.path == DeviceAPI.URL_TOKEN_REFRESH) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(readStringFromJson(app, R.raw.refresh_token_valid))
@@ -102,7 +102,7 @@ class NetworkAuthenticatorTest {
             var failedOnce = false
 
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == TokenAPI.URL_TOKEN_REFRESH) {
+                if (request?.path == DeviceAPI.URL_TOKEN_REFRESH) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(readStringFromJson(app, R.raw.refresh_token_valid))
@@ -183,7 +183,7 @@ class NetworkAuthenticatorTest {
             var userRequestCount = 0
 
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == TokenAPI.URL_TOKEN_REFRESH) {
+                if (request?.path == DeviceAPI.URL_TOKEN_REFRESH) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(readStringFromJson(app, R.raw.refresh_token_valid))
@@ -240,7 +240,7 @@ class NetworkAuthenticatorTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == TokenAPI.URL_TOKEN_REFRESH) {
+                if (request?.path == DeviceAPI.URL_TOKEN_REFRESH) {
                     return MockResponse()
                             .setResponseCode(401)
                             .setBody(readStringFromJson(app, R.raw.error_invalid_refresh_token))

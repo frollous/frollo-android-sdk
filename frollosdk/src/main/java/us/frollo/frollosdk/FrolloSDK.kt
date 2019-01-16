@@ -76,6 +76,16 @@ object FrolloSDK {
         AndroidThreeTen.init(app)
     }
 
+    fun refreshData() {
+        //TODO: incomplete implementation
+        refreshSystem()
+    }
+
+    private fun refreshSystem() {
+        //TODO: incomplete implementation
+        authentication.updateDevice()
+    }
+
     fun logout(completion: OnFrolloSDKCompletionListener? = null) {
         authentication.logoutUser {
             reset(completion)

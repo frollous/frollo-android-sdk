@@ -13,10 +13,12 @@ import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkService
+import us.frollo.frollosdk.data.remote.api.DeviceAPI
 import us.frollo.frollosdk.data.remote.api.UserAPI
 import us.frollo.frollosdk.error.*
 import us.frollo.frollosdk.extensions.*
 import us.frollo.frollosdk.mapping.toUser
+import us.frollo.frollosdk.model.api.device.DeviceUpdateRequest
 import us.frollo.frollosdk.model.api.user.*
 import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.model.coredata.user.Attribution
@@ -31,6 +33,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
         private set(value) { pref.loggedIn = value }
 
     private val userAPI: UserAPI = network.create(UserAPI::class.java)
+    private val deviceAPI: DeviceAPI = network.create(DeviceAPI::class.java)
 
     //TODO: Review - This returns a new LiveData object ON EACH call. Maybe the app should implement a MediatorLiveData and change source in ViewModel.
     fun fetchUser(): LiveData<Resource<User>> =
@@ -165,8 +168,19 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     fun authenticateRequest(request: Request) =
             network.authenticateRequest(request)
 
-    fun updateDevice() {
-        // TODO: To be implemented
+    internal fun updateDevice(notificationToken: String? = null, completion: OnFrolloSDKCompletionListener? = null) {
+        val request = DeviceUpdateRequest(
+                deviceName = di.deviceName,
+                notificationToken = notificationToken,
+                timezone = TimeZone.getDefault().id)
+
+        deviceAPI.updateDevice(request).enqueue { _, error ->
+            if (error != null) {
+                Timber.d(error.localizedDescription)
+            }
+
+            completion?.invoke(error)
+        }
     }
 
     internal fun logoutUser(completion: OnFrolloSDKCompletionListener? = null) {

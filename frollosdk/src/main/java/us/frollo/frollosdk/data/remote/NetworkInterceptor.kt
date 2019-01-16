@@ -14,7 +14,7 @@ import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_BUNDLE_ID
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_DEVICE_VERSION
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_SOFTWARE_VERSION
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_USER_AGENT
-import us.frollo.frollosdk.data.remote.api.TokenAPI.Companion.URL_TOKEN_REFRESH
+import us.frollo.frollosdk.data.remote.api.DeviceAPI.Companion.URL_TOKEN_REFRESH
 import us.frollo.frollosdk.data.remote.api.UserAPI.Companion.URL_LOGIN
 import us.frollo.frollosdk.data.remote.api.UserAPI.Companion.URL_REGISTER
 import us.frollo.frollosdk.data.remote.api.UserAPI.Companion.URL_PASSWORD_RESET

@@ -16,7 +16,7 @@ import org.junit.Assert.*
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.data.remote.api.TokenAPI
+import us.frollo.frollosdk.data.remote.api.DeviceAPI
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.api.user.TokenResponse
 import us.frollo.frollosdk.preferences.Preferences
@@ -71,7 +71,7 @@ class NetworkServiceTest {
     fun testForceRefreshingAccessTokens() {
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == TokenAPI.URL_TOKEN_REFRESH) {
+                if (request?.path == DeviceAPI.URL_TOKEN_REFRESH) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(readStringFromJson(app, R.raw.refresh_token_valid))
@@ -92,7 +92,7 @@ class NetworkServiceTest {
         assertEquals(1721259268, preferences.accessTokenExpiry)
 
         val request = mockServer.takeRequest()
-        assertEquals(TokenAPI.URL_TOKEN_REFRESH, request.path)
+        assertEquals(DeviceAPI.URL_TOKEN_REFRESH, request.path)
     }
 
     @Test

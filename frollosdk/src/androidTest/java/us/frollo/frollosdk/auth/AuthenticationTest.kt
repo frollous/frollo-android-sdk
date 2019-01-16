@@ -22,6 +22,7 @@ import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkService
+import us.frollo.frollosdk.data.remote.api.DeviceAPI
 import us.frollo.frollosdk.data.remote.api.UserAPI
 import us.frollo.frollosdk.error.*
 import us.frollo.frollosdk.extensions.fromJson
@@ -623,6 +624,36 @@ class AuthenticationTest {
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1, preferences.accessTokenExpiry)
         }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testUpdateDevice() {
+        initSetup()
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == DeviceAPI.URL_DEVICE) {
+                    return MockResponse()
+                            .setResponseCode(204)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        authentication.updateDevice(notificationToken = "SomeToken12345") { error ->
+            assertNull(error)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(DeviceAPI.URL_DEVICE, request.path)
 
         wait(3)
 

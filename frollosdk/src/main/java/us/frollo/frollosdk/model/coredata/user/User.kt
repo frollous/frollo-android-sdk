@@ -1,7 +1,7 @@
 package us.frollo.frollosdk.model.coredata.user
 
 data class User(
-        val userId: Int, //TODO: review if we should allow to modify this
+        val userId: Long, //TODO: review if we should allow to modify this
         var firstName: String?,
         var email: String,
         val emailVerified: Boolean, //TODO: review if we should allow to modify this

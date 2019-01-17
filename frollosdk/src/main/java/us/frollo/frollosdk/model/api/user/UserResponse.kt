@@ -12,7 +12,7 @@ import us.frollo.frollosdk.model.coredata.user.*
         indices = [Index("user_id")])
 internal data class UserResponse(
         @PrimaryKey
-        @ColumnInfo(name = "user_id") @SerializedName("id") val userId: Int,
+        @ColumnInfo(name = "user_id") @SerializedName("id") val userId: Long,
         @ColumnInfo(name = "first_name") @SerializedName("first_name") val firstName: String,
         @ColumnInfo(name = "email") @SerializedName("email") val email: String,
         @ColumnInfo(name = "email_verified") @SerializedName("email_verified") val emailVerified: Boolean,

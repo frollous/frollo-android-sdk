@@ -12,7 +12,7 @@ internal fun testUserResponseData() : UserResponse {
     val name = randomUUID()
 
     return UserResponse(
-                userId = randomNumber(),
+                userId = randomNumber().toLong(),
                 firstName = name,
                 email = "$name@frollo.us",
                 emailVerified = true,

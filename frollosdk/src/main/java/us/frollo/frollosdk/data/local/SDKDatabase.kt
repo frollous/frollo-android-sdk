@@ -5,16 +5,21 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import us.frollo.frollosdk.data.local.dao.MessageDao
 import us.frollo.frollosdk.data.local.dao.UserDao
+import us.frollo.frollosdk.model.api.messages.MessageResponse
 import us.frollo.frollosdk.model.api.user.UserResponse
 
 @Database(entities = [
-    UserResponse::class
+    UserResponse::class,
+    MessageResponse::class
 ], version = 1, exportSchema = true)
 
 @TypeConverters(Converters::class)
 abstract class SDKDatabase : RoomDatabase() {
+
     internal abstract fun users(): UserDao
+    internal abstract fun messages(): MessageDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"

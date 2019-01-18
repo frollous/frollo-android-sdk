@@ -40,6 +40,36 @@ internal fun testUserResponseData() : UserResponse {
                 accessTokenExp = 1721259268)
 }
 
+internal fun UserResponse.testModifyUserResponseData(firstName: String) : UserResponse {
+    return UserResponse(
+            userId = userId,
+            firstName = firstName,
+            email = email,
+            emailVerified = emailVerified,
+            status = status,
+            primaryCurrency = primaryCurrency,
+            validPassword = validPassword,
+            registerComplete = registerComplete,
+            registrationDate = registrationDate,
+            facebookId = facebookId,
+            attribution = attribution,
+            lastName = lastName,
+            mobileNumber = mobileNumber,
+            gender = gender,
+            currentAddress = currentAddress,
+            previousAddress = previousAddress,
+            householdSize = householdSize,
+            householdType = householdType,
+            occupation = occupation,
+            industry = industry,
+            dateOfBirth = dateOfBirth,
+            driverLicense = driverLicense,
+            features = features,
+            refreshToken = refreshToken,
+            accessToken = accessToken,
+            accessTokenExp = accessTokenExp)
+}
+
 internal fun testEmailLoginData() : UserLoginRequest {
     val name = randomUUID()
 

@@ -3,6 +3,7 @@ package us.frollo.frollosdk.data.local
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import us.frollo.frollosdk.extensions.fromJson
+import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.user.*
 
 /**
@@ -14,6 +15,12 @@ internal class Converters {
         val instance = Converters()
         private val gson = Gson()
     }
+
+    @TypeConverter
+    fun stringToListOfString(value: String?): List<String>? = if (value == null) null else value.split("|").filter { it.isNotBlank() }
+
+    @TypeConverter
+    fun stringFromListOfString(value: List<String>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|" , postfix = "|")
 
     @TypeConverter
     fun stringToListOfFeatureFlag(value: String?): List<FeatureFlag>? = if (value == null) null else gson.fromJson<List<FeatureFlag>>(value)
@@ -56,4 +63,10 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromAttribution(value: Attribution?): String? = if (value == null) null else gson.toJson(value)
+
+    @TypeConverter
+    fun stringToContentType(value: String?): ContentType? = if (value == null) ContentType.TEXT else ContentType.valueOf(value)
+
+    @TypeConverter
+    fun stringFromContentType(value: ContentType?): String? = value?.name ?: run { ContentType.TEXT.name }
 }

@@ -3,9 +3,30 @@ package us.frollo.frollosdk.data.local
 import org.junit.Test
 
 import org.junit.Assert.*
+import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.user.*
 
 class ConvertersTest {
+
+    @Test
+    fun testStringToListOfString() {
+        val string = "|welcome|welcome_event|event|"
+        val list = Converters.instance.stringToListOfString(string)
+        assertNotNull(list)
+        assertTrue(list?.size == 3)
+        assertEquals("welcome", list?.get(0))
+        assertEquals("welcome_event", list?.get(1))
+        assertEquals("event", list?.get(2))
+
+        assertNull(Converters.instance.stringToListOfString(null))
+    }
+
+    @Test
+    fun testStringFromListOfString() {
+        val list = mutableListOf("welcome", "welcome_event", "event")
+        val string = Converters.instance.stringFromListOfString(list)
+        assertEquals("|welcome|welcome_event|event|", string)
+    }
 
     @Test
     fun testStringToListOfFeatureFlag() {
@@ -124,5 +145,21 @@ class ConvertersTest {
         val attr = Attribution(network = "organic", campaign = "frollo")
         val json = Converters.instance.stringFromAttribution(attr)
         assertEquals("{\"network\":\"organic\",\"campaign\":\"frollo\"}", json)
+    }
+
+    @Test
+    fun testStringToContentType() {
+        val status = Converters.instance.stringToContentType("IMAGE")
+        assertEquals(ContentType.IMAGE, status)
+
+        assertEquals(ContentType.TEXT, Converters.instance.stringToContentType(null))
+    }
+
+    @Test
+    fun testStringFromContentType() {
+        val str = Converters.instance.stringFromContentType(ContentType.IMAGE)
+        assertEquals("IMAGE", str)
+
+        assertEquals("TEXT", Converters.instance.stringFromContentType(null))
     }
 }

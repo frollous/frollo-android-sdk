@@ -9,7 +9,8 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import okhttp3.mockwebserver.MockResponse
 
-internal fun randomNumber() = Random().nextInt()
+internal fun randomNumber(range: IntRange? = null)
+        = if (range == null) Random().nextInt() else range.random()
 
 internal fun randomUUID() = UUID.randomUUID().toString()
 
@@ -22,6 +23,8 @@ internal fun randomString(length: Int) : String {
             .map(charPool::get)
             .joinToString("")
 }
+
+internal fun randomBoolean() = Random().nextBoolean()
 
 @Throws(Exception::class)
 fun convertStreamToString(inputStream: InputStream): String {

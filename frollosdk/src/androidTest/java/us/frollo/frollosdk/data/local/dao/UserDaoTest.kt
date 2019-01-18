@@ -35,8 +35,6 @@ class UserDaoTest {
 
     @Test
     fun testLoad() {
-        assertNotNull(db)
-
         val testObserver = db.users().load().test()
         testObserver.awaitValue()
         assertNull(testObserver.value())
@@ -50,8 +48,6 @@ class UserDaoTest {
 
     @Test
     fun testInsert() {
-        assertNotNull(db)
-
         val data = testUserResponseData()
         db.users().insert(data)
 
@@ -66,12 +62,11 @@ class UserDaoTest {
         testObserver2.awaitValue()
         assertNotNull(testObserver2.value())
         assertEquals(data.userId, testObserver2.value()?.userId)
+        assertEquals("New first name", testObserver2.value()?.firstName)
     }
 
     @Test
     fun testClear() {
-        assertNotNull(db)
-
         val data = testUserResponseData()
         db.users().insert(data)
 

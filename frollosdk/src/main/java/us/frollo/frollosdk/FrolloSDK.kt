@@ -1,12 +1,13 @@
 package us.frollo.frollosdk
 
 import android.app.Application
+import androidx.core.os.bundleOf
 import com.jakewharton.threetenabp.AndroidThreeTen
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 import timber.log.Timber
 import us.frollo.frollosdk.auth.Authentication
-import us.frollo.frollosdk.core.ACTION.ACTION_USER_LOGGED_OUT
+import us.frollo.frollosdk.auth.AuthenticationStatus
+import us.frollo.frollosdk.core.ACTION.ACTION_AUTHENTICATION_CHANGED
+import us.frollo.frollosdk.core.ARGUMENT.ARG_AUTHENTICATION_STATUS
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.core.SetupParams
@@ -15,6 +16,7 @@ import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.extensions.notify
 import us.frollo.frollosdk.keystore.Keystore
+import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.version.Version
 
@@ -26,8 +28,12 @@ object FrolloSDK {
     val authentication: Authentication
         get() =_authentication ?: throw IllegalAccessException("SDK not setup")
 
+    val messages: Messages
+        get() =_messages ?: throw IllegalAccessException("SDK not setup")
+
     private var _setup = false
     private var _authentication: Authentication? = null
+    private var _messages: Messages? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
@@ -60,6 +66,7 @@ object FrolloSDK {
         network = NetworkService(params.serverUrl, keyStore, preferences)
         // 7. Setup Authentication
         _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
+        _messages = Messages(network, database)
 
         if (version.migrationNeeded()) {
             version.migrateVersion()
@@ -117,6 +124,7 @@ object FrolloSDK {
         database.clearAllTables()
         completion?.invoke(null)
 
-        notify(ACTION_USER_LOGGED_OUT)
+        notify(ACTION_AUTHENTICATION_CHANGED,
+                bundleOf(Pair(ARG_AUTHENTICATION_STATUS, AuthenticationStatus.LOGGED_OUT)))
     }
 }

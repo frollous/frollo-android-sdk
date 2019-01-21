@@ -76,4 +76,9 @@ class UtilityExtensionTest {
         assertEquals("Unauthorized", okHttpResponse.clonedBodyString)
     }
 
+    @Test
+    fun testBooleanToInt() {
+        assertEquals(1, true.toInt())
+        assertEquals(0, false.toInt())
+    }
 }

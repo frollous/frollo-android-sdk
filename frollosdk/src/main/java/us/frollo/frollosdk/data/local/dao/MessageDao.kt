@@ -16,11 +16,11 @@ internal interface MessageDao {
     @Query("SELECT * FROM message WHERE message_types LIKE '%|'||:messageType||'|%'")
     fun load(messageType: String): LiveData<List<MessageResponse>>
 
+    @Query("SELECT * FROM message WHERE msg_id = :messageId")
+    fun load(messageId: Long): LiveData<MessageResponse?>
+
     @RawQuery(observedEntities = [MessageResponse::class])
     fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<MessageResponse>>
-
-    @Query("SELECT * FROM message WHERE msg_id = :messageId")
-    fun find(messageId: Long): LiveData<MessageResponse>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: MessageResponse): LongArray
@@ -30,6 +30,9 @@ internal interface MessageDao {
 
     @Query("SELECT msg_id FROM message WHERE msg_id NOT IN (:apiIds)")
     fun getStaleIds(apiIds: LongArray): List<Long>
+
+    @Query("SELECT msg_id FROM message WHERE (msg_id NOT IN (:apiIds)) AND (read = 0)")
+    fun getUnreadStaleIds(apiIds: LongArray): List<Long>
 
     @Query("DELETE FROM message WHERE msg_id IN (:messageIds)")
     fun deleteMany(messageIds: LongArray)

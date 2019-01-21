@@ -2,7 +2,6 @@ package us.frollo.frollosdk.data.local.dao
 
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
@@ -13,11 +12,10 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.data.local.SDKDatabase
+import us.frollo.frollosdk.extensions.generateSQLQueryMessages
 
 import us.frollo.frollosdk.model.testMessageResponseData
 import us.frollo.frollosdk.model.testModifyUserResponseData
-
-import java.lang.StringBuilder
 
 class MessageDaoTest {
 
@@ -86,28 +84,22 @@ class MessageDaoTest {
 
     @Test
     fun testLoadByQuery() {
-        val data1 = testMessageResponseData(types = mutableListOf("survey"))
-        val data2 = testMessageResponseData(types = mutableListOf("event"))
-        val data3 = testMessageResponseData(types = mutableListOf("survey", "welcome"))
-        val data4 = testMessageResponseData(types = mutableListOf("dashboard_event"))
-        val data5 = testMessageResponseData(types = mutableListOf("survey", "dashboard_event"))
+        val data1 = testMessageResponseData(types = mutableListOf("survey"), read = false)
+        val data2 = testMessageResponseData(types = mutableListOf("event"), read = false)
+        val data3 = testMessageResponseData(types = mutableListOf("survey", "welcome"), read = true)
+        val data4 = testMessageResponseData(types = mutableListOf("dashboard_event"), read = false)
+        val data5 = testMessageResponseData(types = mutableListOf("survey", "dashboard_event"), read = false)
         val list = mutableListOf(data1, data2, data3, data4, data5)
 
         db.messages().insertAll(*list.toTypedArray())
 
-        val sb = StringBuilder()
-        val types = mutableListOf("survey", "dashboard_event")
-        types.forEachIndexed { index, str ->
-            sb.append("(message_types LIKE '%|$str|%')")
-            if (index < types.size - 1) sb.append(" OR ")
-        }
-
-        val query = SimpleSQLiteQuery("SELECT * FROM message WHERE $sb")
+        val messageTypes = mutableListOf("survey", "dashboard_event")
+        val query = generateSQLQueryMessages(messageTypes, false)
 
         val testObserver = db.messages().loadByQuery(query).test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
-        assertEquals(4, testObserver.value().size)
+        assertEquals(3, testObserver.value().size)
     }
 
     @Test
@@ -116,10 +108,10 @@ class MessageDaoTest {
         val list = mutableListOf(testMessageResponseData(), data, testMessageResponseData())
         db.messages().insertAll(*list.toTypedArray())
 
-        val testObserver = db.messages().find(data.messageId).test()
+        val testObserver = db.messages().load(data.messageId).test()
         testObserver.awaitValue()
         assertNotNull(testObserver.value())
-        assertEquals(data.messageId, testObserver.value().messageId)
+        assertEquals(data.messageId, testObserver.value()?.messageId)
     }
 
     @Test
@@ -165,6 +157,21 @@ class MessageDaoTest {
         val staleIds = db.messages().getStaleIds(longArrayOf(100, 103)).sorted()
         assertEquals(2, staleIds.size)
         assertTrue(staleIds.containsAll(mutableListOf<Long>(101, 102)))
+    }
+
+    @Test
+    fun testGetUnreadStaleIds() {
+        val data1 = testMessageResponseData(msgId = 100, read = true)
+        val data2 = testMessageResponseData(msgId = 101, read = false)
+        val data3 = testMessageResponseData(msgId = 102, read = false)
+        val data4 = testMessageResponseData(msgId = 103, read = false)
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        db.messages().insertAll(*list.toTypedArray())
+
+        val staleIds = db.messages().getUnreadStaleIds(longArrayOf(101)).sorted()
+        assertEquals(2, staleIds.size)
+        assertTrue(staleIds.containsAll(mutableListOf<Long>(102, 103)))
     }
 
     @Test

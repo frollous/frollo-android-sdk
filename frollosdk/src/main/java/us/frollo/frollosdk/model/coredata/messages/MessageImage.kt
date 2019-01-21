@@ -12,7 +12,7 @@ data class MessageImage(
         override val title: String?,
         override val contentType: ContentType,
         override val action: Action?,
-        val height: Double,
-        val width: Double,
+        val height: Double?,
+        val width: Double?,
         val url: String
 ) : Message(messageId, event, userEventId, placement, persists, read, interacted, messageTypes, title, contentType, action)

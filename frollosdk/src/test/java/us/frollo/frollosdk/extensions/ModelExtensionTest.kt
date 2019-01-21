@@ -31,4 +31,10 @@ class ModelExtensionTest {
         val request = user.updateRequest()
         Assert.assertEquals(user.firstName, request.firstName)
     }
+
+    @Test
+    fun testGenerateSQLQueryMessages() {
+        val query = generateSQLQueryMessages(mutableListOf("survey", "event"), false)
+        Assert.assertEquals("SELECT * FROM message WHERE ((message_types LIKE '%|survey|%') OR (message_types LIKE '%|event|%')) AND read = 0", query.sql)
+    }
 }

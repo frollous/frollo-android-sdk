@@ -54,12 +54,12 @@ internal fun testMessageResponseData(type: ContentType? = null, types: List<Stri
             userEventId = randomNumber(1..100000).toLong())
 }
 
-internal fun MessageResponse.testModifyUserResponseData(newTitle: String? = null, types: List<String>? = null) : MessageResponse {
+internal fun MessageResponse.testModifyUserResponseData(newTitle: String? = null, types: List<String>? = null, messageContent: MessageContent? = null) : MessageResponse {
     return MessageResponse(
             messageId = messageId,
             action = action,
             contentType = contentType,
-            content = content,
+            content = if (messageContent == null) content else messageContent,
             event = event,
             interacted = interacted,
             messageTypes = if (types == null) messageTypes else types,

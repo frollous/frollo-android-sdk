@@ -1,0 +1,17 @@
+{
+  "id": 12345,
+  "event": "TEST_WEBVIEW_AUTH",
+  "user_event_id": 47936,
+  "placement": 1,
+  "persists": true,
+  "read": false,
+  "interacted": false,
+  "message_types": ["home_nudge"],
+  "title": "Test WebView Auth",
+  "content_type": "text",
+  "content": { "design_type": "information", "footer": "Footer", "header": "Header", "icon_url": "https://example.com/image.png", "text": "Some body" },
+  "action": {
+    "link": "https://example.com",
+    "open_external": false
+  }
+}

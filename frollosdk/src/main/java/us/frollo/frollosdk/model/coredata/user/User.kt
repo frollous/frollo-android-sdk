@@ -1,15 +1,15 @@
 package us.frollo.frollosdk.model.coredata.user
 
 data class User(
-        val userId: Long, //TODO: review if we should allow to modify this
+        val userId: Long,
         var firstName: String?,
         var email: String,
-        val emailVerified: Boolean, //TODO: review if we should allow to modify this
-        val status: UserStatus, //TODO: review if we should allow to modify this
-        val primaryCurrency: String, //TODO: review if we should allow to modify this
-        var validPassword: Boolean, //TODO: review if we should allow to modify this
-        val registrationDate: String, //TODO: review if we should allow to modify this
-        val facebookId: String?, //TODO: review if we should allow to modify this
+        val emailVerified: Boolean,
+        val status: UserStatus,
+        val primaryCurrency: String,
+        val validPassword: Boolean,
+        val registrationDate: String,
+        val facebookId: String?,
         var attribution: Attribution?,
         var lastName: String?,
         var mobileNumber: String?,
@@ -22,4 +22,4 @@ data class User(
         var industry: Industry?,
         var dateOfBirth: String?,
         var driverLicense: String?,
-        val features: List<FeatureFlag>?) //TODO: review if we should allow to modify this
+        val features: List<FeatureFlag>?)

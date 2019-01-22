@@ -86,9 +86,6 @@ internal class TokenDbAdapter(val mContext: Context) {
         }
 
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-
-            //TODO: MM ideally we should change this so upgrading doesn't lose the token data
-
             Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                     + newVersion + ", which will destroy all old data")
             db.execSQL(DATABASE_DROP_TOKEN)

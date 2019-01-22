@@ -78,4 +78,28 @@ class EventsTest {
 
         tearDown()
     }
+
+    @Test
+    fun testEventHandled() {
+        initSetup()
+
+        events.handleEvent("TEST_EVENT") { handled, error  ->
+            assertNull(error)
+            assertTrue(handled)
+        }
+
+        tearDown()
+    }
+
+    @Test
+    fun testEventNotHandled() {
+        initSetup()
+
+        events.handleEvent("UNKNOWN_EVENT") { handled, error  ->
+            assertNull(error)
+            assertFalse(handled)
+        }
+
+        tearDown()
+    }
 }

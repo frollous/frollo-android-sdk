@@ -46,10 +46,9 @@ internal class NetworkHelper(private val authToken: AuthToken) {
     internal val deviceVersion: String
         get() = "Android${Build.VERSION.RELEASE}"
 
-    //TODO: Check with Edd if we have to send "SDK" instead of "V" for version string
-    // "us.frollo.frollosdk|V1.0.0|B777|Android8.1.0|API2.0"
+    // "us.frollo.frollosdk|SDK1.0.0|B777|Android8.1.0|API2.0"
     internal val userAgent: String
-        get() = "${BuildConfig.APPLICATION_ID}|V${BuildConfig.VERSION_NAME}|B${BuildConfig.VERSION_CODE}|Android${Build.VERSION.RELEASE}|API$API_VERSION"
+        get() = "${BuildConfig.APPLICATION_ID}|SDK${BuildConfig.VERSION_NAME}|B${BuildConfig.VERSION_CODE}|Android${Build.VERSION.RELEASE}|API$API_VERSION"
 
     /**
      * Returns the temporary otp token formatted and ready for header authorization for registering the user.

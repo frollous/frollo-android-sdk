@@ -1,6 +1,7 @@
 package us.frollo.frollosdk
 
 import android.app.Application
+import android.os.Handler
 import androidx.core.os.bundleOf
 import com.jakewharton.threetenabp.AndroidThreeTen
 import timber.log.Timber
@@ -19,6 +20,7 @@ import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.version.Version
+import java.util.*
 
 object FrolloSDK {
 
@@ -39,11 +41,13 @@ object FrolloSDK {
     private lateinit var version: Version
     private lateinit var network: NetworkService
     private lateinit var database: SDKDatabase
+    internal var refreshTimer: Timer? = null
+        private set
 
     internal lateinit var app: Application
 
     @Throws(FrolloSDKError::class)
-    fun setup(application: Application, params: SetupParams, callback: ((FrolloSDKError?) -> Unit)) {
+    fun setup(application: Application, params: SetupParams, completion: OnFrolloSDKCompletionListener) {
         this.app = application
 
         registerTimber()
@@ -73,7 +77,7 @@ object FrolloSDK {
         }
 
         _setup = true
-        callback.invoke(null)
+        completion.invoke(null)
     }
 
     private fun registerTimber() {
@@ -85,14 +89,65 @@ object FrolloSDK {
         AndroidThreeTen.init(app)
     }
 
+    fun onAppBackgrounded() {
+        pauseScheduledRefreshing()
+    }
+
+    fun onAppForegrounded() {
+        resumeScheduledRefreshing()
+    }
+
     fun refreshData() {
-        //TODO: incomplete implementation
-        refreshSystem()
+        refreshPrimary()
+        Handler().postDelayed({ refreshSecondary() }, 3000)
+        Handler().postDelayed({ refreshSystem() }, 20000)
+
+        resumeScheduledRefreshing()
+    }
+
+    private fun refreshPrimary() {
+        //TODO: Refresh Provider Accounts
+        //TODO: Refresh Accounts
+        //TODO: Refresh Transactions
+        authentication.refreshUser()
+        messages.refreshUnreadMessages()
+    }
+
+    private fun refreshSecondary() {
+        //TODO: Refresh Bill Payments
     }
 
     private fun refreshSystem() {
-        //TODO: incomplete implementation
+        //TODO: Refresh Providers
+        //TODO: Refresh Transaction Categories
+        //TODO: Refresh Merchants
+        //TODO: Refresh Bills
         authentication.updateDevice()
+    }
+
+    private fun resumeScheduledRefreshing() {
+        if (refreshTimer != null)
+            cancelRefreshTimer()
+
+        val timerTask = object : TimerTask() {
+            override fun run() {
+                refreshPrimary()
+            }
+        }
+        refreshTimer = Timer()
+        refreshTimer?.schedule(
+                timerTask,
+                120000, // Initial delay set to 2 minutes, as refreshData() would have already run refreshPrimary() once.
+                120000) // Repeat every 2 minutes
+    }
+
+    private fun pauseScheduledRefreshing() {
+        cancelRefreshTimer()
+    }
+
+    private fun cancelRefreshTimer() {
+        refreshTimer?.cancel()
+        refreshTimer = null
     }
 
     fun logout(completion: OnFrolloSDKCompletionListener? = null) {

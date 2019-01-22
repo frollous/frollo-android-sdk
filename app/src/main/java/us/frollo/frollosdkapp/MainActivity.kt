@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.startActivity
+import timber.log.Timber
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.core.SetupParams
 
@@ -16,7 +17,9 @@ class MainActivity : AppCompatActivity() {
 
         if (!FrolloSDK.isSetup) {
             FrolloSDK.setup(application, SetupParams.Builder().serverUrl("https://api-sandbox.frollo.us").build()) { error ->
-                if (error == null) {
+                if (error != null) {
+                    Timber.d("SDK Setup Failed: ${ error.localizedDescription }")
+                } else {
                     initView()
                 }
             }

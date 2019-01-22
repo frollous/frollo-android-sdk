@@ -3,6 +3,7 @@
     package="us.frollo.frollosdkapp">
 
     <application
+        android:name=".FrolloSDKApp"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"

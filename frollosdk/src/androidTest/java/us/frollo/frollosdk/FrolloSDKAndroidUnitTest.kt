@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jraska.livedata.test
+import okhttp3.HttpUrl
+import okhttp3.mockwebserver.MockWebServer
 
 import org.junit.Assert.*
 import org.junit.Before
@@ -25,6 +27,8 @@ class FrolloSDKAndroidUnitTest {
     private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
     private lateinit var preferences: Preferences
     private lateinit var database: SDKDatabase
+    private lateinit var mockServer: MockWebServer
+    private lateinit var baseUrl: HttpUrl
 
     @Before
     fun resetSingletonByReflection() {
@@ -34,11 +38,16 @@ class FrolloSDKAndroidUnitTest {
     }
 
     private fun initSetup() {
+        mockServer = MockWebServer()
+        mockServer.start()
+        baseUrl = mockServer.url("/")
+
         preferences = Preferences(app)
         database = SDKDatabase.getInstance(app)
     }
 
     private fun tearDown() {
+        mockServer.shutdown()
         preferences.resetAll()
         database.clearAllTables()
     }
@@ -89,6 +98,79 @@ class FrolloSDKAndroidUnitTest {
         } catch (e: IllegalAccessException) {
             assertEquals("SDK not setup", e.localizedMessage)
         }
+    }
+
+    @Test
+    fun testPauseScheduledRefresh() {
+        val url = "https://api.example.com"
+
+        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { error ->
+            assertNull(error)
+
+            FrolloSDK.onAppBackgrounded()
+            assertNull(FrolloSDK.refreshTimer)
+        }
+    }
+
+    @Test
+    fun testResumeScheduledRefresh() {
+        val url = "https://api.example.com"
+
+        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { error ->
+            assertNull(error)
+
+            FrolloSDK.onAppForegrounded()
+            assertNotNull(FrolloSDK.refreshTimer)
+        }
+    }
+
+    @Test
+    fun testRefreshData() {
+        /*initSetup()
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_LOGIN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.user_details_complete))
+                } else if (request?.path == UserAPI.URL_USER_DETAILS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.user_details_complete))
+                } else if (request?.path == MessagesAPI.URL_UNREAD) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.messages_unread))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(baseUrl.toString()).build()) {
+
+            FrolloSDK.authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password") { error ->
+                assertNull(error)
+
+                FrolloSDK.refreshData() //TODO: This never calls the enqueue callback to load data into database
+
+                wait(6)
+
+                val testObserver = FrolloSDK.authentication.fetchUser().test()
+                testObserver.awaitValue()
+                assertNotNull(testObserver.value().data)
+
+                val testObserver2 = FrolloSDK.messages.fetchMessages(read = false).test()
+                testObserver2.awaitValue()
+                val models = testObserver2.value().data
+                assertNotNull(models)
+                assertEquals(7, models?.size)
+            }
+        }
+
+        wait(8)
+
+        tearDown()*/
     }
 
     @Test

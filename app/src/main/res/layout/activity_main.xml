@@ -17,4 +17,10 @@
         android:layout_height="wrap_content"
         android:text="Messages"/>
 
+    <Button
+        android:id="@+id/btn_events"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Events"/>
+
 </LinearLayout>

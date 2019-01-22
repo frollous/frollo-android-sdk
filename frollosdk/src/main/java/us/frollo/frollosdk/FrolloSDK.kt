@@ -15,6 +15,7 @@ import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.error.FrolloSDKError
+import us.frollo.frollosdk.events.Events
 import us.frollo.frollosdk.extensions.notify
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.messages.Messages
@@ -33,9 +34,13 @@ object FrolloSDK {
     val messages: Messages
         get() =_messages ?: throw IllegalAccessException("SDK not setup")
 
+    val events: Events
+        get() =_events ?: throw IllegalAccessException("SDK not setup")
+
     private var _setup = false
     private var _authentication: Authentication? = null
     private var _messages: Messages? = null
+    private var _events: Events? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
@@ -71,6 +76,7 @@ object FrolloSDK {
         // 7. Setup Authentication
         _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
         _messages = Messages(network, database)
+        _events = Events(network)
 
         if (version.migrationNeeded()) {
             version.migrateVersion()

@@ -29,5 +29,6 @@ class MainActivity : AppCompatActivity() {
     private fun initView() {
         btn_authentication.setOnClickListener { startActivity<AuthenticationActivity>() }
         btn_messages.setOnClickListener { startActivity<MessagesActivity>() }
+        btn_events.setOnClickListener { startActivity<EventsActivity>() }
     }
 }

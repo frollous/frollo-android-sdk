@@ -7,6 +7,7 @@ import us.frollo.frollosdk.data.remote.api.EventsAPI
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.model.api.events.EventCreateRequest
+import us.frollo.frollosdk.model.coredata.NotificationPayload
 
 class Events(network: NetworkService) {
 
@@ -21,7 +22,7 @@ class Events(network: NetworkService) {
         }
     }
 
-    internal fun handleEvent(eventName: String, completion: ((handled: Boolean, error: FrolloSDKError?) -> Unit)? = null) {
+    internal fun handleEvent(eventName: String, notificationPayload: NotificationPayload? = null, completion: ((handled: Boolean, error: FrolloSDKError?) -> Unit)? = null) {
         when (eventName) {
             EventNames.TEST.toString() -> {
                 Timber.d("Test event received")

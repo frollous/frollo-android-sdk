@@ -16,6 +16,7 @@ import us.frollo.frollosdk.extensions.generateSQLQueryMessages
 import us.frollo.frollosdk.mapping.toMessage
 import us.frollo.frollosdk.model.api.messages.MessageResponse
 import us.frollo.frollosdk.model.api.messages.MessageUpdateRequest
+import us.frollo.frollosdk.model.coredata.NotificationPayload
 import us.frollo.frollosdk.model.coredata.messages.Message
 
 class Messages(network: NetworkService, private val db: SDKDatabase) {
@@ -94,6 +95,13 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
             } else
                 handleMessageResponse(response, completion)
         }
+    }
+
+    internal fun handleMessageNotification(notification: NotificationPayload) {
+        if (notification.userMessageID == null)
+            return
+
+        refreshMessage(notification.userMessageID)
     }
 
     private fun handleMessagesResponse(response: List<MessageResponse>, unread: Boolean = false, completion: OnFrolloSDKCompletionListener? = null) {

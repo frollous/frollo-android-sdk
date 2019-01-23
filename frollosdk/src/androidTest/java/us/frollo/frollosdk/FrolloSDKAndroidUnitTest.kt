@@ -76,6 +76,7 @@ class FrolloSDKAndroidUnitTest {
             assertNotNull(FrolloSDK.authentication)
             assertNotNull(FrolloSDK.messages)
             assertNotNull(FrolloSDK.events)
+            assertNotNull(FrolloSDK.notifications)
         }
     }
 
@@ -107,6 +108,17 @@ class FrolloSDKAndroidUnitTest {
 
         try {
             FrolloSDK.events
+        } catch (e: IllegalAccessException) {
+            assertEquals("SDK not setup", e.localizedMessage)
+        }
+    }
+
+    @Test
+    fun testSDKNotificationsThrowsErrorBeforeSetup() {
+        assertFalse(FrolloSDK.isSetup)
+
+        try {
+            FrolloSDK.notifications
         } catch (e: IllegalAccessException) {
             assertEquals("SDK not setup", e.localizedMessage)
         }

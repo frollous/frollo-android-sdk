@@ -22,6 +22,7 @@ import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.data.remote.api.MessagesAPI
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.coredata.messages.*
+import us.frollo.frollosdk.model.testMessageNotificationPayload
 import us.frollo.frollosdk.model.testMessageResponseData
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
@@ -332,6 +333,38 @@ class MessagesTest {
         assertEquals("${NetworkHelper.API_VERSION_PATH}/messages/12345", request.path)
 
         wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testHandlePushMessage() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.message_id_12345)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == "${NetworkHelper.API_VERSION_PATH}/messages/12345") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        messages.handleMessageNotification(testMessageNotificationPayload())
+
+        wait(3)
+
+        val request = mockServer.takeRequest()
+        assertEquals("${NetworkHelper.API_VERSION_PATH}/messages/12345", request.path)
+
+        val testObserver = messages.fetchMessage(12345L).test()
+        testObserver.awaitValue()
+        val model = testObserver.value().data
+        assertNotNull(model)
+        assertEquals(12345L, model?.messageId)
 
         tearDown()
     }

@@ -19,6 +19,7 @@ import us.frollo.frollosdk.events.Events
 import us.frollo.frollosdk.extensions.notify
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.messages.Messages
+import us.frollo.frollosdk.notifications.Notifications
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.version.Version
 import java.util.*
@@ -37,10 +38,14 @@ object FrolloSDK {
     val events: Events
         get() =_events ?: throw IllegalAccessException("SDK not setup")
 
+    val notifications: Notifications
+        get() =_notifications ?: throw IllegalAccessException("SDK not setup")
+
     private var _setup = false
     private var _authentication: Authentication? = null
     private var _messages: Messages? = null
     private var _events: Events? = null
+    private var _notifications: Notifications? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
@@ -77,6 +82,7 @@ object FrolloSDK {
         _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
         _messages = Messages(network, database)
         _events = Events(network)
+        _notifications = Notifications(authentication, events, messages)
 
         if (version.migrationNeeded()) {
             version.migrateVersion()
@@ -84,6 +90,34 @@ object FrolloSDK {
 
         _setup = true
         completion.invoke(null)
+    }
+
+    fun logout(completion: OnFrolloSDKCompletionListener? = null) {
+        authentication.logoutUser {
+            reset(completion)
+        }
+    }
+
+    fun deleteUser(completion: OnFrolloSDKCompletionListener? = null) {
+        authentication.deleteUser { error ->
+            if (error != null) completion?.invoke(error)
+            else reset(completion)
+        }
+    }
+
+    @Throws(IllegalAccessException::class)
+    fun reset(completion: OnFrolloSDKCompletionListener? = null) {
+        if (!_setup) throw IllegalAccessException("SDK not setup")
+
+        pauseScheduledRefreshing()
+        // NOTE: Keystore reset is not required as we do not store any data in there. Just keys.
+        authentication.reset()
+        preferences.reset()
+        database.clearAllTables()
+        completion?.invoke(null)
+
+        notify(ACTION_AUTHENTICATION_CHANGED,
+                bundleOf(Pair(ARG_AUTHENTICATION_STATUS, AuthenticationStatus.LOGGED_OUT)))
     }
 
     private fun registerTimber() {
@@ -132,8 +166,7 @@ object FrolloSDK {
     }
 
     private fun resumeScheduledRefreshing() {
-        if (refreshTimer != null)
-            cancelRefreshTimer()
+        cancelRefreshTimer()
 
         val timerTask = object : TimerTask() {
             override fun run() {
@@ -156,36 +189,8 @@ object FrolloSDK {
         refreshTimer = null
     }
 
-    fun logout(completion: OnFrolloSDKCompletionListener? = null) {
-        authentication.logoutUser {
-            reset(completion)
-        }
-    }
-
-    fun deleteUser(completion: OnFrolloSDKCompletionListener? = null) {
-        authentication.deleteUser { error ->
-            if (error != null) completion?.invoke(error)
-            else reset(completion)
-        }
-    }
-
     internal fun forcedLogout() {
         if (authentication.loggedIn)
             reset()
-    }
-
-    @Throws(IllegalAccessException::class)
-    fun reset(completion: OnFrolloSDKCompletionListener? = null) {
-        if (!_setup) throw IllegalAccessException("SDK not setup")
-
-        // TODO: Pause scheduled refreshing
-        // NOTE: Keystore reset is not required as we do not store any data in there. Just keys.
-        authentication.reset()
-        preferences.reset()
-        database.clearAllTables()
-        completion?.invoke(null)
-
-        notify(ACTION_AUTHENTICATION_CHANGED,
-                bundleOf(Pair(ARG_AUTHENTICATION_STATUS, AuthenticationStatus.LOGGED_OUT)))
     }
 }

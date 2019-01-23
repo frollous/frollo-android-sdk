@@ -1,10 +1,13 @@
 package us.frollo.frollosdk.extensions
 
+import android.os.Bundle
 import androidx.sqlite.db.SimpleSQLiteQuery
 import us.frollo.frollosdk.model.api.user.TokenResponse
 import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
+import us.frollo.frollosdk.model.coredata.NotificationPayload
 import us.frollo.frollosdk.model.coredata.user.User
+import us.frollo.frollosdk.notifications.NotificationPayloadNames
 import java.lang.StringBuilder
 
 internal fun UserResponse.stripTokens() =
@@ -72,3 +75,32 @@ internal fun generateSQLQueryMessages(searchParams: List<String>, read: Boolean?
 
     return SimpleSQLiteQuery("SELECT * FROM message WHERE $sb")
 }
+
+internal fun Bundle.toNotificationPayload(): NotificationPayload =
+        createNotificationPayload(
+                getString(NotificationPayloadNames.EVENT.toString()),
+                getString(NotificationPayloadNames.LINK.toString()),
+                getString(NotificationPayloadNames.TRANSACTION_IDS.toString()),
+                getString(NotificationPayloadNames.USER_EVENT_ID.toString()),
+                getString(NotificationPayloadNames.USER_MESSAGE_ID.toString()))
+
+internal fun Map<String, String>.toNotificationPayload(): NotificationPayload =
+        createNotificationPayload(
+                get(NotificationPayloadNames.EVENT.toString()),
+                get(NotificationPayloadNames.LINK.toString()),
+                get(NotificationPayloadNames.TRANSACTION_IDS.toString()),
+                get(NotificationPayloadNames.USER_EVENT_ID.toString()),
+                get(NotificationPayloadNames.USER_MESSAGE_ID.toString()))
+
+internal fun createNotificationPayload(event: String? = null, link: String? = null, transactionIDs: String? = null, userEventID: String? = null, userMessageID: String? = null) =
+        NotificationPayload(
+                event = event,
+                link = link,
+                transactionIDs = transactionIDs
+                        ?.replace("[", "")
+                        ?.replace("]", "")
+                        ?.split(",")
+                        ?.map { it.toLong() }
+                        ?.toList(),
+                userEventID = userEventID?.let { it.trim().toLong() },
+                userMessageID = userMessageID?.let { it.trim().toLong() })

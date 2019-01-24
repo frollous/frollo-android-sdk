@@ -4,10 +4,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import us.frollo.frollosdk.data.remote.ApiResponse
-import us.frollo.frollosdk.error.APIError
-import us.frollo.frollosdk.error.DataError
-import us.frollo.frollosdk.error.FrolloSDKError
-import us.frollo.frollosdk.mapping.toAPIErrorResponse
+import us.frollo.frollosdk.error.*
 import us.frollo.frollosdk.mapping.toDataError
 
 internal fun <T> Call<T>.enqueue(completion: (T?, FrolloSDKError?) -> Unit) {
@@ -17,28 +14,28 @@ internal fun <T> Call<T>.enqueue(completion: (T?, FrolloSDKError?) -> Unit) {
             if (apiResponse.isSuccessful) {
                 completion.invoke(apiResponse.body, null)
             } else {
-                handleFailure(apiResponse, completion)
+                handleFailure(apiResponse, null, completion)
             }
         }
 
         override fun onFailure(call: Call<T>?, t: Throwable?) {
             val errorResponse = ApiResponse<T>(t)
-            handleFailure(errorResponse, completion)
+            handleFailure(errorResponse, t, completion)
         }
     })
 }
 
-internal fun <T> handleFailure(errorResponse: ApiResponse<T>, completion: (T?, FrolloSDKError?) -> Unit) {
-    val error = errorResponse.errorMessage
+internal fun <T> handleFailure(errorResponse: ApiResponse<T>,  t: Throwable? = null, completion: (T?, FrolloSDKError?) -> Unit) {
+    val code = errorResponse.code
+    val errorMsg = errorResponse.errorMessage
 
-    if (error != null) {
-        val dataError = error.toDataError()
-
-        if (dataError != null)
-            completion.invoke(null, DataError(dataError.type, dataError.subType)) // Re-create new DataError as the json converter does not has the context object
-        else
-            completion.invoke(null, APIError(errorResponse.code, error))
-    } else {
-        completion.invoke(null, FrolloSDKError(null))
-    }
+    val dataError = errorMsg?.toDataError()
+    if (dataError != null)
+        completion.invoke(null, DataError(dataError.type, dataError.subType)) // Re-create new DataError as the json converter does not has the context object
+    else if (code != null)
+        completion.invoke(null, APIError(code, errorMsg))
+    else if (t != null)
+        completion.invoke(null, NetworkError(t))
+    else
+        completion.invoke(null, FrolloSDKError(errorMsg))
 }

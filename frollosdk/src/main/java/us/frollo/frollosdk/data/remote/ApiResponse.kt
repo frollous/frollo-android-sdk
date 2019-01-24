@@ -6,7 +6,7 @@ import java.io.IOException
 import java.util.regex.Pattern
 
 internal class ApiResponse<T> {
-    var code: Int = 500
+    var code: Int? = null
     var body: T? = null
     var errorMessage: String? = null
     var links: MutableMap<String, String> = mutableMapOf()

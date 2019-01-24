@@ -98,7 +98,7 @@ class ResourceTest {
         assertEquals(Resource.Status.ERROR, resource.status)
         assertNull(resource.data)
         assertNotNull(resource.error)
-        assertEquals(app.resources.getString(R.string.Error_Generic_UnknownError), resource.error?.debugDescription)
-        assertEquals(app.resources.getString(R.string.Error_Generic_UnknownError), resource.error?.localizedDescription)
+        assertTrue(resource.error is APIError)
+        assertEquals(APIErrorType.OTHER_AUTHORISATION, (resource.error as APIError).type)
     }
 }

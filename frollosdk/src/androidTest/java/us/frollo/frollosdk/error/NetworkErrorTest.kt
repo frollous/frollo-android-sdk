@@ -7,6 +7,7 @@ import org.junit.Test
 
 import org.junit.Assert.*
 import us.frollo.frollosdk.FrolloSDK
+import javax.net.ssl.SSLException
 
 class NetworkErrorTest {
 
@@ -19,21 +20,21 @@ class NetworkErrorTest {
 
     @Test
     fun testLocalizedDescription() {
-        val networkError = NetworkError(NetworkErrorType.INVALID_SSL)
+        val networkError = NetworkError(SSLException("SSL Error"))
         assertEquals(app.resources.getString(NetworkErrorType.INVALID_SSL.textResource), networkError.localizedDescription)
     }
 
     @Test
     fun testDebugDescription() {
-        val networkError = NetworkError(NetworkErrorType.INVALID_SSL)
+        val networkError = NetworkError(SSLException("SSL Error"))
         val localizedDescription = app.resources.getString(NetworkErrorType.INVALID_SSL.textResource)
-        val str = "NetworkError: INVALID_SSL: $localizedDescription"
+        val str = "NetworkError: INVALID_SSL: $localizedDescription | SSL Error"
         assertEquals(str, networkError.debugDescription)
     }
 
     @Test
     fun testNetworkErrorType() {
-        val networkError = NetworkError(NetworkErrorType.INVALID_SSL)
+        val networkError = NetworkError(SSLException("SSL Error"))
         assertEquals(NetworkErrorType.INVALID_SSL, networkError.type)
     }
 }

@@ -23,6 +23,9 @@ import retrofit2.Response
 import us.frollo.frollosdk.data.remote.ApiResponse
 import us.frollo.frollosdk.error.*
 import java.io.IOException
+import java.net.SocketTimeoutException
+import java.security.cert.CertPathValidatorException
+import javax.net.ssl.SSLException
 
 class NetworkExtensionTest {
 
@@ -127,8 +130,8 @@ class NetworkExtensionTest {
 
         testAPI.testData().enqueue { _, error ->
             assertNotNull(error)
-            assertTrue(error is APIError)
-            assertEquals(APIErrorType.SERVER_ERROR, (error as APIError).type)
+            assertTrue(error is NetworkError)
+            assertEquals(NetworkErrorType.CONNECTION_FAILURE, (error as NetworkError).type)
         }
 
         wait(3)
@@ -174,12 +177,68 @@ class NetworkExtensionTest {
         initSetup()
 
         val apiResponse = ApiResponse<Void>(Response.error(401, ResponseBody.create(MediaType.parse("text"), "error")))
-        apiResponse.errorMessage = null
+        apiResponse.code = null
 
         handleFailure(apiResponse) { _, error ->
             assertNotNull(error)
             assertTrue(error is FrolloSDKError)
-            assertEquals(app.resources.getString(R.string.Error_Generic_UnknownError), error?.localizedDescription)
+            assertEquals("error", error?.localizedDescription)
+        }
+
+        tearDown()
+    }
+
+    @Test
+    fun testHandleFailureNetworkErrorIOException() {
+        initSetup()
+
+        handleFailure<Void>(ApiResponse(SocketTimeoutException("timeout")), SocketTimeoutException("timeout")) { _, error ->
+            assertNotNull(error)
+            assertTrue(error is NetworkError)
+            assertEquals(NetworkErrorType.CONNECTION_FAILURE, (error as NetworkError).type)
+            assertEquals("timeout", error.message)
+        }
+
+        tearDown()
+    }
+
+    @Test
+    fun testHandleFailureNetworkErrorSSLException() {
+        initSetup()
+
+        handleFailure<Void>(ApiResponse(SSLException("SSL Error")), SSLException("SSL Error")) { _, error ->
+            assertNotNull(error)
+            assertTrue(error is NetworkError)
+            assertEquals(NetworkErrorType.INVALID_SSL, (error as NetworkError).type)
+            assertEquals("SSL Error", error.message)
+        }
+
+        tearDown()
+    }
+
+    @Test
+    fun testHandleFailureNetworkErrorGeneralSecurityException() {
+        initSetup()
+
+        handleFailure<Void>(ApiResponse(CertPathValidatorException("Certificate Error")), CertPathValidatorException("Certificate Error")) { _, error ->
+            assertNotNull(error)
+            assertTrue(error is NetworkError)
+            assertEquals(NetworkErrorType.INVALID_SSL, (error as NetworkError).type)
+            assertEquals("Certificate Error", error.message)
+        }
+
+        tearDown()
+    }
+
+    @Test
+    fun testHandleFailureNetworkErrorOtherException() {
+        initSetup()
+
+        handleFailure<Void>(ApiResponse(IllegalStateException("Conversion Error")), IllegalStateException("Conversion Error")) { _, error ->
+            assertNotNull(error)
+            assertTrue(error is NetworkError)
+            assertEquals(NetworkErrorType.UNKNOWN, (error as NetworkError).type)
+            assertEquals("Conversion Error", error.message)
         }
 
         tearDown()

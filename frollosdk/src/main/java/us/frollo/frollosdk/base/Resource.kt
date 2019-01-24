@@ -2,6 +2,7 @@ package us.frollo.frollosdk.base
 
 import us.frollo.frollosdk.data.remote.ApiResponse
 import us.frollo.frollosdk.error.APIError
+import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.mapping.toAPIErrorResponse
 import us.frollo.frollosdk.mapping.toDataError
@@ -24,15 +25,15 @@ class Resource<out T> private constructor(val status: Status, val data: T? = nul
         internal fun <T> fromApiResponse(response: ApiResponse<T>): Resource<T> =
                 if (response.isSuccessful) success(response.body)
                 else {
-                    val msg = response.errorMessage
-                    if (msg != null) {
-                        val dataError = msg.toDataError()
+                    val errorMsg = response.errorMessage
+
+                    if (errorMsg != null) {
+                        val dataError = errorMsg.toDataError()
+
                         if (dataError != null)
-                            error(dataError)
-                        else if (msg.toAPIErrorResponse() != null)
-                            error(APIError(response.code, msg))
+                            error(DataError(dataError.type, dataError.subType)) // Re-create new DataError as the json converter does not has the context object)
                         else
-                            error(FrolloSDKError(response.errorMessage))
+                            error(APIError(response.code, errorMsg))
                     } else {
                         error(FrolloSDKError(null))
                     }

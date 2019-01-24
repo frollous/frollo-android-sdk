@@ -29,17 +29,15 @@ internal fun <T> Call<T>.enqueue(completion: (T?, FrolloSDKError?) -> Unit) {
 }
 
 internal fun <T> handleFailure(errorResponse: ApiResponse<T>, completion: (T?, FrolloSDKError?) -> Unit) {
-    val msg = errorResponse.errorMessage
+    val error = errorResponse.errorMessage
 
-    if (msg != null) {
-        val dataError = msg.toDataError()
+    if (error != null) {
+        val dataError = error.toDataError()
 
         if (dataError != null)
-            completion.invoke(null, DataError(dataError.type, dataError.subType)) // Re-create new DataError as the json converter does has the context object
-        else if (msg.toAPIErrorResponse() != null)
-            completion.invoke(null, APIError(errorResponse.code, msg))
+            completion.invoke(null, DataError(dataError.type, dataError.subType)) // Re-create new DataError as the json converter does not has the context object
         else
-            completion.invoke(null, FrolloSDKError(errorResponse.errorMessage))
+            completion.invoke(null, APIError(errorResponse.code, error))
     } else {
         completion.invoke(null, FrolloSDKError(null))
     }

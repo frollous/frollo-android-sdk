@@ -5,7 +5,7 @@ import us.frollo.frollosdk.mapping.toAPIErrorType
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import us.frollo.frollosdk.model.api.shared.APIErrorResponse
 
-class APIError(val statusCode: Int, errorMessage: String) : FrolloSDKError(errorMessage) {
+class APIError(val statusCode: Int, private val error: String?) : FrolloSDKError(error) {
 
     // Type of API Error
     val type : APIErrorType
@@ -17,12 +17,12 @@ class APIError(val statusCode: Int, errorMessage: String) : FrolloSDKError(error
 
     // Error message returned by the API if available
     override val message : String?
-        get() = errorResponse?.errorMessage
+        get() = errorResponse?.errorMessage ?: error
 
     private var errorResponse: APIErrorResponse? = null
 
     init {
-        errorResponse = errorMessage.toAPIErrorResponse()
+        errorResponse = error?.toAPIErrorResponse()
     }
 
     override val localizedDescription: String?

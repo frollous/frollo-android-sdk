@@ -1,0 +1,6 @@
+{
+    "error": {
+        "error_code": "F0004",
+        "error_message": "Invalid User-Agent header"
+    }
+}

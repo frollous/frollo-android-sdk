@@ -11,6 +11,8 @@ import retrofit2.Response
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.R
 import us.frollo.frollosdk.data.remote.ApiResponse
+import us.frollo.frollosdk.error.APIError
+import us.frollo.frollosdk.error.APIErrorType
 import us.frollo.frollosdk.error.FrolloSDKError
 
 class ResourceTest {
@@ -87,8 +89,8 @@ class ResourceTest {
         assertEquals(Resource.Status.ERROR, resource.status)
         assertNull(resource.data)
         assertNotNull(resource.error)
-        assertEquals("Unauthorized", resource.error?.debugDescription)
-        assertEquals("Unauthorized", resource.error?.localizedDescription)
+        assertTrue(resource.error is APIError)
+        assertEquals(APIErrorType.OTHER_AUTHORISATION, (resource.error as APIError).type)
 
         apiResponse.errorMessage = null
         resource = Resource.fromApiResponse(apiResponse)

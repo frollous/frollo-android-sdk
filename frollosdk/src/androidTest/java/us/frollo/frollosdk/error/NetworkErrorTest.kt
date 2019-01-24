@@ -21,7 +21,8 @@ class NetworkErrorTest {
     @Test
     fun testLocalizedDescription() {
         val networkError = NetworkError(SSLException("SSL Error"))
-        assertEquals(app.resources.getString(NetworkErrorType.INVALID_SSL.textResource), networkError.localizedDescription)
+        val str = "${app.resources.getString(NetworkErrorType.INVALID_SSL.textResource)} | SSL Error"
+        assertEquals(str, networkError.localizedDescription)
     }
 
     @Test

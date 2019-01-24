@@ -18,12 +18,12 @@ class NetworkError(private val t: Throwable? = null) : FrolloSDKError(t?.message
         }
 
     override val localizedDescription: String?
-        get() = type.toLocalizedString(context)
+        get() {
+            var msg = type.toLocalizedString(context)
+            t?.let {  msg = msg.plus(" | ${it.message}") }
+            return msg
+        }
 
     override val debugDescription: String?
-        get() {
-            var debug = "NetworkError: ${ type.name }: $localizedDescription"
-            t?.let {  debug = debug.plus(" | ${it.message}") }
-            return debug
-        }
+        get() = "NetworkError: ${ type.name }: $localizedDescription"
 }

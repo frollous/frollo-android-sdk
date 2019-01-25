@@ -63,6 +63,9 @@ class NetworkService(internal val serverUrl: String, keystore: Keystore, pref: P
         }
     }
 
+    internal fun hasTokens() : Boolean =
+            authToken.getAccessToken() != null && authToken.getRefreshToken() != null
+
     internal fun handleTokens(tokenResponse: TokenResponse) {
         authToken.saveTokens(tokenResponse)
     }

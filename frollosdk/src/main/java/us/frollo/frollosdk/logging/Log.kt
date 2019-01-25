@@ -5,10 +5,10 @@ import us.frollo.frollosdk.data.remote.NetworkService
 
 internal object Log {
 
+    var network: NetworkService? = null
+
     var logLevel: LogLevel = LogLevel.ERROR
         set(value) = updateLogLevel(value)
-
-    var network: NetworkService? = null
 
     internal var debugLoggers = mutableListOf<Logger>()
     internal var infoLoggers = mutableListOf<Logger>()

@@ -79,8 +79,8 @@ object FrolloSDK {
         // 6. Setup Network Stack
         network = NetworkService(params.serverUrl, keyStore, preferences)
         // 7. Setup Logger
+        Log.network = network // Initialize Log.network before Log.logLevel as Log.logLevel is dependant on Log.network
         Log.logLevel = params.logLevel
-        Log.network = network
         // 8. Setup Authentication
         _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
         // 9. Setup Messages

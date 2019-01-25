@@ -45,9 +45,11 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
                 Resource.success(it?.toUser())
             }.apply { (this as? MutableLiveData<Resource<User>>)?.value = Resource.loading(null) }
 
-    @Throws(FrolloSDKError::class)
     fun loginUser(method: AuthType, email: String? = null, password: String? = null, userId: String? = null, userToken: String? = null, completion: OnFrolloSDKCompletionListener) {
-        if (loggedIn) throw FrolloSDKError("Multiple call to login when there is already an user logged in.")
+        if (loggedIn) {
+            completion.invoke(DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN))
+            return
+        }
 
         val request = UserLoginRequest(
                 deviceId = di.deviceId,
@@ -74,9 +76,11 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
         }
     }
 
-    @Throws(FrolloSDKError::class)
     fun registerUser(firstName: String, lastName: String? = null, mobileNumber: String? = null, postcode: String? = null, dateOfBirth: Date? = null, email: String, password: String, completion: OnFrolloSDKCompletionListener) {
-        if (loggedIn) throw FrolloSDKError("Multiple call to register when there is already an user logged in.")
+        if (loggedIn) {
+            completion.invoke(DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN))
+            return
+        }
 
         val request = UserRegisterRequest(
                 deviceId = di.deviceId,
@@ -110,6 +114,11 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     }
 
     fun refreshUser(completion: OnFrolloSDKCompletionListener? = null) {
+        if (!loggedIn) {
+            completion?.invoke(DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT))
+            return
+        }
+
         userAPI.fetchUser().enqueue { response, error ->
             if (error != null) {
                 Log.e("$TAG#refreshUser", error.localizedDescription)
@@ -120,6 +129,11 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     }
 
     fun updateUser(user: User, completion: OnFrolloSDKCompletionListener) {
+        if (!loggedIn) {
+            completion.invoke(DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT))
+            return
+        }
+
         userAPI.updateUser(user.updateRequest()).enqueue { response, error ->
             if (error != null) {
                 Log.e("$TAG#updateUser", error.localizedDescription)
@@ -130,6 +144,11 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     }
 
     fun updateAttribution(attribution: Attribution, completion: OnFrolloSDKCompletionListener) {
+        if (!loggedIn) {
+            completion.invoke(DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT))
+            return
+        }
+
         userAPI.updateUser(UserUpdateRequest(attribution = attribution)).enqueue { response, error ->
             if (error != null) {
                 Log.e("$TAG#updateAttribution", error.localizedDescription)
@@ -140,6 +159,11 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     }
 
     fun changePassword(currentPassword: String?, newPassword: String, completion: OnFrolloSDKCompletionListener) {
+        if (!loggedIn) {
+            completion.invoke(DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT))
+            return
+        }
+
         val request = UserChangePasswordRequest(
                 currentPassword = currentPassword, // currentPassword can be for Facebook login only
                 newPassword = newPassword)
@@ -158,6 +182,11 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     }
 
     internal fun deleteUser(completion: OnFrolloSDKCompletionListener) {
+        if (!loggedIn) {
+            completion.invoke(DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT))
+            return
+        }
+
         userAPI.deleteUser().enqueue { _, error ->
             if (error != null) Log.e("$TAG#deleteUser", error.localizedDescription)
             else reset()
@@ -189,6 +218,10 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     }
 
     internal fun logoutUser(completion: OnFrolloSDKCompletionListener? = null) {
+        if (!loggedIn) {
+            return
+        }
+
         userAPI.logout().enqueue { _, error ->
             if (error != null)
                 Log.e("$TAG#logoutUser", error.localizedDescription)

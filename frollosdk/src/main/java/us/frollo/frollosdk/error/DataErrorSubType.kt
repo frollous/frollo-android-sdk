@@ -8,6 +8,8 @@ enum class DataErrorSubType(val type: DataErrorType, @StringRes val textResource
     INVALID_DATA(DataErrorType.API, R.string.Error_Data_API_InvalidData),
     PASSWORD_TOO_SHORT(DataErrorType.API, R.string.Error_Data_API_PasswordTooShort),
 
+    ALREADY_LOGGED_IN(DataErrorType.AUTHENTICATION, R.string.Error_Data_Authentication_AlreadyLoggedIn),
+    LOGGED_OUT(DataErrorType.AUTHENTICATION, R.string.Error_Data_Authentication_LoggedOut),
     MISSING_ACCESS_TOKEN(DataErrorType.AUTHENTICATION, R.string.Error_Data_Authentication_MissingAccessToken),
     MISSING_REFRESH_TOKEN(DataErrorType.AUTHENTICATION, R.string.Error_Data_Authentication_MissingRefreshToken),
 

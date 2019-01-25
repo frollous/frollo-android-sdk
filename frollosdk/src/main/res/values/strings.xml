@@ -24,6 +24,8 @@
     <string name="Error_Data_API_PasswordTooShort">Password must be at least 8 characters long</string>
     <string name="Error_Data_API_Unknown">Unknown error occurred in the API request or response</string>
 
+    <string name="Error_Data_Authentication_AlreadyLoggedIn">User is already logged in.</string>
+    <string name="Error_Data_Authentication_LoggedOut">User is not logged in.</string>
     <string name="Error_Data_Authentication_MissingAccessToken">Access token is missing after refresh</string>
     <string name="Error_Data_Authentication_MissingRefreshToken">Refresh token is missing. No valid login found</string>
     <string name="Error_Data_Authentication_Unknown">Unknown authentication error occurred</string>

@@ -1,10 +1,12 @@
 package us.frollo.frollosdk.mapping
 
-import timber.log.Timber
+import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.model.api.messages.MessageResponse
 import us.frollo.frollosdk.model.coredata.messages.*
 
 internal fun MessageResponse.toMessage(): Message? {
+    val TAG = "MessageMapping"
+
     val contentType = this.contentType
 
     return when (contentType) {
@@ -26,7 +28,7 @@ internal fun MessageResponse.toMessage(): Message? {
                                 header = content.header,
                                 main = mainHtml)
                 } ?: run {
-                        Timber.d("HTML Message : Invalid data in content")
+                    Log.e("$TAG#toMessage-HTML", "HTML Message : Invalid data in content")
                         null
                 }
         }
@@ -51,7 +53,7 @@ internal fun MessageResponse.toMessage(): Message? {
                                 imageUrl = content.imageUrl,
                                 text = content.text)
                 } ?: run {
-                        Timber.d("TEXT Message : Invalid data in content")
+                    Log.e("$TAG#toMessage-TEXT", "TEXT Message : Invalid data in content")
                         null
                 }
         }
@@ -78,7 +80,7 @@ internal fun MessageResponse.toMessage(): Message? {
                             iconUrl = content.iconUrl,
                             url = content.url)
                 } else {
-                    Timber.d("VIDEO Message : Invalid data in content")
+                    Log.e("$TAG#toMessage-VIDEO", "VIDEO Message : Invalid data in content")
                     null
                 }
         }
@@ -101,7 +103,7 @@ internal fun MessageResponse.toMessage(): Message? {
                         width = content.width,
                         url = content.url)
             } else {
-                Timber.d("IMAGE Message : Invalid data in content")
+                Log.e("$TAG#toMessage-IMAGE","IMAGE Message : Invalid data in content")
                 null
             }
         }

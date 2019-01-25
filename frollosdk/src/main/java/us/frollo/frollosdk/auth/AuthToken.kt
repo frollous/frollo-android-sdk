@@ -1,6 +1,5 @@
 package us.frollo.frollosdk.auth
 
-import timber.log.Timber
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.api.user.TokenResponse
 import us.frollo.frollosdk.preferences.Preferences
@@ -16,7 +15,6 @@ internal class AuthToken(private val keystore: Keystore, private val pref: Prefe
     fun getAccessToken(): String? {
         if (accessToken == null)
             accessToken = keystore.decrypt(pref.encryptedAccessToken)
-        Timber.d("SERVICE TOKEN USED WAS: $accessToken")
         return accessToken
     }
 

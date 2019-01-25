@@ -10,10 +10,15 @@ import us.frollo.frollosdk.auth.AuthToken
 import us.frollo.frollosdk.base.LiveDataCallAdapterFactory
 import us.frollo.frollosdk.data.remote.api.DeviceAPI
 import us.frollo.frollosdk.keystore.Keystore
+import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.model.api.user.TokenResponse
 import us.frollo.frollosdk.preferences.Preferences
 
 class NetworkService(internal val serverUrl: String, keystore: Keystore, pref: Preferences) : IApiProvider {
+
+    companion object {
+        private const val TAG = "NetworkService"
+    }
 
     private val authToken = AuthToken(keystore, pref)
     private val helper = NetworkHelper(authToken)
@@ -53,6 +58,7 @@ class NetworkService(internal val serverUrl: String, keystore: Keystore, pref: P
             response.body()?.let { handleTokens(it) }
             response.body()?.accessToken
         } else {
+            Log.e("$TAG#refreshTokens", "Refreshing token failed due to authorisation error.")
             null
         }
     }

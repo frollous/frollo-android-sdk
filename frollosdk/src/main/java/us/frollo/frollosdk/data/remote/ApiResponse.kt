@@ -1,11 +1,19 @@
 package us.frollo.frollosdk.data.remote
 
 import retrofit2.Response
-import timber.log.Timber
+import us.frollo.frollosdk.logging.Log
 import java.io.IOException
 import java.util.regex.Pattern
 
 internal class ApiResponse<T> {
+    companion object {
+        private const val TAG = "ApiResponse"
+
+        private val LINK_PATTERN = Pattern.compile("<([^>]*)>[\\s]*;[\\s]*rel=\"([a-zA-Z0-9]+)\"")
+        private val PAGE_PATTERN = Pattern.compile("\\bpage=(\\d+)")
+        private const val NEXT_LINK = "next"
+    }
+
     var code: Int? = null
     var body: T? = null
     var errorMessage: String? = null
@@ -24,7 +32,7 @@ internal class ApiResponse<T> {
             return try {
                 Integer.parseInt(matcher.group(1))
             } catch (ex: NumberFormatException) {
-                Timber.w("cannot parse next page from %s", next)
+                Log.d("$TAG.nextPage", String.format("cannot parse next page from %s", next))
                 null
             }
         }
@@ -45,7 +53,7 @@ internal class ApiResponse<T> {
                 var message: String? = try {
                     response.errorBody()?.string()
                 } catch (ignored: IOException) {
-                    Timber.d(ignored, "error while parsing response")
+                    Log.d("$TAG.constructor", "$ignored error while parsing response")
                     null
                 }
 
@@ -69,11 +77,5 @@ internal class ApiResponse<T> {
                 }
             }
         }
-    }
-
-    companion object {
-        private val LINK_PATTERN = Pattern.compile("<([^>]*)>[\\s]*;[\\s]*rel=\"([a-zA-Z0-9]+)\"")
-        private val PAGE_PATTERN = Pattern.compile("\\bpage=(\\d+)")
-        private const val NEXT_LINK = "next"
     }
 }

@@ -1,16 +1,20 @@
 package us.frollo.frollosdkapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.startActivity
-import timber.log.Timber
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.core.SetupParams
 
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        private const val TAG = "MainActivity"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         if (!FrolloSDK.isSetup) {
             FrolloSDK.setup(application, SetupParams.Builder().serverUrl("https://api-sandbox.frollo.us").build()) { error ->
                 if (error != null) {
-                    Timber.d("SDK Setup Failed: ${ error.localizedDescription }")
+                    Log.e(TAG, error.localizedDescription)
                     return@setup
                 }
 
@@ -48,7 +52,7 @@ class MainActivity : AppCompatActivity() {
             FirebaseInstanceId.getInstance().instanceId
                     .addOnCompleteListener(OnCompleteListener { task ->
                         if (!task.isSuccessful) {
-                            Timber.d("getInstanceId failed: ${ task.exception }")
+                            Log.e(TAG, "getInstanceId failed: ${ task.exception }")
                             return@OnCompleteListener
                         }
 

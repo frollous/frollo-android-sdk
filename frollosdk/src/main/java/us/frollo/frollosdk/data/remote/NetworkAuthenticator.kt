@@ -48,8 +48,8 @@ internal class NetworkAuthenticator(private val network: NetworkService) : Authe
                     // Do nothing
                 }
             }
-
         }
+
         return newRequest
     }
 }

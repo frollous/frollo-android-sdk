@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import timber.log.Timber
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.data.local.SDKDatabase
@@ -13,6 +12,7 @@ import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.data.remote.api.MessagesAPI
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.generateSQLQueryMessages
+import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toMessage
 import us.frollo.frollosdk.model.api.messages.MessageResponse
 import us.frollo.frollosdk.model.api.messages.MessageUpdateRequest
@@ -20,6 +20,10 @@ import us.frollo.frollosdk.model.coredata.NotificationPayload
 import us.frollo.frollosdk.model.coredata.messages.Message
 
 class Messages(network: NetworkService, private val db: SDKDatabase) {
+
+    companion object {
+        private const val TAG = "Messages"
+    }
 
     private val messagesAPI: MessagesAPI = network.create(MessagesAPI::class.java)
 
@@ -47,7 +51,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
     fun refreshMessage(messageId: Long, completion: OnFrolloSDKCompletionListener? = null) {
         messagesAPI.fetchMessage(messageId).enqueue { response, error ->
             if (error != null) {
-                Timber.d(error.localizedDescription)
+                Log.e("$TAG#refreshMessage", error.localizedDescription)
                 completion?.invoke(error)
             } else if (response == null) {
                 // HACK: invoke completion callback if response is null else app will never be notified if response is null.
@@ -60,7 +64,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
     fun refreshMessages(completion: OnFrolloSDKCompletionListener? = null) {
         messagesAPI.fetchMessages().enqueue { response, error ->
             if (error != null) {
-                Timber.d(error.localizedDescription)
+                Log.e("$TAG#refreshMessages", error.localizedDescription)
                 completion?.invoke(error)
             } else if (response == null) {
                 // HACK: invoke completion callback if response is null else app will never be notified if response is null.
@@ -73,7 +77,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
     fun refreshUnreadMessages(completion: OnFrolloSDKCompletionListener? = null) {
         messagesAPI.fetchUnreadMessages().enqueue { response, error ->
             if (error != null) {
-                Timber.d(error.localizedDescription)
+                Log.e("$TAG#refreshUnreadMessages", error.localizedDescription)
                 completion?.invoke(error)
             } else if (response == null) {
                 // HACK: invoke completion callback if response is null else app will never be notified if response is null.
@@ -87,7 +91,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
     fun updateMessage(messageId: Long, read: Boolean, interacted: Boolean, completion: OnFrolloSDKCompletionListener? = null) {
         messagesAPI.updateMessage(messageId, MessageUpdateRequest(read, interacted)).enqueue { response, error ->
             if (error != null) {
-                Timber.d(error.localizedDescription)
+                Log.e("$TAG#updateMessage", error.localizedDescription)
                 completion?.invoke(error)
             } else if (response == null) {
                 // HACK: invoke completion callback if response is null else app will never be notified if response is null.

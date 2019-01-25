@@ -4,7 +4,6 @@ import android.app.Application
 import android.os.Handler
 import androidx.core.os.bundleOf
 import com.jakewharton.threetenabp.AndroidThreeTen
-import timber.log.Timber
 import us.frollo.frollosdk.auth.Authentication
 import us.frollo.frollosdk.auth.AuthenticationStatus
 import us.frollo.frollosdk.core.ACTION.ACTION_AUTHENTICATION_CHANGED
@@ -18,6 +17,7 @@ import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.events.Events
 import us.frollo.frollosdk.extensions.notify
 import us.frollo.frollosdk.keystore.Keystore
+import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.notifications.Notifications
 import us.frollo.frollosdk.preferences.Preferences
@@ -25,6 +25,8 @@ import us.frollo.frollosdk.version.Version
 import java.util.*
 
 object FrolloSDK {
+
+    private const val TAG = "FrolloSDK"
 
     val isSetup: Boolean
         get() = _setup
@@ -60,8 +62,6 @@ object FrolloSDK {
     fun setup(application: Application, params: SetupParams, completion: OnFrolloSDKCompletionListener) {
         this.app = application
 
-        registerTimber()
-
         if (_setup) throw FrolloSDKError("SDK already setup")
         if (params.serverUrl.isBlank()) throw FrolloSDKError("Server URL cannot be empty")
 
@@ -78,10 +78,16 @@ object FrolloSDK {
         version = Version(preferences)
         // 6. Setup Network Stack
         network = NetworkService(params.serverUrl, keyStore, preferences)
-        // 7. Setup Authentication
+        // 7. Setup Logger
+        Log.logLevel = params.logLevel
+        Log.network = network
+        // 8. Setup Authentication
         _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
+        // 9. Setup Messages
         _messages = Messages(network, database)
+        // 10. Setup Events
         _events = Events(network)
+        // 11. Setup Notifications
         _notifications = Notifications(authentication, events, messages)
 
         if (version.migrationNeeded()) {
@@ -118,11 +124,6 @@ object FrolloSDK {
 
         notify(ACTION_AUTHENTICATION_CHANGED,
                 bundleOf(Pair(ARG_AUTHENTICATION_STATUS, AuthenticationStatus.LOGGED_OUT)))
-    }
-
-    private fun registerTimber() {
-        // TODO: May be handle more levels during Logging task
-        Timber.plant(Timber.DebugTree())
     }
 
     private fun initializeThreeTenABP() {

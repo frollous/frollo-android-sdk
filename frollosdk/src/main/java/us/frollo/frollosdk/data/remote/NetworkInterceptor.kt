@@ -6,7 +6,6 @@ import okhttp3.Request
 import okhttp3.Response
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
-import timber.log.Timber
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_API_VERSION
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.HEADER_AUTHORIZATION
@@ -22,11 +21,14 @@ import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.toJson
+import us.frollo.frollosdk.logging.Log
 import java.io.IOException
 
 internal class NetworkInterceptor(private val network: NetworkService, private val helper: NetworkHelper) : Interceptor {
 
     companion object {
+        private const val TAG = "NetworkInterceptor"
+
         private const val MAX_RATE_LIMIT_COUNT = 10
         private const val TIME_INTERVAL_5_MINUTES = 300L //seconds
     }
@@ -55,7 +57,7 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
 
         //TODO: Review 429 Rate Limiting
         if (!response.isSuccessful && response.code() == 429) {
-            Timber.d("Error Response 429: Too many requests. Backoff!")
+            Log.e("$TAG#intercept", "Error Response 429: Too many requests. Backoff!")
 
             // wait & retry
             try {
@@ -116,7 +118,7 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
     @Throws(DataError::class)
     private fun validateAndAppendAccessToken(builder: Request.Builder) {
         if (helper.authRefreshToken == null) {
-            Timber.d("No valid refresh token when trying to refresh access token.")
+            Log.e("$TAG#validateAndAppendAccessToken", "No valid refresh token when trying to refresh access token.")
             throw DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_REFRESH_TOKEN)
         }
 

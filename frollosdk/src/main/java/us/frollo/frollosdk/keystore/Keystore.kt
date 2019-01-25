@@ -3,7 +3,7 @@ package us.frollo.frollosdk.keystore
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
-import timber.log.Timber
+import android.util.Log
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -13,6 +13,8 @@ import javax.crypto.spec.IvParameterSpec
 class Keystore {
 
     companion object {
+        private const val TAG = "Keystore"
+
         private const val KEY_ALIAS = "FrolloSDKKey"
         private const val KEYSTORE_PROVIDER = "AndroidKeyStore"
         private const val TRANSFORMATION_AES = "AES/CBC/PKCS7Padding"
@@ -31,8 +33,7 @@ class Keystore {
             generateKeys()
             isSetup = true
         } catch (e: Exception) {
-            Timber.d("Failed to load KeyStore")
-            e.printStackTrace()
+            Log.e("FrolloSDKLogger", "$TAG.setup : Error - Failed to load KeyStore")
         }
     }
 
@@ -61,13 +62,11 @@ class Keystore {
             keyGenerator.init(spec)
             keyGenerator.generateKey()
         } catch (e: Exception) {
-            Timber.d("KeyStore Error: Keys creation failed")
-            e.printStackTrace()
+            Log.e("FrolloSDKLogger", "$TAG.aesKey : Error - Keys creation failed")
         }
     }
 
     private fun aesEncrypt(inputStr: String?): String? {
-        Timber.d("KeyStore: AES Encrypt")
         var encryptedStr: String? = null
         try {
             val secretKey = mKeyStore.getKey(KEY_ALIAS, null) as SecretKey
@@ -80,14 +79,12 @@ class Keystore {
             encryptedStr = Base64.encodeToString(encryptedData, Base64.DEFAULT)
 
         } catch (e: Exception) {
-            Timber.d("KeyStore Error: Data encryption failed")
-            e.printStackTrace()
+            Log.e("FrolloSDKLogger", "$TAG.aesEncrypt : Error - Data encryption failed")
         }
         return encryptedStr
     }
 
     private fun aesDecrypt(encryptedStr: String?): String? {
-        Timber.d("KeyStore: AES Decrypt")
         var decryptedStr: String? = null
         try {
             val secretKey = mKeyStore?.getKey(KEY_ALIAS, null) as SecretKey
@@ -100,8 +97,7 @@ class Keystore {
             decryptedStr = String(decryptedData, 0, decryptedData.size, charset("UTF-8"))
 
         } catch (e: Exception) {
-            Timber.d("KeyStore Error: Data decryption failed")
-            e.printStackTrace()
+            Log.e("FrolloSDKLogger", "$TAG.aesDecrypt : Error - Data decryption failed")
         }
         return decryptedStr
     }
@@ -111,8 +107,7 @@ class Keystore {
             mKeyStore.deleteEntry(KEY_ALIAS)
             isSetup = false
         } catch (e: Exception) {
-            Timber.d("KeyStore Error: Delete key failed")
-            e.printStackTrace()
+            Log.e("FrolloSDKLogger", "$TAG.reset : Error - Delete key failed")
         }
     }
 }

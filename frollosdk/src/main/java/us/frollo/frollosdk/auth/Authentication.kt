@@ -6,7 +6,6 @@ import androidx.lifecycle.Transformations
 import okhttp3.Request
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import timber.log.Timber
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.ACTION.ACTION_USER_UPDATED
 import us.frollo.frollosdk.core.DeviceInfo
@@ -17,6 +16,7 @@ import us.frollo.frollosdk.data.remote.api.DeviceAPI
 import us.frollo.frollosdk.data.remote.api.UserAPI
 import us.frollo.frollosdk.error.*
 import us.frollo.frollosdk.extensions.*
+import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.api.device.DeviceUpdateRequest
 import us.frollo.frollosdk.model.api.user.*
@@ -27,6 +27,10 @@ import us.frollo.frollosdk.preferences.Preferences
 import java.util.*
 
 class Authentication(private val di: DeviceInfo, private val network: NetworkService, private val db: SDKDatabase, private val pref: Preferences) {
+
+    companion object {
+        private const val TAG = "Authentication"
+    }
 
     var loggedIn: Boolean
         get() = pref.loggedIn
@@ -58,7 +62,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
         if (request.valid()) {
             userAPI.login(request).enqueue { response, error ->
                 if (error != null) {
-                    Timber.d(error.localizedDescription)
+                    Log.e("$TAG#loginUser", error.localizedDescription)
                     completion.invoke(error)
                 } else {
                     response?.fetchTokens()?.let { network.handleTokens(it) }
@@ -88,7 +92,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
 
         userAPI.register(request).enqueue { response, error ->
             if (error != null) {
-                Timber.d(error.localizedDescription)
+                Log.e("$TAG#registerUser", error.localizedDescription)
                 completion.invoke(error)
             } else {
                 response?.fetchTokens()?.let { network.handleTokens(it) }
@@ -99,7 +103,8 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
 
     fun resetPassword(email: String, completion: OnFrolloSDKCompletionListener) {
         userAPI.resetPassword(UserResetPasswordRequest(email)).enqueue { _, error ->
-            if (error != null) Timber.d(error.localizedDescription)
+            if (error != null)
+                Log.e("$TAG#resetPassword", error.localizedDescription)
             completion.invoke(error)
         }
     }
@@ -107,7 +112,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     fun refreshUser(completion: OnFrolloSDKCompletionListener? = null) {
         userAPI.fetchUser().enqueue { response, error ->
             if (error != null) {
-                Timber.d(error.localizedDescription)
+                Log.e("$TAG#refreshUser", error.localizedDescription)
                 completion?.invoke(error)
             }
             else handleUserResponse(response, completion)
@@ -117,7 +122,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     fun updateUser(user: User, completion: OnFrolloSDKCompletionListener) {
         userAPI.updateUser(user.updateRequest()).enqueue { response, error ->
             if (error != null) {
-                Timber.d(error.localizedDescription)
+                Log.e("$TAG#updateUser", error.localizedDescription)
                 completion.invoke(error)
             }
             else handleUserResponse(response, completion)
@@ -127,7 +132,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     fun updateAttribution(attribution: Attribution, completion: OnFrolloSDKCompletionListener) {
         userAPI.updateUser(UserUpdateRequest(attribution = attribution)).enqueue { response, error ->
             if (error != null) {
-                Timber.d(error.localizedDescription)
+                Log.e("$TAG#updateAttribution", error.localizedDescription)
                 completion.invoke(error)
             }
             else handleUserResponse(response, completion)
@@ -142,7 +147,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
         if (request.valid()) {
             userAPI.changePassword(request).enqueue { _, error ->
                 if (error != null) {
-                    Timber.d(error.localizedDescription)
+                    Log.e("$TAG#changePassword", error.localizedDescription)
                 }
 
                 completion.invoke(error)
@@ -154,7 +159,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
 
     internal fun deleteUser(completion: OnFrolloSDKCompletionListener) {
         userAPI.deleteUser().enqueue { _, error ->
-            if (error != null) Timber.d(error.localizedDescription)
+            if (error != null) Log.e("$TAG#deleteUser", error.localizedDescription)
             else reset()
 
             completion.invoke(error)
@@ -176,7 +181,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
 
         deviceAPI.updateDevice(request).enqueue { _, error ->
             if (error != null) {
-                Timber.d(error.localizedDescription)
+                Log.e("$TAG#updateDevice", error.localizedDescription)
             }
 
             completion?.invoke(error)
@@ -186,7 +191,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     internal fun logoutUser(completion: OnFrolloSDKCompletionListener? = null) {
         userAPI.logout().enqueue { _, error ->
             if (error != null)
-                Timber.d(error.localizedDescription)
+                Log.e("$TAG#logoutUser", error.localizedDescription)
 
             reset()
 

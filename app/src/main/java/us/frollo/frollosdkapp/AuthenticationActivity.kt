@@ -5,16 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.android.synthetic.main.activity_authentication.*
-import timber.log.Timber
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.auth.AuthType
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.ACTION.ACTION_USER_UPDATED
-import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.error.APIError
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.FrolloSDKError
@@ -22,6 +21,10 @@ import us.frollo.frollosdk.model.coredata.user.User
 import java.util.*
 
 class AuthenticationActivity : AppCompatActivity() {
+
+    companion object {
+        private const val TAG = "AuthenticationActivity"
+    }
 
     private var user: User? = null
     private var userLiveData: LiveData<Resource<User>>? = null
@@ -48,12 +51,12 @@ class AuthenticationActivity : AppCompatActivity() {
     }
 
     private fun login() {
-        Timber.d("Logging in...")
+        Log.d(TAG, "Logging in...")
 
         FrolloSDK.authentication.loginUser(
                 method = AuthType.EMAIL,
-                email = "deepak@frollo.us",
-                password = "pass1234") { error ->
+                email = "deepu@gmail.com",
+                password = "Pass1234") { error ->
 
             if (error != null) handleError(error)
             else fetchUser()
@@ -66,11 +69,11 @@ class AuthenticationActivity : AppCompatActivity() {
             when (it?.status) {
                 Resource.Status.SUCCESS -> {
                     user = it.data
-                    Timber.d("*** Hello ${ user?.firstName } ${ user?.lastName }")
-                    Timber.d("*** Email: ${ user?.email }")
+                    Log.d(TAG,"*** Hello ${ user?.firstName } ${ user?.lastName }")
+                    Log.d(TAG,"*** Email: ${ user?.email }")
                 }
-                Resource.Status.ERROR -> Timber.d("Error fetching user from cache")
-                Resource.Status.LOADING -> Timber.d("Fetching user from cache...")
+                Resource.Status.ERROR -> Log.e(TAG,"Error fetching user from cache")
+                Resource.Status.LOADING -> Log.d(TAG,"Fetching user from cache...")
             }
         }
     }
@@ -84,7 +87,7 @@ class AuthenticationActivity : AppCompatActivity() {
 
     private val userRefreshReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            Timber.d("*** User refreshed")
+            Log.d(TAG,"*** User refreshed")
         }
     }
 
@@ -93,12 +96,12 @@ class AuthenticationActivity : AppCompatActivity() {
 
         FrolloSDK.authentication.updateUser(user) { error ->
             if (error != null) handleError(error)
-            else Timber.d("*** Updated last name")
+            else Log.d(TAG,"*** Updated last name")
         }
     }
 
     private fun register() {
-        Timber.d("Registering...")
+        Log.i(TAG,"Registering...")
 
         FrolloSDK.authentication.registerUser(
                 firstName = "test first",
@@ -117,21 +120,21 @@ class AuthenticationActivity : AppCompatActivity() {
     private fun resetPassword() {
         FrolloSDK.authentication.resetPassword(email = "testtest1@frollo.us") { error ->
             if (error != null) handleError(error)
-            else Timber.d("*** Password is reset")
+            else Log.d(TAG,"*** Password is reset")
         }
     }
 
     private fun changePassword() {
         FrolloSDK.authentication.changePassword(currentPassword = "pass1234", newPassword = "P123") { error ->
             if (error != null) handleError(error)
-            else Timber.d("*** Password is changed")
+            else Log.d(TAG,"*** Password is changed")
         }
     }
 
     private fun logout() {
         userLiveData?.removeObservers(this)
         FrolloSDK.logout {
-            Timber.d("*** User logged out")
+            Log.d(TAG,"*** User logged out")
         }
     }
 
@@ -139,7 +142,7 @@ class AuthenticationActivity : AppCompatActivity() {
         userLiveData?.removeObservers(this)
         /*FrolloSDK.deleteUser { error ->
             if (error != null) handleError(error)
-            else Timber.d("*** User deleted")
+            else Log.d(TAG, "*** User deleted")
         }*/
     }
 
@@ -149,9 +152,9 @@ class AuthenticationActivity : AppCompatActivity() {
 
     private fun handleError(error: FrolloSDKError) {
         when (error) {
-            is APIError -> Timber.d("*** Error: ${error.errorCode} - ${error.localizedDescription}")
-            is DataError -> Timber.d("*** Error: ${error.type} - ${error.localizedDescription}")
-            else -> Timber.d("*** Error: ${error.localizedDescription}")
+            is APIError -> Log.e(TAG,"*** Error: ${error.errorCode} - ${error.localizedDescription}")
+            is DataError -> Log.e(TAG,"*** Error: ${error.type} - ${error.localizedDescription}")
+            else -> Log.e(TAG,"*** Error: ${error.localizedDescription}")
         }
     }
 }

@@ -1,8 +1,8 @@
 package us.frollo.frollosdk.core
 
-import android.util.Log
 import org.junit.Assert.*
 import org.junit.Test
+import us.frollo.frollosdk.logging.LogLevel
 
 class SetupParamsTest {
 
@@ -10,10 +10,10 @@ class SetupParamsTest {
     fun testBuildSetupParams() {
         val builder = SetupParams.Builder()
         val params = builder.serverUrl("https://api-test.frollo.us")
-                .logLevel(Log.DEBUG)
+                .logLevel(LogLevel.DEBUG)
                 .build()
         assertNotNull(params)
         assertEquals("https://api-test.frollo.us", params.serverUrl)
-        assertEquals(Log.DEBUG, params.logLevel)
+        assertEquals(LogLevel.DEBUG, params.logLevel)
     }
 }

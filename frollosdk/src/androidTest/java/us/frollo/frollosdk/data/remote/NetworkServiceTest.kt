@@ -55,6 +55,17 @@ class NetworkServiceTest {
     }
 
     @Test
+    fun testHasTokens() {
+        assertFalse(network.hasTokens())
+
+        preferences.encryptedAccessToken = keystore.encrypt("InvalidAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ValidRefreshToken")
+        preferences.accessTokenExpiry = 14529375950
+
+        assertTrue(network.hasTokens())
+    }
+
+    @Test
     fun testHandleTokens() {
         assertNull(preferences.encryptedAccessToken)
         assertNull(preferences.encryptedRefreshToken)

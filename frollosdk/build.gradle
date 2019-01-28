@@ -4,8 +4,6 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    // Uncomment below line to define resource prefix to prevent resource names conflicts
-    //resourcePrefix "frollosdk_"
     compileSdkVersion 28
     defaultConfig {
         minSdkVersion 24 // Android 7.0 (Nougat)

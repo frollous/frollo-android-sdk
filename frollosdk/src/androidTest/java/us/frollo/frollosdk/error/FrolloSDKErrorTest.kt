@@ -21,7 +21,7 @@ class FrolloSDKErrorTest {
     @Test
     fun testLocalizedDescription() {
         var sdkError = FrolloSDKError()
-        assertEquals(app.resources.getString(R.string.Error_Generic_UnknownError), sdkError.localizedDescription)
+        assertEquals(app.resources.getString(R.string.FrolloSDK_Error_Generic_UnknownError), sdkError.localizedDescription)
 
         sdkError = FrolloSDKError("Frollo SDK Error")
         assertEquals("Frollo SDK Error", sdkError.localizedDescription)
@@ -30,7 +30,7 @@ class FrolloSDKErrorTest {
     @Test
     fun testDebugDescription() {
         var sdkError = FrolloSDKError()
-        assertEquals(app.resources.getString(R.string.Error_Generic_UnknownError), sdkError.debugDescription)
+        assertEquals(app.resources.getString(R.string.FrolloSDK_Error_Generic_UnknownError), sdkError.debugDescription)
 
         sdkError = FrolloSDKError("Frollo SDK Error")
         assertEquals("Frollo SDK Error", sdkError.debugDescription)

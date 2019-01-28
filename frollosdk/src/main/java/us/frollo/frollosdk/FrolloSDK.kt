@@ -22,6 +22,7 @@ import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.notifications.Notifications
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.version.Version
+import java.lang.Exception
 import java.util.*
 
 object FrolloSDK {
@@ -65,37 +66,41 @@ object FrolloSDK {
         if (_setup) throw FrolloSDKError("SDK already setup")
         if (params.serverUrl.isBlank()) throw FrolloSDKError("Server URL cannot be empty")
 
-        // 1. Initialize ThreeTenABP
-        initializeThreeTenABP()
-        // 2. Setup Keystore
-        keyStore = Keystore()
-        keyStore.setup()
-        // 3. Setup Preferences
-        preferences = Preferences(application.applicationContext)
-        // 4. Setup Database
-        database = SDKDatabase.getInstance(application)
-        // 5. Setup Version Manager
-        version = Version(preferences)
-        // 6. Setup Network Stack
-        network = NetworkService(params.serverUrl, keyStore, preferences)
-        // 7. Setup Logger
-        Log.network = network // Initialize Log.network before Log.logLevel as Log.logLevel is dependant on Log.network
-        Log.logLevel = params.logLevel
-        // 8. Setup Authentication
-        _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
-        // 9. Setup Messages
-        _messages = Messages(network, database)
-        // 10. Setup Events
-        _events = Events(network)
-        // 11. Setup Notifications
-        _notifications = Notifications(authentication, events, messages)
+        try {
+            // 1. Initialize ThreeTenABP
+            initializeThreeTenABP()
+            // 2. Setup Keystore
+            keyStore = Keystore()
+            keyStore.setup()
+            // 3. Setup Preferences
+            preferences = Preferences(application.applicationContext)
+            // 4. Setup Database
+            database = SDKDatabase.getInstance(application)
+            // 5. Setup Version Manager
+            version = Version(preferences)
+            // 6. Setup Network Stack
+            network = NetworkService(params.serverUrl, keyStore, preferences)
+            // 7. Setup Logger
+            Log.network = network // Initialize Log.network before Log.logLevel as Log.logLevel is dependant on Log.network
+            Log.logLevel = params.logLevel
+            // 8. Setup Authentication
+            _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
+            // 9. Setup Messages
+            _messages = Messages(network, database)
+            // 10. Setup Events
+            _events = Events(network)
+            // 11. Setup Notifications
+            _notifications = Notifications(authentication, events, messages)
 
-        if (version.migrationNeeded()) {
-            version.migrateVersion()
+            if (version.migrationNeeded()) {
+                version.migrateVersion()
+            }
+
+            _setup = true
+            completion.invoke(null)
+        } catch (e: Exception) {
+            completion.invoke(FrolloSDKError("Setup failed : ${e.message}"))
         }
-
-        _setup = true
-        completion.invoke(null)
     }
 
     fun logout(completion: OnFrolloSDKCompletionListener? = null) {

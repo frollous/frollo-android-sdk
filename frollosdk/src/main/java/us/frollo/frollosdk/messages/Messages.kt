@@ -87,7 +87,6 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    //TODO: Update request still uses "clicked" instead of "interacted". To be fixed by Backend. Verify after fix.
     fun updateMessage(messageId: Long, read: Boolean, interacted: Boolean, completion: OnFrolloSDKCompletionListener? = null) {
         messagesAPI.updateMessage(messageId, MessageUpdateRequest(read, interacted)).enqueue { response, error ->
             if (error != null) {

@@ -55,8 +55,8 @@ class AuthenticationActivity : AppCompatActivity() {
 
         FrolloSDK.authentication.loginUser(
                 method = AuthType.EMAIL,
-                email = "deepu@gmail.com",
-                password = "Pass1234") { error ->
+                email = "deepak@frollo.us",
+                password = "pass1234") { error ->
 
             if (error != null) handleError(error)
             else fetchUser()

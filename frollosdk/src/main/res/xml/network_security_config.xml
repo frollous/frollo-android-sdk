@@ -14,6 +14,7 @@
         </pin-set>
     </domain-config>
     <!-- TODO: Review if below breaks the SSL Pinning -->
+    <!-- Below is required for MockWebServer -->
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">localhost</domain>
     </domain-config>

@@ -107,11 +107,6 @@ class NetworkServiceTest {
     }
 
     @Test
-    fun testForceRefreshingInvalidAccessTokens() {
-        //TODO: to be implemented
-    }
-
-    @Test
     fun testAuthenticateRequest() {
         preferences.encryptedAccessToken = keystore.encrypt("ValidAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ValidRefreshToken")

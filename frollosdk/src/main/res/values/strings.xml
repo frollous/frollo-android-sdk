@@ -1,50 +1,50 @@
 <resources>
-    <string name="Error_API_AccountLocked">User account has been locked due to too many incorrect login attempts. Please try again after one hour.</string>
-    <string name="Error_API_BadRequest">The request sent to the server was malformed</string>
-    <string name="Error_API_DeprecatedError">This version of the app is no longer supported. Please upgrade to the latest version to continue</string>
-    <string name="Error_API_InvalidAccessToken">Invalid access token. Use the refresh token to get a valid one</string>
-    <string name="Error_API_InvalidRefreshToken">Login has expired. Re-authorise to get a new refresh token</string>
-    <string name="Error_API_InvalidUsernamePassword">The username or password supplied is incorrect</string>
-    <string name="Error_API_Maintenance">The server is currently under maintenance and will be available again shortly</string>
-    <string name="Error_API_NotFound">Object not found on the API</string>
-    <string name="Error_API_NotImplemented">API has not been implemented</string>
-    <string name="Error_API_PasscodeError">You entered an incorrect passcode too many times and have been logged out</string>
-    <string name="Error_API_PasswordMustBeDifferent">New password must be different to the current password</string>
-    <string name="Error_API_RateLimit">The app has been rate limited. Wait before trying your request again</string>
-    <string name="Error_API_ServerError">Something went wrong at our end. Please try again later. Contact support if this issue persists</string>
-    <string name="Error_API_SuspendedDevice">This device has been logged out. Please login again to continue</string>
-    <string name="Error_API_SuspendedUser">This account has been disabled. Please contact support for details</string>
-    <string name="Error_API_Unauthorised">User is not authorised to do this</string>
-    <string name="Error_API_UnknownAuthorisation">Unknown authorisation error occurred</string>
-    <string name="Error_API_UnknownError">Unknown error occurred on the API</string>
-    <string name="Error_API_UserAlreadyExists">A user account already exists with this identifier</string>
-    <string name="Error_API_UserLoggedOut">User is already logged out</string>
+    <string name="FrolloSDK_Error_API_AccountLocked">User account has been locked due to too many incorrect login attempts. Please try again after one hour.</string>
+    <string name="FrolloSDK_Error_API_BadRequest">The request sent to the server was malformed</string>
+    <string name="FrolloSDK_Error_API_DeprecatedError">This version of the app is no longer supported. Please upgrade to the latest version to continue</string>
+    <string name="FrolloSDK_Error_API_InvalidAccessToken">Invalid access token. Use the refresh token to get a valid one</string>
+    <string name="FrolloSDK_Error_API_InvalidRefreshToken">Login has expired. Re-authorise to get a new refresh token</string>
+    <string name="FrolloSDK_Error_API_InvalidUsernamePassword">The username or password supplied is incorrect</string>
+    <string name="FrolloSDK_Error_API_Maintenance">The server is currently under maintenance and will be available again shortly</string>
+    <string name="FrolloSDK_Error_API_NotFound">Object not found on the API</string>
+    <string name="FrolloSDK_Error_API_NotImplemented">API has not been implemented</string>
+    <string name="FrolloSDK_Error_API_PasscodeError">You entered an incorrect passcode too many times and have been logged out</string>
+    <string name="FrolloSDK_Error_API_PasswordMustBeDifferent">New password must be different to the current password</string>
+    <string name="FrolloSDK_Error_API_RateLimit">The app has been rate limited. Wait before trying your request again</string>
+    <string name="FrolloSDK_Error_API_ServerError">Something went wrong at our end. Please try again later. Contact support if this issue persists</string>
+    <string name="FrolloSDK_Error_API_SuspendedDevice">This device has been logged out. Please login again to continue</string>
+    <string name="FrolloSDK_Error_API_SuspendedUser">This account has been disabled. Please contact support for details</string>
+    <string name="FrolloSDK_Error_API_Unauthorised">User is not authorised to do this</string>
+    <string name="FrolloSDK_Error_API_UnknownAuthorisation">Unknown authorisation error occurred</string>
+    <string name="FrolloSDK_Error_API_UnknownError">Unknown error occurred on the API</string>
+    <string name="FrolloSDK_Error_API_UserAlreadyExists">A user account already exists with this identifier</string>
+    <string name="FrolloSDK_Error_API_UserLoggedOut">User is already logged out</string>
 
-    <string name="Error_Data_API_InvalidData">API request or response data was invalid</string>
-    <string name="Error_Data_API_PasswordTooShort">Password must be at least 8 characters long</string>
-    <string name="Error_Data_API_Unknown">Unknown error occurred in the API request or response</string>
+    <string name="FrolloSDK_Error_Data_API_InvalidData">API request or response data was invalid</string>
+    <string name="FrolloSDK_Error_Data_API_PasswordTooShort">Password must be at least 8 characters long</string>
+    <string name="FrolloSDK_Error_Data_API_Unknown">Unknown error occurred in the API request or response</string>
 
-    <string name="Error_Data_Authentication_AlreadyLoggedIn">User is already logged in.</string>
-    <string name="Error_Data_Authentication_LoggedOut">User is not logged in.</string>
-    <string name="Error_Data_Authentication_MissingAccessToken">Access token is missing after refresh</string>
-    <string name="Error_Data_Authentication_MissingRefreshToken">Refresh token is missing. No valid login found</string>
-    <string name="Error_Data_Authentication_Unknown">Unknown authentication error occurred</string>
+    <string name="FrolloSDK_Error_Data_Authentication_AlreadyLoggedIn">User is already logged in.</string>
+    <string name="FrolloSDK_Error_Data_Authentication_LoggedOut">User is not logged in.</string>
+    <string name="FrolloSDK_Error_Data_Authentication_MissingAccessToken">Access token is missing after refresh</string>
+    <string name="FrolloSDK_Error_Data_Authentication_MissingRefreshToken">Refresh token is missing. No valid login found</string>
+    <string name="FrolloSDK_Error_Data_Authentication_Unknown">Unknown authentication error occurred</string>
 
-    <string name="Error_Data_Database_Corrupted">The database on disk has been corrupted and has been reset</string>
-    <string name="Error_Data_Database_DiskFullError">The device has run out of free space and the SDK can no longer function correctly</string>
-    <string name="Error_Data_Database_MigrationFailed">The database migration failed and the database has been reset</string>
-    <string name="Error_Data_Database_NotFound">The object requested was not found in the database</string>
-    <string name="Error_Data_Database_UnknownError">Unknown error occurred with the database</string>
+    <string name="FrolloSDK_Error_Data_Database_Corrupted">The database on disk has been corrupted and has been reset</string>
+    <string name="FrolloSDK_Error_Data_Database_DiskFullError">The device has run out of free space and the SDK can no longer function correctly</string>
+    <string name="FrolloSDK_Error_Data_Database_MigrationFailed">The database migration failed and the database has been reset</string>
+    <string name="FrolloSDK_Error_Data_Database_NotFound">The object requested was not found in the database</string>
+    <string name="FrolloSDK_Error_Data_Database_UnknownError">Unknown error occurred with the database</string>
 
-    <string name="Error_LoginForm_FieldChoiceNotSelectedFormat">No field selected for multiple choice row %s</string>
-    <string name="Error_LoginForm_MaxLengthExceededFormat">The maximum length for %s has been exceeded</string>
-    <string name="Error_LoginForm_MissingRequiredFieldFormat">%s is required</string>
-    <string name="Error_LoginForm_ValidationFailedFormat">Validation failed for %s</string>
-    <string name="Error_LoginForm_UnknownError">Unknown error occurred validating the login form</string>
+    <string name="FrolloSDK_Error_LoginForm_FieldChoiceNotSelectedFormat">No field selected for multiple choice row %s</string>
+    <string name="FrolloSDK_Error_LoginForm_MaxLengthExceededFormat">The maximum length for %s has been exceeded</string>
+    <string name="FrolloSDK_Error_LoginForm_MissingRequiredFieldFormat">%s is required</string>
+    <string name="FrolloSDK_Error_LoginForm_ValidationFailedFormat">Validation failed for %s</string>
+    <string name="FrolloSDK_Error_LoginForm_UnknownError">Unknown error occurred validating the login form</string>
 
-    <string name="Error_Generic_UnknownError">Unknown error occurred</string>
+    <string name="FrolloSDK_Error_Generic_UnknownError">Unknown error occurred</string>
 
-    <string name="Error_Network_ConnectionFailure">The server couldn\'t be contacted. Check your internet connection and try again</string>
-    <string name="Error_Network_InvalidSSL">Invalid TLS connection. The TLS certificate does not match the pinned public key. This may be an attempt to intercept data</string>
-    <string name="Error_Network_UnknownError">Unknown error occurred with the network</string>
+    <string name="FrolloSDK_Error_Network_ConnectionFailure">The server couldn\'t be contacted. Check your internet connection and try again</string>
+    <string name="FrolloSDK_Error_Network_InvalidSSL">Invalid TLS connection. The TLS certificate does not match the pinned public key. This may be an attempt to intercept data</string>
+    <string name="FrolloSDK_Error_Network_UnknownError">Unknown error occurred with the network</string>
 </resources>

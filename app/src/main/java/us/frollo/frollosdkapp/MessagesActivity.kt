@@ -48,7 +48,7 @@ class MessagesActivity : AppCompatActivity() {
     }
 
     private fun updateMessage() {
-        FrolloSDK.messages.updateMessage(messageId = 58213, read = true, interacted = true) { error ->
+        FrolloSDK.messages.updateMessage(messageId = 52531, read = true, interacted = true) { error ->
             if (error != null) handleError(error)
             else Log.d(TAG,"*** Message updated")
         }

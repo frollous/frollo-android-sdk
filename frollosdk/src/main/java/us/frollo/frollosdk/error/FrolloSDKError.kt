@@ -9,7 +9,7 @@ open class FrolloSDKError(errorMessage: String? = null) : Error(errorMessage) {
     protected val context: Context? = FrolloSDK.app.applicationContext
 
     open val localizedDescription: String? =
-            errorMessage ?: context?.resources?.getString(R.string.Error_Generic_UnknownError)
+            errorMessage ?: context?.resources?.getString(R.string.FrolloSDK_Error_Generic_UnknownError)
     open val debugDescription: String? =
-            errorMessage ?: context?.resources?.getString(R.string.Error_Generic_UnknownError)
+            errorMessage ?: context?.resources?.getString(R.string.FrolloSDK_Error_Generic_UnknownError)
 }

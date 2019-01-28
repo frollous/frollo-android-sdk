@@ -39,7 +39,6 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     private val userAPI: UserAPI = network.create(UserAPI::class.java)
     private val deviceAPI: DeviceAPI = network.create(DeviceAPI::class.java)
 
-    //TODO: Review - This returns a new LiveData object ON EACH call. Maybe the app should implement a MediatorLiveData and change source in ViewModel.
     fun fetchUser(): LiveData<Resource<User>> =
             Transformations.map(db.users().load()) {
                 Resource.success(it?.toUser())

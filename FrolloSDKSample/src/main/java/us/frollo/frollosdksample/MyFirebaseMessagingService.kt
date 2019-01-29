@@ -1,4 +1,4 @@
-package us.frollo.frollosdkapp
+package us.frollo.frollosdksample
 
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService

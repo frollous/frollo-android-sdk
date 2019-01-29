@@ -1,4 +1,4 @@
-package us.frollo.frollosdkapp
+package us.frollo.frollosdksample
 
 import android.content.BroadcastReceiver
 import android.content.Context

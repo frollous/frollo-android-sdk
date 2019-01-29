@@ -1,4 +1,4 @@
-package us.frollo.frollosdkapp
+package us.frollo.frollosdksample
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData

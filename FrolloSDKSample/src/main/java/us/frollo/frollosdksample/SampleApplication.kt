@@ -1,4 +1,4 @@
-package us.frollo.frollosdkapp
+package us.frollo.frollosdksample
 
 import android.app.Application
 import androidx.lifecycle.Lifecycle
@@ -7,7 +7,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import us.frollo.frollosdk.FrolloSDK
 
-class FrolloSDKApp : Application(), LifecycleObserver {
+class SampleApplication : Application(), LifecycleObserver {
 
     override fun onCreate() {
         super.onCreate()

@@ -1,1 +1,1 @@
-include ':app', ':frollosdk'
+include ':FrolloSDKSample', ':frollosdk'

@@ -6,7 +6,7 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "us.frollo.frollosdkapp"
+        applicationId "us.frollo.frollosdksample"
         minSdkVersion 23 // Android 6.0 (Marshmallow)
         targetSdkVersion 28
         versionCode 1

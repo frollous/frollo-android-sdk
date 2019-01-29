@@ -1,5 +1,6 @@
 package us.frollo.frollosdk.data.remote
 
+import android.os.Build
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -13,6 +14,8 @@ import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.model.api.user.TokenResponse
 import us.frollo.frollosdk.preferences.Preferences
+import okhttp3.CertificatePinner
+import us.frollo.frollosdk.BuildConfig
 
 class NetworkService(internal val serverUrl: String, keystore: Keystore, pref: Preferences) : IApiProvider {
 
@@ -31,10 +34,18 @@ class NetworkService(internal val serverUrl: String, keystore: Keystore, pref: P
                 .enableComplexMapKeySerialization()
                 .create()
 
-        val httpClient = OkHttpClient.Builder()
+        val httpClientBuilder = OkHttpClient.Builder()
                 .addInterceptor(interceptor)
                 .authenticator(NetworkAuthenticator(this))
-                .build()
+
+        if (!BuildConfig.DEBUG && Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            val certPinner = CertificatePinner.Builder()
+                    .add("*.frollo.us", "sha256/XysGYqMH3Ml0kZoh6zTTaTzR4wYBGgUWfvbxgh4V4QA=")
+                    .add("*.frollo.us", "sha256/UgMkdW5Xlo5dOndGZIdWLSrMu7DD3gwmnyqSOg+gz3I=")
+                    .build()
+            httpClientBuilder.certificatePinner(certPinner)
+        }
+        val httpClient = httpClientBuilder.build()
 
         val builder = Retrofit.Builder()
                 .client(httpClient)

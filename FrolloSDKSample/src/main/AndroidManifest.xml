@@ -11,7 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".StartupActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,11 +21,14 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".AuthenticationActivity"/>
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/str_login"
+            android:screenOrientation="portrait" />
 
-        <activity android:name=".MessagesActivity"/>
-
-        <activity android:name=".EventsActivity"/>
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait" />
 
         <service android:name=".MyFirebaseMessagingService">
             <intent-filter>

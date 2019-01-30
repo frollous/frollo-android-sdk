@@ -8,7 +8,7 @@ import us.frollo.frollosdk.FrolloSDK
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     companion object {
-        private const val TAG = "MyFirebaseMessagingService"
+        private const val TAG = "MessagingService"
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage?) {

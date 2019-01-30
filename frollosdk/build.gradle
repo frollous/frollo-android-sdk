@@ -31,7 +31,11 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     sourceSets {
-        String sharedTestDir = 'src/sharedTest/java'
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+        androidTest.java.srcDirs += 'src/androidTest/kotlin'
+
+        String sharedTestDir = 'src/sharedTest/kotlin'
         test {
             java.srcDir sharedTestDir
         }

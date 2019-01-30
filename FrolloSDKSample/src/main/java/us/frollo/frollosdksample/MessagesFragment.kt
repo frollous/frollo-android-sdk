@@ -34,9 +34,7 @@ class MessagesFragment : ViewLifecycleFragment() {
 
         initView()
         initLiveData()
-        refresh_layout.onRefresh {
-            refreshUnreadMessages()
-        }
+        refresh_layout.onRefresh { refreshUnreadMessages() }
     }
 
     private fun initView() {
@@ -52,16 +50,9 @@ class MessagesFragment : ViewLifecycleFragment() {
         viewLifecycleOwner?.let { owner ->
             FrolloSDK.messages.fetchMessages(read = false).observe(owner) {
                 when (it?.status) {
-                    Resource.Status.SUCCESS -> {
-                        Log.d(TAG, "*** Success Fetching Messages")
-                        refresh_layout.isRefreshing = false
-                        loadMessages(it.data)
-                    }
-                    Resource.Status.ERROR -> {
-                        refresh_layout.isRefreshing = false
-                        displayError(it.error?.localizedDescription, "Fetch Messages Failed")
-                    }
-                    Resource.Status.LOADING -> refresh_layout.isRefreshing = true
+                    Resource.Status.SUCCESS -> loadMessages(it.data)
+                    Resource.Status.ERROR -> displayError(it.error?.localizedDescription, "Fetch Messages Failed")
+                    Resource.Status.LOADING -> Log.d(TAG, "Loading Messages...")
                 }
             }
         }
@@ -74,6 +65,7 @@ class MessagesFragment : ViewLifecycleFragment() {
 
     private fun refreshUnreadMessages() {
         FrolloSDK.messages.refreshUnreadMessages { error ->
+            refresh_layout.isRefreshing = false
             if (error != null)
                 displayError(error.localizedDescription, "Refreshing Messages Failed")
         }

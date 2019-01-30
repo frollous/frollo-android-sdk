@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_messages.*
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -16,8 +15,9 @@ import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.messages.Message
 import us.frollo.frollosdk.model.coredata.messages.MessageText
 import us.frollo.frollosdksample.adapter.MessagesAdapter
+import us.frollo.frollosdksample.base.ViewLifecycleFragment
 
-class MessagesFragment : Fragment() {
+class MessagesFragment : ViewLifecycleFragment() {
 
     companion object {
         private const val TAG = "MessagesFragment"
@@ -29,8 +29,8 @@ class MessagesFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_messages, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
 
         initView()
         initLiveData()
@@ -49,18 +49,20 @@ class MessagesFragment : Fragment() {
     }
 
     private fun initLiveData() {
-        FrolloSDK.messages.fetchMessages(read = false).observe(this) {
-            when (it?.status) {
-                Resource.Status.SUCCESS -> {
-                    Log.d(TAG, "*** Success Fetching Messages")
-                    refresh_layout.isRefreshing = false
-                    loadMessages(it.data)
+        viewLifecycleOwner?.let { owner ->
+            FrolloSDK.messages.fetchMessages(read = false).observe(owner) {
+                when (it?.status) {
+                    Resource.Status.SUCCESS -> {
+                        Log.d(TAG, "*** Success Fetching Messages")
+                        refresh_layout.isRefreshing = false
+                        loadMessages(it.data)
+                    }
+                    Resource.Status.ERROR -> {
+                        refresh_layout.isRefreshing = false
+                        displayError(it.error?.localizedDescription, "Fetch Messages Failed")
+                    }
+                    Resource.Status.LOADING -> refresh_layout.isRefreshing = true
                 }
-                Resource.Status.ERROR -> {
-                    refresh_layout.isRefreshing = false
-                    displayError(it.error?.localizedDescription, "Fetch Messages Failed")
-                }
-                Resource.Status.LOADING -> refresh_layout.isRefreshing = true
             }
         }
     }

@@ -1,15 +1,15 @@
 package us.frollo.frollosdk.model
 
 import androidx.core.os.bundleOf
-import us.frollo.frollosdk.model.coredata.NotificationPayload
+import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
 
 internal fun testMessageNotificationPayload() =
         NotificationPayload(
-            event = "TEST_MESSAGE",
-            link = "frollo://dashboard",
-            transactionIDs = null,
-            userMessageID = 12345L,
-            userEventID = 98765L)
+                event = "TEST_MESSAGE",
+                link = "frollo://dashboard",
+                transactionIDs = null,
+                userMessageID = 12345L,
+                userEventID = 98765L)
 
 internal fun testEventNotificationBundle() =
         bundleOf(

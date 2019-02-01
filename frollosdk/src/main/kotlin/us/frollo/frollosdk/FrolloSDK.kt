@@ -25,22 +25,40 @@ import us.frollo.frollosdk.version.Version
 import java.lang.Exception
 import java.util.*
 
+/**
+ * Frollo SDK manager and main instantiation. Responsible for managing the lifecycle and coordination of the SDK
+ */
 object FrolloSDK {
 
     private const val TAG = "FrolloSDK"
 
+    /**
+     * Indicates if the SDK has completed setup or not
+     */
     val isSetup: Boolean
         get() = _setup
 
+    /**
+     * Authentication - All authentication and user related data see [Authentication] for details
+     */
     val authentication: Authentication
         get() =_authentication ?: throw IllegalAccessException("SDK not setup")
 
+    /**
+     * Messages - All messages management. See [Messages] for details
+     */
     val messages: Messages
         get() =_messages ?: throw IllegalAccessException("SDK not setup")
 
+    /**
+     * Events - Triggering and handling of events. See [Events] for details
+     */
     val events: Events
         get() =_events ?: throw IllegalAccessException("SDK not setup")
 
+    /**
+     * Notifications - Registering and handling of push notifications
+     */
     val notifications: Notifications
         get() =_notifications ?: throw IllegalAccessException("SDK not setup")
 
@@ -59,12 +77,23 @@ object FrolloSDK {
 
     internal lateinit var app: Application
 
+    /**
+     * Setup the SDK
+     *
+     * Sets up the SDK for use by performing any database migrations or other underlying setup needed. Must be called and completed before using the SDK.
+     *
+     * @param application Application instance of the client app.
+     * @param setupParams Parameters to configure SDK setup. See [SetupParams] for details.
+     * @param completion Completion handler with optional error if something goes wrong during the setup process.
+     *
+     * @throws FrolloSDKError if SDK is already setup or Server URL is empty.
+     */
     @Throws(FrolloSDKError::class)
-    fun setup(application: Application, params: SetupParams, completion: OnFrolloSDKCompletionListener) {
+    fun setup(application: Application, setupParams: SetupParams, completion: OnFrolloSDKCompletionListener) {
         this.app = application
 
         if (_setup) throw FrolloSDKError("SDK already setup")
-        if (params.serverUrl.isBlank()) throw FrolloSDKError("Server URL cannot be empty")
+        if (setupParams.serverUrl.isBlank()) throw FrolloSDKError("Server URL cannot be empty")
 
         try {
             // 1. Initialize ThreeTenABP
@@ -79,10 +108,10 @@ object FrolloSDK {
             // 5. Setup Version Manager
             version = Version(preferences)
             // 6. Setup Network Stack
-            network = NetworkService(params.serverUrl, keyStore, preferences)
+            network = NetworkService(setupParams.serverUrl, keyStore, preferences)
             // 7. Setup Logger
             Log.network = network // Initialize Log.network before Log.logLevel as Log.logLevel is dependant on Log.network
-            Log.logLevel = params.logLevel
+            Log.logLevel = setupParams.logLevel
             // 8. Setup Authentication
             _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
             // 9. Setup Messages
@@ -103,12 +132,23 @@ object FrolloSDK {
         }
     }
 
+    /**
+     * Logout the currently authenticated user from Frollo backend. Resets all caches, preferences and databases.
+     * This revokes the refresh token for the current device if not already revoked and resets the token storage.
+     *
+     * @param completion Completion handler with optional error if something goes wrong during the logout process
+     */
     fun logout(completion: OnFrolloSDKCompletionListener? = null) {
         authentication.logoutUser {
             reset(completion)
         }
     }
 
+    /**
+     * Delete the user account and complete logout activities on success
+     *
+     * @param completion Completion handler with any error that occurred
+     */
     fun deleteUser(completion: OnFrolloSDKCompletionListener? = null) {
         authentication.deleteUser { error ->
             if (error != null) completion?.invoke(error)
@@ -116,6 +156,13 @@ object FrolloSDK {
         }
     }
 
+    /**
+     * Reset the SDK. Clears all caches, databases and preferences. Called automatically from logout.
+     *
+     * @param completion Completion handler with option error if something goes wrong (optional)
+     *
+     * @throws IllegalAccessException if SDK is not setup
+     */
     @Throws(IllegalAccessException::class)
     fun reset(completion: OnFrolloSDKCompletionListener? = null) {
         if (!_setup) throw IllegalAccessException("SDK not setup")
@@ -135,14 +182,27 @@ object FrolloSDK {
         AndroidThreeTen.init(app)
     }
 
+    /**
+     * Application entered the background.
+     *
+     * Notify the SDK of an app lifecycle change. Call this to ensure proper refreshing of cache data occurs when the app enters background or resumes.
+     */
     fun onAppBackgrounded() {
         pauseScheduledRefreshing()
     }
 
+    /**
+     * Application resumed from background
+     *
+     * Notify the SDK of an app lifecycle change. Call this to ensure proper refreshing of cache data occurs when the app enters background or resumes.
+     */
     fun onAppForegrounded() {
         resumeScheduledRefreshing()
     }
 
+    /**
+     * Refreshes all cached data in an optimised way. Fetches most urgent data first and then proceeds to update other caches if needed.
+     */
     fun refreshData() {
         refreshPrimary()
         Handler().postDelayed({ refreshSecondary() }, 3000)
@@ -151,6 +211,9 @@ object FrolloSDK {
         resumeScheduledRefreshing()
     }
 
+    /**
+     * Refresh data from the most time sensitive and important APIs, e.g. accounts, transactions
+     */
     private fun refreshPrimary() {
         //TODO: Refresh Provider Accounts
         //TODO: Refresh Accounts
@@ -159,10 +222,16 @@ object FrolloSDK {
         messages.refreshUnreadMessages()
     }
 
+    /**
+     * Refresh data from other important APIs that frequently change but are less time sensitive, e.g. bill payments
+     */
     private fun refreshSecondary() {
         //TODO: Refresh Bill Payments
     }
 
+    /**
+     * Refresh data from long lived sources which don't change often, e.g. transaction categories, providers
+     */
     private fun refreshSystem() {
         //TODO: Refresh Providers
         //TODO: Refresh Transaction Categories

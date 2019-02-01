@@ -4,8 +4,12 @@ import java.io.IOException
 import java.security.GeneralSecurityException
 import javax.net.ssl.SSLException
 
+/**
+ * Error occuring at the network layer
+ */
 class NetworkError(private val t: Throwable? = null) : FrolloSDKError(t?.message) {
 
+    /** Type of error for common scenarios */
     val type: NetworkErrorType
         get() {
             return if (t is SSLException || t is GeneralSecurityException) {
@@ -17,6 +21,7 @@ class NetworkError(private val t: Throwable? = null) : FrolloSDKError(t?.message
             }
         }
 
+    /** Localized description */
     override val localizedDescription: String?
         get() {
             var msg = type.toLocalizedString(context)
@@ -24,6 +29,7 @@ class NetworkError(private val t: Throwable? = null) : FrolloSDKError(t?.message
             return msg
         }
 
+    /** Debug description */
     override val debugDescription: String?
         get() = "NetworkError: ${ type.name }: $localizedDescription"
 }

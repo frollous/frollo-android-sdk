@@ -32,7 +32,7 @@ class StartupActivity : AppCompatActivity() {
         if (FrolloSDK.isSetup) {
             completeStartup()
         } else {
-            FrolloSDK.setup(application, params = setupParams) { error ->
+            FrolloSDK.setup(application, setupParams = setupParams) { error ->
                 if (error != null)
                     Log.e(TAG, error.localizedDescription)
                 else

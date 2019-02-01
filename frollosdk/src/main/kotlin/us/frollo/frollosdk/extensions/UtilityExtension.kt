@@ -16,7 +16,7 @@ import java.nio.charset.Charset
  * Checks if [value1] and [value2] are not null and executes a function after.
  * Think of this as a 2 parameters `value?.let { ... }`
  */
-fun <T1, T2> ifNotNull(value1: T1?, value2: T2?, bothNotNull: (T1, T2) -> (Unit)) {
+internal fun <T1, T2> ifNotNull(value1: T1?, value2: T2?, bothNotNull: (T1, T2) -> (Unit)) {
     if (value1 != null && value2 != null) {
         bothNotNull(value1, value2)
     }

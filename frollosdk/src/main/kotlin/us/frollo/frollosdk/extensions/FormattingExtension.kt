@@ -5,8 +5,8 @@ import org.threeten.bp.format.DateTimeFormatter
 import java.text.SimpleDateFormat
 import java.util.*
 
-fun LocalDate.toString(formatPattern: String): String =
+internal fun LocalDate.toString(formatPattern: String): String =
         DateTimeFormatter.ofPattern(formatPattern).format(this)
 
-fun Date.toString(formatPattern: String): String =
+internal fun Date.toString(formatPattern: String): String =
         SimpleDateFormat(formatPattern, Locale.getDefault()).format(this)

@@ -16,7 +16,7 @@ internal fun String.toAPIErrorResponse(): APIErrorResponse? {
     }
 }
 
-fun Int.toAPIErrorType(errorCode: APIErrorCode?): APIErrorType {
+internal fun Int.toAPIErrorType(errorCode: APIErrorCode?): APIErrorType {
     val statusCode = this
     return when (statusCode) {
         400 -> {

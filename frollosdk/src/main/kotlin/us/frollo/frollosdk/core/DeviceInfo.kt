@@ -4,6 +4,9 @@ import android.content.Context
 import android.os.Build
 import android.provider.Settings
 
+/**
+ * @suppress
+ */
 class DeviceInfo(private val context: Context) {
 
     internal val deviceId: String

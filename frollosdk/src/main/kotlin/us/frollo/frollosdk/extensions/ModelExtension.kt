@@ -5,7 +5,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import us.frollo.frollosdk.model.api.user.TokenResponse
 import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
-import us.frollo.frollosdk.model.coredata.NotificationPayload
+import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
 import us.frollo.frollosdk.model.coredata.user.User
 import us.frollo.frollosdk.notifications.NotificationPayloadNames
 import java.lang.StringBuilder

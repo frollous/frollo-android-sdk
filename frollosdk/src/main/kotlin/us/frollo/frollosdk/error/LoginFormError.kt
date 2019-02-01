@@ -1,9 +1,18 @@
 package us.frollo.frollosdk.error
 
-class LoginFormError(val type: LoginFormErrorType, val fieldName: String) : FrolloSDKError() {
+/**
+ * Error occuring when using the aggregation provider login forms
+ */
+class LoginFormError(
+        /** Login form error type */
+        val type: LoginFormErrorType,
+        /** Affected field name */
+        val fieldName: String) : FrolloSDKError() {
 
+    /** Additional error information */
     var additionalError: String? = null
 
+    /** Localized description */
     override val localizedDescription: String?
         get() {
             var description = type.toLocalizedString(context, fieldName)
@@ -11,6 +20,7 @@ class LoginFormError(val type: LoginFormErrorType, val fieldName: String) : Frol
             return description
         }
 
+    /** Debug description */
     override val debugDescription: String?
         get() = "LoginFormError: ${ type.name }: $localizedDescription"
 }

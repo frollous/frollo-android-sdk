@@ -1,6 +1,6 @@
-package us.frollo.frollosdk.model.coredata
+package us.frollo.frollosdk.model.coredata.notifications
 
-data class NotificationPayload(
+internal data class NotificationPayload(
         val event: String? = null,
         val link: String? = null,
         val transactionIDs: List<Long>? = null,

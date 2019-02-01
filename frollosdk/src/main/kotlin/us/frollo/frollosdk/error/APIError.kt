@@ -5,17 +5,23 @@ import us.frollo.frollosdk.mapping.toAPIErrorType
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import us.frollo.frollosdk.model.api.shared.APIErrorResponse
 
-class APIError(val statusCode: Int, private val error: String?) : FrolloSDKError(error) {
+/**
+ * Represents errors that can be returned from the API
+ */
+class APIError(
+        /** Status code received from the API */
+        val statusCode: Int,
+        private val error: String?) : FrolloSDKError(error) {
 
-    // Type of API Error
+    /** Type of API Error */
     val type : APIErrorType
         get() = statusCode.toAPIErrorType(errorCode)
 
-    // Error code returned by the API if available and recognised
+    /** Error code returned by the API if available and recognised */
     val errorCode: APIErrorCode?
         get() = errorResponse?.errorCode
 
-    // Error message returned by the API if available
+    /** Error message returned by the API if available */
     override val message : String?
         get() = errorResponse?.errorMessage ?: error
 
@@ -25,9 +31,11 @@ class APIError(val statusCode: Int, private val error: String?) : FrolloSDKError
         errorResponse = error?.toAPIErrorResponse()
     }
 
+    /** Localized description */
     override val localizedDescription: String?
         get() = type.toLocalizedString(context)
 
+    /** Debug description */
     override val debugDescription: String?
         get() {
             var debug = "APIError: Type [${ type.name }] HTTP Status Code: $statusCode "

@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'org.jetbrains.dokka-android'
 
 android {
     compileSdkVersion 28
@@ -41,6 +42,39 @@ android {
         }
         androidTest {
             java.srcDir sharedTestDir
+        }
+    }
+    kapt {
+        arguments {
+            // Print schemas for each version of room database
+            arg("room.schemaLocation", "$projectDir/schemas".toString())
+        }
+    }
+    dokka {
+        outputFormat = 'html'
+        outputDirectory = "$buildDir/javadoc"
+        reportUndocumented = true
+        includeNonPublic = false
+        skipDeprecated = false
+        skipEmptyPackages = true
+
+        includes = ['packages.md','extras.md']
+
+        packageOptions {
+            prefix = "us.frollo.frollosdk.data.local"
+            suppress = true
+        }
+        packageOptions {
+            prefix = "us.frollo.frollosdk.keystore"
+            suppress = true
+        }
+        packageOptions {
+            prefix = "us.frollo.frollosdk.data.remote"
+            suppress = true
+        }
+        packageOptions {
+            prefix = "us.frollo.frollosdk.preferences"
+            suppress = true
         }
     }
 }

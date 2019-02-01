@@ -16,9 +16,12 @@ import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toMessage
 import us.frollo.frollosdk.model.api.messages.MessageResponse
 import us.frollo.frollosdk.model.api.messages.MessageUpdateRequest
-import us.frollo.frollosdk.model.coredata.NotificationPayload
+import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
 import us.frollo.frollosdk.model.coredata.messages.Message
 
+/**
+ * Manages caching and refreshing of messages
+ */
 class Messages(network: NetworkService, private val db: SDKDatabase) {
 
     companion object {
@@ -27,11 +30,28 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
 
     private val messagesAPI: MessagesAPI = network.create(MessagesAPI::class.java)
 
+    /**
+     * Fetch message by ID from the cache
+     *
+     * @param messageId Unique message ID to fetch
+     *
+     * @return LiveData object of Resource<Message> which can be observed using an Observer for future changes as well.
+     */
     fun fetchMessage(messageId: Long): LiveData<Resource<Message>> =
             Transformations.map(db.messages().load(messageId)) { response ->
                 Resource.success(response?.toMessage())
             }.apply { (this as? MutableLiveData<Resource<Message>>)?.value = Resource.loading(null) }
 
+    /**
+     * Fetch messages from the cache
+     *
+     * Fetches all messages if no params are passed.
+     *
+     * @param messageTypes: List of message types to find matching Messages for (optional)
+     * @param read Fetch only read/unread messages (optional)
+     *
+     * @return LiveData object of Resource<List<Message>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchMessages(messageTypes: List<String>? = null, read: Boolean? = null): LiveData<Resource<List<Message>>> {
         return if (messageTypes != null) {
             Transformations.map(db.messages().loadByQuery(generateSQLQueryMessages(messageTypes, read))) { response ->
@@ -48,6 +68,12 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
+    /**
+     * Refresh a specific message by ID from the host
+     *
+     * @param messageId ID of the message to fetch
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshMessage(messageId: Long, completion: OnFrolloSDKCompletionListener? = null) {
         messagesAPI.fetchMessage(messageId).enqueue { response, error ->
             if (error != null) {
@@ -61,6 +87,11 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
+    /**
+     * Refresh all available messages from the host.
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshMessages(completion: OnFrolloSDKCompletionListener? = null) {
         messagesAPI.fetchMessages().enqueue { response, error ->
             if (error != null) {
@@ -74,6 +105,11 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
+    /**
+     * Refresh all unread messages from the host.
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshUnreadMessages(completion: OnFrolloSDKCompletionListener? = null) {
         messagesAPI.fetchUnreadMessages().enqueue { response, error ->
             if (error != null) {
@@ -87,6 +123,15 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
+    /**
+     * Update a message on the host
+     *
+     * @param messageId ID of the message to be updated
+     * @param read Mark message read/unread
+     * @param interacted Mark message interacted or not
+     * @param messageId ID of the message to be updated
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun updateMessage(messageId: Long, read: Boolean, interacted: Boolean, completion: OnFrolloSDKCompletionListener? = null) {
         messagesAPI.updateMessage(messageId, MessageUpdateRequest(read, interacted)).enqueue { response, error ->
             if (error != null) {

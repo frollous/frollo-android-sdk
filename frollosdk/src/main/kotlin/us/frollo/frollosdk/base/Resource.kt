@@ -6,9 +6,39 @@ import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.mapping.toDataError
 
-class Resource<out T> private constructor(val status: Status, val data: T? = null, val error: FrolloSDKError? = null) {
+/**
+ * Wrapper class around the data with different fetch states
+ */
+class Resource<out T> private constructor(
+        /**
+         * Status of the fetch result
+         */
+        val status: Status,
+        /**
+         * Fetched data. null if state is [Status.ERROR]
+         */
+        val data: T? = null,
+        /**
+         * Error details if state is [Status.ERROR]
+         */
+        val error: FrolloSDKError? = null) {
+
+    /**
+     * Enum of fetch result states
+     */
     enum class Status {
-        SUCCESS, ERROR, LOADING
+        /**
+         * Indicates data fetched successfully.
+         */
+        SUCCESS,
+        /**
+         * Indicates error while fetching data.
+         */
+        ERROR,
+        /**
+         * Indicates data fetch is still under progress
+         */
+        LOADING
     }
 
     /**

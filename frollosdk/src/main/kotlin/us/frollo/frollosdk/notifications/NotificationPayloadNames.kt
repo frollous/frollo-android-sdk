@@ -3,7 +3,6 @@ package us.frollo.frollosdk.notifications
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
-
 internal enum class NotificationPayloadNames {
     @SerializedName("event") EVENT,
     @SerializedName("link") LINK,

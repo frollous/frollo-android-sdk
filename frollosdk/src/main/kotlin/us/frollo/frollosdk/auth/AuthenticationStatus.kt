@@ -1,5 +1,11 @@
 package us.frollo.frollosdk.auth
 
+/**
+ * Status of the FrolloSDK authentication with Frollo servers
+ */
 enum class AuthenticationStatus {
-    AUTHENTICATED, LOGGED_OUT
+    /** User Authenticated */
+    AUTHENTICATED,
+    /** User logged out */
+    LOGGED_OUT
 }

@@ -26,6 +26,8 @@ platform :android do
         gradle_task: "connectedAndroidTest"
       )
 
+      gradle(task: "dokka")
+
       slack(message: "Frollo Android SDK Successfully Integrated!",
             default_payloads: [:git_branch, :lane, :test_result],
             success: true)

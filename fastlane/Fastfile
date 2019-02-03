@@ -23,7 +23,8 @@ platform :android do
 
       automated_test_emulator_run(
         AVD_setup_path: "fastlane/AVD/AVD_setup.json",
-        gradle_task: "connectedAndroidTest"
+        gradle_task: "connectedAndroidTest",
+        AVD_param_launch_timeout: "120"
       )
 
       gradle(task: "dokka")

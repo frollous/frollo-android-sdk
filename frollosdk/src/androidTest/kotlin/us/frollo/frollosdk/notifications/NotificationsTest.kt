@@ -60,6 +60,7 @@ class NotificationsTest {
         database = SDKDatabase.getInstance(app)
         network = NetworkService(baseUrl.toString(), keystore, preferences)
 
+        preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900

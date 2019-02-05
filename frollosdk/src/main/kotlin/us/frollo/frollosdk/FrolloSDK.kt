@@ -4,6 +4,8 @@ import android.app.Application
 import android.os.Handler
 import androidx.core.os.bundleOf
 import com.jakewharton.threetenabp.AndroidThreeTen
+import org.threeten.bp.Duration
+import org.threeten.bp.LocalDateTime
 import us.frollo.frollosdk.auth.Authentication
 import us.frollo.frollosdk.auth.AuthenticationStatus
 import us.frollo.frollosdk.core.ACTION.ACTION_AUTHENTICATION_CHANGED
@@ -31,6 +33,7 @@ import java.util.*
 object FrolloSDK {
 
     private const val TAG = "FrolloSDK"
+    private const val CACHE_EXPIRY = 120000L // 2 minutes
 
     /**
      * Indicates if the SDK has completed setup or not
@@ -74,6 +77,7 @@ object FrolloSDK {
     private lateinit var database: SDKDatabase
     internal var refreshTimer: Timer? = null
         private set
+    private var deviceLastUpdated: LocalDateTime? = null
 
     internal lateinit var app: Application
 
@@ -198,6 +202,24 @@ object FrolloSDK {
      */
     fun onAppForegrounded() {
         resumeScheduledRefreshing()
+
+        // Update device timezone, name and IDs regularly
+        val now = LocalDateTime.now()
+
+        var updateDevice = true
+
+        deviceLastUpdated?.let { lastUpdated ->
+            val time = Duration.between(lastUpdated, now).toMillis()
+            if (time < CACHE_EXPIRY) {
+                updateDevice = false
+            }
+        }
+
+        if (updateDevice) {
+            deviceLastUpdated = now
+
+            authentication.updateDevice()
+        }
     }
 
     /**
@@ -251,8 +273,8 @@ object FrolloSDK {
         refreshTimer = Timer()
         refreshTimer?.schedule(
                 timerTask,
-                120000, // Initial delay set to 2 minutes, as refreshData() would have already run refreshPrimary() once.
-                120000) // Repeat every 2 minutes
+                CACHE_EXPIRY, // Initial delay set to CACHE_EXPIRY minutes, as refreshData() would have already run refreshPrimary() once.
+                CACHE_EXPIRY) // Repeat every CACHE_EXPIRY minutes
     }
 
     private fun pauseScheduledRefreshing() {

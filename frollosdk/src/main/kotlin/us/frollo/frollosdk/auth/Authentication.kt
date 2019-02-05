@@ -282,16 +282,33 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
             network.authenticateRequest(request)
 
     /**
+     * Update the compliance status of the current device. Use this to indicate a rooted device for example.
+     *
+     * @param compliant Indicates if the device is compliant or not
+     * @param completion Completion handler with any error that occurred (optional)
+     */
+    fun updateDeviceCompliance(compliant: Boolean, completion: OnFrolloSDKCompletionListener? = null) {
+        updateDevice(compliant = compliant, completion = completion)
+    }
+
+    /**
      * Update information about the current device. Updates the current device name and timezone automatically.
      *
+     * @param compliant Indicates if the device is compliant or not (optional)
      * @param notificationToken Push notification token for the device (optional)
      * @param completion Completion handler with any error that occurred (optional)
      */
-    internal fun updateDevice(notificationToken: String? = null, completion: OnFrolloSDKCompletionListener? = null) {
+    internal fun updateDevice(compliant: Boolean? = null, notificationToken: String? = null, completion: OnFrolloSDKCompletionListener? = null) {
+        if (!loggedIn) {
+            completion?.invoke(DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT))
+            return
+        }
+
         val request = DeviceUpdateRequest(
                 deviceName = di.deviceName,
                 notificationToken = notificationToken,
-                timezone = TimeZone.getDefault().id)
+                timezone = TimeZone.getDefault().id,
+                compliant = compliant)
 
         deviceAPI.updateDevice(request).enqueue { _, error ->
             if (error != null) {

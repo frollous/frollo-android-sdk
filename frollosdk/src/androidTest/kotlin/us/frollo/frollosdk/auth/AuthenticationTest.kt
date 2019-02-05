@@ -652,11 +652,43 @@ class AuthenticationTest {
             }
         })
 
+        preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         authentication.updateDevice(notificationToken = "SomeToken12345") { error ->
+            assertNull(error)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(DeviceAPI.URL_DEVICE, request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testUpdateDeviceCompliance() {
+        initSetup()
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == DeviceAPI.URL_DEVICE) {
+                    return MockResponse()
+                            .setResponseCode(204)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        authentication.updateDeviceCompliance(true) { error ->
             assertNull(error)
         }
 

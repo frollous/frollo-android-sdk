@@ -3,6 +3,7 @@ package us.frollo.frollosdk.data.local
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import us.frollo.frollosdk.extensions.fromJson
+import us.frollo.frollosdk.model.coredata.aggregation.providers.*
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.user.*
 
@@ -16,12 +17,14 @@ internal class Converters {
         private val gson = Gson()
     }
 
+    //Generic
     @TypeConverter
     fun stringToListOfString(value: String?): List<String>? = if (value == null) null else value.split("|").filter { it.isNotBlank() }
 
     @TypeConverter
     fun stringFromListOfString(value: List<String>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|" , postfix = "|")
 
+    //User
     @TypeConverter
     fun stringToListOfFeatureFlag(value: String?): List<FeatureFlag>? = if (value == null) null else gson.fromJson<List<FeatureFlag>>(value)
 
@@ -64,9 +67,41 @@ internal class Converters {
     @TypeConverter
     fun stringFromAttribution(value: Attribution?): String? = if (value == null) null else gson.toJson(value)
 
+    //Message
     @TypeConverter
     fun stringToContentType(value: String?): ContentType? = if (value == null) ContentType.TEXT else ContentType.valueOf(value)
 
     @TypeConverter
     fun stringFromContentType(value: ContentType?): String? = value?.name ?: run { ContentType.TEXT.name }
+
+    //Aggregation
+    @TypeConverter
+    fun stringToProviderStatus(value: String?): ProviderStatus? = if (value == null) null else ProviderStatus.valueOf(value)
+
+    @TypeConverter
+    fun stringFromProviderStatus(value: ProviderStatus?): String? = value?.name
+
+    @TypeConverter
+    fun stringToProviderAuthType(value: String?): ProviderAuthType? = if (value == null) ProviderAuthType.UNKNOWN else ProviderAuthType.valueOf(value)
+
+    @TypeConverter
+    fun stringFromProviderAuthType(value: ProviderAuthType?): String? = value?.name ?: ProviderAuthType.UNKNOWN.name
+
+    @TypeConverter
+    fun stringToProviderMFAType(value: String?): ProviderMFAType? = if (value == null) ProviderMFAType.UNKNOWN else ProviderMFAType.valueOf(value)
+
+    @TypeConverter
+    fun stringFromProviderMFAType(value: ProviderMFAType?): String? = value?.name ?: ProviderMFAType.UNKNOWN.name
+
+    @TypeConverter
+    fun stringToProviderLoginForm(value: String?): ProviderLoginForm? = if (value == null) null else gson.fromJson(value)
+
+    @TypeConverter
+    fun stringFromProviderLoginForm(value: ProviderLoginForm?): String? = if (value == null) null else gson.toJson(value)
+
+    @TypeConverter
+    fun stringToProviderEncryption(value: String?): ProviderEncryption? = if (value == null) null else gson.fromJson(value)
+
+    @TypeConverter
+    fun stringFromProviderEncryption(value: ProviderEncryption?): String? = if (value == null) null else gson.toJson(value)
 }

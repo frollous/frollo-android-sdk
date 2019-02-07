@@ -10,6 +10,8 @@ import okhttp3.Response
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.core.ARGUMENT.ARG_DATA
 import java.nio.charset.Charset
+import java.util.regex.Pattern
+import java.util.regex.PatternSyntaxException
 
 /* Kotlin extensions */
 /**
@@ -60,3 +62,11 @@ internal fun notify(action: String, bundleExtras: Bundle? = null) {
 }
 
 internal fun Boolean.toInt() = if (this) 1 else 0
+
+internal fun String.regexValidate(regex: String): Boolean {
+    return try {
+        Pattern.compile(regex).matcher(this).matches()
+    } catch (e: PatternSyntaxException) {
+        false
+    }
+}

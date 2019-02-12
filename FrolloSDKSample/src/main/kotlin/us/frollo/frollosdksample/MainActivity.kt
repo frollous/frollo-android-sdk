@@ -6,11 +6,9 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.alert
 import org.jetbrains.anko.startActivity
 import us.frollo.frollosdk.FrolloSDK
 
@@ -56,22 +54,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadFragment(itemId: Int) {
-        var fragment : Fragment? = null
-        when (itemId) {
-            R.id.nav_messages -> {
-                supportActionBar?.title = "Messages"
-                fragment = messagesFragment
-            }
-            R.id.nav_accounts -> {
-                supportActionBar?.title = "Accounts"
-                fragment = accountsFragment
-            }
+        val fragment = when (itemId) {
+            R.id.nav_messages -> messagesFragment
+            R.id.nav_accounts -> accountsFragment
+            else -> null
         }
 
-        if (fragment != null) {
+        fragment?.let {
             supportFragmentManager
                     .beginTransaction()
-                    .replace(R.id.container, fragment)
+                    .replace(R.id.container, it)
                     .commitAllowingStateLoss()
         }
     }
@@ -84,22 +76,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return when (item?.itemId) {
-            R.id.menu_logout -> {
-                logout()
+            R.id.menu_profile -> {
+                startActivity<ProfileActivity>()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun logout() {
-        alert("Are you sure you want to logout?", "Logout") {
-            positiveButton("Yes") {
-                FrolloSDK.logout()
-                startActivity<LoginActivity>()
-                finish()
-            }
-            negativeButton("No") {}
-        }.showThemed()
     }
 }

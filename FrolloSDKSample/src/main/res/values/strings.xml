@@ -4,9 +4,16 @@
     <string name="str_email">Email</string>
     <string name="str_password">Password</string>
     <string name="str_login">Login</string>
+    <string name="str_logout">Logout</string>
 
-    <string name="str_menu_logout">Logout</string>
+    <string name="str_menu_profile">Profile</string>
+    <string name="str_menu_add">Add</string>
 
+    <string name="title_profile">Profile</string>
     <string name="title_messages">Messages</string>
     <string name="title_accounts">Accounts</string>
+    <string name="title_provider_accounts">Provider Accounts</string>
+
+    <string name="str_add_provider">Add Provider</string>
+    <string name="str_add_account">Add Account</string>
 </resources>

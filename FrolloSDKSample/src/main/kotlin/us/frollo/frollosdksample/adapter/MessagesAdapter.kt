@@ -1,49 +1,50 @@
 package us.frollo.frollosdksample.adapter
 
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.template_message_item.view.*
+import us.frollo.frollosdk.model.coredata.messages.Message
 import us.frollo.frollosdk.model.coredata.messages.MessageText
 import us.frollo.frollosdksample.R
+import us.frollo.frollosdksample.base.BaseRecyclerAdapter
+import us.frollo.frollosdksample.base.BaseViewHolder
 import us.frollo.frollosdksample.hide
 import us.frollo.frollosdksample.show
 
-class MessagesAdapter : RecyclerView.Adapter<MessagesAdapter.MyViewHolder>() {
+class MessagesAdapter : BaseRecyclerAdapter<Message, MessagesAdapter.MessageTextViewHolder>(Message::class.java, messageComparator)  {
 
-    private var dataSet = listOf<MessageText>()
-
-    fun replaceAll(data: List<MessageText>) {
-        dataSet = data
-        notifyDataSetChanged()
+    companion object {
+        private val messageComparator = compareByDescending<Message> { it.placement }
     }
 
-    class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view)
+    override fun getViewHolderLayout(viewType: Int) =
+            R.layout.template_message_item
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessagesAdapter.MyViewHolder {
-        val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.template_message_item, parent, false)
-        return MyViewHolder(view)
-    }
+    override fun getViewHolder(view: View, viewType: Int) =
+            MessageTextViewHolder(view)
 
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        loadText(holder.view.text_header, dataSet[position].header)
-        loadText(holder.view.text_title, dataSet[position].title)
-        loadText(holder.view.text_body, dataSet[position].text)
-        loadText(holder.view.text_footer, dataSet[position].footer)
-        loadText(holder.view.text_action, dataSet[position].action?.title)
-    }
+    inner class MessageTextViewHolder(itemView: View) : BaseViewHolder<Message>(itemView) {
 
-    private fun loadText(tv: TextView, text: String?) {
-        text?.let {
-            tv.show()
-            tv.text = it
-        } ?: run {
-            tv.hide()
+        override fun bind(model: Message) {
+            val message = model as? MessageText
+            loadText(itemView.text_header, message?.header)
+            loadText(itemView.text_title, message?.title)
+            loadText(itemView.text_body, message?.text)
+            loadText(itemView.text_footer, message?.footer)
+            loadText(itemView.text_action, message?.action?.title)
+        }
+
+        override fun recycle() {
+            itemView.text_title.text = null
+        }
+
+        private fun loadText(tv: TextView, text: String?) {
+            text?.let {
+                tv.show()
+                tv.text = it
+            } ?: run {
+                tv.hide()
+            }
         }
     }
-
-    override fun getItemCount() = dataSet.size
 }

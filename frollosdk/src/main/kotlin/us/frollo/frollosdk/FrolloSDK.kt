@@ -6,6 +6,7 @@ import androidx.core.os.bundleOf
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalDateTime
+import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.auth.Authentication
 import us.frollo.frollosdk.auth.AuthenticationStatus
 import us.frollo.frollosdk.core.ACTION.ACTION_AUTHENTICATION_CHANGED
@@ -48,6 +49,12 @@ object FrolloSDK {
         get() =_authentication ?: throw IllegalAccessException("SDK not setup")
 
     /**
+     * Aggregation - All account and transaction related data see [Aggregation] for details
+     */
+    val aggregation: Aggregation
+        get() =_aggregation ?: throw IllegalAccessException("SDK not setup")
+
+    /**
      * Messages - All messages management. See [Messages] for details
      */
     val messages: Messages
@@ -67,6 +74,7 @@ object FrolloSDK {
 
     private var _setup = false
     private var _authentication: Authentication? = null
+    private var _aggregation: Aggregation? = null
     private var _messages: Messages? = null
     private var _events: Events? = null
     private var _notifications: Notifications? = null
@@ -118,11 +126,13 @@ object FrolloSDK {
             Log.logLevel = setupParams.logLevel
             // 8. Setup Authentication
             _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
-            // 9. Setup Messages
+            // 9. Setup Aggregation
+            _aggregation = Aggregation(network, database)
+            // 10. Setup Messages
             _messages = Messages(network, database)
-            // 10. Setup Events
+            // 11. Setup Events
             _events = Events(network)
-            // 11. Setup Notifications
+            // 12. Setup Notifications
             _notifications = Notifications(authentication, events, messages)
 
             if (version.migrationNeeded()) {
@@ -255,7 +265,7 @@ object FrolloSDK {
      * Refresh data from long lived sources which don't change often, e.g. transaction categories, providers
      */
     private fun refreshSystem() {
-        //TODO: Refresh Providers
+        aggregation.refreshProviders()
         //TODO: Refresh Transaction Categories
         //TODO: Refresh Merchants
         //TODO: Refresh Bills

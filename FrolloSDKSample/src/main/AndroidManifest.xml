@@ -30,6 +30,21 @@
             android:name=".MainActivity"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".ProfileActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/title_profile"/>
+
+        <activity
+            android:name=".ProvidersActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/str_add_provider"/>
+
+        <activity
+            android:name=".AddProviderAccountActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/str_add_account"/>
+
         <service android:name=".MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

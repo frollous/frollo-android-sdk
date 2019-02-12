@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 	<item
-		android:id="@+id/menu_profile"
-		android:title="@string/str_menu_profile"
-		android:icon="@drawable/ic_person"
+		android:id="@+id/menu_add"
+		android:title="@string/str_menu_add"
+		android:icon="@drawable/ic_add"
 		app:showAsAction="always"
-        android:menuCategory="container"/>
+		android:menuCategory="secondary"/>
 </menu>

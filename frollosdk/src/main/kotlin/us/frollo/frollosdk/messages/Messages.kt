@@ -55,15 +55,15 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
     fun fetchMessages(messageTypes: List<String>? = null, read: Boolean? = null): LiveData<Resource<List<Message>>> {
         return if (messageTypes != null) {
             Transformations.map(db.messages().loadByQuery(generateSQLQueryMessages(messageTypes, read))) { response ->
-                Resource.success(messageRules(response))
+                Resource.success(mapMessageResponse(response))
             }.apply { (this as? MutableLiveData<Resource<List<Message>>>)?.value = Resource.loading(null) }
         } else if (read != null) {
             Transformations.map(db.messages().load(read)) { response ->
-                Resource.success(messageRules(response))
+                Resource.success(mapMessageResponse(response))
             }.apply { (this as? MutableLiveData<Resource<List<Message>>>)?.value = Resource.loading(null) }
         } else {
             Transformations.map(db.messages().load()) { response ->
-                Resource.success(messageRules(response))
+                Resource.success(mapMessageResponse(response))
             }.apply { (this as? MutableLiveData<Resource<List<Message>>>)?.value = Resource.loading(null) }
         }
     }
@@ -80,7 +80,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
                 Log.e("$TAG#refreshMessage", error.localizedDescription)
                 completion?.invoke(error)
             } else if (response == null) {
-                // HACK: invoke completion callback if response is null else app will never be notified if response is null.
+                // Explicitly invoke completion callback if response is null.
                 completion?.invoke(null)
             } else
                 handleMessageResponse(response, completion)
@@ -98,7 +98,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
                 Log.e("$TAG#refreshMessages", error.localizedDescription)
                 completion?.invoke(error)
             } else if (response == null) {
-                // HACK: invoke completion callback if response is null else app will never be notified if response is null.
+                // Explicitly invoke completion callback if response is null.
                 completion?.invoke(null)
             } else
                 handleMessagesResponse(response = response, completion = completion)
@@ -116,7 +116,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
                 Log.e("$TAG#refreshUnreadMessages", error.localizedDescription)
                 completion?.invoke(error)
             } else if (response == null) {
-                // HACK: invoke completion callback if response is null else app will never be notified if response is null.
+                // Explicitly invoke completion callback if response is null.
                 completion?.invoke(null)
             } else
                 handleMessagesResponse(response = response, unread = true, completion = completion)
@@ -138,7 +138,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
                 Log.e("$TAG#updateMessage", error.localizedDescription)
                 completion?.invoke(error)
             } else if (response == null) {
-                // HACK: invoke completion callback if response is null else app will never be notified if response is null.
+                // Explicitly invoke completion callback if response is null.
                 completion?.invoke(null)
             } else
                 handleMessageResponse(response, completion)
@@ -176,6 +176,6 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    private fun messageRules(models: List<MessageResponse>): List<Message> =
+    private fun mapMessageResponse(models: List<MessageResponse>): List<Message> =
             models.mapNotNull { it.toMessage() }.toList()
 }

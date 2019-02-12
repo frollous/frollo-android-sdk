@@ -15,9 +15,9 @@ import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.messages.Message
 import us.frollo.frollosdk.model.coredata.messages.MessageText
 import us.frollo.frollosdksample.adapter.MessagesAdapter
-import us.frollo.frollosdksample.base.ViewLifecycleFragment
+import us.frollo.frollosdksample.base.BaseFragment
 
-class MessagesFragment : ViewLifecycleFragment() {
+class MessagesFragment : BaseFragment() {
 
     companion object {
         private const val TAG = "MessagesFragment"
@@ -32,6 +32,7 @@ class MessagesFragment : ViewLifecycleFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        actionBar?.title = getString(R.string.title_messages)
         initView()
         initLiveData()
         refresh_layout.onRefresh { refreshUnreadMessages() }

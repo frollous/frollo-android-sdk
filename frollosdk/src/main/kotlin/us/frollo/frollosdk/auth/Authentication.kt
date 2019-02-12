@@ -353,7 +353,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
                     notify(ACTION_USER_UPDATED)
                 }
             }
-        } ?: run { completion?.invoke(null) } // HACK: invoke completion callback if response is null else app will never be notified if response is null.
+        } ?: run { completion?.invoke(null) } // Explicitly invoke completion callback if response is null.
     }
 
     internal fun reset() {

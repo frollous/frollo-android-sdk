@@ -10,7 +10,7 @@ import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
 @Dao
 internal interface ProviderDao {
 
-    @Query("SELECT * FROM provider LIMIT 1")
+    @Query("SELECT * FROM provider")
     fun load(): LiveData<List<ProviderResponse>>
 
     @Query("SELECT * FROM provider WHERE provider_id = :providerId")

@@ -1,5 +1,7 @@
 package us.frollo.frollosdk.model.coredata.messages
 
+import us.frollo.frollosdk.model.IAdapterModel
+
 /** Data representation of a Message */
 abstract class Message(
         /** Unique identifier of the message */
@@ -23,4 +25,4 @@ abstract class Message(
         /** Type of content the message contains, indicates subclasses of [Message] */
         open val contentType: ContentType,
         /** Action data containing the URL the user should be taken to when interacting with a message. Can be a deeplink or web URL. */
-        open val action: Action?)
+        open val action: Action?): IAdapterModel

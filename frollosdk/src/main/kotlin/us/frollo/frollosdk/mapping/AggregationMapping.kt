@@ -4,7 +4,7 @@ import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
 
-internal fun ProviderResponse.toProvider(): Provider? =
+internal fun ProviderResponse.toProvider(): Provider =
         Provider(
                 providerId = providerId,
                 providerName = providerName,

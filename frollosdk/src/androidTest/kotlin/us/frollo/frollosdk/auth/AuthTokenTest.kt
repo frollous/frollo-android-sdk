@@ -22,6 +22,7 @@ class AuthTokenTest {
         preferences = Preferences(context)
         keyStore.setup()
         authToken = AuthToken(keyStore, preferences)
+        authToken.clearTokens()
     }
 
     @After

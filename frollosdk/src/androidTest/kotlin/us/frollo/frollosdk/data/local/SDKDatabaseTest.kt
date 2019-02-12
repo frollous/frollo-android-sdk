@@ -23,4 +23,6 @@ class SDKDatabaseTest {
         db = SDKDatabase.getInstance(app)
         assertNotNull(db)
     }
+
+    //TODO: Migration_1_2 test
 }

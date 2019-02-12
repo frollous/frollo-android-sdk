@@ -4,10 +4,10 @@ import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
 enum class ProviderMFAType {
-    @SerializedName("'token'") TOKEN,
+    @SerializedName("token") TOKEN,
     @SerializedName("question") QUESTION,
     @SerializedName("strong_multiple") STRONG_MULTIPLE,
-    @SerializedName("'image'") IMAGE,
+    @SerializedName("image") IMAGE,
     @SerializedName("unknown") UNKNOWN;
 
     //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

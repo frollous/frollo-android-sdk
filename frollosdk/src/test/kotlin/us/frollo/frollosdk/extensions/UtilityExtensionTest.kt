@@ -81,4 +81,9 @@ class UtilityExtensionTest {
         assertEquals(1, true.toInt())
         assertEquals(0, false.toInt())
     }
+
+    @Test
+    fun testRegexValidate() {
+        assertTrue("12345678".regexValidate("\\b\\d{8}\\b"))
+    }
 }

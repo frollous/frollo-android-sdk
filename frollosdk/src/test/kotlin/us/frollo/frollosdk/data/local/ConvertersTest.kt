@@ -3,6 +3,7 @@ package us.frollo.frollosdk.data.local
 import org.junit.Test
 
 import org.junit.Assert.*
+import us.frollo.frollosdk.model.coredata.aggregation.providers.*
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.user.*
 
@@ -161,5 +162,103 @@ class ConvertersTest {
         assertEquals("IMAGE", str)
 
         assertEquals("TEXT", Converters.instance.stringFromContentType(null))
+    }
+
+    @Test
+    fun testStringToProviderStatus() {
+        val status = Converters.instance.stringToProviderStatus("SUPPORTED")
+        assertEquals(ProviderStatus.SUPPORTED, status)
+
+        assertNull(Converters.instance.stringToProviderStatus(null))
+    }
+
+    @Test
+    fun testStringFromProviderStatus() {
+        val str = Converters.instance.stringFromProviderStatus(ProviderStatus.SUPPORTED)
+        assertEquals("SUPPORTED", str)
+
+        assertNull(Converters.instance.stringFromProviderStatus(null))
+    }
+
+    @Test
+    fun testStringToProviderAuthType() {
+        val status = Converters.instance.stringToProviderAuthType("CREDENTIALS")
+        assertEquals(ProviderAuthType.CREDENTIALS, status)
+
+        assertEquals(ProviderAuthType.UNKNOWN, Converters.instance.stringToProviderAuthType(null))
+    }
+
+    @Test
+    fun testStringFromProviderAuthType() {
+        val str = Converters.instance.stringFromProviderAuthType(ProviderAuthType.CREDENTIALS)
+        assertEquals("CREDENTIALS", str)
+
+        assertEquals("UNKNOWN", Converters.instance.stringFromProviderAuthType(null))
+    }
+
+    @Test
+    fun testStringToProviderMFAType() {
+        val status = Converters.instance.stringToProviderMFAType("QUESTION")
+        assertEquals(ProviderMFAType.QUESTION, status)
+
+        assertEquals(ProviderMFAType.UNKNOWN, Converters.instance.stringToProviderMFAType(null))
+    }
+
+    @Test
+    fun testStringFromProviderMFAType() {
+        val str = Converters.instance.stringFromProviderMFAType(ProviderMFAType.QUESTION)
+        assertEquals("QUESTION", str)
+
+        assertEquals("UNKNOWN", Converters.instance.stringFromProviderMFAType(null))
+    }
+
+    @Test
+    fun testStringToProviderLoginForm() {
+        val json = "{\"id\":\"13039\",\"forgetPasswordURL\":\"https://ib.mebank.com.au/auth/ib/login.html\",\"formType\":\"login\",\"row\":[]}"
+        val form = Converters.instance.stringToProviderLoginForm(json)
+        assertNotNull(form)
+        assertEquals("13039", form?.formId)
+        assertEquals("https://ib.mebank.com.au/auth/ib/login.html", form?.forgetPasswordUrl)
+        assertEquals(ProviderFormType.LOGIN, form?.formType)
+        assertTrue(form?.rows?.isEmpty() == true)
+
+        assertNull(Converters.instance.stringToProviderLoginForm(null))
+    }
+
+    @Test
+    fun testStringFromProviderLoginForm() {
+        val form = ProviderLoginForm(
+                formId = "13039",
+                forgetPasswordUrl = "https://ib.mebank.com.au/auth/ib/login.html",
+                formType = ProviderFormType.LOGIN,
+                rows = listOf(),
+                help = null,
+                mfaInfoText = null,
+                mfaInfoTitle = null,
+                mfaTimeout = null)
+        val json = Converters.instance.stringFromProviderLoginForm(form)
+        assertEquals("{\"id\":\"13039\",\"forgetPasswordURL\":\"https://ib.mebank.com.au/auth/ib/login.html\",\"formType\":\"login\",\"row\":[]}", json)
+    }
+
+    @Test
+    fun testStringToProviderEncryption() {
+        val json = "{\"encryption_type\":\"encrypt_values\",\"alias\":\"abcd1234\",\"pem\":\"xyz1234\"}"
+        val encryption = Converters.instance.stringToProviderEncryption(json)
+        assertNotNull(encryption)
+        assertEquals(ProviderEncryptionType.ENCRYPT_VALUES, encryption?.encryptionType)
+        assertEquals("abcd1234", encryption?.alias)
+        assertEquals("xyz1234", encryption?.pem)
+
+        assertNull(Converters.instance.stringToProviderEncryption(null))
+    }
+
+    @Test
+    fun testStringFromProviderEncryption() {
+        val encryption = ProviderEncryption(
+                pem = "xyz1234",
+                alias = "abcd1234",
+                encryptionType = ProviderEncryptionType.ENCRYPT_VALUES)
+        val json = Converters.instance.stringFromProviderEncryption(encryption)
+        assertEquals("{\"encryption_type\":\"encrypt_values\",\"alias\":\"abcd1234\",\"pem\":\"xyz1234\"}", json)
     }
 }

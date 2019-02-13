@@ -12,6 +12,7 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.data.local.SDKDatabase
+import us.frollo.frollosdk.mapping.toProvider
 import us.frollo.frollosdk.model.testProviderResponseData
 
 class ProviderDaoTest {
@@ -39,7 +40,7 @@ class ProviderDaoTest {
         val data4 = testProviderResponseData(providerId = 4)
         val list = mutableListOf(data1, data2, data3, data4)
 
-        db.providers().insertAll(*list.toTypedArray())
+        db.providers().insertAll(*list.map { it.toProvider() }.toList().toTypedArray())
 
         val testObserver = db.providers().load().test()
         testObserver.awaitValue()
@@ -51,7 +52,7 @@ class ProviderDaoTest {
     fun testLoadByProviderId() {
         val data = testProviderResponseData(providerId = 102)
         val list = mutableListOf(testProviderResponseData(providerId = 101), data, testProviderResponseData(providerId = 103))
-        db.providers().insertAll(*list.toTypedArray())
+        db.providers().insertAll(*list.map { it.toProvider() }.toList().toTypedArray())
 
         val testObserver = db.providers().load(data.providerId).test()
         testObserver.awaitValue()
@@ -66,7 +67,7 @@ class ProviderDaoTest {
         val data3 = testProviderResponseData(providerId = 3)
         val list = mutableListOf(data1, data2, data3)
 
-        db.providers().insertAll(*list.toTypedArray())
+        db.providers().insertAll(*list.map { it.toProvider() }.toList().toTypedArray())
 
         val testObserver = db.providers().load().test()
         testObserver.awaitValue()
@@ -78,7 +79,7 @@ class ProviderDaoTest {
     fun testInsert() {
         val data = testProviderResponseData()
 
-        db.providers().insert(data)
+        db.providers().insert(data.toProvider())
 
         val testObserver = db.providers().load().test()
         testObserver.awaitValue()
@@ -94,7 +95,7 @@ class ProviderDaoTest {
         val data4 = testProviderResponseData(providerId = 103)
         val list = mutableListOf(data1, data2, data3, data4)
 
-        db.providers().insertAll(*list.toTypedArray())
+        db.providers().insertAll(*list.map { it.toProvider() }.toList().toTypedArray())
 
         val staleIds = db.providers().getStaleIds(longArrayOf(100, 103)).sorted()
         assertEquals(2, staleIds.size)
@@ -109,7 +110,7 @@ class ProviderDaoTest {
         val data4 = testProviderResponseData(providerId = 103)
         val list = mutableListOf(data1, data2, data3, data4)
 
-        db.providers().insertAll(*list.toTypedArray())
+        db.providers().insertAll(*list.map { it.toProvider() }.toList().toTypedArray())
 
         db.providers().deleteMany(longArrayOf(100, 103))
 
@@ -127,7 +128,7 @@ class ProviderDaoTest {
         val data4 = testProviderResponseData(providerId = 103)
         val list = mutableListOf(data1, data2, data3, data4)
 
-        db.providers().insertAll(*list.toTypedArray())
+        db.providers().insertAll(*list.map { it.toProvider() }.toList().toTypedArray())
 
         db.providers().delete(100)
 
@@ -145,7 +146,7 @@ class ProviderDaoTest {
         val data4 = testProviderResponseData(providerId = 103)
         val list = mutableListOf(data1, data2, data3, data4)
 
-        db.providers().insertAll(*list.toTypedArray())
+        db.providers().insertAll(*list.map { it.toProvider() }.toList().toTypedArray())
 
         db.providers().clear()
 

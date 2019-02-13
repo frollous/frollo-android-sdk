@@ -20,6 +20,7 @@ import us.frollo.frollosdk.data.remote.NetworkHelper
 import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.data.remote.api.AggregationAPI
 import us.frollo.frollosdk.keystore.Keystore
+import us.frollo.frollosdk.mapping.toProvider
 import us.frollo.frollosdk.model.testProviderResponseData
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
@@ -71,7 +72,7 @@ class AggregationTest {
 
         val data = testProviderResponseData()
         val list = mutableListOf(testProviderResponseData(), data, testProviderResponseData())
-        database.providers().insertAll(*list.toTypedArray())
+        database.providers().insertAll(*list.map { it.toProvider() }.toList().toTypedArray())
 
         val testObserver = aggregation.fetchProvider(data.providerId).test()
         testObserver.awaitValue()
@@ -91,7 +92,7 @@ class AggregationTest {
         val data4 = testProviderResponseData()
         val list = mutableListOf(data1, data2, data3, data4)
 
-        database.providers().insertAll(*list.toTypedArray())
+        database.providers().insertAll(*list.map { it.toProvider() }.toList().toTypedArray())
 
         val testObserver = aggregation.fetchProviders().test()
         testObserver.awaitValue()

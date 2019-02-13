@@ -30,13 +30,13 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
     //TODO: Refresh Transactions Broadcast local implementation
 
     fun fetchProvider(providerId: Long): LiveData<Resource<Provider>> =
-            Transformations.map(db.providers().load(providerId)) { response ->
-                Resource.success(response?.toProvider())
+            Transformations.map(db.providers().load(providerId)) { model ->
+                Resource.success(model)
             }.apply { (this as? MutableLiveData<Resource<Provider>>)?.value = Resource.loading(null) }
 
     fun fetchProviders(): LiveData<Resource<List<Provider>>> =
-            Transformations.map(db.providers().load()) { response ->
-                Resource.success(mapProviderResponse(response))
+            Transformations.map(db.providers().load()) { models ->
+                Resource.success(models)
             }.apply { (this as? MutableLiveData<Resource<List<Provider>>>)?.value = Resource.loading(null) }
 
     fun refreshProvider(providerId: Long, completion: OnFrolloSDKCompletionListener? = null) {
@@ -68,7 +68,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
 
     private fun handleProvidersResponse(response: List<ProviderResponse>, completion: OnFrolloSDKCompletionListener? = null) {
         doAsync {
-            db.providers().insertAll(*response.toTypedArray())
+            val models = mapProviderResponse(response)
+            db.providers().insertAll(*models.toTypedArray())
 
             val apiIds = response.map { it.providerId }.toList()
             val staleIds = db.providers().getStaleIds(apiIds.toLongArray())
@@ -83,12 +84,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
 
     private fun handleProviderResponse(response: ProviderResponse, completion: OnFrolloSDKCompletionListener? = null) {
         doAsync {
-            db.providers().insert(response)
+            db.providers().insert(response.toProvider())
 
             uiThread { completion?.invoke(null) }
         }
     }
 
     private fun mapProviderResponse(models: List<ProviderResponse>): List<Provider> =
-            models.mapNotNull { it.toProvider() }.toList()
+            models.map { it.toProvider() }.toList()
 }

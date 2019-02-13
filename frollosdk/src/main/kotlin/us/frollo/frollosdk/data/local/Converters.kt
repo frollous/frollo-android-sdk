@@ -6,7 +6,6 @@ import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
-import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.providers.*
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.user.*
@@ -118,13 +117,13 @@ internal class Converters {
     @TypeConverter
     fun stringFromProviderEncryption(value: ProviderEncryption?): String? = if (value == null) null else gson.toJson(value)
 
+    @TypeConverter
+    fun stringToListOfProviderContainerName(value: String?): List<ProviderContainerName>? = if (value == null) null else value.split("|").filter { it.isNotBlank() }.map { ProviderContainerName.valueOf(it.toUpperCase()) }.toList()
+
+    @TypeConverter
+    fun stringFromListOfProviderContainerName(value: List<ProviderContainerName>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|" , postfix = "|")
+
     ///ProviderAccount
-    @TypeConverter
-    fun stringToProviderAccountRefreshStatus(value: String?): ProviderAccountRefreshStatus? = if (value == null) null else gson.fromJson(value)
-
-    @TypeConverter
-    fun stringFromProviderAccountRefreshStatus(value: ProviderAccountRefreshStatus?): String? = if (value == null) null else gson.toJson(value)
-
     @TypeConverter
     fun stringToAccountRefreshStatus(value: String?): AccountRefreshStatus? = if (value == null) AccountRefreshStatus.UPDATING else AccountRefreshStatus.valueOf(value)
 

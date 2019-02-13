@@ -3,9 +3,14 @@ package us.frollo.frollosdk.data.local
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import us.frollo.frollosdk.extensions.fromJson
+import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
+import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
+import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
+import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.providers.*
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.user.*
+import java.util.*
 
 /**
  * Type converters to allow Room to reference complex data types.
@@ -23,6 +28,12 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromListOfString(value: List<String>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|" , postfix = "|")
+
+    @TypeConverter
+    fun timestampToDate(value: Long?): Date? = if (value == null) null else Date(value)
+
+    @TypeConverter
+    fun timestampFromDate(date: Date?): Long? = date?.time
 
     //User
     @TypeConverter
@@ -75,6 +86,8 @@ internal class Converters {
     fun stringFromContentType(value: ContentType?): String? = value?.name ?: run { ContentType.TEXT.name }
 
     //Aggregation
+
+    ///Provider
     @TypeConverter
     fun stringToProviderStatus(value: String?): ProviderStatus? = if (value == null) null else ProviderStatus.valueOf(value)
 
@@ -104,4 +117,29 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromProviderEncryption(value: ProviderEncryption?): String? = if (value == null) null else gson.toJson(value)
+
+    ///ProviderAccount
+    @TypeConverter
+    fun stringToProviderAccountRefreshStatus(value: String?): ProviderAccountRefreshStatus? = if (value == null) null else gson.fromJson(value)
+
+    @TypeConverter
+    fun stringFromProviderAccountRefreshStatus(value: ProviderAccountRefreshStatus?): String? = if (value == null) null else gson.toJson(value)
+
+    @TypeConverter
+    fun stringToAccountRefreshStatus(value: String?): AccountRefreshStatus? = if (value == null) AccountRefreshStatus.UPDATING else AccountRefreshStatus.valueOf(value)
+
+    @TypeConverter
+    fun stringFromAccountRefreshStatus(value: AccountRefreshStatus?): String? = value?.name ?: AccountRefreshStatus.UPDATING.name
+
+    @TypeConverter
+    fun stringToAccountRefreshSubStatus(value: String?): AccountRefreshSubStatus? = if (value == null) null else AccountRefreshSubStatus.valueOf(value)
+
+    @TypeConverter
+    fun stringFromAccountRefreshSubStatus(value: AccountRefreshSubStatus?): String? = value?.name
+
+    @TypeConverter
+    fun stringToAccountRefreshAdditionalStatus(value: String?): AccountRefreshAdditionalStatus? = if (value == null) null else AccountRefreshAdditionalStatus.valueOf(value)
+
+    @TypeConverter
+    fun stringFromAccountRefreshAdditionalStatus(value: AccountRefreshAdditionalStatus?): String? = value?.name
 }

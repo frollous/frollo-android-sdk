@@ -1,9 +1,6 @@
 package us.frollo.frollosdk.model.coredata.aggregation.providers
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
 import us.frollo.frollosdk.model.IAdapterModel
 
 /**
@@ -33,5 +30,5 @@ data class Provider(
         @ColumnInfo(name = "help_message") val helpMessage: String?,
         @ColumnInfo(name = "login_help_message") val loginHelpMessage: String?,
         @ColumnInfo(name = "login_form") val loginForm: ProviderLoginForm?,
-        @ColumnInfo(name = "encryption") val encryption: ProviderEncryption?
+        @Embedded(prefix = "encryption_") val encryption: ProviderEncryption?
 ): IAdapterModel

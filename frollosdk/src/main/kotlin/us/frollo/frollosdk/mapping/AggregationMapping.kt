@@ -1,7 +1,9 @@
 package us.frollo.frollosdk.mapping
 
+import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
@@ -35,3 +37,38 @@ internal fun ProviderAccountResponse.toProviderAccount(): ProviderAccount =
                 editable = editable,
                 refreshStatus = refreshStatus,
                 loginForm = loginForm)
+
+internal fun AccountResponse.toAccount(): Account =
+        Account(
+                accountId = accountId,
+                accountName = accountName,
+                accountNumber = accountNumber,
+                bsb = bsb,
+                nickName = nickName,
+                providerAccountId = providerAccountId,
+                providerName = providerName,
+                aggregator = aggregator,
+                aggregatorId = aggregatorId,
+                holderProfile = holderProfile,
+                accountStatus = accountStatus,
+                attributes = attributes,
+                included = included,
+                favourite = favourite,
+                hidden = hidden,
+                refreshStatus = refreshStatus,
+                currentBalance = currentBalance,
+                availableBalance = availableBalance,
+                availableCash = availableCash,
+                availableCredit = availableCredit,
+                totalCashLimit = totalCashLimit,
+                totalCreditLine = totalCreditLine,
+                interestTotal = interestTotal,
+                apr = apr,
+                interestRate = interestRate,
+                amountDue = amountDue,
+                minimumAmountDue = minimumAmountDue,
+                lastPaymentAmount = lastPaymentAmount,
+                lastPaymentDate = lastPaymentDate,
+                dueDate = dueDate,
+                endDate = endDate,
+                balanceDetails = balanceDetails)

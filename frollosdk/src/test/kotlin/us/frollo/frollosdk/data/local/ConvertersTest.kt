@@ -3,6 +3,7 @@ package us.frollo.frollosdk.data.local
 import org.junit.Test
 
 import org.junit.Assert.*
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.*
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
@@ -245,25 +246,19 @@ class ConvertersTest {
     }
 
     @Test
-    fun testStringToProviderEncryption() {
-        val json = "{\"encryption_type\":\"encrypt_values\",\"alias\":\"abcd1234\",\"pem\":\"xyz1234\"}"
-        val encryption = Converters.instance.stringToProviderEncryption(json)
-        assertNotNull(encryption)
-        assertEquals(ProviderEncryptionType.ENCRYPT_VALUES, encryption?.encryptionType)
-        assertEquals("abcd1234", encryption?.alias)
-        assertEquals("xyz1234", encryption?.pem)
+    fun testStringToProviderEncryptionType() {
+        val status = Converters.instance.stringToProviderEncryptionType("ENCRYPT_VALUES")
+        assertEquals(ProviderEncryptionType.ENCRYPT_VALUES, status)
 
-        assertNull(Converters.instance.stringToProviderEncryption(null))
+        assertNull(Converters.instance.stringToProviderEncryptionType(null))
     }
 
     @Test
-    fun testStringFromProviderEncryption() {
-        val encryption = ProviderEncryption(
-                pem = "xyz1234",
-                alias = "abcd1234",
-                encryptionType = ProviderEncryptionType.ENCRYPT_VALUES)
-        val json = Converters.instance.stringFromProviderEncryption(encryption)
-        assertEquals("{\"encryption_type\":\"encrypt_values\",\"alias\":\"abcd1234\",\"pem\":\"xyz1234\"}", json)
+    fun testStringFromProviderEncryptionType() {
+        val str = Converters.instance.stringFromProviderEncryptionType(ProviderEncryptionType.ENCRYPT_VALUES)
+        assertEquals("ENCRYPT_VALUES", str)
+
+        assertNull(Converters.instance.stringFromProviderEncryptionType(null))
     }
 
     @Test
@@ -351,5 +346,122 @@ class ConvertersTest {
         assertEquals("ACCEPT_SPLASH", str)
 
         assertNull(Converters.instance.stringFromAccountRefreshAdditionalStatus(null))
+    }
+
+    @Test
+    fun testStringToBigDecimal() {
+        val value1 = (123.00001).toBigDecimal()
+        val value2 = Converters.instance.stringToBigDecimal("123.00001")
+        assertEquals(value1, value2)
+    }
+
+    @Test
+    fun testStringFromBigDecimal() {
+        val value = (123.00001).toBigDecimal()
+        val valueStr = Converters.instance.stringFromBigDecimal(value)
+        assertEquals("123.00001", valueStr)
+    }
+
+    @Test
+    fun testStringToAccountStatus() {
+        val status = Converters.instance.stringToAccountStatus("ACTIVE")
+        assertEquals(AccountStatus.ACTIVE, status)
+
+        assertNull(Converters.instance.stringToAccountStatus(null))
+    }
+
+    @Test
+    fun testStringFromAccountStatus() {
+        val str = Converters.instance.stringFromAccountStatus(AccountStatus.ACTIVE)
+        assertEquals("ACTIVE", str)
+
+        assertNull(Converters.instance.stringFromAccountStatus(null))
+    }
+
+    @Test
+    fun testStringToAccountType() {
+        val status = Converters.instance.stringToAccountType("BANK")
+        assertEquals(AccountType.BANK, status)
+
+        assertEquals(AccountType.UNKNOWN, Converters.instance.stringToAccountType(null))
+    }
+
+    @Test
+    fun testStringFromAccountType() {
+        val str = Converters.instance.stringFromAccountType(AccountType.BANK)
+        assertEquals("BANK", str)
+
+        assertEquals("UNKNOWN", Converters.instance.stringFromAccountType(null))
+    }
+
+    @Test
+    fun testStringToAccountClassification() {
+        val status = Converters.instance.stringToAccountClassification("ADD_ON_CARD")
+        assertEquals(AccountClassification.ADD_ON_CARD, status)
+
+        assertEquals(AccountClassification.OTHER, Converters.instance.stringToAccountClassification(null))
+    }
+
+    @Test
+    fun testStringFromAccountClassification() {
+        val str = Converters.instance.stringFromAccountClassification(AccountClassification.ADD_ON_CARD)
+        assertEquals("ADD_ON_CARD", str)
+
+        assertEquals("OTHER", Converters.instance.stringFromAccountClassification(null))
+    }
+
+    @Test
+    fun testStringToAccountSubType() {
+        val status = Converters.instance.stringToAccountSubType("AUTO_INSURANCE")
+        assertEquals(AccountSubType.AUTO_INSURANCE, status)
+
+        assertEquals(AccountSubType.OTHER, Converters.instance.stringToAccountSubType(null))
+    }
+
+    @Test
+    fun testStringFromAccountSubType() {
+        val str = Converters.instance.stringFromAccountSubType(AccountSubType.AUTO_INSURANCE)
+        assertEquals("AUTO_INSURANCE", str)
+
+        assertEquals("OTHER", Converters.instance.stringFromAccountSubType(null))
+    }
+
+    @Test
+    fun testStringToAccountGroup() {
+        val status = Converters.instance.stringToAccountGroup("INVESTMENT")
+        assertEquals(AccountGroup.INVESTMENT, status)
+
+        assertEquals(AccountGroup.OTHER, Converters.instance.stringToAccountGroup(null))
+    }
+
+    @Test
+    fun testStringFromAccountGroup() {
+        val str = Converters.instance.stringFromAccountGroup(AccountGroup.INVESTMENT)
+        assertEquals("INVESTMENT", str)
+
+        assertEquals("OTHER", Converters.instance.stringFromAccountGroup(null))
+    }
+
+    @Test
+    fun testStringToListOfBalanceTier() {
+        val json = "[{\"description\":\"Below average\",\"min\":0,\"max\":549},{\"description\":\"Above average\",\"min\":550,\"max\":700}]"
+        val tiers = Converters.instance.stringToListOfBalanceTier(json)
+        assertNotNull(tiers)
+        assertTrue(tiers?.size == 2)
+        assertEquals("Below average", tiers?.get(0)?.description)
+        assertEquals(549, tiers?.get(0)?.max)
+        assertEquals(0, tiers?.get(0)?.min)
+        assertEquals("Above average", tiers?.get(1)?.description)
+        assertEquals(700, tiers?.get(1)?.max)
+        assertEquals(550, tiers?.get(1)?.min)
+
+        assertNull(Converters.instance.stringToListOfBalanceTier(null))
+    }
+
+    @Test
+    fun testStringFromListOfBalanceTier() {
+        val tiers = mutableListOf(BalanceTier(description = "Below average", max = 549, min = 0), BalanceTier(description = "Above average", max = 700, min = 550))
+        val json = Converters.instance.stringFromListOfBalanceTier(tiers)
+        assertEquals("[{\"description\":\"Below average\",\"min\":0,\"max\":549},{\"description\":\"Above average\",\"min\":550,\"max\":700}]", json)
     }
 }

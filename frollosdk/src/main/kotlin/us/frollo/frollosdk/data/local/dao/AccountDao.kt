@@ -16,6 +16,9 @@ internal interface AccountDao {
     @Query("SELECT * FROM account WHERE account_id = :accountId")
     fun load(accountId: Long): LiveData<Account?>
 
+    @Query("SELECT * FROM account WHERE provider_account_id = :providerAccountId")
+    fun loadByProviderAccountId(providerAccountId: Long): LiveData<List<Account>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: Account): LongArray
 

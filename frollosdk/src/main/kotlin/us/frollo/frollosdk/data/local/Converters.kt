@@ -120,10 +120,10 @@ internal class Converters {
     fun stringFromProviderLoginForm(value: ProviderLoginForm?): String? = if (value == null) null else gson.toJson(value)
 
     @TypeConverter
-    fun stringToProviderEncryption(value: String?): ProviderEncryption? = if (value == null) null else gson.fromJson(value)
+    fun stringToProviderEncryptionType(value: String?): ProviderEncryptionType? = if (value == null) null else ProviderEncryptionType.valueOf(value)
 
     @TypeConverter
-    fun stringFromProviderEncryption(value: ProviderEncryption?): String? = if (value == null) null else gson.toJson(value)
+    fun stringFromProviderEncryptionType(value: ProviderEncryptionType?): String? = value?.name
 
     @TypeConverter
     fun stringToListOfProviderContainerName(value: String?): List<ProviderContainerName>? = if (value == null) null else value.split("|").filter { it.isNotBlank() }.map { ProviderContainerName.valueOf(it.toUpperCase()) }.toList()
@@ -152,28 +152,16 @@ internal class Converters {
 
     ///Account
     @TypeConverter
-    fun stringToBalance(value: String?): Balance? = if (value == null) null else gson.fromJson(value)
-
-    @TypeConverter
-    fun stringFromBalance(value: Balance?): String? = if (value == null) null else gson.toJson(value)
-
-    @TypeConverter
-    fun stringToAccountAttributes(value: String?): AccountAttributes? = if (value == null) null else gson.fromJson(value)
-
-    @TypeConverter
-    fun stringFromAccountAttributes(value: AccountAttributes?): String? = if (value == null) null else gson.toJson(value)
-
-    @TypeConverter
     fun stringToAccountStatus(value: String?): AccountStatus? = if (value == null) null else AccountStatus.valueOf(value)
 
     @TypeConverter
     fun stringFromAccountStatus(value: AccountStatus?): String? = value?.name
 
     @TypeConverter
-    fun stringToAccountContainer(value: String?): AccountContainer? = if (value == null) AccountContainer.UNKNOWN else AccountContainer.valueOf(value)
+    fun stringToAccountType(value: String?): AccountType? = if (value == null) AccountType.UNKNOWN else AccountType.valueOf(value)
 
     @TypeConverter
-    fun stringFromAccountContainer(value: AccountContainer?): String? = value?.name ?: AccountContainer.UNKNOWN.name
+    fun stringFromAccountType(value: AccountType?): String? = value?.name ?: AccountType.UNKNOWN.name
 
     @TypeConverter
     fun stringToAccountClassification(value: String?): AccountClassification? = if (value == null) AccountClassification.OTHER else AccountClassification.valueOf(value)
@@ -182,10 +170,10 @@ internal class Converters {
     fun stringFromAccountClassification(value: AccountClassification?): String? = value?.name ?: AccountClassification.OTHER.name
 
     @TypeConverter
-    fun stringToAccountType(value: String?): AccountType? = if (value == null) AccountType.OTHER else AccountType.valueOf(value)
+    fun stringToAccountSubType(value: String?): AccountSubType? = if (value == null) AccountSubType.OTHER else AccountSubType.valueOf(value)
 
     @TypeConverter
-    fun stringFromAccountType(value: AccountType?): String? = value?.name ?: AccountType.OTHER.name
+    fun stringFromAccountSubType(value: AccountSubType?): String? = value?.name ?: AccountSubType.OTHER.name
 
     @TypeConverter
     fun stringToAccountGroup(value: String?): AccountGroup? = if (value == null) AccountGroup.OTHER else AccountGroup.valueOf(value)
@@ -198,10 +186,4 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromListOfBalanceTier(value: List<BalanceTier>?): String? = if (value == null) null else gson.toJson(value)
-
-    @TypeConverter
-    fun stringToBalanceDetails(value: String?): BalanceDetails? = if (value == null) null else gson.fromJson(value)
-
-    @TypeConverter
-    fun stringFromBalanceDetails(value: BalanceDetails?): String? = if (value == null) null else gson.toJson(value)
 }

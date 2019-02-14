@@ -16,4 +16,6 @@
 
     <string name="str_add_provider">Add Provider</string>
     <string name="str_add_account">Add Account</string>
+    <string name="str_unknown_provider_account">Unknown Provider Account</string>
+    <string name="str_accounts_count">%d Accounts</string>
 </resources>

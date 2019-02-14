@@ -41,7 +41,6 @@ class MessagesFragment : BaseFragment() {
     private fun initView() {
         recycler_messages.apply {
             layoutManager = LinearLayoutManager(context)
-            isNestedScrollingEnabled = false
             addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
             adapter = messagesAdapter
         }

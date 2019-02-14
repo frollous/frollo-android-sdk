@@ -247,7 +247,7 @@ object FrolloSDK {
      * Refresh data from the most time sensitive and important APIs, e.g. accounts, transactions
      */
     private fun refreshPrimary() {
-        //TODO: Refresh Provider Accounts
+        aggregation.refreshProviderAccounts()
         //TODO: Refresh Accounts
         //TODO: Refresh Transactions
         authentication.refreshUser()

@@ -1,7 +1,7 @@
 package us.frollo.frollosdksample.adapter
 
 import android.view.View
-import kotlinx.android.synthetic.main.template_message_item.view.*
+import kotlinx.android.synthetic.main.template_provider_item.view.*
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdksample.R
 import us.frollo.frollosdksample.base.BaseRecyclerAdapter

@@ -1,6 +1,8 @@
 package us.frollo.frollosdk.mapping
 
+import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
+import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
 
@@ -25,3 +27,11 @@ internal fun ProviderResponse.toProvider(): Provider =
                 loginHelpMessage = loginHelpMessage,
                 loginForm = loginForm,
                 encryption = encryption)
+
+internal fun ProviderAccountResponse.toProviderAccount(): ProviderAccount =
+        ProviderAccount(
+                providerAccountId = providerAccountId,
+                providerId = providerId,
+                editable = editable,
+                refreshStatus = refreshStatus,
+                loginForm = loginForm)

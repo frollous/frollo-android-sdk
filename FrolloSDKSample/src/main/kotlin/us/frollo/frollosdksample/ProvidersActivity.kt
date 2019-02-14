@@ -34,7 +34,6 @@ class ProvidersActivity : BaseStackActivity() {
     private fun initView() {
         recycler_providers.apply {
             layoutManager = LinearLayoutManager(context)
-            isNestedScrollingEnabled = false
             addItemDecoration(DividerItemDecoration(this@ProvidersActivity, LinearLayoutManager.VERTICAL))
             adapter = providersAdapter.apply {
                 onItemClick { model, _, _ ->

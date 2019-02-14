@@ -3,9 +3,13 @@ package us.frollo.frollosdk.data.local
 import org.junit.Test
 
 import org.junit.Assert.*
+import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
+import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
+import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
 import us.frollo.frollosdk.model.coredata.aggregation.providers.*
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.user.*
+import java.util.*
 
 class ConvertersTest {
 
@@ -260,5 +264,92 @@ class ConvertersTest {
                 encryptionType = ProviderEncryptionType.ENCRYPT_VALUES)
         val json = Converters.instance.stringFromProviderEncryption(encryption)
         assertEquals("{\"encryption_type\":\"encrypt_values\",\"alias\":\"abcd1234\",\"pem\":\"xyz1234\"}", json)
+    }
+
+    @Test
+    fun testStringToListOfProviderContainerName() {
+        val string = "|bank|credit_card|bill|"
+        val list = Converters.instance.stringToListOfProviderContainerName(string)
+        assertNotNull(list)
+        assertTrue(list?.size == 3)
+        assertEquals(ProviderContainerName.BANK, list?.get(0))
+        assertEquals(ProviderContainerName.CREDIT_CARD, list?.get(1))
+        assertEquals(ProviderContainerName.BILL, list?.get(2))
+
+        assertNull(Converters.instance.stringToListOfProviderContainerName(null))
+    }
+
+    @Test
+    fun testStringFromListOfProviderContainerName() {
+        val list = mutableListOf(ProviderContainerName.BANK, ProviderContainerName.CREDIT_CARD, ProviderContainerName.BILL)
+        val string = Converters.instance.stringFromListOfProviderContainerName(list)
+        assertEquals("|bank|credit_card|bill|", string)
+    }
+
+    @Test
+    fun testTimestampToDate() {
+        val cal = Calendar.getInstance()
+        cal.set(2019, 2, 1, 8, 10)
+        val date1 = cal.time
+        val date2 = Converters.instance.timestampToDate(date1.time)
+        assertEquals(date1, date2)
+    }
+
+    @Test
+    fun testTimestampFromDate() {
+        val cal = Calendar.getInstance()
+        cal.set(2019, 2, 1, 8, 10)
+        val date = cal.time
+        val timestamp1 = date.time
+        val timestamp2 = Converters.instance.timestampFromDate(date)
+        assertEquals(timestamp1, timestamp2)
+    }
+
+    @Test
+    fun testStringToAccountRefreshStatus() {
+        val status = Converters.instance.stringToAccountRefreshStatus("SUCCESS")
+        assertEquals(AccountRefreshStatus.SUCCESS, status)
+
+        assertEquals(AccountRefreshStatus.UPDATING, Converters.instance.stringToAccountRefreshStatus(null))
+    }
+
+    @Test
+    fun testStringFromAccountRefreshStatus() {
+        val str = Converters.instance.stringFromAccountRefreshStatus(AccountRefreshStatus.SUCCESS)
+        assertEquals("SUCCESS", str)
+
+        assertEquals("UPDATING", Converters.instance.stringFromAccountRefreshStatus(null))
+    }
+
+    @Test
+    fun testStringToAccountRefreshSubStatus() {
+        val status = Converters.instance.stringToAccountRefreshSubStatus("SUCCESS")
+        assertEquals(AccountRefreshSubStatus.SUCCESS, status)
+
+        assertNull(Converters.instance.stringToAccountRefreshSubStatus(null))
+    }
+
+    @Test
+    fun testStringFromAccountRefreshSubStatus() {
+        val str = Converters.instance.stringFromAccountRefreshSubStatus(AccountRefreshSubStatus.SUCCESS)
+        assertEquals("SUCCESS", str)
+
+        assertNull(Converters.instance.stringFromAccountRefreshSubStatus(null))
+    }
+
+    @Test
+    fun testStringToAccountRefreshAdditionalStatus() {
+        val status = Converters.instance.stringToAccountRefreshAdditionalStatus("ACCEPT_SPLASH")
+        assertEquals(AccountRefreshAdditionalStatus.ACCEPT_SPLASH, status)
+
+        assertNull(Converters.instance.stringToAccountRefreshAdditionalStatus(null))
+    }
+
+    @Test
+    fun testStringFromAccountRefreshAdditionalStatus() {
+        val str = Converters.instance.stringFromAccountRefreshAdditionalStatus(AccountRefreshAdditionalStatus.ACCEPT_SPLASH)
+        assertEquals("ACCEPT_SPLASH", str)
+
+        assertNull(Converters.instance.stringFromAccountRefreshAdditionalStatus(null))
     }
 }

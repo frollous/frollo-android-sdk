@@ -6,7 +6,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRe
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
 import java.util.*
 
-data class ProviderAccountRefreshStatus(
+data class RefreshStatus(
         @SerializedName("status") var status: AccountRefreshStatus,
         @SerializedName("sub_status") val subStatus: AccountRefreshSubStatus?,
         @SerializedName("additional_status") val additionalStatus: AccountRefreshAdditionalStatus?,

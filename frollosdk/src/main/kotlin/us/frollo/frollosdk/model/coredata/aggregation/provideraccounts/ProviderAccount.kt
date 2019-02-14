@@ -15,6 +15,6 @@ data class ProviderAccount(
         @ColumnInfo(name = "provider_account_id") val providerAccountId: Long,
         @ColumnInfo(name = "provider_id") val providerId: Long,
         @ColumnInfo(name = "editable") val editable: Boolean,
-        @Embedded(prefix = "r_status_") val refreshStatus: ProviderAccountRefreshStatus?,
+        @Embedded(prefix = "r_status_") val refreshStatus: RefreshStatus?,
         @ColumnInfo(name = "login_form") val loginForm: ProviderLoginForm?
 ): IAdapterModel

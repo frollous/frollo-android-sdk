@@ -7,12 +7,10 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import us.frollo.frollosdk.data.local.dao.MessageDao
-import us.frollo.frollosdk.data.local.dao.ProviderAccountDao
-import us.frollo.frollosdk.data.local.dao.ProviderDao
-import us.frollo.frollosdk.data.local.dao.UserDao
+import us.frollo.frollosdk.data.local.dao.*
 import us.frollo.frollosdk.model.api.messages.MessageResponse
 import us.frollo.frollosdk.model.api.user.UserResponse
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 
@@ -20,7 +18,8 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
     UserResponse::class,
     MessageResponse::class,
     Provider::class,
-    ProviderAccount::class
+    ProviderAccount::class,
+    Account::class
 ], version = 2, exportSchema = true)
 
 @TypeConverters(Converters::class)
@@ -30,6 +29,7 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun messages(): MessageDao
     internal abstract fun providers(): ProviderDao
     internal abstract fun provideraccounts(): ProviderAccountDao
+    internal abstract fun accounts(): AccountDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"

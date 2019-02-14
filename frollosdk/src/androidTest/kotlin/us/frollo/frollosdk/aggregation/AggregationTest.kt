@@ -211,6 +211,26 @@ class AggregationTest {
     }
 
     @Test
+    fun testFetchProviderAccountsByProviderId() {
+        initSetup()
+
+        val data1 = testProviderAccountResponseData(providerId = 1)
+        val data2 = testProviderAccountResponseData(providerId = 2)
+        val data3 = testProviderAccountResponseData(providerId = 1)
+        val data4 = testProviderAccountResponseData(providerId = 1)
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        database.provideraccounts().insertAll(*list.map { it.toProviderAccount() }.toList().toTypedArray())
+
+        val testObserver = aggregation.fetchProviderAccountsByProviderId(providerId = 1).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(3, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshProviderAccounts() {
         initSetup()
 

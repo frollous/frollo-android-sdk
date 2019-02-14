@@ -113,6 +113,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
                 Resource.success(models)
             }.apply { (this as? MutableLiveData<Resource<List<ProviderAccount>>>)?.value = Resource.loading(null) }
 
+    fun fetchProviderAccountsByProviderId(providerId: Long): LiveData<Resource<List<ProviderAccount>>> =
+            Transformations.map(db.provideraccounts().loadByProviderId(providerId)) { models ->
+                Resource.success(models)
+            }.apply { (this as? MutableLiveData<Resource<List<ProviderAccount>>>)?.value = Resource.loading(null) }
+
     fun refreshProviderAccount(providerAccountId: Long, completion: OnFrolloSDKCompletionListener? = null) {
         aggregationAPI.fetchProviderAccount(providerAccountId).enqueue { response, error ->
             if (error != null) {

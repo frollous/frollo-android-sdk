@@ -16,10 +16,11 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
+        private const val DEFAULT_PAGE = R.id.nav_accounts
     }
 
     private val messagesFragment = MessagesFragment()
-    private val accountsFragment = AccountsFragment()
+    private val accountsFragment = ProviderAccountsFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        bottomNavSelected(R.id.nav_messages)
+        bottomNavSelected(DEFAULT_PAGE)
     }
 
     private fun registerPushNotification() {

@@ -36,6 +36,11 @@
             android:label="@string/title_profile"/>
 
         <activity
+            android:name=".AccountsActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/title_accounts"/>
+
+        <activity
             android:name=".ProvidersActivity"
             android:screenOrientation="portrait"
             android:label="@string/str_add_provider"/>

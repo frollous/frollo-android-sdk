@@ -10,14 +10,22 @@ import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.data.remote.api.AggregationAPI
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.logging.Log
+import us.frollo.frollosdk.mapping.toAccount
 import us.frollo.frollosdk.mapping.toProvider
 import us.frollo.frollosdk.mapping.toProviderAccount
+import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
+import us.frollo.frollosdk.model.api.aggregation.accounts.AccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountCreateRequest
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
@@ -224,4 +232,104 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
             db.provideraccounts().delete(providerAccountId)
         }
     }
+
+    // Account
+
+    fun fetchAccount(accountId: Long): LiveData<Resource<Account>> =
+            Transformations.map(db.accounts().load(accountId)) { model ->
+                Resource.success(model)
+            }.apply { (this as? MutableLiveData<Resource<Account>>)?.value = Resource.loading(null) }
+
+    fun fetchAccounts(): LiveData<Resource<List<Account>>> =
+            Transformations.map(db.accounts().load()) { models ->
+                Resource.success(models)
+            }.apply { (this as? MutableLiveData<Resource<List<Account>>>)?.value = Resource.loading(null) }
+
+    fun fetchAccountsByProviderAccountId(providerAccountId: Long): LiveData<Resource<List<Account>>> =
+            Transformations.map(db.accounts().loadByProviderAccountId(providerAccountId)) { models ->
+                Resource.success(models)
+            }.apply { (this as? MutableLiveData<Resource<List<Account>>>)?.value = Resource.loading(null) }
+
+    fun refreshAccount(accountId: Long, completion: OnFrolloSDKCompletionListener? = null) {
+        aggregationAPI.fetchAccount(accountId).enqueue { response, error ->
+            if (error != null) {
+                Log.e("$TAG#refreshAccount", error.localizedDescription)
+                completion?.invoke(error)
+            } else if (response == null) {
+                // Explicitly invoke completion callback if response is null.
+                completion?.invoke(null)
+            } else
+                handleAccountResponse(response, completion)
+        }
+    }
+
+    fun refreshAccounts(completion: OnFrolloSDKCompletionListener? = null) {
+        aggregationAPI.fetchAccounts().enqueue { response, error ->
+            if (error != null) {
+                Log.e("$TAG#refreshAccounts", error.localizedDescription)
+                completion?.invoke(error)
+            } else if (response == null) {
+                // Explicitly invoke completion callback if response is null.
+                completion?.invoke(null)
+            } else {
+                handleAccountsResponse(response = response, completion = completion)
+            }
+        }
+    }
+
+    fun updateAccount(accountId: Long, hidden: Boolean, included: Boolean, favourite: Boolean? = null,
+                      accountSubType: AccountSubType? = null, nickName: String? = null,
+                      completion: OnFrolloSDKCompletionListener? = null) {
+
+        val request = AccountUpdateRequest(
+                hidden = hidden,
+                included = included,
+                favourite = favourite,
+                accountSubType = accountSubType,
+                nickName = nickName)
+
+        if (!request.valid) {
+            Log.e("$TAG#updateAccount", "'hidden' and 'included' must compliment each other. Both cannot be true.")
+            completion?.invoke(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA))
+            return
+        }
+
+        aggregationAPI.updateAccount(accountId, request).enqueue { response, error ->
+            if (error != null) {
+                Log.e("$TAG#updateAccount", error.localizedDescription)
+                completion?.invoke(error)
+            } else if (response == null) {
+                // Explicitly invoke completion callback if response is null.
+                completion?.invoke(null)
+            } else
+                handleAccountResponse(response, completion)
+        }
+    }
+
+    private fun handleAccountsResponse(response: List<AccountResponse>, completion: OnFrolloSDKCompletionListener? = null) {
+        doAsync {
+            val models = mapAccountResponse(response)
+            db.accounts().insertAll(*models.toTypedArray())
+
+            val apiIds = response.map { it.accountId }.toList()
+            val staleIds = db.accounts().getStaleIds(apiIds.toLongArray())
+
+            if (staleIds.isNotEmpty()) {
+                db.accounts().deleteMany(staleIds.toLongArray())
+            }
+
+            uiThread { completion?.invoke(null) }
+        }
+    }
+
+    private fun handleAccountResponse(response: AccountResponse, completion: OnFrolloSDKCompletionListener? = null) {
+        doAsync {
+            db.accounts().insert(response.toAccount())
+
+            uiThread { completion?.invoke(null) }
+        }
+    }
+
+    private fun mapAccountResponse(models: List<AccountResponse>): List<Account> =
+            models.map { it.toAccount() }.toList()
 }

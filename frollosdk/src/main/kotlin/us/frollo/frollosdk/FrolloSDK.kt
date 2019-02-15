@@ -248,7 +248,7 @@ object FrolloSDK {
      */
     private fun refreshPrimary() {
         aggregation.refreshProviderAccounts()
-        //TODO: Refresh Accounts
+        aggregation.refreshAccounts()
         //TODO: Refresh Transactions
         authentication.refreshUser()
         messages.refreshUnreadMessages()

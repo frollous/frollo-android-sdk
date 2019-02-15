@@ -2,13 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/nav_messages"
-        android:icon="@drawable/ic_messages"
-        android:title="@string/title_messages" />
-
-    <item
         android:id="@+id/nav_accounts"
         android:icon="@drawable/ic_accounts"
         android:title="@string/title_accounts" />
+
+    <item
+        android:id="@+id/nav_messages"
+        android:icon="@drawable/ic_messages"
+        android:title="@string/title_messages" />
 
 </menu>

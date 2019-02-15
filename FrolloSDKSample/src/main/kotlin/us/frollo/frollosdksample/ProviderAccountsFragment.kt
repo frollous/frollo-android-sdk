@@ -5,7 +5,7 @@ import android.util.Log
 import android.view.*
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.fragment_accounts.*
+import kotlinx.android.synthetic.main.fragment_provider_accounts.*
 import org.jetbrains.anko.support.v4.onRefresh
 import org.jetbrains.anko.support.v4.startActivity
 import us.frollo.frollosdk.FrolloSDK
@@ -14,10 +14,10 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderA
 import us.frollo.frollosdksample.adapter.ProviderAccountsAdapter
 import us.frollo.frollosdksample.base.BaseFragment
 
-class AccountsFragment : BaseFragment() {
+class ProviderAccountsFragment : BaseFragment() {
 
     companion object {
-        private const val TAG = "AccountsFragment"
+        private const val TAG = "ProviderAccounts"
     }
 
     private val providerAccountsAdapter = ProviderAccountsAdapter()
@@ -49,7 +49,7 @@ class AccountsFragment : BaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_accounts, container, false)
+        return inflater.inflate(R.layout.fragment_provider_accounts, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -63,7 +63,7 @@ class AccountsFragment : BaseFragment() {
     }
 
     private fun initView() {
-        recycler_providers.apply {
+        recycler_provider_accounts.apply {
             layoutManager = LinearLayoutManager(context)
             addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
             adapter = providerAccountsAdapter.apply {
@@ -97,7 +97,6 @@ class AccountsFragment : BaseFragment() {
     }
 
     private fun showAccounts(providerAccount: ProviderAccount) {
-        //startActivity<AddProviderAccountActivity>(ARGUMENT.ARG_GENERIC to provider.providerId)
-        // TODO: to be implemented
+        startActivity<AccountsActivity>(ARGUMENT.ARG_GENERIC to providerAccount.providerAccountId)
     }
 }

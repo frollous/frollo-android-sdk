@@ -1,6 +1,7 @@
 package us.frollo.frollosdk.model
 
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
+import us.frollo.frollosdk.model.api.aggregation.accounts.AccountUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.*
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
@@ -66,4 +67,13 @@ internal fun testAccountResponseData(accountId: Long? = null, providerAccountId:
             bsb = randomUUID(),
             interestTotal = Balance(amount = randomNumber().toBigDecimal(), currency = "AUD"),
             endDate = randomUUID())
+}
+
+internal fun testUpdateRequestData(hidden: Boolean = false, included: Boolean = true): AccountUpdateRequest {
+    return AccountUpdateRequest(
+            hidden = hidden,
+            included = included,
+            favourite = true,
+            accountSubType = AccountSubType.BANK_ACCOUNT,
+            nickName = "Friendly Name")
 }

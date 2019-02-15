@@ -3,6 +3,8 @@ package us.frollo.frollosdk.data.remote.api
 import retrofit2.Call
 import retrofit2.http.*
 import us.frollo.frollosdk.data.remote.NetworkHelper.Companion.API_VERSION_PATH
+import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
+import us.frollo.frollosdk.model.api.aggregation.accounts.AccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountCreateRequest
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
@@ -17,6 +19,10 @@ internal interface AggregationAPI {
         // Provider Account URLs
         const val URL_PROVIDER_ACCOUNTS = "$API_VERSION_PATH/aggregation/provideraccounts/"
         const val URL_PROVIDER_ACCOUNT = "$API_VERSION_PATH/aggregation/provideraccounts/{provider_account_id}"
+
+        // Account URLs
+        const val URL_ACCOUNTS = "$API_VERSION_PATH/aggregation/accounts/"
+        const val URL_ACCOUNT = "$API_VERSION_PATH/aggregation/accounts/{account_id}"
     }
 
     // Provider API
@@ -43,4 +49,15 @@ internal interface AggregationAPI {
 
     @DELETE(URL_PROVIDER_ACCOUNT)
     fun deleteProviderAccount(@Path("provider_account_id") providerAccountId: Long): Call<Void>
+
+    // Account API
+
+    @GET(URL_ACCOUNTS)
+    fun fetchAccounts(): Call<List<AccountResponse>>
+
+    @GET(URL_ACCOUNT)
+    fun fetchAccount(@Path("account_id") accountId: Long): Call<AccountResponse>
+
+    @PUT(URL_ACCOUNT)
+    fun updateAccount(@Path("account_id") accountId: Long, @Body request: AccountUpdateRequest): Call<AccountResponse>
 }

@@ -1,4 +1,4 @@
-package us.frollo.frollosdksample
+package us.frollo.frollosdksample.view.aggregation
 
 import android.os.Bundle
 import android.util.Log
@@ -10,8 +10,12 @@ import org.jetbrains.anko.support.v4.onRefresh
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
-import us.frollo.frollosdksample.adapter.ProvidersAdapter
+import us.frollo.frollosdksample.base.ARGUMENT
+import us.frollo.frollosdksample.R
+import us.frollo.frollosdksample.view.aggregation.adapters.ProvidersAdapter
 import us.frollo.frollosdksample.base.BaseStackActivity
+import us.frollo.frollosdksample.utils.displayError
+import us.frollo.frollosdksample.utils.observe
 
 class ProvidersActivity : BaseStackActivity() {
 

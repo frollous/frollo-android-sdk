@@ -12,7 +12,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".StartupActivity"
+            android:name=".view.StartupActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,35 +22,35 @@
         </activity>
 
         <activity
-            android:name=".LoginActivity"
+            android:name=".view.authentication.LoginActivity"
             android:label="@string/str_login"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".view.MainActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ProfileActivity"
+            android:name=".view.profile.ProfileActivity"
             android:screenOrientation="portrait"
             android:label="@string/title_profile"/>
 
         <activity
-            android:name=".AccountsActivity"
+            android:name=".view.aggregation.AccountsActivity"
             android:screenOrientation="portrait"
             android:label="@string/title_accounts"/>
 
         <activity
-            android:name=".ProvidersActivity"
+            android:name=".view.aggregation.ProvidersActivity"
             android:screenOrientation="portrait"
             android:label="@string/str_add_provider"/>
 
         <activity
-            android:name=".AddProviderAccountActivity"
+            android:name=".view.aggregation.AddProviderAccountActivity"
             android:screenOrientation="portrait"
             android:label="@string/str_add_account"/>
 
-        <service android:name=".MyFirebaseMessagingService">
+        <service android:name=".view.notifications.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

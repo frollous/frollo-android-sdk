@@ -1,4 +1,4 @@
-package us.frollo.frollosdksample
+package us.frollo.frollosdksample.view.messages
 
 import android.os.Bundle
 import android.util.Log
@@ -14,8 +14,11 @@ import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.messages.Message
 import us.frollo.frollosdk.model.coredata.messages.MessageText
-import us.frollo.frollosdksample.adapter.MessagesAdapter
+import us.frollo.frollosdksample.R
 import us.frollo.frollosdksample.base.BaseFragment
+import us.frollo.frollosdksample.utils.displayError
+import us.frollo.frollosdksample.utils.observe
+import us.frollo.frollosdksample.view.messages.adapters.MessagesAdapter
 
 class MessagesFragment : BaseFragment() {
 

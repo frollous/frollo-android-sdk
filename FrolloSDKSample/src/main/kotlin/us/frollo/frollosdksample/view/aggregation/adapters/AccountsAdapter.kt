@@ -1,4 +1,4 @@
-package us.frollo.frollosdksample.adapter
+package us.frollo.frollosdksample.view.aggregation.adapters
 
 import android.view.View
 import kotlinx.android.synthetic.main.template_account_item.view.*
@@ -7,6 +7,10 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRe
 import us.frollo.frollosdksample.*
 import us.frollo.frollosdksample.base.BaseRecyclerAdapter
 import us.frollo.frollosdksample.base.BaseViewHolder
+import us.frollo.frollosdksample.utils.display
+import us.frollo.frollosdksample.utils.hide
+import us.frollo.frollosdksample.utils.show
+import us.frollo.frollosdksample.utils.toString
 
 class AccountsAdapter : BaseRecyclerAdapter<Account, AccountsAdapter.AccountViewHolder>(Account::class.java, accountComparator) {
 

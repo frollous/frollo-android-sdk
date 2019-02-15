@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 import us.frollo.frollosdk.model.IAdapterModel
-import us.frollo.frollosdksample.inflate
+import us.frollo.frollosdksample.utils.inflate
 
 abstract class BaseRecyclerAdapter<T: IAdapterModel, VH : BaseViewHolder<T>>(klass: Class<T>, private val comparator: Comparator<T>? = null) : RecyclerView.Adapter<VH>() {
     protected var mData = listOf<T>()

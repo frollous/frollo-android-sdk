@@ -1,4 +1,4 @@
-package us.frollo.frollosdksample
+package us.frollo.frollosdksample.view.notifications
 
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService

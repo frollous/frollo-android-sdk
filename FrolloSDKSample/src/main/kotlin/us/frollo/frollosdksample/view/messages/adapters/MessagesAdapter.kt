@@ -1,4 +1,4 @@
-package us.frollo.frollosdksample.adapter
+package us.frollo.frollosdksample.view.messages.adapters
 
 import android.view.View
 import android.widget.TextView
@@ -8,8 +8,8 @@ import us.frollo.frollosdk.model.coredata.messages.MessageText
 import us.frollo.frollosdksample.R
 import us.frollo.frollosdksample.base.BaseRecyclerAdapter
 import us.frollo.frollosdksample.base.BaseViewHolder
-import us.frollo.frollosdksample.hide
-import us.frollo.frollosdksample.show
+import us.frollo.frollosdksample.utils.hide
+import us.frollo.frollosdksample.utils.show
 
 class MessagesAdapter : BaseRecyclerAdapter<Message, MessagesAdapter.MessageTextViewHolder>(Message::class.java, messageComparator)  {
 

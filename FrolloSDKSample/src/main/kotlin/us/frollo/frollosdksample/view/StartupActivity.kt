@@ -1,4 +1,4 @@
-package us.frollo.frollosdksample
+package us.frollo.frollosdksample.view
 
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +8,10 @@ import org.jetbrains.anko.startActivity
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.logging.LogLevel
+import us.frollo.frollosdksample.R
+import us.frollo.frollosdksample.utils.hide
+import us.frollo.frollosdksample.utils.show
+import us.frollo.frollosdksample.view.authentication.LoginActivity
 
 class StartupActivity : AppCompatActivity() {
 

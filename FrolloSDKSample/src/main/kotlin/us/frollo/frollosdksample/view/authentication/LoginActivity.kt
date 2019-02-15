@@ -1,4 +1,4 @@
-package us.frollo.frollosdksample
+package us.frollo.frollosdksample.view.authentication
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -6,6 +6,11 @@ import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.startActivity
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.auth.AuthType
+import us.frollo.frollosdksample.*
+import us.frollo.frollosdksample.utils.displayError
+import us.frollo.frollosdksample.utils.hide
+import us.frollo.frollosdksample.utils.show
+import us.frollo.frollosdksample.view.MainActivity
 
 class LoginActivity : AppCompatActivity() {
 

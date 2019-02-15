@@ -1,4 +1,4 @@
-package us.frollo.frollosdksample
+package us.frollo.frollosdksample.view
 
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +11,10 @@ import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.startActivity
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdksample.R
+import us.frollo.frollosdksample.view.aggregation.ProviderAccountsFragment
+import us.frollo.frollosdksample.view.messages.MessagesFragment
+import us.frollo.frollosdksample.view.profile.ProfileActivity
 
 class MainActivity : AppCompatActivity() {
 

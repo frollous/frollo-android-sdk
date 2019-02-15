@@ -1,4 +1,4 @@
-package us.frollo.frollosdksample.adapter
+package us.frollo.frollosdksample.view.aggregation.adapters
 
 import android.view.View
 import kotlinx.android.synthetic.main.template_provider_item.view.*

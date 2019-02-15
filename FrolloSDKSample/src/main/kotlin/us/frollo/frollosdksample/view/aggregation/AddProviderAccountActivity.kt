@@ -1,4 +1,4 @@
-package us.frollo.frollosdksample
+package us.frollo.frollosdksample.view.aggregation
 
 import android.os.Bundle
 import android.util.Log
@@ -6,7 +6,11 @@ import kotlinx.android.synthetic.main.activity_add_provider_account.*
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
+import us.frollo.frollosdksample.base.ARGUMENT
+import us.frollo.frollosdksample.R
 import us.frollo.frollosdksample.base.BaseStackActivity
+import us.frollo.frollosdksample.utils.displayError
+import us.frollo.frollosdksample.utils.observe
 
 class AddProviderAccountActivity : BaseStackActivity() {
 

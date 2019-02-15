@@ -1,4 +1,4 @@
-package us.frollo.frollosdksample
+package us.frollo.frollosdksample.utils
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -16,6 +16,7 @@ import androidx.lifecycle.Observer
 import org.jetbrains.anko.AlertBuilder
 import org.jetbrains.anko.alert
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Balance
+import us.frollo.frollosdksample.R
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*

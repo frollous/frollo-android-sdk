@@ -2,7 +2,7 @@ package us.frollo.frollosdksample.base
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import us.frollo.frollosdksample.ifNotNull
+import us.frollo.frollosdksample.utils.ifNotNull
 
 abstract class BaseViewHolder<in T>(itemView: View): RecyclerView.ViewHolder(itemView) {
     private var mClickCallback: (((View), (Int)) -> Unit)? = null

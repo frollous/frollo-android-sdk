@@ -1,11 +1,14 @@
-package us.frollo.frollosdksample
+package us.frollo.frollosdksample.view.profile
 
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_profile.*
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.startActivity
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdksample.R
 import us.frollo.frollosdksample.base.BaseStackActivity
+import us.frollo.frollosdksample.utils.showThemed
+import us.frollo.frollosdksample.view.authentication.LoginActivity
 
 class ProfileActivity : BaseStackActivity() {
 

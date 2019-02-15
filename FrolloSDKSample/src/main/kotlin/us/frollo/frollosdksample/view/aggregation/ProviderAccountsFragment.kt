@@ -1,4 +1,4 @@
-package us.frollo.frollosdksample
+package us.frollo.frollosdksample.view.aggregation
 
 import android.os.Bundle
 import android.util.Log
@@ -11,8 +11,12 @@ import org.jetbrains.anko.support.v4.startActivity
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
-import us.frollo.frollosdksample.adapter.ProviderAccountsAdapter
+import us.frollo.frollosdksample.base.ARGUMENT
+import us.frollo.frollosdksample.R
+import us.frollo.frollosdksample.view.aggregation.adapters.ProviderAccountsAdapter
 import us.frollo.frollosdksample.base.BaseFragment
+import us.frollo.frollosdksample.utils.displayError
+import us.frollo.frollosdksample.utils.observe
 
 class ProviderAccountsFragment : BaseFragment() {
 

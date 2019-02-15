@@ -13,6 +13,6 @@ internal data class UserRegisterRequest(
         @SerializedName("password") val password: String,
 
         @SerializedName("address") var currentAddress: Address? = null,
-        @SerializedName("date_of_birth") var dateOfBirth: String? = null,
+        @SerializedName("date_of_birth") var dateOfBirth: String? = null, // yyyy-MM or yyyy-MM-dd
         @SerializedName("last_name") val lastName: String? = null,
         @SerializedName("mobile_number") val mobileNumber: String? = null)

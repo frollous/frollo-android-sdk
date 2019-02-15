@@ -16,5 +16,5 @@ internal data class UserUpdateRequest(
         @SerializedName("marital_status") val householdType: HouseholdType? = null,
         @SerializedName("occupation") val occupation: Occupation? = null,
         @SerializedName("industry") val industry: Industry? = null,
-        @SerializedName("date_of_birth") val dateOfBirth: String? = null,
+        @SerializedName("date_of_birth") val dateOfBirth: String? = null, // yyyy-MM or yyyy-MM-dd
         @SerializedName("driver_license") val driverLicense: String? = null)

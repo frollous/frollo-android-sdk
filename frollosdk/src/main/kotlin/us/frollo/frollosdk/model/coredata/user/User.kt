@@ -18,7 +18,7 @@ data class User(
         val primaryCurrency: String,
         /** User has a valid password */
         val validPassword: Boolean,
-        /** Date user registered */
+        /** Date user registered (format pattern - yyyy-MM-dd) */
         val registrationDate: String,
         /** Facebook ID associated with the user (optional) */
         val facebookId: String?,
@@ -42,7 +42,7 @@ data class User(
         var occupation: Occupation?,
         /** Industry the user works in (optional) */
         var industry: Industry?,
-        /** Date of birth of the user (optional) */
+        /** Date of birth of the user (optional) (format pattern - yyyy-MM or yyyy-MM-dd) */
         var dateOfBirth: String?,
         /** Drivers license of the user */
         var driverLicense: String?,

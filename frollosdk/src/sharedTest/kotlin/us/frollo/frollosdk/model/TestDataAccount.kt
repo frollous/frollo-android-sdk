@@ -10,7 +10,6 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.RefreshSt
 import us.frollo.frollosdk.testutils.randomNumber
 import us.frollo.frollosdk.testutils.randomUUID
 import java.math.BigDecimal
-import java.util.*
 import kotlin.random.Random
 
 internal fun testAccountResponseData(accountId: Long? = null, providerAccountId: Long? = null) : AccountResponse {
@@ -25,8 +24,8 @@ internal fun testAccountResponseData(accountId: Long? = null, providerAccountId:
             status = AccountRefreshStatus.NEEDS_ACTION,
             subStatus = AccountRefreshSubStatus.INPUT_REQUIRED,
             additionalStatus = AccountRefreshAdditionalStatus.MFA_NEEDED,
-            lastRefreshed = Date(),
-            nextRefresh = Date())
+            lastRefreshed = "2019-01-01",
+            nextRefresh = "2019-01-01")
 
     val attributes = AccountAttributes(
             accountType = AccountType.values()[Random.nextInt(AccountType.values().size)],
@@ -52,11 +51,11 @@ internal fun testAccountResponseData(accountId: Long? = null, providerAccountId:
             availableCredit = Balance(amount = randomNumber().toBigDecimal(), currency = "AUD"),
             balanceDetails = balanceDetails,
             currentBalance = Balance(amount = randomNumber().toBigDecimal(), currency = "AUD"),
-            dueDate = Date(),
+            dueDate = "2019-01-01",
             holderProfile = holderProfile,
             interestRate = BigDecimal("3.05"),
             lastPaymentAmount = Balance(amount = randomNumber().toBigDecimal(), currency = "AUD"),
-            lastPaymentDate = Date(),
+            lastPaymentDate = "2019-01-01",
             minimumAmountDue = Balance(amount = randomNumber().toBigDecimal(), currency = "AUD"),
             nickName = "Friendly Name",
             totalCashLimit = Balance(amount = randomNumber().toBigDecimal(), currency = "AUD"),

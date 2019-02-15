@@ -11,7 +11,8 @@ import java.util.*
  * database migration, as the column name would not change.
  */
 @Entity(tableName = "account",
-        indices = [Index("account_id")])
+        indices = [Index("account_id"),
+                   Index("provider_account_id")])
 data class Account(
         @PrimaryKey
         @ColumnInfo(name = "account_id") val accountId: Long,
@@ -42,8 +43,8 @@ data class Account(
         @Embedded(prefix = "a_due_") val amountDue: Balance?,
         @Embedded(prefix = "m_amount_") val minimumAmountDue: Balance?,
         @Embedded(prefix = "l_payment_") val lastPaymentAmount: Balance?,
-        @ColumnInfo(name = "last_payment_date") val lastPaymentDate: Date?,
-        @ColumnInfo(name = "due_date") val dueDate: Date?,
-        @ColumnInfo(name = "end_date") val endDate: String?,
+        @ColumnInfo(name = "last_payment_date") val lastPaymentDate: String?, // ISO8601 format Eg: 2011-12-03T10:15:30+01:00
+        @ColumnInfo(name = "due_date") val dueDate: String?, // ISO8601 format Eg: 2011-12-03T10:15:30+01:00
+        @ColumnInfo(name = "end_date") val endDate: String?, // yyyy-MM-dd
         @Embedded(prefix = "b_details_") val balanceDetails: BalanceDetails?
 ): IAdapterModel

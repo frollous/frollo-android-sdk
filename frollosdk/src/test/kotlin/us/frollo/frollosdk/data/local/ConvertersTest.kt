@@ -10,7 +10,6 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRe
 import us.frollo.frollosdk.model.coredata.aggregation.providers.*
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.user.*
-import java.util.*
 
 class ConvertersTest {
 
@@ -279,25 +278,6 @@ class ConvertersTest {
         val list = mutableListOf(ProviderContainerName.BANK, ProviderContainerName.CREDIT_CARD, ProviderContainerName.BILL)
         val string = Converters.instance.stringFromListOfProviderContainerName(list)
         assertEquals("|bank|credit_card|bill|", string)
-    }
-
-    @Test
-    fun testTimestampToDate() {
-        val cal = Calendar.getInstance()
-        cal.set(2019, 2, 1, 8, 10)
-        val date1 = cal.time
-        val date2 = Converters.instance.timestampToDate(date1.time)
-        assertEquals(date1, date2)
-    }
-
-    @Test
-    fun testTimestampFromDate() {
-        val cal = Calendar.getInstance()
-        cal.set(2019, 2, 1, 8, 10)
-        val date = cal.time
-        val timestamp1 = date.time
-        val timestamp2 = Converters.instance.timestampFromDate(date)
-        assertEquals(timestamp1, timestamp2)
     }
 
     @Test

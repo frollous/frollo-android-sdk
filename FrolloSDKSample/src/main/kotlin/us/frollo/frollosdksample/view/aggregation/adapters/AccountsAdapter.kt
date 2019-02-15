@@ -7,10 +7,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRe
 import us.frollo.frollosdksample.*
 import us.frollo.frollosdksample.base.BaseRecyclerAdapter
 import us.frollo.frollosdksample.base.BaseViewHolder
-import us.frollo.frollosdksample.utils.display
-import us.frollo.frollosdksample.utils.hide
-import us.frollo.frollosdksample.utils.show
-import us.frollo.frollosdksample.utils.toString
+import us.frollo.frollosdksample.utils.*
 
 class AccountsAdapter : BaseRecyclerAdapter<Account, AccountsAdapter.AccountViewHolder>(Account::class.java, accountComparator) {
 
@@ -29,7 +26,7 @@ class AccountsAdapter : BaseRecyclerAdapter<Account, AccountsAdapter.AccountView
         override fun bind(model: Account) {
             itemView.text_account_name.text = model.nickName ?: model.accountName
             itemView.text_last_updated.text = model.refreshStatus?.lastRefreshed?.let {
-                String.format("Last updated %s", it.toString("dd/MM/yyyy"))
+                String.format("Last updated %s", it.formatISOString("dd/MM/yyyy"))
             } ?: run { "Never updated" }
             itemView.text_amount.text = model.availableBalance?.display ?: model.currentBalance?.display
 

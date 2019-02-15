@@ -6,7 +6,6 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRe
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.RefreshStatus
 import us.frollo.frollosdk.testutils.randomNumber
-import java.util.*
 
 internal fun testProviderAccountResponseData(providerAccountId: Long? = null, providerId: Long? = null) : ProviderAccountResponse {
 
@@ -14,8 +13,8 @@ internal fun testProviderAccountResponseData(providerAccountId: Long? = null, pr
             status = AccountRefreshStatus.NEEDS_ACTION,
             subStatus = AccountRefreshSubStatus.INPUT_REQUIRED,
             additionalStatus = AccountRefreshAdditionalStatus.MFA_NEEDED,
-            lastRefreshed = Date(),
-            nextRefresh = Date())
+            lastRefreshed = "2019-01-01",
+            nextRefresh = "2019-01-01")
 
     return ProviderAccountResponse(
             providerAccountId = providerAccountId ?: randomNumber().toLong(),

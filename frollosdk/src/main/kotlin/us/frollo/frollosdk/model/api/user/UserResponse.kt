@@ -33,7 +33,7 @@ internal data class UserResponse(
         @ColumnInfo(name = "marital_status") @SerializedName("marital_status") val householdType: HouseholdType?,
         @ColumnInfo(name = "occupation") @SerializedName("occupation") val occupation: Occupation?,
         @ColumnInfo(name = "industry") @SerializedName("industry") val industry: Industry?,
-        @ColumnInfo(name = "date_of_birth") @SerializedName("date_of_birth") val dateOfBirth: String?,
+        @ColumnInfo(name = "date_of_birth") @SerializedName("date_of_birth") val dateOfBirth: String?, // yyyy-MM or yyyy-MM-dd
         @ColumnInfo(name = "driver_license") @SerializedName("driver_license") val driverLicense: String?,
         @ColumnInfo(name = "features") @SerializedName("features") val features: List<FeatureFlag>?,
 

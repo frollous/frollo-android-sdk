@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.*
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.RefreshStatus
 import java.math.BigDecimal
-import java.util.*
 
 internal data class AccountResponse(
         @PrimaryKey
@@ -37,8 +36,8 @@ internal data class AccountResponse(
         @SerializedName("amount_due") val amountDue: Balance?,
         @SerializedName("minimum_amount_due") val minimumAmountDue: Balance?,
         @SerializedName("last_payment_amount") val lastPaymentAmount: Balance?,
-        @SerializedName("last_payment_date") val lastPaymentDate: Date?,
-        @SerializedName("due_date") val dueDate: Date?,
-        @SerializedName("end_date") val endDate: String?,
+        @SerializedName("last_payment_date") val lastPaymentDate: String?, // ISO8601 format Eg: 2011-12-03T10:15:30+01:00
+        @SerializedName("due_date") val dueDate: String?, // ISO8601 format Eg: 2011-12-03T10:15:30+01:00
+        @SerializedName("end_date") val endDate: String?, // yyyy-MM-dd
         @SerializedName("balance_details") val balanceDetails: BalanceDetails?
 )

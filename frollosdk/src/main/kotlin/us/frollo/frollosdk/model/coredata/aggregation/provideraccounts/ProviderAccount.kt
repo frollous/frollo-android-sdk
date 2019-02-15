@@ -9,7 +9,8 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginFor
  * database migration, as the column name would not change.
  */
 @Entity(tableName = "provider_account",
-        indices = [Index("provider_account_id")])
+        indices = [Index("provider_account_id"),
+                   Index("provider_id")])
 data class ProviderAccount(
         @PrimaryKey
         @ColumnInfo(name = "provider_account_id") val providerAccountId: Long,

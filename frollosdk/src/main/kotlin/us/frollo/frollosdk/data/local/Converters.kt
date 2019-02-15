@@ -8,7 +8,10 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRe
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
 import us.frollo.frollosdk.model.coredata.aggregation.providers.*
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
 import us.frollo.frollosdk.model.coredata.messages.ContentType
+import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.user.*
 import java.math.BigDecimal
 import java.util.*
@@ -29,12 +32,6 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromListOfString(value: List<String>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|" , postfix = "|")
-
-    @TypeConverter
-    fun timestampToDate(value: Long?): Date? = if (value == null) null else Date(value)
-
-    @TypeConverter
-    fun timestampFromDate(date: Date?): Long? = date?.time
 
     @TypeConverter
     fun stringToBigDecimal(value: String?): BigDecimal? = if (value == null) null else BigDecimal(value)
@@ -186,4 +183,26 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromListOfBalanceTier(value: List<BalanceTier>?): String? = if (value == null) null else gson.toJson(value)
+
+    // Transaction
+
+    @TypeConverter
+    fun stringToTransactionBaseType(value: String?): TransactionBaseType? = if (value == null) TransactionBaseType.UNKNOWN else TransactionBaseType.valueOf(value)
+
+    @TypeConverter
+    fun stringFromTransactionBaseType(value: TransactionBaseType?): String? = value?.name ?: TransactionBaseType.UNKNOWN.name
+
+    @TypeConverter
+    fun stringToTransactionStatus(value: String?): TransactionStatus? = if (value == null) null else TransactionStatus.valueOf(value)
+
+    @TypeConverter
+    fun stringFromTransactionStatus(value: TransactionStatus?): String? = value?.name
+
+    // Shared
+
+    @TypeConverter
+    fun stringToBudgetCategory(value: String?): BudgetCategory? = if (value == null) null else BudgetCategory.valueOf(value)
+
+    @TypeConverter
+    fun stringFromBudgetCategory(value: BudgetCategory?): String? = value?.name
 }

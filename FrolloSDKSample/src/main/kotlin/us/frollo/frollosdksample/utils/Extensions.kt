@@ -15,10 +15,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import org.jetbrains.anko.AlertBuilder
 import org.jetbrains.anko.alert
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Balance
 import us.frollo.frollosdksample.R
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
 import java.util.*
 
 fun <T1, T2> ifNotNull(value1: T1?, value2: T2?, bothNotNull: (T1, T2) -> (Unit)) {
@@ -66,8 +67,11 @@ fun Activity.displayError(message: String?, title: String) {
     }.showThemed()
 }
 
-fun Date.toString(format: String): String =
-        SimpleDateFormat(format, Locale.getDefault()).format(this)
+fun LocalDateTime.toString(pattern: String): String =
+        DateTimeFormatter.ofPattern(pattern).format(this)
+
+fun String.formatISOString(pattern: String): String =
+        LocalDateTime.parse(this, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toString(pattern)
 
 fun Number.toCurrencyString(currency: String, fractionDigits: Int = 2): String {
     val format = NumberFormat.getCurrencyInstance(Locale.getDefault())

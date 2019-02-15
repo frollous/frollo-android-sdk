@@ -267,7 +267,6 @@ object FrolloSDK {
     private fun refreshSystem() {
         aggregation.refreshProviders()
         //TODO: Refresh Transaction Categories
-        //TODO: Refresh Merchants
         //TODO: Refresh Bills
         authentication.updateDevice()
     }

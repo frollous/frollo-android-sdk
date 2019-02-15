@@ -19,15 +19,22 @@ import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkHelper
 import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.data.remote.api.AggregationAPI
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.keystore.Keystore
+import us.frollo.frollosdk.mapping.toAccount
 import us.frollo.frollosdk.mapping.toProvider
 import us.frollo.frollosdk.mapping.toProviderAccount
-import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.loginFormFilledData
+import us.frollo.frollosdk.model.testAccountResponseData
 import us.frollo.frollosdk.model.testProviderAccountResponseData
 import us.frollo.frollosdk.model.testProviderResponseData
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
+import us.frollo.frollosdk.testutils.randomBoolean
+import us.frollo.frollosdk.testutils.randomUUID
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.wait
 
@@ -69,6 +76,8 @@ class AggregationTest {
         preferences.resetAll()
         database.clearAllTables()
     }
+
+    // Provider Tests
 
     @Test
     fun testFetchProviderByID() {
@@ -173,6 +182,8 @@ class AggregationTest {
 
         tearDown()
     }
+
+    // Provider Account Tests
 
     @Test
     fun testFetchProviderAccountByID() {
@@ -407,5 +418,209 @@ class AggregationTest {
     @Test
     fun testProviderAccountsFetchMissingProviders() {
         //TODO: to be implemented
+    }
+
+    // Account Tests
+
+    @Test
+    fun testFetchAccountByID() {
+        initSetup()
+
+        val data = testAccountResponseData()
+        val list = mutableListOf(testAccountResponseData(), data, testAccountResponseData())
+        database.accounts().insertAll(*list.map { it.toAccount() }.toList().toTypedArray())
+
+        val testObserver = aggregation.fetchAccount(data.accountId).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(data.accountId, testObserver.value().data?.accountId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchAccounts() {
+        initSetup()
+
+        val data1 = testAccountResponseData()
+        val data2 = testAccountResponseData()
+        val data3 = testAccountResponseData()
+        val data4 = testAccountResponseData()
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        database.accounts().insertAll(*list.map { it.toAccount() }.toList().toTypedArray())
+
+        val testObserver = aggregation.fetchAccounts().test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(4, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchAccountsByProviderAccountId() {
+        initSetup()
+
+        val data1 = testAccountResponseData(providerAccountId = 1)
+        val data2 = testAccountResponseData(providerAccountId = 2)
+        val data3 = testAccountResponseData(providerAccountId = 1)
+        val data4 = testAccountResponseData(providerAccountId = 1)
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        database.accounts().insertAll(*list.map { it.toAccount() }.toList().toTypedArray())
+
+        val testObserver = aggregation.fetchAccountsByProviderAccountId(providerAccountId = 1).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(3, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshAccounts() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.accounts_valid)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == AggregationAPI.URL_ACCOUNTS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshAccounts { error ->
+            assertNull(error)
+
+            val testObserver = aggregation.fetchAccounts().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(4, models?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(AggregationAPI.URL_ACCOUNTS, request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshAccountByID() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.account_id_542)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == "${NetworkHelper.API_VERSION_PATH}/aggregation/accounts/542") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshAccount(542L) { error ->
+            assertNull(error)
+
+            val testObserver = aggregation.fetchAccount(542L).test()
+            testObserver.awaitValue()
+            val model = testObserver.value().data
+            assertNotNull(model)
+            assertEquals(542L, model?.accountId)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${NetworkHelper.API_VERSION_PATH}/aggregation/accounts/542", request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testUpdateAccountValid() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.account_id_542)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == "${NetworkHelper.API_VERSION_PATH}/aggregation/accounts/542") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.updateAccount(
+                accountId = 542,
+                hidden = false,
+                included = true,
+                favourite = randomBoolean(),
+                accountSubType = AccountSubType.SAVINGS,
+                nickName = randomUUID()) { error ->
+
+            assertNull(error)
+
+            val testObserver = aggregation.fetchAccounts().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(1, models?.size)
+            assertEquals(542L, models?.get(0)?.accountId)
+            assertEquals(867L, models?.get(0)?.providerAccountId)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${NetworkHelper.API_VERSION_PATH}/aggregation/accounts/542", request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testUpdateAccountInvalid() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.account_id_542)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == "${NetworkHelper.API_VERSION_PATH}/aggregation/accounts/542") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.updateAccount(
+                accountId = 542,
+                hidden = true,
+                included = true,
+                favourite = randomBoolean(),
+                accountSubType = AccountSubType.SAVINGS,
+                nickName = randomUUID()) { error ->
+
+            assertNotNull(error)
+            assertTrue(error is DataError)
+            assertEquals(DataErrorType.API, (error as DataError).type)
+            assertEquals(DataErrorSubType.INVALID_DATA, error.subType)
+        }
+
+        wait(3)
+
+        tearDown()
     }
 }

@@ -155,6 +155,24 @@ class AccountDaoTest {
     }
 
     @Test
+    fun testDeleteByProviderAccountId() {
+        val data1 = testAccountResponseData(providerAccountId = 1)
+        val data2 = testAccountResponseData(providerAccountId = 2)
+        val data3 = testAccountResponseData(providerAccountId = 2)
+        val data4 = testAccountResponseData(providerAccountId = 1)
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        db.accounts().insertAll(*list.map { it.toAccount() }.toList().toTypedArray())
+
+        db.accounts().deleteByProviderAccountId(1)
+
+        val testObserver = db.accounts().load().test()
+        testObserver.awaitValue()
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(2, testObserver.value().size)
+    }
+
+    @Test
     fun testClear() {
         val data1 = testAccountResponseData(accountId = 100)
         val data2 = testAccountResponseData(accountId = 101)

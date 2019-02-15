@@ -8,7 +8,10 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRe
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
 import us.frollo.frollosdk.model.coredata.aggregation.providers.*
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
 import us.frollo.frollosdk.model.coredata.messages.ContentType
+import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.user.*
 
 class ConvertersTest {
@@ -443,5 +446,53 @@ class ConvertersTest {
         val tiers = mutableListOf(BalanceTier(description = "Below average", max = 549, min = 0), BalanceTier(description = "Above average", max = 700, min = 550))
         val json = Converters.instance.stringFromListOfBalanceTier(tiers)
         assertEquals("[{\"description\":\"Below average\",\"min\":0,\"max\":549},{\"description\":\"Above average\",\"min\":550,\"max\":700}]", json)
+    }
+
+    @Test
+    fun testStringToTransactionBaseType() {
+        val status = Converters.instance.stringToTransactionBaseType("CREDIT")
+        assertEquals(TransactionBaseType.CREDIT, status)
+
+        assertEquals(TransactionBaseType.UNKNOWN, Converters.instance.stringToTransactionBaseType(null))
+    }
+
+    @Test
+    fun testStringFromTransactionBaseType() {
+        val str = Converters.instance.stringFromTransactionBaseType(TransactionBaseType.CREDIT)
+        assertEquals("CREDIT", str)
+
+        assertEquals("UNKNOWN", Converters.instance.stringFromTransactionBaseType(null))
+    }
+
+    @Test
+    fun testStringToTransactionStatus() {
+        val status = Converters.instance.stringToTransactionStatus("POSTED")
+        assertEquals(TransactionStatus.POSTED, status)
+
+        assertNull(Converters.instance.stringToTransactionStatus(null))
+    }
+
+    @Test
+    fun testStringFromTransactionStatus() {
+        val str = Converters.instance.stringFromTransactionStatus(TransactionStatus.POSTED)
+        assertEquals("POSTED", str)
+
+        assertNull(Converters.instance.stringFromTransactionStatus(null))
+    }
+
+    @Test
+    fun testStringToBudgetCategory() {
+        val status = Converters.instance.stringToBudgetCategory("INCOME")
+        assertEquals(BudgetCategory.INCOME, status)
+
+        assertNull(Converters.instance.stringToBudgetCategory(null))
+    }
+
+    @Test
+    fun testStringFromBudgetCategory() {
+        val str = Converters.instance.stringFromBudgetCategory(BudgetCategory.INCOME)
+        assertEquals("INCOME", str)
+
+        assertNull(Converters.instance.stringFromBudgetCategory(null))
     }
 }

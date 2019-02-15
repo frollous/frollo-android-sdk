@@ -3,10 +3,12 @@ package us.frollo.frollosdk.mapping
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
+import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 
 internal fun ProviderResponse.toProvider(): Provider =
         Provider(
@@ -72,3 +74,21 @@ internal fun AccountResponse.toAccount(): Account =
                 dueDate = dueDate,
                 endDate = endDate,
                 balanceDetails = balanceDetails)
+
+internal fun TransactionResponse.toTransaction(): Transaction =
+        Transaction(
+                transactionId = transactionId,
+                accountId = accountId,
+                amount = amount,
+                baseType = baseType,
+                billId = billId,
+                billPaymentId = billPaymentId,
+                categoryId = categoryId,
+                merchantId = merchantId,
+                budgetCategory = budgetCategory,
+                description = description,
+                included = included,
+                memo = memo,
+                postDate = postDate,
+                status = status,
+                transactionDate = transactionDate)

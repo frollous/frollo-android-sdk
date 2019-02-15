@@ -5,6 +5,7 @@ import org.junit.Test
 import us.frollo.frollosdk.model.testAccountResponseData
 import us.frollo.frollosdk.model.testProviderAccountResponseData
 import us.frollo.frollosdk.model.testProviderResponseData
+import us.frollo.frollosdk.model.testTransactionResponseData
 
 class AggregationMappingTest {
 
@@ -27,5 +28,12 @@ class AggregationMappingTest {
         val response = testAccountResponseData(accountId = 12345)
         val model = response.toAccount()
         assertEquals(12345L, model.accountId)
+    }
+
+    @Test
+    fun testTransactionResponseToTransaction() {
+        val response = testTransactionResponseData(transactionId = 12345)
+        val model = response.toTransaction()
+        assertEquals(12345L, model.transactionId)
     }
 }

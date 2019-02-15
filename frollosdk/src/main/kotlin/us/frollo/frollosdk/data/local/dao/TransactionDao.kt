@@ -16,6 +16,9 @@ internal interface TransactionDao {
     @Query("SELECT * FROM transaction_model WHERE transaction_id = :transactionId")
     fun load(transactionId: Long): LiveData<Transaction?>
 
+    @Query("SELECT * FROM transaction_model WHERE transaction_id in (:transactionIds)")
+    fun load(transactionIds: LongArray): LiveData<List<Transaction>>
+
     @Query("SELECT * FROM transaction_model WHERE account_id = :accountId")
     fun loadByAccountId(accountId: Long): LiveData<List<Transaction>>
 

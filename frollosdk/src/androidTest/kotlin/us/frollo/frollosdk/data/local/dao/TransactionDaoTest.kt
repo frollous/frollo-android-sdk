@@ -61,6 +61,22 @@ class TransactionDaoTest {
     }
 
     @Test
+    fun testLoadByTransactionIds() {
+        val data1 = testTransactionResponseData(transactionId = 100)
+        val data2 = testTransactionResponseData(transactionId = 101)
+        val data3 = testTransactionResponseData(transactionId = 102)
+        val data4 = testTransactionResponseData(transactionId = 103)
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        db.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+
+        val testObserver = db.transactions().load(longArrayOf(100, 101)).test()
+        testObserver.awaitValue()
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(2, testObserver.value().size)
+    }
+
+    @Test
     fun testLoadByProviderAccountId() {
         val data1 = testTransactionResponseData(accountId = 1)
         val data2 = testTransactionResponseData(accountId = 1)

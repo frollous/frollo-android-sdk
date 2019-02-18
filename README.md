@@ -1,2 +1,0 @@
-# Frollo SDK
-

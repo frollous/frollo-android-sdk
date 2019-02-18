@@ -8,14 +8,18 @@
 
     <string name="str_menu_profile">Profile</string>
     <string name="str_menu_add">Add</string>
+    <string name="str_menu_save">Save</string>
 
     <string name="title_profile">Profile</string>
     <string name="title_messages">Messages</string>
     <string name="title_accounts">Accounts</string>
+    <string name="title_transactions">Transactions</string>
+    <string name="title_transaction_details">Details</string>
     <string name="title_provider_accounts">Provider Accounts</string>
 
     <string name="str_add_provider">Add Provider</string>
     <string name="str_add_account">Add Account</string>
     <string name="str_unknown_provider_account">Unknown Provider Account</string>
     <string name="str_accounts_count">%d Accounts</string>
+    <string name="str_excluded">Excluded</string>
 </resources>

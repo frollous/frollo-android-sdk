@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_accounts.*
+import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.support.v4.onRefresh
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Resource
@@ -72,7 +73,6 @@ class AccountsActivity : BaseStackActivity() {
     }
 
     private fun showTransactions(account: Account) {
-        //startActivity<AddProviderAccountActivity>(ARGUMENT.ARG_GENERIC to provider.providerId)
-        // TODO: to be implemented
+        startActivity<TransactionsActivity>(ARGUMENT.ARG_GENERIC to account.accountId)
     }
 }

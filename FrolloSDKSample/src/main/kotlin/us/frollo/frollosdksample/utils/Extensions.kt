@@ -15,6 +15,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import org.jetbrains.anko.AlertBuilder
 import org.jetbrains.anko.alert
+import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Balance
@@ -69,6 +70,15 @@ fun Activity.displayError(message: String?, title: String) {
 
 fun LocalDateTime.toString(pattern: String): String =
         DateTimeFormatter.ofPattern(pattern).format(this)
+
+fun LocalDate.toString(pattern: String): String =
+        DateTimeFormatter.ofPattern(pattern).format(this)
+
+fun String.changeDateFormat(originalPattern: String, newPattern: String): String {
+    val sourceFormatter = DateTimeFormatter.ofPattern(originalPattern)
+    val newFormatter = DateTimeFormatter.ofPattern(newPattern)
+    return newFormatter.format(sourceFormatter.parse(this))
+}
 
 fun String.formatISOString(pattern: String): String =
         LocalDateTime.parse(this, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toString(pattern)

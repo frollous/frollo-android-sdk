@@ -1,10 +1,8 @@
 package us.frollo.frollosdk.data.local.dao
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 
 @Dao
@@ -21,6 +19,9 @@ internal interface TransactionDao {
 
     @Query("SELECT * FROM transaction_model WHERE account_id = :accountId")
     fun loadByAccountId(accountId: Long): LiveData<List<Transaction>>
+
+    @RawQuery
+    fun getIdsQuery(queryStr: SupportSQLiteQuery): MutableList<Long>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: Transaction): LongArray

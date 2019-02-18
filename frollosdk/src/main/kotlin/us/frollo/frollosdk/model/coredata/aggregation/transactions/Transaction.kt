@@ -32,4 +32,9 @@ data class Transaction(
         @ColumnInfo(name = "merchant_id") val merchantId: Long,
         @ColumnInfo(name = "bill_id") var billId: Long?,
         @ColumnInfo(name = "bill_payment_id") var billPaymentId: Long?
-): IAdapterModel
+): IAdapterModel {
+
+    companion object {
+        const val DATE_FORMAT_PATTERN = "yyyy-MM-dd"
+    }
+}

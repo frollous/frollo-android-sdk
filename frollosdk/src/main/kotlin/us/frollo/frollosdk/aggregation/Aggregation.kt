@@ -13,22 +13,27 @@ import us.frollo.frollosdk.data.remote.api.AggregationAPI
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
-import us.frollo.frollosdk.extensions.enqueue
+import us.frollo.frollosdk.extensions.*
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toAccount
 import us.frollo.frollosdk.mapping.toProvider
 import us.frollo.frollosdk.mapping.toProviderAccount
+import us.frollo.frollosdk.mapping.toTransaction
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountCreateRequest
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
+import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
+import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
+import kotlin.collections.ArrayList
 
 /**
  * Manages all aggregation data including accounts, transactions, categories and merchants.
@@ -332,4 +337,130 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
 
     private fun mapAccountResponse(models: List<AccountResponse>): List<Account> =
             models.map { it.toAccount() }.toList()
+
+    // Transaction
+
+    fun fetchTransaction(transactionId: Long): LiveData<Resource<Transaction>> =
+            Transformations.map(db.transactions().load(transactionId)) { model ->
+                Resource.success(model)
+            }.apply { (this as? MutableLiveData<Resource<Transaction>>)?.value = Resource.loading(null) }
+
+    fun fetchTransactions(transactionIds: LongArray? = null): LiveData<Resource<List<Transaction>>> {
+        val result = if (transactionIds != null) db.transactions().load(transactionIds)
+                     else db.transactions().load()
+
+        return Transformations.map(result) { models ->
+            Resource.success(models)
+        }.apply { (this as? MutableLiveData<Resource<List<Transaction>>>)?.value = Resource.loading(null) }
+    }
+
+    fun fetchTransactionsByAccountId(accountId: Long): LiveData<Resource<List<Transaction>>> =
+            Transformations.map(db.transactions().loadByAccountId(accountId)) { models ->
+                Resource.success(models)
+            }.apply { (this as? MutableLiveData<Resource<List<Transaction>>>)?.value = Resource.loading(null) }
+
+    fun refreshTransaction(transactionId: Long, completion: OnFrolloSDKCompletionListener? = null) {
+        aggregationAPI.fetchTransaction(transactionId).enqueue { response, error ->
+            if (error != null) {
+                Log.e("$TAG#refreshTransaction", error.localizedDescription)
+                completion?.invoke(error)
+            } else if (response == null) {
+                // Explicitly invoke completion callback if response is null.
+                completion?.invoke(null)
+            } else
+                handleTransactionResponse(response, completion)
+        }
+    }
+
+    fun refreshTransactions(fromDate: String, toDate: String, accountIds: LongArray? = null,
+                            transactionIncluded: Boolean? = null, completion: OnFrolloSDKCompletionListener? = null) {
+        aggregationAPI.fetchTransactionsByQuery(fromDate = fromDate, toDate = toDate,
+                accountIds = accountIds, transactionIncluded = transactionIncluded).enqueue { response, error ->
+
+            if (error != null) {
+                Log.e("$TAG#refreshTransactionsByQuery", error.localizedDescription)
+                completion?.invoke(error)
+            } else if (response == null) {
+                // Explicitly invoke completion callback if response is null.
+                completion?.invoke(null)
+            } else {
+                handleTransactionsResponse(response = response, fromDate = fromDate, toDate = toDate,
+                        accountIds = accountIds, transactionIncluded = transactionIncluded, completion = completion)
+            }
+        }
+    }
+
+    fun refreshTransactions(transactionIds: LongArray, completion: OnFrolloSDKCompletionListener? = null) {
+        aggregationAPI.fetchTransactionsByIDs(transactionIds).enqueue { response, error ->
+            if (error != null) {
+                Log.e("$TAG#refreshTransactionsByIDs", error.localizedDescription)
+                completion?.invoke(error)
+            } else if (response == null) {
+                // Explicitly invoke completion callback if response is null.
+                completion?.invoke(null)
+            } else {
+                handleTransactionsResponse(response = response, completion = completion)
+            }
+        }
+    }
+
+    fun updateTransaction(transactionId: Long, transaction: Transaction,
+                          recategoriseAll: Boolean? = null, includeApplyAll: Boolean? = null,
+                          completion: OnFrolloSDKCompletionListener? = null) {
+
+        val request = TransactionUpdateRequest(
+                budgetCategory = transaction.budgetCategory,
+                categoryId = transaction.categoryId,
+                included = transaction.included,
+                memo = transaction.memo,
+                userDescription = transaction.description?.user,
+                recategoriseAll = recategoriseAll,
+                includeApplyAll = includeApplyAll)
+
+        aggregationAPI.updateTransaction(transactionId, request).enqueue { response, error ->
+            if (error != null) {
+                Log.e("$TAG#updateTransaction", error.localizedDescription)
+                completion?.invoke(error)
+            } else if (response == null) {
+                // Explicitly invoke completion callback if response is null.
+                completion?.invoke(null)
+            } else
+                handleTransactionResponse(response, completion)
+        }
+    }
+
+    private fun handleTransactionsResponse(response: List<TransactionResponse>, fromDate: String? = null, toDate: String? = null,
+                                           accountIds: LongArray? = null, transactionIncluded: Boolean? = null,
+                                           completion: OnFrolloSDKCompletionListener? = null) {
+        doAsync {
+            val models = mapTransactionResponse(response)
+            db.transactions().insertAll(*models.toTypedArray())
+
+            ifNotNull(fromDate, toDate) { from, to ->
+                val apiIds = response.map { it.transactionId }.toList().sorted()
+                val staleIds = ArrayList(db.transactions().getIdsQuery(
+                        sqlForTransactionStaleIds(fromDate = from, toDate = to,
+                                accountIds = accountIds, transactionIncluded = transactionIncluded)).sorted())
+
+                staleIds.removeAll(apiIds)
+
+                if (staleIds.isNotEmpty()) {
+                    db.transactions().deleteMany(staleIds.toLongArray())
+                }
+            }
+
+            uiThread { completion?.invoke(null) }
+        }
+    }
+
+    private fun handleTransactionResponse(response: TransactionResponse, completion: OnFrolloSDKCompletionListener? = null) {
+        doAsync {
+            db.transactions().insert(response.toTransaction())
+
+            uiThread { completion?.invoke(null) }
+        }
+    }
+
+    private fun mapTransactionResponse(models: List<TransactionResponse>): List<Transaction> =
+            models.map { it.toTransaction() }.toList()
 }

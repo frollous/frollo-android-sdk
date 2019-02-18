@@ -41,6 +41,16 @@
             android:label="@string/title_accounts"/>
 
         <activity
+            android:name=".view.aggregation.TransactionsActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/title_transactions"/>
+
+        <activity
+            android:name=".view.aggregation.TransactionDetailsActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/title_transaction_details"/>
+
+        <activity
             android:name=".view.aggregation.ProvidersActivity"
             android:screenOrientation="portrait"
             android:label="@string/str_add_provider"/>

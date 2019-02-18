@@ -5,7 +5,9 @@ import android.os.Handler
 import androidx.core.os.bundleOf
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.threeten.bp.Duration
+import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.temporal.TemporalAdjusters
 import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.auth.Authentication
 import us.frollo.frollosdk.auth.AuthenticationStatus
@@ -19,14 +21,17 @@ import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.events.Events
 import us.frollo.frollosdk.extensions.notify
+import us.frollo.frollosdk.extensions.toString
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.messages.Messages
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.notifications.Notifications
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.version.Version
 import java.lang.Exception
-import java.util.*
+import java.util.Timer
+import java.util.TimerTask
 
 /**
  * Frollo SDK manager and main instantiation. Responsible for managing the lifecycle and coordination of the SDK
@@ -249,7 +254,9 @@ object FrolloSDK {
     private fun refreshPrimary() {
         aggregation.refreshProviderAccounts()
         aggregation.refreshAccounts()
-        //TODO: Refresh Transactions
+        aggregation.refreshTransactions(
+                fromDate = LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth()).toString(Transaction.DATE_FORMAT_PATTERN),
+                toDate = LocalDate.now().toString(Transaction.DATE_FORMAT_PATTERN))
         authentication.refreshUser()
         messages.refreshUnreadMessages()
     }

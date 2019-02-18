@@ -76,6 +76,19 @@ internal fun generateSQLQueryMessages(searchParams: List<String>, read: Boolean?
     return SimpleSQLiteQuery("SELECT * FROM message WHERE $sb")
 }
 
+internal fun sqlForTransactionStaleIds(fromDate: String, toDate: String, accountIds: LongArray? = null, transactionIncluded: Boolean? = null): SimpleSQLiteQuery {
+    val sb = StringBuilder()
+
+    accountIds?.let { sb.append(" AND account_id IN (${accountIds.joinToString(",")}) ") }
+
+    transactionIncluded?.let { sb.append(" AND included = ${ it.toInt() } ") }
+
+    val query = "SELECT transaction_id FROM transaction_model " +
+            "WHERE ((transaction_date BETWEEN Date('$fromDate') AND Date('$toDate')) $sb)"
+
+    return SimpleSQLiteQuery(query)
+}
+
 internal fun Bundle.toNotificationPayload(): NotificationPayload =
         createNotificationPayload(
                 getString(NotificationPayloadNames.EVENT.toString()),

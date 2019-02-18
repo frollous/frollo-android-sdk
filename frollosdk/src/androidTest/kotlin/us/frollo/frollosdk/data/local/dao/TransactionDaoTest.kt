@@ -5,6 +5,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
+import kotlinx.coroutines.experimental.async
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -12,8 +15,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.data.local.SDKDatabase
+import us.frollo.frollosdk.extensions.sqlForTransactionStaleIds
 import us.frollo.frollosdk.mapping.toTransaction
 import us.frollo.frollosdk.model.testTransactionResponseData
+import us.frollo.frollosdk.testutils.wait
 
 class TransactionDaoTest {
 
@@ -77,7 +82,7 @@ class TransactionDaoTest {
     }
 
     @Test
-    fun testLoadByProviderAccountId() {
+    fun testLoadByAccountId() {
         val data1 = testTransactionResponseData(accountId = 1)
         val data2 = testTransactionResponseData(accountId = 1)
         val data3 = testTransactionResponseData(accountId = 2)
@@ -89,6 +94,27 @@ class TransactionDaoTest {
         testObserver.awaitValue()
         assertNotNull(testObserver.value())
         assertEquals(3, testObserver.value().size)
+    }
+
+    @Test
+    fun testLoadByQuery() {
+        val data1 = testTransactionResponseData(transactionId = 100, accountId = 1, transactionDate = "2019-01-04", included = false)
+        val data2 = testTransactionResponseData(transactionId = 101, accountId = 1, transactionDate = "2019-01-20", included = false)
+        val data3 = testTransactionResponseData(transactionId = 102, accountId = 1, transactionDate = "2018-12-31", included = false)
+        val data4 = testTransactionResponseData(transactionId = 103, accountId = 2, transactionDate = "2019-01-20", included = false)
+        val data5 = testTransactionResponseData(transactionId = 104, accountId = 1, transactionDate = "2019-02-03", included = false)
+        val data6 = testTransactionResponseData(transactionId = 105, accountId = 1, transactionDate = "2019-01-02", included = false)
+        val data7 = testTransactionResponseData(transactionId = 106, accountId = 1, transactionDate = "2019-02-04", included = false)
+        val list = mutableListOf(data1, data2, data3, data4, data5, data6, data7)
+
+        db.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+
+        val query = sqlForTransactionStaleIds(fromDate = "2019-01-03", toDate = "2019-02-03", accountIds = longArrayOf(1), transactionIncluded = false)
+
+        val ids = db.transactions().getIdsQuery(query)
+
+        assertTrue(ids.isNotEmpty())
+        assertEquals(3, ids.size)
     }
 
     @Test

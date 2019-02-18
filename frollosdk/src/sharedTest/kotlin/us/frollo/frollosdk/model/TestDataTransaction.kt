@@ -11,7 +11,8 @@ import us.frollo.frollosdk.testutils.randomNumber
 import us.frollo.frollosdk.testutils.randomUUID
 import kotlin.random.Random
 
-internal fun testTransactionResponseData(transactionId: Long? = null, accountId: Long? = null) : TransactionResponse {
+internal fun testTransactionResponseData(transactionId: Long? = null, accountId: Long? = null,
+                                         transactionDate: String? = null, included: Boolean? = null) : TransactionResponse {
     return TransactionResponse(
             transactionId = transactionId ?: randomNumber().toLong(),
             accountId = accountId ?: randomNumber().toLong(),
@@ -23,9 +24,9 @@ internal fun testTransactionResponseData(transactionId: Long? = null, accountId:
             merchantId = randomNumber().toLong(),
             budgetCategory = BudgetCategory.values()[Random.nextInt(BudgetCategory.values().size)],
             description = TransactionDescription(original = randomUUID(), user = null, simple = null),
-            included = randomBoolean(),
+            included = included ?: randomBoolean(),
             memo = randomUUID(),
             postDate = "2019-01-01",
             status = TransactionStatus.values()[Random.nextInt(TransactionStatus.values().size)],
-            transactionDate = "2019-01-01")
+            transactionDate = transactionDate ?: "2019-01-01")
 }

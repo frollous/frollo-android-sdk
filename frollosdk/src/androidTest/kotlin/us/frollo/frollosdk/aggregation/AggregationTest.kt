@@ -26,11 +26,9 @@ import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.mapping.toAccount
 import us.frollo.frollosdk.mapping.toProvider
 import us.frollo.frollosdk.mapping.toProviderAccount
+import us.frollo.frollosdk.mapping.toTransaction
+import us.frollo.frollosdk.model.*
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
-import us.frollo.frollosdk.model.loginFormFilledData
-import us.frollo.frollosdk.model.testAccountResponseData
-import us.frollo.frollosdk.model.testProviderAccountResponseData
-import us.frollo.frollosdk.model.testProviderResponseData
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.randomBoolean
@@ -618,6 +616,225 @@ class AggregationTest {
             assertEquals(DataErrorType.API, (error as DataError).type)
             assertEquals(DataErrorSubType.INVALID_DATA, error.subType)
         }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    // Transaction Tests
+
+    @Test
+    fun testFetchTransactionByID() {
+        initSetup()
+
+        val data = testTransactionResponseData()
+        val list = mutableListOf(testTransactionResponseData(), data, testTransactionResponseData())
+        database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+
+        val testObserver = aggregation.fetchTransaction(data.transactionId).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(data.transactionId, testObserver.value().data?.transactionId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactions() {
+        initSetup()
+
+        val data1 = testTransactionResponseData()
+        val data2 = testTransactionResponseData()
+        val data3 = testTransactionResponseData()
+        val data4 = testTransactionResponseData()
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+
+        val testObserver = aggregation.fetchTransactions().test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(4, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionByIds() {
+        initSetup()
+
+        val data1 = testTransactionResponseData(transactionId = 100)
+        val data2 = testTransactionResponseData(transactionId = 101)
+        val data3 = testTransactionResponseData(transactionId = 102)
+        val data4 = testTransactionResponseData(transactionId = 103)
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+
+        val testObserver = aggregation.fetchTransactions(longArrayOf(101,103)).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(2, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionsByAccountId() {
+        initSetup()
+
+        val data1 = testTransactionResponseData(accountId = 1)
+        val data2 = testTransactionResponseData(accountId = 2)
+        val data3 = testTransactionResponseData(accountId = 1)
+        val data4 = testTransactionResponseData(accountId = 1)
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+
+        val testObserver = aggregation.fetchTransactionsByAccountId(accountId = 1).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(3, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshTransactions() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.transactions_2018_08_01_valid)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == "${AggregationAPI.URL_TRANSACTIONS}?from_date=2018-06-01&to_date=2018-08-08") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshTransactions(fromDate = "2018-06-01", toDate = "2018-08-08") { error ->
+            assertNull(error)
+
+            val testObserver = aggregation.fetchTransactions().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(179, models?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${AggregationAPI.URL_TRANSACTIONS}?from_date=2018-06-01&to_date=2018-08-08", request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshTransactionByID() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.transaction_id_99703)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == "${NetworkHelper.API_VERSION_PATH}/aggregation/transactions/99703") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshTransaction(99703L) { error ->
+            assertNull(error)
+
+            val testObserver = aggregation.fetchTransaction(99703L).test()
+            testObserver.awaitValue()
+            val model = testObserver.value().data
+            assertNotNull(model)
+            assertEquals(99703L, model?.transactionId)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${NetworkHelper.API_VERSION_PATH}/aggregation/transactions/99703", request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshTransactionsByIds() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.transactions_2018_08_01_valid)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == "${AggregationAPI.URL_TRANSACTIONS}?transaction_ids=1,2,3,4,5") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshTransactions(longArrayOf(1, 2, 3, 4, 5)) { error ->
+            assertNull(error)
+
+            val testObserver = aggregation.fetchTransactions().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(179, models?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${AggregationAPI.URL_TRANSACTIONS}?transaction_ids=1,2,3,4,5", request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testUpdateTransaction() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.transaction_id_99703)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == "${NetworkHelper.API_VERSION_PATH}/aggregation/transactions/99703") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val transaction = testTransactionResponseData().toTransaction()
+
+        aggregation.updateTransaction(99703, transaction) { error ->
+
+            assertNull(error)
+
+            val testObserver = aggregation.fetchTransactions().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(1, models?.size)
+            assertEquals(99703L, models?.get(0)?.transactionId)
+            assertEquals(543L, models?.get(0)?.accountId)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${NetworkHelper.API_VERSION_PATH}/aggregation/transactions/99703", request.path)
 
         wait(3)
 

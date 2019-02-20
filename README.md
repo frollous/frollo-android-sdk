@@ -10,19 +10,19 @@
 
 To integrate Frollo Android SDK to your Android app use the following steps:
 
-1. Pull the Frollo SDK code base
-     If you are using GIT version control for your project, add Frollo SDK as a submodule in your project
-     `git submodule add git@bitbucket.org:frollo1/frollo-android-sdk.git`
-     `git submodule update --init --recursive`
-     or
-     Clone SDK repo inside your project
-     `git clone git@bitbucket.org:frollo1/frollo-android-sdk.git`
+1. Pull the Frollo SDK code base    
+     If you are using GIT version control for your project, add Frollo SDK as a submodule in your project    
+     `git submodule add git@bitbucket.org:frollo1/frollo-android-sdk.git`    
+     `git submodule update --init --recursive`    
+     or    
+     Clone SDK repo inside your project    
+     `git clone git@bitbucket.org:frollo1/frollo-android-sdk.git`    
      You should see a folder named _frollo-android-sdk_ inside your root project directory and within it, the SDK code. 
 2. Add _frollo-android-sdk_ module to your **settings.gradle** file
    > include ':app', ':frollo-android-sdk'
 3. Add below line to the dependencies in your **app/build.gradle** file
-   > dependencies {
-   >     //..
-   >     implementation project(":frollo-android-sdk")
+   > dependencies {    
+   >     //..    
+   >     implementation project(":frollo-android-sdk")    
    > }
 4. Build! 👷‍♂️

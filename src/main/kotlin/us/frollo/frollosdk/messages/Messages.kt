@@ -74,7 +74,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @param messageId ID of the message to fetch
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun refreshMessage(messageId: Long, completion: OnFrolloSDKCompletionListener? = null) {
+    fun refreshMessage(messageId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         messagesAPI.fetchMessage(messageId).enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -93,7 +93,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      *
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun refreshMessages(completion: OnFrolloSDKCompletionListener? = null) {
+    fun refreshMessages(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         messagesAPI.fetchMessages().enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -112,7 +112,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      *
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun refreshUnreadMessages(completion: OnFrolloSDKCompletionListener? = null) {
+    fun refreshUnreadMessages(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         messagesAPI.fetchUnreadMessages().enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -135,7 +135,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @param messageId ID of the message to be updated
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun updateMessage(messageId: Long, read: Boolean, interacted: Boolean, completion: OnFrolloSDKCompletionListener? = null) {
+    fun updateMessage(messageId: Long, read: Boolean, interacted: Boolean, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         messagesAPI.updateMessage(messageId, MessageUpdateRequest(read, interacted)).enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -156,7 +156,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
         refreshMessage(notification.userMessageID)
     }
 
-    private fun handleMessagesResponse(response: List<MessageResponse>?, unread: Boolean = false, completion: OnFrolloSDKCompletionListener? = null) {
+    private fun handleMessagesResponse(response: List<MessageResponse>?, unread: Boolean = false, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
                 db.messages().insertAll(*response.toTypedArray())
@@ -174,7 +174,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
 
-    private fun handleMessageResponse(response: MessageResponse?, completion: OnFrolloSDKCompletionListener? = null) {
+    private fun handleMessageResponse(response: MessageResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
                 db.messages().insert(response)

@@ -65,7 +65,8 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
      * @param userToken Token for the user depending on authentication method (optional)
      * @param completion: Completion handler with any error that occurred
      */
-    fun loginUser(method: AuthType, email: String? = null, password: String? = null, userId: String? = null, userToken: String? = null, completion: OnFrolloSDKCompletionListener) {
+    fun loginUser(method: AuthType, email: String? = null, password: String? = null, userId: String? = null,
+                  userToken: String? = null, completion: OnFrolloSDKCompletionListener<Result>) {
         if (loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
             completion.invoke(Result.error(error))
@@ -113,7 +114,9 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
      * @param password Password for the user
      * @param completion Completion handler with any error that occurred
      */
-    fun registerUser(firstName: String, lastName: String? = null, mobileNumber: String? = null, postcode: String? = null, dateOfBirth: Date? = null, email: String, password: String, completion: OnFrolloSDKCompletionListener) {
+    fun registerUser(firstName: String, lastName: String? = null, mobileNumber: String? = null,
+                     postcode: String? = null, dateOfBirth: Date? = null, email: String, password: String,
+                     completion: OnFrolloSDKCompletionListener<Result>) {
         if (loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
             completion.invoke(Result.error(error))
@@ -154,7 +157,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
      * @param email Email address of the account to begin resetting the password for.
      * @param completion A completion handler once the API has returned and the cache has been updated. Returns any error that occurred during the process.
      */
-    fun resetPassword(email: String, completion: OnFrolloSDKCompletionListener) {
+    fun resetPassword(email: String, completion: OnFrolloSDKCompletionListener<Result>) {
         userAPI.resetPassword(UserResetPasswordRequest(email)).enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -173,7 +176,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
      *
      * @param completion A completion handler once the API has returned and the cache has been updated. Returns any error that occurred during the process. (Optional)
      */
-    fun refreshUser(completion: OnFrolloSDKCompletionListener? = null) {
+    fun refreshUser(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (!loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
             completion?.invoke(Result.error(error))
@@ -198,7 +201,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
      *
      * @param completion A completion handler once the API has returned and the cache has been updated. Returns any error that occurred during the process.
      */
-    fun updateUser(user: User, completion: OnFrolloSDKCompletionListener) {
+    fun updateUser(user: User, completion: OnFrolloSDKCompletionListener<Result>) {
         if (!loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
             completion.invoke(Result.error(error))
@@ -223,7 +226,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
      *
      * @param completion A completion handler once the API has returned and the cache has been updated. Returns any error that occurred during the process.
      */
-    fun updateAttribution(attribution: Attribution, completion: OnFrolloSDKCompletionListener) {
+    fun updateAttribution(attribution: Attribution, completion: OnFrolloSDKCompletionListener<Result>) {
         if (!loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
             completion.invoke(Result.error(error))
@@ -250,7 +253,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
      * @param newPassword New password for the user - must be at least 8 characters
      * @param completion Completion handler with any error that occurred
      */
-    fun changePassword(currentPassword: String?, newPassword: String, completion: OnFrolloSDKCompletionListener) {
+    fun changePassword(currentPassword: String?, newPassword: String, completion: OnFrolloSDKCompletionListener<Result>) {
         if (!loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
             completion.invoke(Result.error(error))
@@ -284,7 +287,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
      *
      * @param completion Completion handler with any error that occurred
      */
-    internal fun deleteUser(completion: OnFrolloSDKCompletionListener) {
+    internal fun deleteUser(completion: OnFrolloSDKCompletionListener<Result>) {
         if (!loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
             completion.invoke(Result.error(error))
@@ -330,7 +333,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
      * @param compliant Indicates if the device is compliant or not
      * @param completion Completion handler with any error that occurred (optional)
      */
-    fun updateDeviceCompliance(compliant: Boolean, completion: OnFrolloSDKCompletionListener? = null) {
+    fun updateDeviceCompliance(compliant: Boolean, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         updateDevice(compliant = compliant, completion = completion)
     }
 
@@ -341,7 +344,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
      * @param notificationToken Push notification token for the device (optional)
      * @param completion Completion handler with any error that occurred (optional)
      */
-    internal fun updateDevice(compliant: Boolean? = null, notificationToken: String? = null, completion: OnFrolloSDKCompletionListener? = null) {
+    internal fun updateDevice(compliant: Boolean? = null, notificationToken: String? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (!loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
             completion?.invoke(Result.error(error))
@@ -372,7 +375,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
      *
      * @param completion Completion handler with optional error if something goes wrong during the logout process
      */
-    internal fun logoutUser(completion: OnFrolloSDKCompletionListener? = null) {
+    internal fun logoutUser(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (!loggedIn) {
             return
         }
@@ -393,7 +396,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
         }
     }
 
-    private fun handleUserResponse(userResponse: UserResponse?, completion: OnFrolloSDKCompletionListener? = null) {
+    private fun handleUserResponse(userResponse: UserResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         userResponse?.let {
             if (!loggedIn) loggedIn = true
 

@@ -15,10 +15,7 @@ import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.*
 import us.frollo.frollosdk.logging.Log
-import us.frollo.frollosdk.mapping.toAccount
-import us.frollo.frollosdk.mapping.toProvider
-import us.frollo.frollosdk.mapping.toProviderAccount
-import us.frollo.frollosdk.mapping.toTransaction
+import us.frollo.frollosdk.mapping.*
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountCreateRequest
@@ -60,7 +57,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
                 Resource.success(models)
             }
 
-    fun refreshProvider(providerId: Long, completion: OnFrolloSDKCompletionListener? = null) {
+    fun refreshProvider(providerId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchProvider(providerId).enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -74,7 +71,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    fun refreshProviders(completion: OnFrolloSDKCompletionListener? = null) {
+    fun refreshProviders(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchProviders().enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -88,7 +85,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    private fun handleProvidersResponse(response: List<ProviderResponse>?, completion: OnFrolloSDKCompletionListener? = null) {
+    private fun handleProvidersResponse(response: List<ProviderResponse>?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
                 val models = mapProviderResponse(response)
@@ -106,7 +103,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
 
-    private fun handleProviderResponse(response: ProviderResponse?, completion: OnFrolloSDKCompletionListener? = null) {
+    private fun handleProviderResponse(response: ProviderResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
                 db.providers().insert(response.toProvider())
@@ -136,7 +133,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
                 Resource.success(models)
             }
 
-    fun refreshProviderAccount(providerAccountId: Long, completion: OnFrolloSDKCompletionListener? = null) {
+    fun refreshProviderAccount(providerAccountId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchProviderAccount(providerAccountId).enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -150,7 +147,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    fun refreshProviderAccounts(completion: OnFrolloSDKCompletionListener? = null) {
+    fun refreshProviderAccounts(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchProviderAccounts().enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -164,7 +161,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    fun createProviderAccount(providerId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener? = null) {
+    fun createProviderAccount(providerId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val request = ProviderAccountCreateRequest(loginForm = loginForm, providerID = providerId)
 
         aggregationAPI.createProviderAccount(request).enqueue { resource ->
@@ -180,7 +177,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    fun deleteProviderAccount(providerAccountId: Long, completion: OnFrolloSDKCompletionListener? = null) {
+    fun deleteProviderAccount(providerAccountId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.deleteProviderAccount(providerAccountId).enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -199,7 +196,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    fun updateProviderAccount(providerAccountId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener? = null) {
+    fun updateProviderAccount(providerAccountId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val request = ProviderAccountUpdateRequest(loginForm = loginForm)
 
         aggregationAPI.updateProviderAccount(providerAccountId, request).enqueue { resource ->
@@ -215,7 +212,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    private fun handleProviderAccountsResponse(response: List<ProviderAccountResponse>?, completion: OnFrolloSDKCompletionListener? = null) {
+    private fun handleProviderAccountsResponse(response: List<ProviderAccountResponse>?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
                 val models = mapProviderAccountResponse(response)
@@ -233,7 +230,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
 
-    private fun handleProviderAccountResponse(response: ProviderAccountResponse?, completion: OnFrolloSDKCompletionListener? = null) {
+    private fun handleProviderAccountResponse(response: ProviderAccountResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
                 db.provideraccounts().insert(response.toProviderAccount())
@@ -269,7 +266,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
                 Resource.success(models)
             }
 
-    fun refreshAccount(accountId: Long, completion: OnFrolloSDKCompletionListener? = null) {
+    fun refreshAccount(accountId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchAccount(accountId).enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -283,7 +280,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    fun refreshAccounts(completion: OnFrolloSDKCompletionListener? = null) {
+    fun refreshAccounts(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchAccounts().enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -299,7 +296,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
 
     fun updateAccount(accountId: Long, hidden: Boolean, included: Boolean, favourite: Boolean? = null,
                       accountSubType: AccountSubType? = null, nickName: String? = null,
-                      completion: OnFrolloSDKCompletionListener? = null) {
+                      completion: OnFrolloSDKCompletionListener<Result>? = null) {
 
         val request = AccountUpdateRequest(
                 hidden = hidden,
@@ -328,7 +325,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    private fun handleAccountsResponse(response: List<AccountResponse>?, completion: OnFrolloSDKCompletionListener? = null) {
+    private fun handleAccountsResponse(response: List<AccountResponse>?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
                 val models = mapAccountResponse(response)
@@ -346,7 +343,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
 
-    private fun handleAccountResponse(response: AccountResponse?, completion: OnFrolloSDKCompletionListener? = null) {
+    private fun handleAccountResponse(response: AccountResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
                 db.accounts().insert(response.toAccount())
@@ -380,7 +377,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
                 Resource.success(models)
             }
 
-    fun refreshTransaction(transactionId: Long, completion: OnFrolloSDKCompletionListener? = null) {
+    fun refreshTransaction(transactionId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchTransaction(transactionId).enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -395,7 +392,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
     }
 
     fun refreshTransactions(fromDate: String, toDate: String, accountIds: LongArray? = null,
-                            transactionIncluded: Boolean? = null, completion: OnFrolloSDKCompletionListener? = null) {
+                            transactionIncluded: Boolean? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchTransactionsByQuery(fromDate = fromDate, toDate = toDate,
                 accountIds = accountIds, transactionIncluded = transactionIncluded).enqueue { resource ->
 
@@ -412,7 +409,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    fun refreshTransactions(transactionIds: LongArray, completion: OnFrolloSDKCompletionListener? = null) {
+    fun refreshTransactions(transactionIds: LongArray, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchTransactionsByIDs(transactionIds).enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -428,7 +425,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
 
     fun updateTransaction(transactionId: Long, transaction: Transaction,
                           recategoriseAll: Boolean? = null, includeApplyAll: Boolean? = null,
-                          completion: OnFrolloSDKCompletionListener? = null) {
+                          completion: OnFrolloSDKCompletionListener<Result>? = null) {
 
         val request = TransactionUpdateRequest(
                 budgetCategory = transaction.budgetCategory,
@@ -454,7 +451,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
 
     private fun handleTransactionsResponse(response: List<TransactionResponse>?, fromDate: String? = null, toDate: String? = null,
                                            accountIds: LongArray? = null, transactionIncluded: Boolean? = null,
-                                           completion: OnFrolloSDKCompletionListener? = null) {
+                                           completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
                 val models = mapTransactionResponse(response)
@@ -478,7 +475,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
 
-    private fun handleTransactionResponse(response: TransactionResponse?, completion: OnFrolloSDKCompletionListener? = null) {
+    private fun handleTransactionResponse(response: TransactionResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
                 db.transactions().insert(response.toTransaction())

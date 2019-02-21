@@ -107,7 +107,7 @@ object FrolloSDK {
      * @throws FrolloSDKError if SDK is already setup or Server URL is empty.
      */
     @Throws(FrolloSDKError::class)
-    fun setup(application: Application, setupParams: SetupParams, completion: OnFrolloSDKCompletionListener) {
+    fun setup(application: Application, setupParams: SetupParams, completion: OnFrolloSDKCompletionListener<Result>) {
         this.app = application
 
         if (_setup) throw FrolloSDKError("SDK already setup")
@@ -168,7 +168,7 @@ object FrolloSDK {
      *
      * @param completion Completion handler with any error that occurred
      */
-    fun deleteUser(completion: OnFrolloSDKCompletionListener? = null) {
+    fun deleteUser(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         authentication.deleteUser { result ->
             when (result.status) {
                 Result.Status.SUCCESS -> reset(completion)
@@ -185,7 +185,7 @@ object FrolloSDK {
      * @throws IllegalAccessException if SDK is not setup
      */
     @Throws(IllegalAccessException::class)
-    fun reset(completion: OnFrolloSDKCompletionListener? = null) {
+    fun reset(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (!_setup) throw IllegalAccessException("SDK not setup")
 
         pauseScheduledRefreshing()

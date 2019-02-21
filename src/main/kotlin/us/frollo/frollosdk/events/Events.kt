@@ -29,7 +29,7 @@ class Events(network: NetworkService) {
      * @param delayMinutes Delay in minutes for the host to delay the event (optional)
      * @param completion Completion handler with option error if something occurs (optional)
      */
-    fun triggerEvent(eventName: String, delayMinutes: Long? = null, completion: OnFrolloSDKCompletionListener? = null) {
+    fun triggerEvent(eventName: String, delayMinutes: Long? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         eventsAPI.createEvent(EventCreateRequest(event = eventName, delayMinutes = delayMinutes ?: 0)).enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {

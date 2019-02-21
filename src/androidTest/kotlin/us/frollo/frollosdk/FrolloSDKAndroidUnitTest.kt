@@ -15,7 +15,7 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.SetupParams
-import us.frollo.frollosdk.data.local.SDKDatabase
+import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.model.testUserResponseData
 import us.frollo.frollosdk.preferences.Preferences

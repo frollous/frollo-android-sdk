@@ -3,7 +3,7 @@ package us.frollo.frollosdk.base
 import androidx.lifecycle.LiveData
 import retrofit2.CallAdapter
 import retrofit2.Retrofit
-import us.frollo.frollosdk.data.remote.ApiResponse
+import us.frollo.frollosdk.network.ApiResponse
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 

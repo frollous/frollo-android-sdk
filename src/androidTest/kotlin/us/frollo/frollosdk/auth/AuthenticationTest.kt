@@ -21,10 +21,10 @@ import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.SetupParams
-import us.frollo.frollosdk.data.local.SDKDatabase
-import us.frollo.frollosdk.data.remote.NetworkService
-import us.frollo.frollosdk.data.remote.api.DeviceAPI
-import us.frollo.frollosdk.data.remote.api.UserAPI
+import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.network.NetworkService
+import us.frollo.frollosdk.network.api.DeviceAPI
+import us.frollo.frollosdk.network.api.UserAPI
 import us.frollo.frollosdk.error.*
 import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.keystore.Keystore

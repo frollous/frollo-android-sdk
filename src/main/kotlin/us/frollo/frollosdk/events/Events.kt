@@ -3,8 +3,8 @@ package us.frollo.frollosdk.events
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
-import us.frollo.frollosdk.data.remote.NetworkService
-import us.frollo.frollosdk.data.remote.api.EventsAPI
+import us.frollo.frollosdk.network.NetworkService
+import us.frollo.frollosdk.network.api.EventsAPI
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.logging.Log

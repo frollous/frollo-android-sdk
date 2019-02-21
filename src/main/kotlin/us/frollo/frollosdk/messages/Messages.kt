@@ -1,16 +1,15 @@
 package us.frollo.frollosdk.messages
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
-import us.frollo.frollosdk.data.local.SDKDatabase
-import us.frollo.frollosdk.data.remote.NetworkService
-import us.frollo.frollosdk.data.remote.api.MessagesAPI
+import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.network.NetworkService
+import us.frollo.frollosdk.network.api.MessagesAPI
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.generateSQLQueryMessages
 import us.frollo.frollosdk.logging.Log

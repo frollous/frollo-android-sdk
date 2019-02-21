@@ -17,8 +17,8 @@ import us.frollo.frollosdk.core.ARGUMENT.ARG_AUTHENTICATION_STATUS
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.core.SetupParams
-import us.frollo.frollosdk.data.local.SDKDatabase
-import us.frollo.frollosdk.data.remote.NetworkService
+import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.events.Events
 import us.frollo.frollosdk.extensions.notify

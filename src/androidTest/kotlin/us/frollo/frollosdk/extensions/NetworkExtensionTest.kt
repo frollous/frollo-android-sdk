@@ -21,7 +21,7 @@ import us.frollo.frollosdk.testutils.wait
 import okhttp3.mockwebserver.MockResponse
 import retrofit2.Response
 import us.frollo.frollosdk.base.Resource
-import us.frollo.frollosdk.data.remote.ApiResponse
+import us.frollo.frollosdk.network.ApiResponse
 import us.frollo.frollosdk.error.*
 import java.io.IOException
 import java.net.SocketTimeoutException

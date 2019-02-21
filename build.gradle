@@ -61,7 +61,7 @@ android {
         includes = ['packages.md','extras.md']
 
         packageOptions {
-            prefix = "us.frollo.frollosdk.data.local"
+            prefix = "us.frollo.frollosdk.database"
             suppress = true
         }
         packageOptions {
@@ -69,7 +69,7 @@ android {
             suppress = true
         }
         packageOptions {
-            prefix = "us.frollo.frollosdk.data.remote"
+            prefix = "us.frollo.frollosdk.network"
             suppress = true
         }
         packageOptions {
@@ -80,7 +80,7 @@ android {
 }
 
 buildscript {
-    ext.kotlin_version_internal = '1.3.20'
+    ext.kotlin_version_internal = '1.3.21'
 
     repositories {
         google()

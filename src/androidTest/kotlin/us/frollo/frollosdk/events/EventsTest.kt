@@ -14,8 +14,8 @@ import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.SetupParams
-import us.frollo.frollosdk.data.remote.NetworkService
-import us.frollo.frollosdk.data.remote.api.EventsAPI
+import us.frollo.frollosdk.network.NetworkService
+import us.frollo.frollosdk.network.api.EventsAPI
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.testutils.wait

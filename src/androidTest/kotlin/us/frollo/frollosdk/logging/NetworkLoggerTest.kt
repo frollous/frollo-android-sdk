@@ -13,8 +13,8 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.core.SetupParams
-import us.frollo.frollosdk.data.remote.NetworkService
-import us.frollo.frollosdk.data.remote.api.DeviceAPI
+import us.frollo.frollosdk.network.NetworkService
+import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.preferences.Preferences
 

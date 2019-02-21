@@ -16,10 +16,10 @@ import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.SetupParams
-import us.frollo.frollosdk.data.local.SDKDatabase
-import us.frollo.frollosdk.data.remote.NetworkHelper
-import us.frollo.frollosdk.data.remote.NetworkService
-import us.frollo.frollosdk.data.remote.api.AggregationAPI
+import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.network.NetworkHelper
+import us.frollo.frollosdk.network.NetworkService
+import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType

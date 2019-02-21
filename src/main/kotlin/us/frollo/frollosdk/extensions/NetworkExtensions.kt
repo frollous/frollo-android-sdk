@@ -4,7 +4,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import us.frollo.frollosdk.base.Resource
-import us.frollo.frollosdk.data.remote.ApiResponse
+import us.frollo.frollosdk.network.ApiResponse
 import us.frollo.frollosdk.error.*
 import us.frollo.frollosdk.mapping.toDataError
 

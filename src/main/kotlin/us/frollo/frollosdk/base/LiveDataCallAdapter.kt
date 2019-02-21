@@ -6,7 +6,7 @@ import retrofit2.Call
 import retrofit2.CallAdapter
 import retrofit2.Callback
 import retrofit2.Response
-import us.frollo.frollosdk.data.remote.ApiResponse
+import us.frollo.frollosdk.network.ApiResponse
 import java.lang.reflect.Type
 
 /**

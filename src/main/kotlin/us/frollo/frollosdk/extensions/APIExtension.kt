@@ -1,7 +1,7 @@
 package us.frollo.frollosdk.extensions
 
 import retrofit2.Call
-import us.frollo.frollosdk.data.remote.api.AggregationAPI
+import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 
 internal fun AggregationAPI.fetchTransactionsByQuery(

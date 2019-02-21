@@ -1,6 +1,5 @@
 package us.frollo.frollosdk.model.api.aggregation.transactions
 
-import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Balance
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
@@ -9,7 +8,6 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionSt
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 
 internal data class TransactionResponse(
-        @PrimaryKey
         @SerializedName("id") val transactionId: Long,
         @SerializedName("base_type") val baseType: TransactionBaseType,
         @SerializedName("status") val status: TransactionStatus,

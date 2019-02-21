@@ -83,15 +83,15 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
                 userToken = userToken)
 
         if (request.valid()) {
-            userAPI.login(request).enqueue { result ->
-                when(result.status) {
+            userAPI.login(request).enqueue { resource ->
+                when(resource.status) {
                     Resource.Status.SUCCESS -> {
-                        result.data?.fetchTokens()?.let { network.handleTokens(it) }
-                        handleUserResponse(result.data?.stripTokens(), completion)
+                        resource.data?.fetchTokens()?.let { network.handleTokens(it) }
+                        handleUserResponse(resource.data?.stripTokens(), completion)
                     }
                     Resource.Status.ERROR -> {
-                        Log.e("$TAG#loginUser", result.error?.localizedDescription)
-                        completion.invoke(Result.error(result.error))
+                        Log.e("$TAG#loginUser", resource.error?.localizedDescription)
+                        completion.invoke(Result.error(resource.error))
                     }
                 }
             }
@@ -132,15 +132,15 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
                 mobileNumber = mobileNumber,
                 dateOfBirth = dateOfBirth?.toString("yyyy-MM"))
 
-        userAPI.register(request).enqueue { result ->
-            when(result.status) {
+        userAPI.register(request).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    result.data?.fetchTokens()?.let { network.handleTokens(it) }
-                    handleUserResponse(result.data?.stripTokens(), completion)
+                    resource.data?.fetchTokens()?.let { network.handleTokens(it) }
+                    handleUserResponse(resource.data?.stripTokens(), completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#registerUser", result.error?.localizedDescription)
-                    completion.invoke(Result.error(result.error))
+                    Log.e("$TAG#registerUser", resource.error?.localizedDescription)
+                    completion.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -155,14 +155,14 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
      * @param completion A completion handler once the API has returned and the cache has been updated. Returns any error that occurred during the process.
      */
     fun resetPassword(email: String, completion: OnFrolloSDKCompletionListener) {
-        userAPI.resetPassword(UserResetPasswordRequest(email)).enqueue { result ->
-            when(result.status) {
+        userAPI.resetPassword(UserResetPasswordRequest(email)).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
                     completion.invoke(Result.success())
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#resetPassword", result.error?.localizedDescription)
-                    completion.invoke(Result.error(result.error))
+                    Log.e("$TAG#resetPassword", resource.error?.localizedDescription)
+                    completion.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -180,14 +180,14 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
             return
         }
 
-        userAPI.fetchUser().enqueue { result ->
-            when(result.status) {
+        userAPI.fetchUser().enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleUserResponse(result.data, completion)
+                    handleUserResponse(resource.data, completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshUser", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#refreshUser", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -205,14 +205,14 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
             return
         }
 
-        userAPI.updateUser(user.updateRequest()).enqueue { result ->
-            when(result.status) {
+        userAPI.updateUser(user.updateRequest()).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleUserResponse(result.data, completion)
+                    handleUserResponse(resource.data, completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#updateUser", result.error?.localizedDescription)
-                    completion.invoke(Result.error(result.error))
+                    Log.e("$TAG#updateUser", resource.error?.localizedDescription)
+                    completion.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -230,14 +230,14 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
             return
         }
 
-        userAPI.updateUser(UserUpdateRequest(attribution = attribution)).enqueue { result ->
-            when(result.status) {
+        userAPI.updateUser(UserUpdateRequest(attribution = attribution)).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleUserResponse(result.data, completion)
+                    handleUserResponse(resource.data, completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#updateAttribution", result.error?.localizedDescription)
-                    completion.invoke(Result.error(result.error))
+                    Log.e("$TAG#updateAttribution", resource.error?.localizedDescription)
+                    completion.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -262,14 +262,14 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
                 newPassword = newPassword)
 
         if (request.valid()) {
-            userAPI.changePassword(request).enqueue { result ->
-                when(result.status) {
+            userAPI.changePassword(request).enqueue { resource ->
+                when(resource.status) {
                     Resource.Status.SUCCESS -> {
                         completion.invoke(Result.success())
                     }
                     Resource.Status.ERROR -> {
-                        Log.e("$TAG#changePassword", result.error?.localizedDescription)
-                        completion.invoke(Result.error(result.error))
+                        Log.e("$TAG#changePassword", resource.error?.localizedDescription)
+                        completion.invoke(Result.error(resource.error))
                     }
                 }
             }
@@ -291,15 +291,15 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
             return
         }
 
-        userAPI.deleteUser().enqueue { result ->
-            when(result.status) {
+        userAPI.deleteUser().enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
                     reset()
                     completion.invoke(Result.success())
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#deleteUser", result.error?.localizedDescription)
-                    completion.invoke(Result.error(result.error))
+                    Log.e("$TAG#deleteUser", resource.error?.localizedDescription)
+                    completion.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -354,14 +354,14 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
                 timezone = TimeZone.getDefault().id,
                 compliant = compliant)
 
-        deviceAPI.updateDevice(request).enqueue { result ->
-            when(result.status) {
+        deviceAPI.updateDevice(request).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
                     completion?.invoke(Result.success())
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#updateDevice", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#updateDevice", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -377,17 +377,17 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
             return
         }
 
-        userAPI.logout().enqueue { result ->
+        userAPI.logout().enqueue { resource ->
 
             reset()
 
-            when(result.status) {
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
                     completion?.invoke(Result.success())
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#logoutUser", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#logoutUser", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }

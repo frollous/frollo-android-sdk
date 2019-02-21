@@ -82,9 +82,9 @@ class NetworkExtensionTest {
             }
         })
 
-        testAPI.testData().enqueue { result ->
-            assertEquals(Resource.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        testAPI.testData().enqueue { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
         }
 
         val request = mockServer.takeRequest()
@@ -110,11 +110,11 @@ class NetworkExtensionTest {
             }
         })
 
-        testAPI.testData().enqueue { result ->
-            assertEquals(Resource.Status.ERROR, result.status)
-            assertNotNull(result.error)
-            assertTrue(result.error is APIError)
-            assertEquals(APIErrorType.OTHER_AUTHORISATION, (result.error as APIError).type)
+        testAPI.testData().enqueue { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertTrue(resource.error is APIError)
+            assertEquals(APIErrorType.OTHER_AUTHORISATION, (resource.error as APIError).type)
         }
 
         val request = mockServer.takeRequest()
@@ -131,11 +131,11 @@ class NetworkExtensionTest {
 
         mockServer.enqueue(MockResponse().apply {  socketPolicy = SocketPolicy.DISCONNECT_AFTER_REQUEST })
 
-        testAPI.testData().enqueue { result ->
-            assertEquals(Resource.Status.ERROR, result.status)
-            assertNotNull(result.error)
-            assertTrue(result.error is NetworkError)
-            assertEquals(NetworkErrorType.CONNECTION_FAILURE, (result.error as NetworkError).type)
+        testAPI.testData().enqueue { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertTrue(resource.error is NetworkError)
+            assertEquals(NetworkErrorType.CONNECTION_FAILURE, (resource.error as NetworkError).type)
         }
 
         wait(3)

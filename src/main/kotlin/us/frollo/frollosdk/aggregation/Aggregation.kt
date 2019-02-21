@@ -61,28 +61,28 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
             }
 
     fun refreshProvider(providerId: Long, completion: OnFrolloSDKCompletionListener? = null) {
-        aggregationAPI.fetchProvider(providerId).enqueue { result ->
-            when(result.status) {
+        aggregationAPI.fetchProvider(providerId).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleProviderResponse(result.data, completion)
+                    handleProviderResponse(resource.data, completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshProvider", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#refreshProvider", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
     }
 
     fun refreshProviders(completion: OnFrolloSDKCompletionListener? = null) {
-        aggregationAPI.fetchProviders().enqueue { result ->
-            when(result.status) {
+        aggregationAPI.fetchProviders().enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleProvidersResponse(response = result.data, completion = completion)
+                    handleProvidersResponse(response = resource.data, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshProviders", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#refreshProviders", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -137,28 +137,28 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
             }
 
     fun refreshProviderAccount(providerAccountId: Long, completion: OnFrolloSDKCompletionListener? = null) {
-        aggregationAPI.fetchProviderAccount(providerAccountId).enqueue { result ->
-            when(result.status) {
+        aggregationAPI.fetchProviderAccount(providerAccountId).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleProviderAccountResponse(response = result.data, completion = completion)
+                    handleProviderAccountResponse(response = resource.data, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshProviderAccount", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#refreshProviderAccount", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
     }
 
     fun refreshProviderAccounts(completion: OnFrolloSDKCompletionListener? = null) {
-        aggregationAPI.fetchProviderAccounts().enqueue { result ->
-            when(result.status) {
+        aggregationAPI.fetchProviderAccounts().enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleProviderAccountsResponse(response = result.data, completion = completion)
+                    handleProviderAccountsResponse(response = resource.data, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshProviderAccounts", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#refreshProviderAccounts", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -167,22 +167,22 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
     fun createProviderAccount(providerId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener? = null) {
         val request = ProviderAccountCreateRequest(loginForm = loginForm, providerID = providerId)
 
-        aggregationAPI.createProviderAccount(request).enqueue { result ->
-            when(result.status) {
+        aggregationAPI.createProviderAccount(request).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleProviderAccountResponse(response = result.data, completion = completion)
+                    handleProviderAccountResponse(response = resource.data, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#createProviderAccount", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#createProviderAccount", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
     }
 
     fun deleteProviderAccount(providerAccountId: Long, completion: OnFrolloSDKCompletionListener? = null) {
-        aggregationAPI.deleteProviderAccount(providerAccountId).enqueue { result ->
-            when(result.status) {
+        aggregationAPI.deleteProviderAccount(providerAccountId).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
                     // Manually delete other data linked to this provider account
                     // as we are not using ForeignKeys because ForeignKey constraints
@@ -192,8 +192,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
                     completion?.invoke(Result.success())
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#deleteProviderAccount", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#deleteProviderAccount", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -202,14 +202,14 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
     fun updateProviderAccount(providerAccountId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener? = null) {
         val request = ProviderAccountUpdateRequest(loginForm = loginForm)
 
-        aggregationAPI.updateProviderAccount(providerAccountId, request).enqueue { result ->
-            when(result.status) {
+        aggregationAPI.updateProviderAccount(providerAccountId, request).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleProviderAccountResponse(response = result.data, completion = completion)
+                    handleProviderAccountResponse(response = resource.data, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#updateProviderAccount", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#updateProviderAccount", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -270,28 +270,28 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
             }
 
     fun refreshAccount(accountId: Long, completion: OnFrolloSDKCompletionListener? = null) {
-        aggregationAPI.fetchAccount(accountId).enqueue { result ->
-            when(result.status) {
+        aggregationAPI.fetchAccount(accountId).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleAccountResponse(response = result.data, completion = completion)
+                    handleAccountResponse(response = resource.data, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshAccount", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#refreshAccount", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
     }
 
     fun refreshAccounts(completion: OnFrolloSDKCompletionListener? = null) {
-        aggregationAPI.fetchAccounts().enqueue { result ->
-            when(result.status) {
+        aggregationAPI.fetchAccounts().enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleAccountsResponse(response = result.data, completion = completion)
+                    handleAccountsResponse(response = resource.data, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshAccounts", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#refreshAccounts", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -315,14 +315,14 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
             return
         }
 
-        aggregationAPI.updateAccount(accountId, request).enqueue { result ->
-            when(result.status) {
+        aggregationAPI.updateAccount(accountId, request).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleAccountResponse(response = result.data, completion = completion)
+                    handleAccountResponse(response = resource.data, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#updateAccount", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#updateAccount", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -381,14 +381,14 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
             }
 
     fun refreshTransaction(transactionId: Long, completion: OnFrolloSDKCompletionListener? = null) {
-        aggregationAPI.fetchTransaction(transactionId).enqueue { result ->
-            when(result.status) {
+        aggregationAPI.fetchTransaction(transactionId).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleTransactionResponse(response = result.data, completion = completion)
+                    handleTransactionResponse(response = resource.data, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshTransaction", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#refreshTransaction", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -397,30 +397,30 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
     fun refreshTransactions(fromDate: String, toDate: String, accountIds: LongArray? = null,
                             transactionIncluded: Boolean? = null, completion: OnFrolloSDKCompletionListener? = null) {
         aggregationAPI.fetchTransactionsByQuery(fromDate = fromDate, toDate = toDate,
-                accountIds = accountIds, transactionIncluded = transactionIncluded).enqueue { result ->
+                accountIds = accountIds, transactionIncluded = transactionIncluded).enqueue { resource ->
 
-            when(result.status) {
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleTransactionsResponse(response = result.data, fromDate = fromDate, toDate = toDate,
+                    handleTransactionsResponse(response = resource.data, fromDate = fromDate, toDate = toDate,
                             accountIds = accountIds, transactionIncluded = transactionIncluded, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshTransactions", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#refreshTransactions", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
     }
 
     fun refreshTransactions(transactionIds: LongArray, completion: OnFrolloSDKCompletionListener? = null) {
-        aggregationAPI.fetchTransactionsByIDs(transactionIds).enqueue { result ->
-            when(result.status) {
+        aggregationAPI.fetchTransactionsByIDs(transactionIds).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleTransactionsResponse(response = result.data, completion = completion)
+                    handleTransactionsResponse(response = resource.data, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshTransactionsByIDs", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#refreshTransactionsByIDs", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -439,14 +439,14 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
                 recategoriseAll = recategoriseAll,
                 includeApplyAll = includeApplyAll)
 
-        aggregationAPI.updateTransaction(transactionId, request).enqueue { result ->
-            when(result.status) {
+        aggregationAPI.updateTransaction(transactionId, request).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleTransactionResponse(response = result.data, completion = completion)
+                    handleTransactionResponse(response = resource.data, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#updateTransaction", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#updateTransaction", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }

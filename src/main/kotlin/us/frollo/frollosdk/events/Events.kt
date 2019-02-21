@@ -30,14 +30,14 @@ class Events(network: NetworkService) {
      * @param completion Completion handler with option error if something occurs (optional)
      */
     fun triggerEvent(eventName: String, delayMinutes: Long? = null, completion: OnFrolloSDKCompletionListener? = null) {
-        eventsAPI.createEvent(EventCreateRequest(event = eventName, delayMinutes = delayMinutes ?: 0)).enqueue { result ->
-            when(result.status) {
+        eventsAPI.createEvent(EventCreateRequest(event = eventName, delayMinutes = delayMinutes ?: 0)).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
                     completion?.invoke(Result.success())
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#triggerEvent", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#triggerEvent", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }

@@ -75,14 +75,14 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshMessage(messageId: Long, completion: OnFrolloSDKCompletionListener? = null) {
-        messagesAPI.fetchMessage(messageId).enqueue { result ->
-            when(result.status) {
+        messagesAPI.fetchMessage(messageId).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleMessageResponse(response = result.data, completion = completion)
+                    handleMessageResponse(response = resource.data, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshMessage", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#refreshMessage", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -94,14 +94,14 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshMessages(completion: OnFrolloSDKCompletionListener? = null) {
-        messagesAPI.fetchMessages().enqueue { result ->
-            when(result.status) {
+        messagesAPI.fetchMessages().enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleMessagesResponse(response = result.data, completion = completion)
+                    handleMessagesResponse(response = resource.data, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshMessages", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#refreshMessages", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -113,14 +113,14 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshUnreadMessages(completion: OnFrolloSDKCompletionListener? = null) {
-        messagesAPI.fetchUnreadMessages().enqueue { result ->
-            when(result.status) {
+        messagesAPI.fetchUnreadMessages().enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleMessagesResponse(response = result.data,  unread = true, completion = completion)
+                    handleMessagesResponse(response = resource.data,  unread = true, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshUnreadMessages", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#refreshUnreadMessages", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }
@@ -136,14 +136,14 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun updateMessage(messageId: Long, read: Boolean, interacted: Boolean, completion: OnFrolloSDKCompletionListener? = null) {
-        messagesAPI.updateMessage(messageId, MessageUpdateRequest(read, interacted)).enqueue { result ->
-            when(result.status) {
+        messagesAPI.updateMessage(messageId, MessageUpdateRequest(read, interacted)).enqueue { resource ->
+            when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleMessageResponse(response = result.data, completion = completion)
+                    handleMessageResponse(response = resource.data, completion = completion)
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#updateMessage", result.error?.localizedDescription)
-                    completion?.invoke(Result.error(result.error))
+                    Log.e("$TAG#updateMessage", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
                 }
             }
         }

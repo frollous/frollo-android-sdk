@@ -6,6 +6,7 @@ import androidx.lifecycle.Transformations
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.base.Resource
+import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkService
@@ -40,7 +41,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
     fun fetchMessage(messageId: Long): LiveData<Resource<Message>> =
             Transformations.map(db.messages().load(messageId)) { response ->
                 Resource.success(response?.toMessage())
-            }.apply { (this as? MutableLiveData<Resource<Message>>)?.value = Resource.loading(null) }
+            }
 
     /**
      * Fetch messages from the cache
@@ -56,15 +57,15 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
         return if (messageTypes != null) {
             Transformations.map(db.messages().loadByQuery(generateSQLQueryMessages(messageTypes, read))) { response ->
                 Resource.success(mapMessageResponse(response))
-            }.apply { (this as? MutableLiveData<Resource<List<Message>>>)?.value = Resource.loading(null) }
+            }
         } else if (read != null) {
             Transformations.map(db.messages().load(read)) { response ->
                 Resource.success(mapMessageResponse(response))
-            }.apply { (this as? MutableLiveData<Resource<List<Message>>>)?.value = Resource.loading(null) }
+            }
         } else {
             Transformations.map(db.messages().load()) { response ->
                 Resource.success(mapMessageResponse(response))
-            }.apply { (this as? MutableLiveData<Resource<List<Message>>>)?.value = Resource.loading(null) }
+            }
         }
     }
 
@@ -75,15 +76,16 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshMessage(messageId: Long, completion: OnFrolloSDKCompletionListener? = null) {
-        messagesAPI.fetchMessage(messageId).enqueue { response, error ->
-            if (error != null) {
-                Log.e("$TAG#refreshMessage", error.localizedDescription)
-                completion?.invoke(error)
-            } else if (response == null) {
-                // Explicitly invoke completion callback if response is null.
-                completion?.invoke(null)
-            } else
-                handleMessageResponse(response, completion)
+        messagesAPI.fetchMessage(messageId).enqueue { result ->
+            when(result.status) {
+                Resource.Status.SUCCESS -> {
+                    handleMessageResponse(response = result.data, completion = completion)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshMessage", result.error?.localizedDescription)
+                    completion?.invoke(Result.error(result.error))
+                }
+            }
         }
     }
 
@@ -93,15 +95,16 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshMessages(completion: OnFrolloSDKCompletionListener? = null) {
-        messagesAPI.fetchMessages().enqueue { response, error ->
-            if (error != null) {
-                Log.e("$TAG#refreshMessages", error.localizedDescription)
-                completion?.invoke(error)
-            } else if (response == null) {
-                // Explicitly invoke completion callback if response is null.
-                completion?.invoke(null)
-            } else
-                handleMessagesResponse(response = response, completion = completion)
+        messagesAPI.fetchMessages().enqueue { result ->
+            when(result.status) {
+                Resource.Status.SUCCESS -> {
+                    handleMessagesResponse(response = result.data, completion = completion)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshMessages", result.error?.localizedDescription)
+                    completion?.invoke(Result.error(result.error))
+                }
+            }
         }
     }
 
@@ -111,15 +114,16 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshUnreadMessages(completion: OnFrolloSDKCompletionListener? = null) {
-        messagesAPI.fetchUnreadMessages().enqueue { response, error ->
-            if (error != null) {
-                Log.e("$TAG#refreshUnreadMessages", error.localizedDescription)
-                completion?.invoke(error)
-            } else if (response == null) {
-                // Explicitly invoke completion callback if response is null.
-                completion?.invoke(null)
-            } else
-                handleMessagesResponse(response = response, unread = true, completion = completion)
+        messagesAPI.fetchUnreadMessages().enqueue { result ->
+            when(result.status) {
+                Resource.Status.SUCCESS -> {
+                    handleMessagesResponse(response = result.data,  unread = true, completion = completion)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshUnreadMessages", result.error?.localizedDescription)
+                    completion?.invoke(Result.error(result.error))
+                }
+            }
         }
     }
 
@@ -133,15 +137,16 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun updateMessage(messageId: Long, read: Boolean, interacted: Boolean, completion: OnFrolloSDKCompletionListener? = null) {
-        messagesAPI.updateMessage(messageId, MessageUpdateRequest(read, interacted)).enqueue { response, error ->
-            if (error != null) {
-                Log.e("$TAG#updateMessage", error.localizedDescription)
-                completion?.invoke(error)
-            } else if (response == null) {
-                // Explicitly invoke completion callback if response is null.
-                completion?.invoke(null)
-            } else
-                handleMessageResponse(response, completion)
+        messagesAPI.updateMessage(messageId, MessageUpdateRequest(read, interacted)).enqueue { result ->
+            when(result.status) {
+                Resource.Status.SUCCESS -> {
+                    handleMessageResponse(response = result.data, completion = completion)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#updateMessage", result.error?.localizedDescription)
+                    completion?.invoke(Result.error(result.error))
+                }
+            }
         }
     }
 
@@ -152,28 +157,32 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
         refreshMessage(notification.userMessageID)
     }
 
-    private fun handleMessagesResponse(response: List<MessageResponse>, unread: Boolean = false, completion: OnFrolloSDKCompletionListener? = null) {
-        doAsync {
-            db.messages().insertAll(*response.toTypedArray())
+    private fun handleMessagesResponse(response: List<MessageResponse>?, unread: Boolean = false, completion: OnFrolloSDKCompletionListener? = null) {
+        response?.let {
+            doAsync {
+                db.messages().insertAll(*response.toTypedArray())
 
-            val apiIds = response.map { it.messageId }.toList()
-            val staleIds = if (unread) db.messages().getUnreadStaleIds(apiIds.toLongArray())
-                           else db.messages().getStaleIds(apiIds.toLongArray())
+                val apiIds = response.map { it.messageId }.toList()
+                val staleIds = if (unread) db.messages().getUnreadStaleIds(apiIds.toLongArray())
+                else db.messages().getStaleIds(apiIds.toLongArray())
 
-            if (staleIds.isNotEmpty()) {
-                db.messages().deleteMany(staleIds.toLongArray())
+                if (staleIds.isNotEmpty()) {
+                    db.messages().deleteMany(staleIds.toLongArray())
+                }
+
+                uiThread { completion?.invoke(Result.success()) }
             }
-
-            uiThread { completion?.invoke(null) }
-        }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
 
-    private fun handleMessageResponse(response: MessageResponse, completion: OnFrolloSDKCompletionListener? = null) {
-        doAsync {
-            db.messages().insert(response)
+    private fun handleMessageResponse(response: MessageResponse?, completion: OnFrolloSDKCompletionListener? = null) {
+        response?.let {
+            doAsync {
+                db.messages().insert(response)
 
-            uiThread { completion?.invoke(null) }
-        }
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
 
     private fun mapMessageResponse(models: List<MessageResponse>): List<Message> =

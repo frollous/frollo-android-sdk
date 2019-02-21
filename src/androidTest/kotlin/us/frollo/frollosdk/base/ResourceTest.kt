@@ -2,17 +2,10 @@ package us.frollo.frollosdk.base
 
 import android.app.Application
 import androidx.test.platform.app.InstrumentationRegistry
-import okhttp3.MediaType
-import okhttp3.ResponseBody
 import org.junit.Test
 import org.junit.Assert.*
 import org.junit.Before
-import retrofit2.Response
 import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.R
-import us.frollo.frollosdk.data.remote.ApiResponse
-import us.frollo.frollosdk.error.APIError
-import us.frollo.frollosdk.error.APIErrorType
 import us.frollo.frollosdk.error.FrolloSDKError
 
 class ResourceTest {
@@ -50,16 +43,6 @@ class ResourceTest {
     }
 
     @Test
-    fun testResourceLoading() {
-        val resource = Resource.loading("12345")
-        assertNotNull(resource)
-        assertEquals(Resource.Status.LOADING, resource.status)
-        assertNotNull(resource.data)
-        assertEquals("12345", resource.data)
-        assertNull(resource.error)
-    }
-
-    @Test
     fun testResourceError() {
         val resource = Resource.error(FrolloSDKError(errorMessage = "Unauthorized"), data = null)
         assertNotNull(resource)
@@ -68,37 +51,5 @@ class ResourceTest {
         assertNotNull(resource.error)
         assertEquals("Unauthorized", resource.error?.debugDescription)
         assertEquals("Unauthorized", resource.error?.localizedDescription)
-    }
-
-    @Test
-    fun testSuccessFromApiResponse() {
-        val apiResponse = ApiResponse<String>(Response.success("12345"))
-        val resource: Resource<String> = Resource.fromApiResponse(apiResponse)
-        assertNotNull(resource)
-        assertEquals(Resource.Status.SUCCESS, resource.status)
-        assertNotNull(resource.data)
-        assertEquals("12345", resource.data)
-        assertNull(resource.error)
-    }
-
-    @Test
-    fun testErrorFromApiResponse() {
-        val apiResponse = ApiResponse<String>(Response.error(401, ResponseBody.create(MediaType.parse("text"), "Unauthorized")))
-        var resource: Resource<String> = Resource.fromApiResponse(apiResponse)
-        assertNotNull(resource)
-        assertEquals(Resource.Status.ERROR, resource.status)
-        assertNull(resource.data)
-        assertNotNull(resource.error)
-        assertTrue(resource.error is APIError)
-        assertEquals(APIErrorType.OTHER_AUTHORISATION, (resource.error as APIError).type)
-
-        apiResponse.errorMessage = null
-        resource = Resource.fromApiResponse(apiResponse)
-        assertNotNull(resource)
-        assertEquals(Resource.Status.ERROR, resource.status)
-        assertNull(resource.data)
-        assertNotNull(resource.error)
-        assertTrue(resource.error is APIError)
-        assertEquals(APIErrorType.OTHER_AUTHORISATION, (resource.error as APIError).type)
     }
 }

@@ -1,5 +1,7 @@
 package us.frollo.frollosdk.events
 
+import us.frollo.frollosdk.base.Resource
+import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.data.remote.api.EventsAPI
@@ -28,11 +30,16 @@ class Events(network: NetworkService) {
      * @param completion Completion handler with option error if something occurs (optional)
      */
     fun triggerEvent(eventName: String, delayMinutes: Long? = null, completion: OnFrolloSDKCompletionListener? = null) {
-        eventsAPI.createEvent(EventCreateRequest(event = eventName, delayMinutes = delayMinutes ?: 0)).enqueue { _, error ->
-            if (error != null)
-                Log.e("$TAG#triggerEvent", error.localizedDescription)
-
-            completion?.invoke(error)
+        eventsAPI.createEvent(EventCreateRequest(event = eventName, delayMinutes = delayMinutes ?: 0)).enqueue { result ->
+            when(result.status) {
+                Resource.Status.SUCCESS -> {
+                    completion?.invoke(Result.success())
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#triggerEvent", result.error?.localizedDescription)
+                    completion?.invoke(Result.error(result.error))
+                }
+            }
         }
     }
 

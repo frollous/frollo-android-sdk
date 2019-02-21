@@ -5,15 +5,11 @@ import us.frollo.frollosdk.error.FrolloSDKError
 /**
  * Wrapper class around the data with different fetch states
  */
-class Resource<out T> private constructor(
+class Result private constructor(
         /**
          * Status of the fetch result
          */
         val status: Status,
-        /**
-         * Fetched data. null if state is [Status.ERROR]
-         */
-        val data: T? = null,
         /**
          * Error details if state is [Status.ERROR]
          */
@@ -33,13 +29,8 @@ class Resource<out T> private constructor(
         ERROR
     }
 
-    /**
-     * Maps the [Resource] data into a new [Resource] object with new data, while copying the other properties
-     */
-    fun <Y> map(function: (T?) -> Y?): Resource<Y> = Resource(status, function(data), error)
-
     companion object {
-        internal fun <T> success(data: T?): Resource<T> = Resource(Status.SUCCESS, data, null)
-        internal fun <T> error(error: FrolloSDKError?, data: T? = null): Resource<T> = Resource(Status.ERROR, data, error)
+        internal fun success(): Result = Result(Status.SUCCESS)
+        internal fun error(error: FrolloSDKError?): Result = Result(Status.ERROR, error)
     }
 }

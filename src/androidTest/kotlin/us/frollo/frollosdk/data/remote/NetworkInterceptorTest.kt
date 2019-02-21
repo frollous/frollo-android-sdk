@@ -86,7 +86,7 @@ class NetworkInterceptorTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        userAPI.fetchUser().enqueue { _, _ -> }
+        userAPI.fetchUser().enqueue { }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_USER_DETAILS, request.path)
@@ -116,7 +116,7 @@ class NetworkInterceptorTest {
         })
 
         val bearer = "Bearer ${OTP.generateOTP("us.frollo.frollosdk")}"
-        userAPI.register(testValidRegisterData()).enqueue { _, _ -> }
+        userAPI.register(testValidRegisterData()).enqueue { }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_REGISTER, request.path)
@@ -142,7 +142,7 @@ class NetworkInterceptorTest {
         })
 
         val bearer = "Bearer ${OTP.generateOTP("us.frollo.frollosdk")}"
-        userAPI.resetPassword(testResetPasswordData()).enqueue { _, _ -> }
+        userAPI.resetPassword(testResetPasswordData()).enqueue { }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_PASSWORD_RESET, request.path)
@@ -172,7 +172,7 @@ class NetworkInterceptorTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        userAPI.fetchUser().enqueue { _, _ -> }
+        userAPI.fetchUser().enqueue { }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_USER_DETAILS, request.path)
@@ -223,7 +223,7 @@ class NetworkInterceptorTest {
             }
         })
 
-        userAPI.login(testEmailLoginData()).enqueue { _, _ -> }
+        userAPI.login(testEmailLoginData()).enqueue { }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_LOGIN, request.path)

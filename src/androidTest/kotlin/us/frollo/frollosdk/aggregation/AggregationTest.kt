@@ -14,6 +14,7 @@ import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkHelper
@@ -129,8 +130,9 @@ class AggregationTest {
             }
         })
 
-        aggregation.refreshProviders { error ->
-            assertNull(error)
+        aggregation.refreshProviders { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = aggregation.fetchProviders().test()
             testObserver.awaitValue()
@@ -163,8 +165,9 @@ class AggregationTest {
             }
         })
 
-        aggregation.refreshProvider(12345L) { error ->
-            assertNull(error)
+        aggregation.refreshProvider(12345L) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = aggregation.fetchProvider(12345L).test()
             testObserver.awaitValue()
@@ -255,8 +258,9 @@ class AggregationTest {
             }
         })
 
-        aggregation.refreshProviderAccounts { error ->
-            assertNull(error)
+        aggregation.refreshProviderAccounts { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = aggregation.fetchProviderAccounts().test()
             testObserver.awaitValue()
@@ -289,8 +293,9 @@ class AggregationTest {
             }
         })
 
-        aggregation.refreshProviderAccount(123L) { error ->
-            assertNull(error)
+        aggregation.refreshProviderAccount(123L) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = aggregation.fetchProviderAccount(123L).test()
             testObserver.awaitValue()
@@ -323,8 +328,9 @@ class AggregationTest {
             }
         })
 
-        aggregation.createProviderAccount(providerId = 4078, loginForm = loginFormFilledData()) { error ->
-            assertNull(error)
+        aggregation.createProviderAccount(providerId = 4078, loginForm = loginFormFilledData()) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = aggregation.fetchProviderAccounts().test()
             testObserver.awaitValue()
@@ -359,8 +365,9 @@ class AggregationTest {
         val data = testProviderAccountResponseData(providerAccountId = 12345)
         database.provideraccounts().insert(data.toProviderAccount())
 
-        aggregation.deleteProviderAccount(12345) { error ->
-            assertNull(error)
+        aggregation.deleteProviderAccount(12345) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             wait(1)
 
@@ -394,8 +401,9 @@ class AggregationTest {
             }
         })
 
-        aggregation.updateProviderAccount(loginForm = loginFormFilledData(), providerAccountId = 123) { error ->
-            assertNull(error)
+        aggregation.updateProviderAccount(loginForm = loginFormFilledData(), providerAccountId = 123) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = aggregation.fetchProviderAccounts().test()
             testObserver.awaitValue()
@@ -492,8 +500,9 @@ class AggregationTest {
             }
         })
 
-        aggregation.refreshAccounts { error ->
-            assertNull(error)
+        aggregation.refreshAccounts { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = aggregation.fetchAccounts().test()
             testObserver.awaitValue()
@@ -526,8 +535,9 @@ class AggregationTest {
             }
         })
 
-        aggregation.refreshAccount(542L) { error ->
-            assertNull(error)
+        aggregation.refreshAccount(542L) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = aggregation.fetchAccount(542L).test()
             testObserver.awaitValue()
@@ -566,9 +576,10 @@ class AggregationTest {
                 included = true,
                 favourite = randomBoolean(),
                 accountSubType = AccountSubType.SAVINGS,
-                nickName = randomUUID()) { error ->
+                nickName = randomUUID()) { result ->
 
-            assertNull(error)
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = aggregation.fetchAccounts().test()
             testObserver.awaitValue()
@@ -609,12 +620,13 @@ class AggregationTest {
                 included = true,
                 favourite = randomBoolean(),
                 accountSubType = AccountSubType.SAVINGS,
-                nickName = randomUUID()) { error ->
+                nickName = randomUUID()) { result ->
 
-            assertNotNull(error)
-            assertTrue(error is DataError)
-            assertEquals(DataErrorType.API, (error as DataError).type)
-            assertEquals(DataErrorSubType.INVALID_DATA, error.subType)
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertTrue(result.error is DataError)
+            assertEquals(DataErrorType.API, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.INVALID_DATA, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -716,8 +728,9 @@ class AggregationTest {
             }
         })
 
-        aggregation.refreshTransactions(fromDate = "2018-06-01", toDate = "2018-08-08") { error ->
-            assertNull(error)
+        aggregation.refreshTransactions(fromDate = "2018-06-01", toDate = "2018-08-08") { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = aggregation.fetchTransactions().test()
             testObserver.awaitValue()
@@ -750,8 +763,9 @@ class AggregationTest {
             }
         })
 
-        aggregation.refreshTransaction(99703L) { error ->
-            assertNull(error)
+        aggregation.refreshTransaction(99703L) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = aggregation.fetchTransaction(99703L).test()
             testObserver.awaitValue()
@@ -784,8 +798,9 @@ class AggregationTest {
             }
         })
 
-        aggregation.refreshTransactions(longArrayOf(1, 2, 3, 4, 5)) { error ->
-            assertNull(error)
+        aggregation.refreshTransactions(longArrayOf(1, 2, 3, 4, 5)) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = aggregation.fetchTransactions().test()
             testObserver.awaitValue()
@@ -820,9 +835,9 @@ class AggregationTest {
 
         val transaction = testTransactionResponseData().toTransaction()
 
-        aggregation.updateTransaction(99703, transaction) { error ->
-
-            assertNull(error)
+        aggregation.updateTransaction(99703, transaction) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = aggregation.fetchTransactions().test()
             testObserver.awaitValue()

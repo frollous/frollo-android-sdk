@@ -15,6 +15,6 @@ internal class NetworkLogger(private val network: NetworkService?) : Logger() {
             return
         }
 
-        deviceAPI?.createLog(LogRequest(message = message, score = logLevel.score))?.enqueue { _, _ ->  }
+        deviceAPI?.createLog(LogRequest(message = message, score = logLevel.score))?.enqueue { }
     }
 }

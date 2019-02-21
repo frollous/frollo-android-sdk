@@ -15,6 +15,7 @@ import org.junit.Rule
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.data.remote.NetworkHelper
@@ -159,8 +160,9 @@ class MessagesTest {
             }
         })
 
-        messages.refreshMessages { error ->
-            assertNull(error)
+        messages.refreshMessages { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = messages.fetchMessages().test()
             testObserver.awaitValue()
@@ -201,8 +203,9 @@ class MessagesTest {
             }
         })
 
-        messages.refreshMessages { error ->
-            assertNull(error)
+        messages.refreshMessages { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = messages.fetchMessages().test()
             testObserver.awaitValue()
@@ -243,8 +246,9 @@ class MessagesTest {
             }
         })
 
-        messages.refreshMessage(12345L) { error ->
-            assertNull(error)
+        messages.refreshMessage(12345L) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = messages.fetchMessage(12345L).test()
             testObserver.awaitValue()
@@ -277,8 +281,9 @@ class MessagesTest {
             }
         })
 
-        messages.refreshUnreadMessages { error ->
-            assertNull(error)
+        messages.refreshUnreadMessages { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = messages.fetchMessages(read = false).test()
             testObserver.awaitValue()
@@ -319,8 +324,9 @@ class MessagesTest {
             }
         })
 
-        messages.updateMessage(12345L, true, true) { error ->
-            assertNull(error)
+        messages.updateMessage(12345L, true, true) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = messages.fetchMessage(12345L).test()
             testObserver.awaitValue()

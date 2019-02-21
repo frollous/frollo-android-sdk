@@ -14,6 +14,7 @@ import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.data.remote.api.DeviceAPI
 import us.frollo.frollosdk.data.remote.api.UserAPI
@@ -80,8 +81,9 @@ class NetworkAuthenticatorTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 30 // 30 seconds in the future falls within the 5 minute access token expiry
 
-        userAPI.fetchUser().enqueue { _, error ->
-            assertNull(error)
+        userAPI.fetchUser().enqueue { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
 
             assertEquals(2, mockServer.requestCount)
             assertEquals("AValidAccessTokenFromHost", keystore.decrypt(preferences.encryptedAccessToken))
@@ -126,8 +128,9 @@ class NetworkAuthenticatorTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900 //
 
-        userAPI.fetchUser().enqueue { _, error ->
-            assertNull(error)
+        userAPI.fetchUser().enqueue { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
 
             assertEquals(3, mockServer.requestCount)
             assertEquals("AValidAccessTokenFromHost", keystore.decrypt(preferences.encryptedAccessToken))
@@ -156,14 +159,15 @@ class NetworkAuthenticatorTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 30
 
-        userAPI.fetchUser().enqueue { _, error ->
-            assertNotNull(error)
+        userAPI.fetchUser().enqueue { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
 
             assertEquals(1, mockServer.requestCount)
 
-            assertTrue(error is DataError)
-            assertEquals(DataErrorType.AUTHENTICATION, (error as DataError).type)
-            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, error.subType)
+            assertTrue(resource.error is DataError)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
 
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
@@ -207,26 +211,29 @@ class NetworkAuthenticatorTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        userAPI.fetchUser().enqueue { response, error ->
-            assertNull(error)
+        userAPI.fetchUser().enqueue { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
 
-            assertNotNull(response)
+            assertNotNull(resource.data)
 
             assertEquals("AValidAccessTokenFromHost", keystore.decrypt(preferences.encryptedAccessToken))
             assertEquals("AValidRefreshTokenFromHost", keystore.decrypt(preferences.encryptedRefreshToken))
             assertEquals(1721259268, preferences.accessTokenExpiry)
         }
 
-        userAPI.fetchUser().enqueue { response, error ->
-            assertNull(error)
+        userAPI.fetchUser().enqueue { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
 
-            assertNotNull(response)
+            assertNotNull(resource.data)
         }
 
-        userAPI.fetchUser().enqueue { response, error ->
-            assertNull(error)
+        userAPI.fetchUser().enqueue { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
 
-            assertNotNull(response)
+            assertNotNull(resource.data)
         }
 
         wait(8)
@@ -257,20 +264,23 @@ class NetworkAuthenticatorTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        userAPI.fetchUser().enqueue { response, error ->
-            assertNotNull(error)
+        userAPI.fetchUser().enqueue { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
 
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1, preferences.accessTokenExpiry)
         }
 
-        userAPI.fetchUser().enqueue { response, error ->
-            assertNotNull(error)
+        userAPI.fetchUser().enqueue { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
         }
 
-        userAPI.fetchUser().enqueue { response, error ->
-            assertNotNull(error)
+        userAPI.fetchUser().enqueue { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
         }
 
         wait(8)

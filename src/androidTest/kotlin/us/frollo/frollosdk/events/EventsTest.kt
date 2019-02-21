@@ -12,6 +12,7 @@ import org.junit.Assert.*
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.data.remote.NetworkService
 import us.frollo.frollosdk.data.remote.api.EventsAPI
@@ -67,8 +68,9 @@ class EventsTest {
             }
         })
 
-        events.triggerEvent("TEST_EVENT", 15) { error ->
-            assertNull(error)
+        events.triggerEvent("TEST_EVENT", 15) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
         }
 
         val request = mockServer.takeRequest()

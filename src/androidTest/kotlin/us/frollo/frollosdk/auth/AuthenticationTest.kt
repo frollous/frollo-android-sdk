@@ -18,6 +18,7 @@ import org.junit.Rule
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.data.local.SDKDatabase
@@ -98,8 +99,9 @@ class AuthenticationTest {
         testObserver.awaitValue()
         assertNull(testObserver.value().data)
 
-        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password") { error ->
-            assertNull(error)
+        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password") { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver2 = authentication.fetchUser().test()
             testObserver2.awaitValue()
@@ -132,8 +134,10 @@ class AuthenticationTest {
 
         assertFalse(authentication.loggedIn)
 
-        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password") { error ->
-            assertNull(error)
+        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password") { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
             assertTrue(authentication.loggedIn)
         }
 
@@ -158,8 +162,9 @@ class AuthenticationTest {
             }
         })
 
-        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password") { error ->
-            assertNull(error)
+        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password") { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = authentication.fetchUser().test()
             testObserver.awaitValue()
@@ -194,14 +199,15 @@ class AuthenticationTest {
             }
         })
 
-        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "wrong_password") { error ->
-            assertNotNull(error)
+        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "wrong_password") { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
 
             val testObserver = authentication.fetchUser().test()
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
-            assertEquals(401, (error as APIError).statusCode)
+            assertEquals(401, (result.error as APIError).statusCode)
             assertFalse(authentication.loggedIn)
         }
 
@@ -217,15 +223,16 @@ class AuthenticationTest {
     fun testInvalidLoginData() {
         initSetup()
 
-        authentication.loginUser(AuthType.FACEBOOK) { error ->
-            assertNotNull(error)
+        authentication.loginUser(AuthType.FACEBOOK) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
 
             val testObserver = authentication.fetchUser().test()
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
-            assertEquals((error as DataError).type, DataErrorType.API)
-            assertEquals(error.subType, DataErrorSubType.INVALID_DATA)
+            assertEquals((result.error as DataError).type, DataErrorType.API)
+            assertEquals((result.error as DataError).subType, DataErrorSubType.INVALID_DATA)
         }
 
         wait(3)
@@ -256,9 +263,10 @@ class AuthenticationTest {
                 postcode = "2060",
                 dateOfBirth = Date(),
                 email = "user@frollo.us",
-                password = "password") { error ->
+                password = "password") { result ->
 
-            assertNull(error)
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = authentication.fetchUser().test()
             testObserver.awaitValue()
@@ -298,8 +306,9 @@ class AuthenticationTest {
             }
         })
 
-        authentication.refreshUser { error ->
-            assertNull(error)
+        authentication.refreshUser { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = authentication.fetchUser().test()
             testObserver.awaitValue()
@@ -338,8 +347,9 @@ class AuthenticationTest {
             }
         })
 
-        authentication.updateUser(testUserResponseData().toUser()) { error ->
-            assertNull(error)
+        authentication.updateUser(testUserResponseData().toUser()) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = authentication.fetchUser().test()
             testObserver.awaitValue()
@@ -378,8 +388,9 @@ class AuthenticationTest {
             }
         })
 
-        authentication.updateAttribution(Attribution(campaign = randomString(8))) { error ->
-            assertNull(error)
+        authentication.updateAttribution(Attribution(campaign = randomString(8))) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             val testObserver = authentication.fetchUser().test()
             testObserver.awaitValue()
@@ -416,8 +427,9 @@ class AuthenticationTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        authentication.logoutUser { error ->
-            assertNull(error)
+        authentication.logoutUser { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             assertFalse(authentication.loggedIn)
             assertNull(preferences.encryptedAccessToken)
@@ -454,11 +466,12 @@ class AuthenticationTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        authentication.refreshUser { error ->
-            assertNotNull(error)
+        authentication.refreshUser { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
 
-            assertTrue(error is APIError)
-            assertEquals(APIErrorType.SUSPENDED_DEVICE, (error as APIError).type)
+            assertTrue(result.error is APIError)
+            assertEquals(APIErrorType.SUSPENDED_DEVICE, (result.error as APIError).type)
 
             assertFalse(authentication.loggedIn)
             assertNull(preferences.encryptedAccessToken)
@@ -490,8 +503,9 @@ class AuthenticationTest {
             }
         })
 
-        authentication.changePassword(currentPassword = randomUUID(), newPassword = randomUUID()) { error ->
-            assertNull(error)
+        authentication.changePassword(currentPassword = randomUUID(), newPassword = randomUUID()) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
         }
 
         val request = mockServer.takeRequest()
@@ -521,11 +535,12 @@ class AuthenticationTest {
             }
         })
 
-        authentication.changePassword(currentPassword = randomUUID(), newPassword = "1234") { error ->
-            assertNotNull(error)
+        authentication.changePassword(currentPassword = randomUUID(), newPassword = "1234") { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
 
-            assertEquals(DataErrorType.API, (error as DataError).type)
-            assertEquals(DataErrorSubType.PASSWORD_TOO_SHORT, error.subType)
+            assertEquals(DataErrorType.API, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.PASSWORD_TOO_SHORT, (result.error as DataError).subType)
         }
 
         assertEquals(0, mockServer.requestCount)
@@ -554,8 +569,9 @@ class AuthenticationTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        authentication.deleteUser { error ->
-            assertNull(error)
+        authentication.deleteUser { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             assertFalse(authentication.loggedIn)
             assertNull(preferences.encryptedAccessToken)
@@ -587,8 +603,9 @@ class AuthenticationTest {
             }
         })
 
-        authentication.resetPassword(email = "user@frollo.us") { error ->
-            assertNull(error)
+        authentication.resetPassword(email = "user@frollo.us") { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
         }
 
         val request = mockServer.takeRequest()
@@ -620,12 +637,13 @@ class AuthenticationTest {
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        authentication.refreshUser { error ->
-            assertNotNull(error)
+        authentication.refreshUser { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
 
-            assertTrue(error is DataError)
-            assertEquals(DataErrorType.AUTHENTICATION, (error as DataError).type)
-            assertEquals(DataErrorSubType.MISSING_REFRESH_TOKEN, error.subType)
+            assertTrue(result.error is DataError)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_REFRESH_TOKEN, (result.error as DataError).subType)
 
             assertFalse(authentication.loggedIn)
             assertNull(preferences.encryptedAccessToken)
@@ -657,8 +675,9 @@ class AuthenticationTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        authentication.updateDevice(notificationToken = "SomeToken12345") { error ->
-            assertNull(error)
+        authentication.updateDevice(notificationToken = "SomeToken12345") { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
         }
 
         val request = mockServer.takeRequest()
@@ -688,8 +707,9 @@ class AuthenticationTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        authentication.updateDeviceCompliance(true) { error ->
-            assertNull(error)
+        authentication.updateDeviceCompliance(true) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
         }
 
         val request = mockServer.takeRequest()
@@ -734,8 +754,9 @@ class AuthenticationTest {
             }
         })
 
-        authentication.loginUser(AuthType.EMAIL, "deepak@frollo.us", "pass1234") { error ->
-            assertNull(error)
+        authentication.loginUser(AuthType.EMAIL, "deepak@frollo.us", "pass1234") { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             assertTrue(authentication.loggedIn)
 

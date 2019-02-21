@@ -13,6 +13,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
+import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.data.local.SDKDatabase
 import us.frollo.frollosdk.error.FrolloSDKError
@@ -69,8 +70,9 @@ class FrolloSDKAndroidUnitTest {
 
         assertFalse(FrolloSDK.isSetup)
 
-        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { error ->
-            assertNull(error)
+        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             assertTrue(FrolloSDK.isSetup)
             assertNotNull(FrolloSDK.authentication)
@@ -140,8 +142,9 @@ class FrolloSDKAndroidUnitTest {
     fun testPauseScheduledRefresh() {
         val url = "https://api.example.com"
 
-        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { error ->
-            assertNull(error)
+        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             FrolloSDK.onAppBackgrounded()
             assertNull(FrolloSDK.refreshTimer)
@@ -152,8 +155,9 @@ class FrolloSDKAndroidUnitTest {
     fun testResumeScheduledRefresh() {
         val url = "https://api.example.com"
 
-        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { error ->
-            assertNull(error)
+        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             FrolloSDK.onAppForegrounded()
             assertNotNull(FrolloSDK.refreshTimer)
@@ -226,21 +230,22 @@ class FrolloSDKAndroidUnitTest {
         testObserver.awaitValue()
         assertNotNull(testObserver.value())
 
-        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { error ->
-            assertNull(error)
+        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
-            FrolloSDK.logout { err ->
-                assertNull(err)
+            FrolloSDK.logout()
 
-                assertFalse(preferences.loggedIn)
-                assertNull(preferences.encryptedAccessToken)
-                assertNull(preferences.encryptedRefreshToken)
-                assertEquals(-1, preferences.accessTokenExpiry)
+            wait(3)
 
-                val testObserver2 = database.users().load().test()
-                testObserver2.awaitValue()
-                assertNull(testObserver2.value())
-            }
+            assertFalse(preferences.loggedIn)
+            assertNull(preferences.encryptedAccessToken)
+            assertNull(preferences.encryptedRefreshToken)
+            assertEquals(-1, preferences.accessTokenExpiry)
+
+            val testObserver2 = database.users().load().test()
+            testObserver2.awaitValue()
+            assertNull(testObserver2.value())
         }
 
         wait(3)
@@ -265,8 +270,9 @@ class FrolloSDKAndroidUnitTest {
         testObserver.awaitValue()
         assertNotNull(testObserver.value())
 
-        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { error ->
-            assertNull(error)
+        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             FrolloSDK.forcedLogout()
 
@@ -302,11 +308,13 @@ class FrolloSDKAndroidUnitTest {
         testObserver.awaitValue()
         assertNotNull(testObserver.value())
 
-        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { error ->
-            assertNull(error)
+        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
-            FrolloSDK.reset { err ->
-                assertNull(err)
+            FrolloSDK.reset { res ->
+                assertEquals(Result.Status.SUCCESS, res.status)
+                assertNull(res.error)
 
                 assertFalse(preferences.loggedIn)
                 assertNull(preferences.encryptedAccessToken)

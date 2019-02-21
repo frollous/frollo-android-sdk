@@ -11,6 +11,7 @@ import org.threeten.bp.temporal.TemporalAdjusters
 import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.auth.Authentication
 import us.frollo.frollosdk.auth.AuthenticationStatus
+import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.ACTION.ACTION_AUTHENTICATION_CHANGED
 import us.frollo.frollosdk.core.ARGUMENT.ARG_AUTHENTICATION_STATUS
 import us.frollo.frollosdk.core.DeviceInfo
@@ -145,21 +146,20 @@ object FrolloSDK {
             }
 
             _setup = true
-            completion.invoke(null)
+            completion.invoke(Result.success())
         } catch (e: Exception) {
-            completion.invoke(FrolloSDKError("Setup failed : ${e.message}"))
+            val error = FrolloSDKError("Setup failed : ${e.message}")
+            completion.invoke(Result.error(error))
         }
     }
 
     /**
      * Logout the currently authenticated user from Frollo backend. Resets all caches, preferences and databases.
      * This revokes the refresh token for the current device if not already revoked and resets the token storage.
-     *
-     * @param completion Completion handler with optional error if something goes wrong during the logout process
      */
-    fun logout(completion: OnFrolloSDKCompletionListener? = null) {
+    fun logout() {
         authentication.logoutUser {
-            reset(completion)
+            reset()
         }
     }
 
@@ -169,9 +169,11 @@ object FrolloSDK {
      * @param completion Completion handler with any error that occurred
      */
     fun deleteUser(completion: OnFrolloSDKCompletionListener? = null) {
-        authentication.deleteUser { error ->
-            if (error != null) completion?.invoke(error)
-            else reset(completion)
+        authentication.deleteUser { result ->
+            when (result.status) {
+                Result.Status.SUCCESS -> reset(completion)
+                Result.Status.ERROR -> completion?.invoke(Result.error(result.error))
+            }
         }
     }
 
@@ -191,7 +193,7 @@ object FrolloSDK {
         authentication.reset()
         preferences.reset()
         database.clearAllTables()
-        completion?.invoke(null)
+        completion?.invoke(Result.success())
 
         notify(ACTION_AUTHENTICATION_CHANGED,
                 bundleOf(Pair(ARG_AUTHENTICATION_STATUS, AuthenticationStatus.LOGGED_OUT)))

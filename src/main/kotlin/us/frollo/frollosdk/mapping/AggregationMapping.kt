@@ -102,7 +102,7 @@ internal fun TransactionsSummaryResponse.toTransactionsSummary(): TransactionsSu
                 count = count,
                 sum = sum)
 
-internal fun TransactionCategoryResponse.toTransactionsSummary(): TransactionCategory =
+internal fun TransactionCategoryResponse.toTransactionCategory(): TransactionCategory =
         TransactionCategory(
                 transactionCategoryId = transactionCategoryId,
                 userDefined = userDefined,

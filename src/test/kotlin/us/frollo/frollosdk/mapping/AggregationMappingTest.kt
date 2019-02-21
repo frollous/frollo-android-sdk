@@ -40,4 +40,11 @@ class AggregationMappingTest {
         val model = response.toTransactionsSummary()
         assertEquals(123L, model.count)
     }
+
+    @Test
+    fun testTransactionCategoryResponseToTransactionCategory() {
+        val response = testTransactionCategoryResponseData(transactionCategoryId = 12345)
+        val model = response.toTransactionCategory()
+        assertEquals(12345L, model.transactionCategoryId)
+    }
 }

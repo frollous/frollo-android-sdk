@@ -8,6 +8,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRe
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
 import us.frollo.frollosdk.model.coredata.aggregation.providers.*
+import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategoryType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
 import us.frollo.frollosdk.model.coredata.messages.ContentType
@@ -494,5 +495,21 @@ class ConvertersTest {
         assertEquals("INCOME", str)
 
         assertNull(Converters.instance.stringFromBudgetCategory(null))
+    }
+
+    @Test
+    fun testStringToTransactionCategoryType() {
+        val status = Converters.instance.stringToTransactionCategoryType("INCOME")
+        assertEquals(TransactionCategoryType.INCOME, status)
+
+        assertEquals(TransactionCategoryType.UNCATEGORIZED, Converters.instance.stringToTransactionCategoryType(null))
+    }
+
+    @Test
+    fun testStringFromTransactionCategoryType() {
+        val str = Converters.instance.stringFromTransactionCategoryType(TransactionCategoryType.INCOME)
+        assertEquals("INCOME", str)
+
+        assertEquals("UNCATEGORIZED", Converters.instance.stringFromTransactionCategoryType(null))
     }
 }

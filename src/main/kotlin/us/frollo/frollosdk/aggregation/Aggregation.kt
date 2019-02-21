@@ -30,6 +30,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderA
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionsSummary
 import kotlin.collections.ArrayList
 
 /**
@@ -446,6 +447,18 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
                     completion?.invoke(Result.error(resource.error))
                 }
             }
+        }
+    }
+
+    fun fetchTransactionsSummary(fromDate: String, toDate: String, accountIds: LongArray? = null, transactionIncluded: Boolean? = null,
+                                 completion: OnFrolloSDKCompletionListener<Resource<TransactionsSummary>>) {
+        aggregationAPI.fetchTransactionsSummaryByQuery(fromDate = fromDate, toDate = toDate,
+                accountIds = accountIds, transactionIncluded = transactionIncluded).enqueue { resource ->
+
+            if (resource.status == Resource.Status.ERROR)
+                Log.e("$TAG#fetchTransactionsSummary", resource.error?.localizedDescription)
+
+            completion.invoke(resource.map { it?.toTransactionsSummary() })
         }
     }
 

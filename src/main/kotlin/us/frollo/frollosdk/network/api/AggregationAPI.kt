@@ -10,6 +10,7 @@ import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccoun
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
+import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
 
 internal interface AggregationAPI {
@@ -29,6 +30,7 @@ internal interface AggregationAPI {
         // Transaction URLs
         const val URL_TRANSACTIONS = "$API_VERSION_PATH/aggregation/transactions/"
         const val URL_TRANSACTION = "$API_VERSION_PATH/aggregation/transactions/{transaction_id}"
+        const val URL_TRANSACTIONS_SUMMARY = "$API_VERSION_PATH/aggregation/transactions/summary/"
     }
 
     // Provider API
@@ -79,4 +81,9 @@ internal interface AggregationAPI {
 
     @PUT(URL_TRANSACTION)
     fun updateTransaction(@Path("transaction_id") transactionId: Long, @Body request: TransactionUpdateRequest): Call<TransactionResponse>
+
+    // Note: Query parameters for this call may also contain
+    // {transaction_ids, account_ids, from_date, to_date, account_included, transaction_included}
+    @GET(URL_TRANSACTIONS_SUMMARY)
+    fun fetchTransactionsSummary(@QueryMap queryParams: Map<String, String>): Call<TransactionsSummaryResponse>
 }

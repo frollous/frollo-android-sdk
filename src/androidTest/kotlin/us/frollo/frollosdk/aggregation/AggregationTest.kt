@@ -14,6 +14,7 @@ import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.SetupParams
 import us.frollo.frollosdk.database.SDKDatabase
@@ -850,6 +851,39 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals("${NetworkHelper.API_VERSION_PATH}/aggregation/transactions/99703", request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionsSummary() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.transactions_summary_valid)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == "${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?from_date=2018-06-01&to_date=2018-08-08") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.fetchTransactionsSummary(fromDate = "2018-06-01", toDate = "2018-08-08") { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            assertNotNull(resource.data)
+            assertEquals(166L, resource.data?.count)
+            assertEquals((-1039.0).toBigDecimal(), resource.data?.sum)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?from_date=2018-06-01&to_date=2018-08-08", request.path)
 
         wait(3)
 

@@ -4,11 +4,13 @@ import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
+import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionsSummary
 
 internal fun ProviderResponse.toProvider(): Provider =
         Provider(
@@ -92,3 +94,8 @@ internal fun TransactionResponse.toTransaction(): Transaction =
                 postDate = postDate,
                 status = status,
                 transactionDate = transactionDate)
+
+internal fun TransactionsSummaryResponse.toTransactionsSummary(): TransactionsSummary =
+        TransactionsSummary(
+                count = count,
+                sum = sum)

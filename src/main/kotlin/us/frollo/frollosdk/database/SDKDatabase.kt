@@ -13,6 +13,7 @@ import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
+import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 
 @Database(entities = [
@@ -21,7 +22,8 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
     Provider::class,
     ProviderAccount::class,
     Account::class,
-    Transaction::class
+    Transaction::class,
+    TransactionCategory::class
 ], version = 2, exportSchema = true)
 
 @TypeConverters(Converters::class)
@@ -30,9 +32,10 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun users(): UserDao
     internal abstract fun messages(): MessageDao
     internal abstract fun providers(): ProviderDao
-    internal abstract fun provideraccounts(): ProviderAccountDao
+    internal abstract fun providerAccounts(): ProviderAccountDao
     internal abstract fun accounts(): AccountDao
     internal abstract fun transactions(): TransactionDao
+    internal abstract fun transactionCategories(): TransactionCategoryDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"

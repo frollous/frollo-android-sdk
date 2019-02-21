@@ -8,6 +8,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRe
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
 import us.frollo.frollosdk.model.coredata.aggregation.providers.*
+import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategoryType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
 import us.frollo.frollosdk.model.coredata.messages.ContentType
@@ -196,6 +197,14 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromTransactionStatus(value: TransactionStatus?): String? = value?.name
+
+    // Transaction Category
+
+    @TypeConverter
+    fun stringToTransactionCategoryType(value: String?): TransactionCategoryType? = if (value == null) TransactionCategoryType.UNCATEGORIZED else TransactionCategoryType.valueOf(value)
+
+    @TypeConverter
+    fun stringFromTransactionCategoryType(value: TransactionCategoryType?): String? = value?.name ?: TransactionCategoryType.UNCATEGORIZED.name
 
     // Shared
 

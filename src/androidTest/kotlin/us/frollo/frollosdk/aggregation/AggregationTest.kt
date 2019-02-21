@@ -193,7 +193,7 @@ class AggregationTest {
 
         val data = testProviderAccountResponseData()
         val list = mutableListOf(testProviderAccountResponseData(), data, testProviderAccountResponseData())
-        database.provideraccounts().insertAll(*list.map { it.toProviderAccount() }.toList().toTypedArray())
+        database.providerAccounts().insertAll(*list.map { it.toProviderAccount() }.toList().toTypedArray())
 
         val testObserver = aggregation.fetchProviderAccount(data.providerAccountId).test()
         testObserver.awaitValue()
@@ -213,7 +213,7 @@ class AggregationTest {
         val data4 = testProviderAccountResponseData()
         val list = mutableListOf(data1, data2, data3, data4)
 
-        database.provideraccounts().insertAll(*list.map { it.toProviderAccount() }.toList().toTypedArray())
+        database.providerAccounts().insertAll(*list.map { it.toProviderAccount() }.toList().toTypedArray())
 
         val testObserver = aggregation.fetchProviderAccounts().test()
         testObserver.awaitValue()
@@ -233,7 +233,7 @@ class AggregationTest {
         val data4 = testProviderAccountResponseData(providerId = 1)
         val list = mutableListOf(data1, data2, data3, data4)
 
-        database.provideraccounts().insertAll(*list.map { it.toProviderAccount() }.toList().toTypedArray())
+        database.providerAccounts().insertAll(*list.map { it.toProviderAccount() }.toList().toTypedArray())
 
         val testObserver = aggregation.fetchProviderAccountsByProviderId(providerId = 1).test()
         testObserver.awaitValue()
@@ -364,7 +364,7 @@ class AggregationTest {
         })
 
         val data = testProviderAccountResponseData(providerAccountId = 12345)
-        database.provideraccounts().insert(data.toProviderAccount())
+        database.providerAccounts().insert(data.toProviderAccount())
 
         aggregation.deleteProviderAccount(12345) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)

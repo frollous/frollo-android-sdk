@@ -120,17 +120,17 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
     // Provider Account
 
     fun fetchProviderAccount(providerAccountId: Long): LiveData<Resource<ProviderAccount>> =
-            Transformations.map(db.provideraccounts().load(providerAccountId)) { model ->
+            Transformations.map(db.providerAccounts().load(providerAccountId)) { model ->
                 Resource.success(model)
             }
 
     fun fetchProviderAccounts(): LiveData<Resource<List<ProviderAccount>>> =
-            Transformations.map(db.provideraccounts().load()) { models ->
+            Transformations.map(db.providerAccounts().load()) { models ->
                 Resource.success(models)
             }
 
     fun fetchProviderAccountsByProviderId(providerId: Long): LiveData<Resource<List<ProviderAccount>>> =
-            Transformations.map(db.provideraccounts().loadByProviderId(providerId)) { models ->
+            Transformations.map(db.providerAccounts().loadByProviderId(providerId)) { models ->
                 Resource.success(models)
             }
 
@@ -217,13 +217,13 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         response?.let {
             doAsync {
                 val models = mapProviderAccountResponse(response)
-                db.provideraccounts().insertAll(*models.toTypedArray())
+                db.providerAccounts().insertAll(*models.toTypedArray())
 
                 val apiIds = response.map { it.providerAccountId }.toList()
-                val staleIds = db.provideraccounts().getStaleIds(apiIds.toLongArray())
+                val staleIds = db.providerAccounts().getStaleIds(apiIds.toLongArray())
 
                 if (staleIds.isNotEmpty()) {
-                    db.provideraccounts().deleteMany(staleIds.toLongArray())
+                    db.providerAccounts().deleteMany(staleIds.toLongArray())
                 }
 
                 uiThread { completion?.invoke(Result.success()) }
@@ -234,7 +234,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
     private fun handleProviderAccountResponse(response: ProviderAccountResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
-                db.provideraccounts().insert(response.toProviderAccount())
+                db.providerAccounts().insert(response.toProviderAccount())
 
                 uiThread { completion?.invoke(Result.success()) }
             }
@@ -246,7 +246,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
 
     private fun removeCachedProviderAccount(providerAccountId: Long) {
         doAsync {
-            db.provideraccounts().delete(providerAccountId)
+            db.providerAccounts().delete(providerAccountId)
         }
     }
 

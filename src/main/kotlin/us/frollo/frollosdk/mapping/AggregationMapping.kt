@@ -3,12 +3,14 @@ package us.frollo.frollosdk.mapping
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
+import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
+import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionsSummary
 
@@ -99,3 +101,13 @@ internal fun TransactionsSummaryResponse.toTransactionsSummary(): TransactionsSu
         TransactionsSummary(
                 count = count,
                 sum = sum)
+
+internal fun TransactionCategoryResponse.toTransactionsSummary(): TransactionCategory =
+        TransactionCategory(
+                transactionCategoryId = transactionCategoryId,
+                userDefined = userDefined,
+                name = name,
+                categoryType = categoryType,
+                defaultBudgetCategory = defaultBudgetCategory,
+                iconUrl = iconUrl,
+                placement = placement)

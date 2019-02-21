@@ -22,6 +22,7 @@ import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccoun
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
+import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
@@ -29,6 +30,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
+import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionsSummary
 import kotlin.collections.ArrayList
@@ -500,4 +502,53 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
 
     private fun mapTransactionResponse(models: List<TransactionResponse>): List<Transaction> =
             models.map { it.toTransaction() }.toList()
+
+    // Transaction Category
+
+    // Provider
+
+    fun fetchTransactionCategory(transactionCategoryId: Long): LiveData<Resource<TransactionCategory>> =
+            Transformations.map(db.transactionCategories().load(transactionCategoryId)) { model ->
+                Resource.success(model)
+            }
+
+    fun fetchTransactionCategories(): LiveData<Resource<List<TransactionCategory>>> =
+            Transformations.map(db.transactionCategories().load()) { models ->
+                Resource.success(models)
+            }
+
+    fun refreshTransactionCategories(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        aggregationAPI.fetchTransactionCategories().enqueue { resource ->
+            when(resource.status) {
+                Resource.Status.SUCCESS -> {
+                    handleTransactionCategoriesResponse(response = resource.data, completion = completion)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshTransactionCategories", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+            }
+        }
+    }
+
+    private fun handleTransactionCategoriesResponse(response: List<TransactionCategoryResponse>?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        response?.let {
+            doAsync {
+                val models = mapTransactionCategoryResponse(response)
+                db.transactionCategories().insertAll(*models.toTypedArray())
+
+                val apiIds = response.map { it.transactionCategoryId }.toList()
+                val staleIds = db.transactionCategories().getStaleIds(apiIds.toLongArray())
+
+                if (staleIds.isNotEmpty()) {
+                    db.transactionCategories().deleteMany(staleIds.toLongArray())
+                }
+
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    private fun mapTransactionCategoryResponse(models: List<TransactionCategoryResponse>): List<TransactionCategory> =
+            models.map { it.toTransactionCategory() }.toList()
 }

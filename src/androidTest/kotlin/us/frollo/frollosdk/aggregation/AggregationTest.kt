@@ -25,10 +25,7 @@ import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.keystore.Keystore
-import us.frollo.frollosdk.mapping.toAccount
-import us.frollo.frollosdk.mapping.toProvider
-import us.frollo.frollosdk.mapping.toProviderAccount
-import us.frollo.frollosdk.mapping.toTransaction
+import us.frollo.frollosdk.mapping.*
 import us.frollo.frollosdk.model.*
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.preferences.Preferences
@@ -884,6 +881,79 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals("${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?from_date=2018-06-01&to_date=2018-08-08", request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    // Transaction Category Tests
+
+    @Test
+    fun testFetchTransactionCategoryByID() {
+        initSetup()
+
+        val data = testTransactionCategoryResponseData()
+        val list = mutableListOf(testTransactionCategoryResponseData(), data, testTransactionCategoryResponseData())
+        database.transactionCategories().insertAll(*list.map { it.toTransactionCategory() }.toList().toTypedArray())
+
+        val testObserver = aggregation.fetchTransactionCategory(data.transactionCategoryId).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(data.transactionCategoryId, testObserver.value().data?.transactionCategoryId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionCategories() {
+        initSetup()
+
+        val data1 = testTransactionCategoryResponseData()
+        val data2 = testTransactionCategoryResponseData()
+        val data3 = testTransactionCategoryResponseData()
+        val data4 = testTransactionCategoryResponseData()
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        database.transactionCategories().insertAll(*list.map { it.toTransactionCategory() }.toList().toTypedArray())
+
+        val testObserver = aggregation.fetchTransactionCategories().test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(4, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshTransactionCategories() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.transaction_categories_valid)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == AggregationAPI.URL_TRANSACTION_CATEGORIES) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshTransactionCategories { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchTransactionCategories().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(43, models?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(AggregationAPI.URL_TRANSACTION_CATEGORIES, request.path)
 
         wait(3)
 

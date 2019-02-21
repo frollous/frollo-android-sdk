@@ -9,6 +9,7 @@ import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccoun
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
+import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
@@ -31,6 +32,9 @@ internal interface AggregationAPI {
         const val URL_TRANSACTIONS = "$API_VERSION_PATH/aggregation/transactions/"
         const val URL_TRANSACTION = "$API_VERSION_PATH/aggregation/transactions/{transaction_id}"
         const val URL_TRANSACTIONS_SUMMARY = "$API_VERSION_PATH/aggregation/transactions/summary/"
+
+        // Transaction Category URLs
+        const val URL_TRANSACTION_CATEGORIES = "$API_VERSION_PATH/aggregation/transactions/categories/"
     }
 
     // Provider API
@@ -86,4 +90,9 @@ internal interface AggregationAPI {
     // {transaction_ids, account_ids, from_date, to_date, account_included, transaction_included}
     @GET(URL_TRANSACTIONS_SUMMARY)
     fun fetchTransactionsSummary(@QueryMap queryParams: Map<String, String>): Call<TransactionsSummaryResponse>
+
+    // Transaction Category API
+
+    @GET(URL_TRANSACTION_CATEGORIES)
+    fun fetchTransactionCategories(): Call<List<TransactionCategoryResponse>>
 }

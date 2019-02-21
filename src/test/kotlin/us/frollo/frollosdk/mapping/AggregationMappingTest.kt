@@ -47,4 +47,11 @@ class AggregationMappingTest {
         val model = response.toTransactionCategory()
         assertEquals(12345L, model.transactionCategoryId)
     }
+
+    @Test
+    fun testMerchantResponseToTransactionCategory() {
+        val response = testMerchantResponseData(merchantId = 12345)
+        val model = response.toMerchant()
+        assertEquals(12345L, model.merchantId)
+    }
 }

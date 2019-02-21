@@ -4,6 +4,7 @@ import org.junit.Test
 
 import org.junit.Assert.*
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.*
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
@@ -511,5 +512,21 @@ class ConvertersTest {
         assertEquals("INCOME", str)
 
         assertEquals("UNCATEGORIZED", Converters.instance.stringFromTransactionCategoryType(null))
+    }
+
+    @Test
+    fun testStringToMerchantType() {
+        val status = Converters.instance.stringToMerchantType("RETAILER")
+        assertEquals(MerchantType.RETAILER, status)
+
+        assertEquals(MerchantType.UNKNOWN, Converters.instance.stringToMerchantType(null))
+    }
+
+    @Test
+    fun testStringFromMerchantType() {
+        val str = Converters.instance.stringFromMerchantType(MerchantType.RETAILER)
+        assertEquals("RETAILER", str)
+
+        assertEquals("UNKNOWN", Converters.instance.stringFromMerchantType(null))
     }
 }

@@ -1,12 +1,14 @@
 package us.frollo.frollosdk.mapping
 
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
+import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
@@ -111,3 +113,10 @@ internal fun TransactionCategoryResponse.toTransactionCategory(): TransactionCat
                 defaultBudgetCategory = defaultBudgetCategory,
                 iconUrl = iconUrl,
                 placement = placement)
+
+internal fun MerchantResponse.toMerchant(): Merchant =
+        Merchant(
+                merchantId = merchantId,
+                name = name,
+                merchantType = merchantType,
+                smallLogoUrl = smallLogoUrl)

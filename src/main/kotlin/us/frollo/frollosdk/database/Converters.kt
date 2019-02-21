@@ -4,6 +4,7 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.*
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
@@ -205,6 +206,14 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromTransactionCategoryType(value: TransactionCategoryType?): String? = value?.name ?: TransactionCategoryType.UNCATEGORIZED.name
+
+    // Merchant
+
+    @TypeConverter
+    fun stringToMerchantType(value: String?): MerchantType? = if (value == null) MerchantType.UNKNOWN else MerchantType.valueOf(value)
+
+    @TypeConverter
+    fun stringFromMerchantType(value: MerchantType?): String? = value?.name ?: MerchantType.UNKNOWN.name
 
     // Shared
 

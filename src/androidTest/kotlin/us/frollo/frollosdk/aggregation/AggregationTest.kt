@@ -887,6 +887,39 @@ class AggregationTest {
         tearDown()
     }
 
+    @Test
+    fun testFetchTransactionsSummaryByIDs() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.transactions_summary_valid)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == "${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?transaction_ids=1,2,3,4,5") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.fetchTransactionsSummary(transactionIds = longArrayOf(1, 2, 3, 4, 5)) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            assertNotNull(resource.data)
+            assertEquals(166L, resource.data?.count)
+            assertEquals((-1039.0).toBigDecimal(), resource.data?.sum)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?transaction_ids=1,2,3,4,5", request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
     // Transaction Category Tests
 
     @Test

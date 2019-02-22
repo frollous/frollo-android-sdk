@@ -5,6 +5,7 @@ import retrofit2.http.*
 import us.frollo.frollosdk.network.NetworkHelper.Companion.API_VERSION_PATH
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountUpdateRequest
+import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountCreateRequest
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
@@ -35,6 +36,10 @@ internal interface AggregationAPI {
 
         // Transaction Category URLs
         const val URL_TRANSACTION_CATEGORIES = "$API_VERSION_PATH/aggregation/transactions/categories/"
+
+        // Merchant URLs
+        const val URL_MERCHANTS = "$API_VERSION_PATH/aggregation/merchants/"
+        const val URL_MERCHANT = "$API_VERSION_PATH/aggregation/merchants/{merchant_id}"
     }
 
     // Provider API
@@ -75,8 +80,7 @@ internal interface AggregationAPI {
 
     // Transaction API
 
-    // Note: Query parameters for this call may also contain
-    // {transaction_ids, account_ids, from_date, to_date, account_included, transaction_included, skip, count}
+    // Query parameters: {transaction_ids, account_ids, from_date, to_date, account_included, transaction_included, skip, count}
     @GET(URL_TRANSACTIONS)
     fun fetchTransactions(@QueryMap queryParams: Map<String, String>): Call<List<TransactionResponse>>
 
@@ -86,8 +90,7 @@ internal interface AggregationAPI {
     @PUT(URL_TRANSACTION)
     fun updateTransaction(@Path("transaction_id") transactionId: Long, @Body request: TransactionUpdateRequest): Call<TransactionResponse>
 
-    // Note: Query parameters for this call may also contain
-    // {transaction_ids, account_ids, from_date, to_date, account_included, transaction_included}
+    // Query parameters: {transaction_ids, account_ids, from_date, to_date, account_included, transaction_included}
     @GET(URL_TRANSACTIONS_SUMMARY)
     fun fetchTransactionsSummary(@QueryMap queryParams: Map<String, String>): Call<TransactionsSummaryResponse>
 
@@ -95,4 +98,16 @@ internal interface AggregationAPI {
 
     @GET(URL_TRANSACTION_CATEGORIES)
     fun fetchTransactionCategories(): Call<List<TransactionCategoryResponse>>
+
+    // Merchant API
+
+    @GET(URL_MERCHANTS)
+    fun fetchMerchants(): Call<List<MerchantResponse>>
+
+    @GET(URL_MERCHANT)
+    fun fetchMerchant(@Path("merchant_id") merchantId: Long): Call<MerchantResponse>
+
+    // Query parameters: {merchant_ids}
+    @GET(URL_MERCHANTS)
+    fun fetchMerchantsByIds(@QueryMap queryParams: Map<String, String>): Call<List<MerchantResponse>>
 }

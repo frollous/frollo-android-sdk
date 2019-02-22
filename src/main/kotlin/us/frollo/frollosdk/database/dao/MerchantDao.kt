@@ -22,6 +22,9 @@ internal interface MerchantDao {
     @Query("SELECT merchant_id FROM merchant WHERE merchant_id NOT IN (:apiIds)")
     fun getStaleIds(apiIds: LongArray): List<Long>
 
+    @Query("SELECT merchant_id FROM merchant")
+    fun getIds(): List<Long>
+
     @Query("DELETE FROM merchant WHERE merchant_id IN (:merchantIds)")
     fun deleteMany(merchantIds: LongArray)
 

@@ -18,6 +18,7 @@ import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.*
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountUpdateRequest
+import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountCreateRequest
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
@@ -27,6 +28,7 @@ import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionRespons
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
@@ -45,6 +47,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
     }
 
     private val aggregationAPI: AggregationAPI = network.create(AggregationAPI::class.java)
+
+    private var refreshingMerchantIDs = setOf<Long>()
+    private var refreshingProviderIDs = setOf<Long>()
 
     //TODO: Refresh Transactions Broadcast local implementation
 
@@ -110,6 +115,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         response?.let {
             doAsync {
                 db.providers().insert(response.toProvider())
+
+                refreshingProviderIDs = refreshingProviderIDs.minus(response.providerId)
 
                 uiThread { completion?.invoke(Result.success()) }
             }
@@ -218,6 +225,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
     private fun handleProviderAccountsResponse(response: List<ProviderAccountResponse>?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
+                fetchMissingProviders(response.map { it.providerId }.toSet())
+
                 val models = mapProviderAccountResponse(response)
                 db.providerAccounts().insertAll(*models.toTypedArray())
 
@@ -236,6 +245,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
     private fun handleProviderAccountResponse(response: ProviderAccountResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
+                fetchMissingProviders(setOf(response.providerId))
+
                 db.providerAccounts().insert(response.toProviderAccount())
 
                 uiThread { completion?.invoke(Result.success()) }
@@ -464,11 +475,23 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
+    fun fetchTransactionsSummary(transactionIds: LongArray, completion: OnFrolloSDKCompletionListener<Resource<TransactionsSummary>>) {
+        aggregationAPI.fetchTransactionsSummaryByIDs(transactionIds).enqueue { resource ->
+
+            if (resource.status == Resource.Status.ERROR)
+                Log.e("$TAG#fetchTransactionsSummaryByIDs", resource.error?.localizedDescription)
+
+            completion.invoke(resource.map { it?.toTransactionsSummary() })
+        }
+    }
+
     private fun handleTransactionsResponse(response: List<TransactionResponse>?, fromDate: String? = null, toDate: String? = null,
                                            accountIds: LongArray? = null, transactionIncluded: Boolean? = null,
                                            completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
+                fetchMissingMerchants(response.map { it.merchantId }.toSet())
+
                 val models = mapTransactionResponse(response)
                 db.transactions().insertAll(*models.toTypedArray())
 
@@ -493,6 +516,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
     private fun handleTransactionResponse(response: TransactionResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
+                fetchMissingMerchants(setOf(response.merchantId))
+
                 db.transactions().insert(response.toTransaction())
 
                 uiThread { completion?.invoke(Result.success()) }
@@ -504,8 +529,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
             models.map { it.toTransaction() }.toList()
 
     // Transaction Category
-
-    // Provider
 
     fun fetchTransactionCategory(transactionCategoryId: Long): LiveData<Resource<TransactionCategory>> =
             Transformations.map(db.transactionCategories().load(transactionCategoryId)) { model ->
@@ -551,4 +574,119 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
 
     private fun mapTransactionCategoryResponse(models: List<TransactionCategoryResponse>): List<TransactionCategory> =
             models.map { it.toTransactionCategory() }.toList()
+
+    // Merchant
+
+    fun fetchMerchant(merchantId: Long): LiveData<Resource<Merchant>> =
+            Transformations.map(db.merchants().load(merchantId)) { model ->
+                Resource.success(model)
+            }
+
+    fun fetchMerchants(): LiveData<Resource<List<Merchant>>> =
+            Transformations.map(db.merchants().load()) { models ->
+                Resource.success(models)
+            }
+
+    fun refreshMerchant(merchantId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        aggregationAPI.fetchMerchant(merchantId).enqueue { resource ->
+            when(resource.status) {
+                Resource.Status.SUCCESS -> {
+                    handleMerchantResponse(response = resource.data, completion = completion)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshMerchant", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+            }
+        }
+    }
+
+    fun refreshMerchants(merchantIds: LongArray, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        aggregationAPI.fetchMerchantsByIDs(merchantIds).enqueue { resource ->
+            when(resource.status) {
+                Resource.Status.SUCCESS -> {
+                    handleMerchantsResponse(response = resource.data, byIds = true, completion = completion)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshMerchantsByIDs", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+            }
+        }
+    }
+
+    internal fun refreshMerchants(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        aggregationAPI.fetchMerchants().enqueue { resource ->
+            when(resource.status) {
+                Resource.Status.SUCCESS -> {
+                    handleMerchantsResponse(response = resource.data, completion = completion)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshMerchants", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+            }
+        }
+    }
+
+    private fun handleMerchantResponse(response: MerchantResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        response?.let {
+            doAsync {
+                db.merchants().insert(response.toMerchant())
+
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    private fun handleMerchantsResponse(response: List<MerchantResponse>?, byIds: Boolean = false, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        response?.let {
+            doAsync {
+                val models = mapMerchantResponse(response)
+                db.merchants().insertAll(*models.toTypedArray())
+
+                val apiIds = response.map { it.merchantId }.toList()
+                refreshingMerchantIDs = refreshingMerchantIDs.minus(apiIds)
+
+                if (!byIds) {
+                    val staleIds = db.merchants().getStaleIds(apiIds.toLongArray())
+
+                    if (staleIds.isNotEmpty()) {
+                        db.merchants().deleteMany(staleIds.toLongArray())
+                    }
+                }
+
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    private fun mapMerchantResponse(models: List<MerchantResponse>): List<Merchant> =
+            models.map { it.toMerchant() }.toList()
+
+    ////////
+
+    private fun fetchMissingProviders(providerIds: Set<Long>) {
+        doAsync {
+            val existingProviderIds = db.providers().getIds().toSet()
+            val missingProviderIds = providerIds.compareToFindMissingItems(existingProviderIds).minus(refreshingProviderIDs)
+            if (missingProviderIds.isNotEmpty()) {
+                refreshingProviderIDs = refreshingProviderIDs.plus(missingProviderIds)
+                missingProviderIds.forEach {
+                    refreshProvider(it)
+                }
+            }
+        }
+    }
+
+    private fun fetchMissingMerchants(merchantIds: Set<Long>) {
+        doAsync {
+            val existingMerchantIds = db.merchants().getIds().toSet()
+            val missingMerchantIds = merchantIds.compareToFindMissingItems(existingMerchantIds).minus(refreshingMerchantIDs)
+            if (missingMerchantIds.isNotEmpty()) {
+                refreshingMerchantIDs = refreshingMerchantIDs.plus(missingMerchantIds)
+                refreshMerchants(missingMerchantIds.toLongArray())
+            }
+        }
+    }
 }

@@ -22,6 +22,9 @@ internal interface ProviderDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(model: Provider): Long
 
+    @Query("SELECT provider_id FROM provider")
+    fun getIds(): List<Long>
+
     @Query("SELECT provider_id FROM provider WHERE provider_id NOT IN (:apiIds)")
     fun getStaleIds(apiIds: LongArray): List<Long>
 

@@ -70,3 +70,15 @@ internal fun String.regexValidate(regex: String): Boolean {
         false
     }
 }
+
+internal fun Set<Long>.compareToFindMissingItems(l2: Set<Long>): Set<Long> {
+    val l1 = this
+
+    var missingElements = setOf<Long>()
+    l1.forEach {
+        if (!l2.contains(it))
+            missingElements = missingElements.plus(it)
+    }
+
+    return missingElements
+}

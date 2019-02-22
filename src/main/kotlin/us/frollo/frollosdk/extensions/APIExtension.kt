@@ -1,6 +1,7 @@
 package us.frollo.frollosdk.extensions
 
 import retrofit2.Call
+import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
 import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
@@ -46,3 +47,6 @@ internal fun AggregationAPI.fetchTransactionsSummaryByQuery(
 
 internal fun AggregationAPI.fetchTransactionsSummaryByIDs(transactionIds: LongArray) : Call<TransactionsSummaryResponse> =
         fetchTransactionsSummary(mapOf("transaction_ids" to transactionIds.joinToString(",")))
+
+internal fun AggregationAPI.fetchMerchantsByIDs(merchantIds: LongArray) : Call<List<MerchantResponse>> =
+        fetchMerchantsByIds(mapOf("merchant_ids" to merchantIds.joinToString(",")))

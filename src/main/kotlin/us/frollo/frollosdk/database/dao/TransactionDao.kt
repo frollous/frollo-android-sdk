@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionRelation
 
 @Dao
 internal interface TransactionDao {
@@ -29,6 +30,9 @@ internal interface TransactionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(model: Transaction): Long
 
+    @Query("SELECT transaction_id FROM transaction_model WHERE account_id IN (:accountIds)")
+    fun getIdsByAccountIds(accountIds: LongArray): LongArray
+
     @Query("SELECT transaction_id FROM transaction_model WHERE transaction_id NOT IN (:apiIds)")
     fun getStaleIds(apiIds: LongArray): List<Long>
 
@@ -46,4 +50,22 @@ internal interface TransactionDao {
 
     @Query("DELETE FROM transaction_model")
     fun clear()
+
+    // Relation methods
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM transaction_model")
+    fun loadWithRelation(): LiveData<List<TransactionRelation>>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM transaction_model WHERE transaction_id = :transactionId")
+    fun loadWithRelation(transactionId: Long): LiveData<TransactionRelation?>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM transaction_model WHERE transaction_id in (:transactionIds)")
+    fun loadWithRelation(transactionIds: LongArray): LiveData<List<TransactionRelation>>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM transaction_model WHERE account_id = :accountId")
+    fun loadByAccountIdWithRelation(accountId: Long): LiveData<List<TransactionRelation>>
 }

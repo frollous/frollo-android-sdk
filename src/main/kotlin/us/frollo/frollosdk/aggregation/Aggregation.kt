@@ -27,13 +27,17 @@ import us.frollo.frollosdk.model.api.aggregation.transactioncategories.Transacti
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountRelation
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
+import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccountRelation
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderRelation
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionRelation
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionsSummary
 import kotlin.collections.ArrayList
 
@@ -62,6 +66,16 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
 
     fun fetchProviders(): LiveData<Resource<List<Provider>>> =
             Transformations.map(db.providers().load()) { models ->
+                Resource.success(models)
+            }
+
+    fun fetchProviderWithRelation(providerId: Long): LiveData<Resource<ProviderRelation>> =
+            Transformations.map(db.providers().loadWithRelation(providerId)) { model ->
+                Resource.success(model)
+            }
+
+    fun fetchProvidersWithRelation(): LiveData<Resource<List<ProviderRelation>>> =
+            Transformations.map(db.providers().loadWithRelation()) { models ->
                 Resource.success(models)
             }
 
@@ -103,7 +117,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
                 val staleIds = db.providers().getStaleIds(apiIds.toLongArray())
 
                 if (staleIds.isNotEmpty()) {
-                    db.providers().deleteMany(staleIds.toLongArray())
+                    removeCachedProviders(staleIds.toLongArray())
                 }
 
                 uiThread { completion?.invoke(Result.success()) }
@@ -140,6 +154,21 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
 
     fun fetchProviderAccountsByProviderId(providerId: Long): LiveData<Resource<List<ProviderAccount>>> =
             Transformations.map(db.providerAccounts().loadByProviderId(providerId)) { models ->
+                Resource.success(models)
+            }
+
+    fun fetchProviderAccountWithRelation(providerAccountId: Long): LiveData<Resource<ProviderAccountRelation>> =
+            Transformations.map(db.providerAccounts().loadWithRelation(providerAccountId)) { model ->
+                Resource.success(model)
+            }
+
+    fun fetchProviderAccountsWithRelation(): LiveData<Resource<List<ProviderAccountRelation>>> =
+            Transformations.map(db.providerAccounts().loadWithRelation()) { models ->
+                Resource.success(models)
+            }
+
+    fun fetchProviderAccountsByProviderIdWithRelation(providerId: Long): LiveData<Resource<List<ProviderAccountRelation>>> =
+            Transformations.map(db.providerAccounts().loadByProviderIdWithRelation(providerId)) { models ->
                 Resource.success(models)
             }
 
@@ -191,11 +220,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         aggregationAPI.deleteProviderAccount(providerAccountId).enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
-                    // Manually delete other data linked to this provider account
-                    // as we are not using ForeignKeys because ForeignKey constraints
-                    // do not allow to insert data into child table prior to parent table
-                    //TODO: Manually delete other data linked to this provider account
-                    removeCachedProviderAccount(providerAccountId)
+                    removeCachedProviderAccounts(longArrayOf(providerAccountId))
                     completion?.invoke(Result.success())
                 }
                 Resource.Status.ERROR -> {
@@ -234,7 +259,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
                 val staleIds = db.providerAccounts().getStaleIds(apiIds.toLongArray())
 
                 if (staleIds.isNotEmpty()) {
-                    db.providerAccounts().deleteMany(staleIds.toLongArray())
+                    removeCachedProviderAccounts(staleIds.toLongArray())
                 }
 
                 uiThread { completion?.invoke(Result.success()) }
@@ -257,12 +282,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
     private fun mapProviderAccountResponse(models: List<ProviderAccountResponse>): List<ProviderAccount> =
             models.map { it.toProviderAccount() }.toList()
 
-    private fun removeCachedProviderAccount(providerAccountId: Long) {
-        doAsync {
-            db.providerAccounts().delete(providerAccountId)
-        }
-    }
-
     // Account
 
     fun fetchAccount(accountId: Long): LiveData<Resource<Account>> =
@@ -277,6 +296,21 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
 
     fun fetchAccountsByProviderAccountId(providerAccountId: Long): LiveData<Resource<List<Account>>> =
             Transformations.map(db.accounts().loadByProviderAccountId(providerAccountId)) { models ->
+                Resource.success(models)
+            }
+
+    fun fetchAccountWithRelation(accountId: Long): LiveData<Resource<AccountRelation>> =
+            Transformations.map(db.accounts().loadWithRelation(accountId)) { model ->
+                Resource.success(model)
+            }
+
+    fun fetchAccountsWithRelation(): LiveData<Resource<List<AccountRelation>>> =
+            Transformations.map(db.accounts().loadWithRelation()) { models ->
+                Resource.success(models)
+            }
+
+    fun fetchAccountsByProviderAccountIdWithRelation(providerAccountId: Long): LiveData<Resource<List<AccountRelation>>> =
+            Transformations.map(db.accounts().loadByProviderAccountIdWithRelation(providerAccountId)) { models ->
                 Resource.success(models)
             }
 
@@ -349,7 +383,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
                 val staleIds = db.accounts().getStaleIds(apiIds.toLongArray())
 
                 if (staleIds.isNotEmpty()) {
-                    db.accounts().deleteMany(staleIds.toLongArray())
+                    removeCachedAccounts(staleIds.toLongArray())
                 }
 
                 uiThread { completion?.invoke(Result.success()) }
@@ -388,6 +422,25 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
 
     fun fetchTransactionsByAccountId(accountId: Long): LiveData<Resource<List<Transaction>>> =
             Transformations.map(db.transactions().loadByAccountId(accountId)) { models ->
+                Resource.success(models)
+            }
+
+    fun fetchTransactionWithRelation(transactionId: Long): LiveData<Resource<TransactionRelation>> =
+            Transformations.map(db.transactions().loadWithRelation(transactionId)) { model ->
+                Resource.success(model)
+            }
+
+    fun fetchTransactionsWithRelation(transactionIds: LongArray? = null): LiveData<Resource<List<TransactionRelation>>> {
+        val result = if (transactionIds != null) db.transactions().loadWithRelation(transactionIds)
+        else db.transactions().loadWithRelation()
+
+        return Transformations.map(result) { models ->
+            Resource.success(models)
+        }
+    }
+
+    fun fetchTransactionsByAccountIdWithRelation(accountId: Long): LiveData<Resource<List<TransactionRelation>>> =
+            Transformations.map(db.transactions().loadByAccountIdWithRelation(accountId)) { models ->
                 Resource.success(models)
             }
 
@@ -504,7 +557,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
                     staleIds.removeAll(apiIds)
 
                     if (staleIds.isNotEmpty()) {
-                        db.transactions().deleteMany(staleIds.toLongArray())
+                        removeCachedTransactions(staleIds.toLongArray())
                     }
                 }
 
@@ -688,5 +741,43 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
                 refreshMerchants(missingMerchantIds.toLongArray())
             }
         }
+    }
+
+    // WARNING: Do not call this method on the main thread
+    private fun removeCachedProviders(providerIds: LongArray) {
+        db.providers().deleteMany(providerIds)
+
+        // Manually delete other data linked to this provider
+        // as we are not using ForeignKeys because ForeignKey constraints
+        // do not allow to insert data into child table prior to parent table
+        val providerAccountIds = db.providerAccounts().getIdsByProviderIds(providerIds)
+        removeCachedProviderAccounts(providerAccountIds)
+    }
+
+    // WARNING: Do not call this method on the main thread
+    private fun removeCachedProviderAccounts(providerAccountIds: LongArray) {
+        db.providerAccounts().deleteMany(providerAccountIds)
+
+        // Manually delete other data linked to this provider account
+        // as we are not using ForeignKeys because ForeignKey constraints
+        // do not allow to insert data into child table prior to parent table
+        val accountIds = db.accounts().getIdsByProviderAccountIds(providerAccountIds)
+        removeCachedAccounts(accountIds)
+    }
+
+    // WARNING: Do not call this method on the main thread
+    private fun removeCachedAccounts(accountIds: LongArray) {
+        db.accounts().deleteMany(accountIds)
+
+        // Manually delete other data linked to this account
+        // as we are not using ForeignKeys because ForeignKey constraints
+        // do not allow to insert data into child table prior to parent table
+        val transactionIds = db.transactions().getIdsByAccountIds(accountIds)
+        removeCachedTransactions(transactionIds)
+    }
+
+    // WARNING: Do not call this method on the main thread
+    private fun removeCachedTransactions(transactionIds: LongArray) {
+        db.transactions().deleteMany(transactionIds)
     }
 }

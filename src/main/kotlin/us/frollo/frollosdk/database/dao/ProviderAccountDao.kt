@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
+import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccountRelation
 
 @Dao
 internal interface ProviderAccountDao {
@@ -25,6 +26,9 @@ internal interface ProviderAccountDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(model: ProviderAccount): Long
 
+    @Query("SELECT provider_account_id FROM provider_account WHERE provider_id IN (:providerIds)")
+    fun getIdsByProviderIds(providerIds: LongArray): LongArray
+
     @Query("SELECT provider_account_id FROM provider_account WHERE provider_account_id NOT IN (:apiIds)")
     fun getStaleIds(apiIds: LongArray): List<Long>
 
@@ -36,4 +40,18 @@ internal interface ProviderAccountDao {
 
     @Query("DELETE FROM provider_account")
     fun clear()
+
+    // Relation methods
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM provider_account")
+    fun loadWithRelation(): LiveData<List<ProviderAccountRelation>>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM provider_account WHERE provider_account_id = :providerAccountId")
+    fun loadWithRelation(providerAccountId: Long): LiveData<ProviderAccountRelation?>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM provider_account WHERE provider_id = :providerId")
+    fun loadByProviderIdWithRelation(providerId: Long): LiveData<List<ProviderAccountRelation>>
 }

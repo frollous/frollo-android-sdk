@@ -5,8 +5,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import us.frollo.frollosdk.database.dao.*
 import us.frollo.frollosdk.model.api.messages.MessageResponse
 import us.frollo.frollosdk.model.api.user.UserResponse
@@ -26,7 +24,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
     Transaction::class,
     TransactionCategory::class,
     Merchant::class
-], version = 2, exportSchema = true)
+], version = 1, exportSchema = true)
 
 @TypeConverters(Converters::class)
 abstract class SDKDatabase : RoomDatabase() {
@@ -55,16 +53,16 @@ abstract class SDKDatabase : RoomDatabase() {
                 Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
                         .allowMainThreadQueries() // Needed for some tests
                         .fallbackToDestructiveMigration()
-                        .addMigrations(MIGRATION_1_2)
+                        //.addMigrations(MIGRATION_1_2)
                         .build()
         /**
          * Copy-paste of auto-generated SQLs from room schema json file
          * located in sandbox code after building under app/schemas/$version.json
          */
-        private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
+        /*private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                // TODO: to be implemented
+                //to be implemented
             }
-        }
+        }*/
     }
 }

@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderRelation
 
 @Dao
 internal interface ProviderDao {
@@ -25,7 +26,7 @@ internal interface ProviderDao {
     @Query("SELECT provider_id FROM provider")
     fun getIds(): List<Long>
 
-    @Query("SELECT provider_id FROM provider WHERE provider_id NOT IN (:apiIds)")
+    @Query("SELECT provider_id FROM provider WHERE provider_id NOT IN (:apiIds) AND provider_status NOT IN ('DISABLED','UNSUPPORTED')")
     fun getStaleIds(apiIds: LongArray): List<Long>
 
     @Query("DELETE FROM provider WHERE provider_id IN (:providerIds)")
@@ -36,4 +37,14 @@ internal interface ProviderDao {
 
     @Query("DELETE FROM provider")
     fun clear()
+
+    // Relation methods
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM provider")
+    fun loadWithRelation(): LiveData<List<ProviderRelation>>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM provider WHERE provider_id = :providerId")
+    fun loadWithRelation(providerId: Long): LiveData<ProviderRelation?>
 }

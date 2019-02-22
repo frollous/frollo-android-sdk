@@ -86,4 +86,13 @@ class UtilityExtensionTest {
     fun testRegexValidate() {
         assertTrue("12345678".regexValidate("\\b\\d{8}\\b"))
     }
+
+    @Test
+    fun testCompareToFindMissingItems() {
+        val set1 = setOf<Long>(1,2,3,7)
+        val set2 = setOf<Long>(1,3,4,5,6)
+        val missingElements = set1.compareToFindMissingItems(set2)
+        assertEquals(2, missingElements.size)
+        assertTrue(missingElements.containsAll(listOf<Long>(2, 7)))
+    }
 }

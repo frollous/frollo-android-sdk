@@ -421,7 +421,44 @@ class AggregationTest {
 
     @Test
     fun testProviderAccountsFetchMissingProviders() {
-        //TODO: to be implemented
+        initSetup()
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == AggregationAPI.URL_PROVIDER_ACCOUNTS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.provider_accounts_valid))
+                } else if (request?.path == "${NetworkHelper.API_VERSION_PATH}/aggregation/providers/12345") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.provider_id_12345))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshProviderAccounts { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchProviderAccounts().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(4, models?.size)
+        }
+
+        wait(3)
+
+        val testObserver2 = aggregation.fetchProviders().test()
+        testObserver2.awaitValue()
+        val models2 = testObserver2.value().data
+        assertNotNull(models2)
+        assertEquals(1, models2?.size)
+        assertEquals(12345L, models2?.get(0)?.providerId)
+
+        tearDown()
     }
 
     // Account Tests
@@ -855,6 +892,50 @@ class AggregationTest {
     }
 
     @Test
+    fun testTransactionsFetchMissingMerchants() {
+        initSetup()
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == "${AggregationAPI.URL_TRANSACTIONS}?from_date=2018-06-01&to_date=2018-08-08") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.transactions_2018_08_01_valid))
+                } else if (request?.path?.contains(AggregationAPI.URL_MERCHANTS) == true) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.merchants_by_id))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshTransactions(fromDate = "2018-06-01", toDate = "2018-08-08") { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchTransactions().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(179, models?.size)
+        }
+
+        wait(3)
+
+        val testObserver2 = aggregation.fetchMerchants().test()
+        testObserver2.awaitValue()
+        val models2 = testObserver2.value().data
+        assertNotNull(models2)
+        assertEquals(5, models2?.size)
+        assertEquals(1L, models2?.get(0)?.merchantId)
+
+        tearDown()
+    }
+
+    // Transaction Summary Tests
+
+    @Test
     fun testFetchTransactionsSummary() {
         initSetup()
 
@@ -987,6 +1068,149 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals(AggregationAPI.URL_TRANSACTION_CATEGORIES, request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    // Merchant Tests
+
+    @Test
+    fun testFetchMerchantByID() {
+        initSetup()
+
+        val data = testMerchantResponseData()
+        val list = mutableListOf(testMerchantResponseData(), data, testMerchantResponseData())
+        database.merchants().insertAll(*list.map { it.toMerchant() }.toList().toTypedArray())
+
+        val testObserver = aggregation.fetchMerchant(data.merchantId).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(data.merchantId, testObserver.value().data?.merchantId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchMerchants() {
+        initSetup()
+
+        val data1 = testMerchantResponseData()
+        val data2 = testMerchantResponseData()
+        val data3 = testMerchantResponseData()
+        val data4 = testMerchantResponseData()
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        database.merchants().insertAll(*list.map { it.toMerchant() }.toList().toTypedArray())
+
+        val testObserver = aggregation.fetchMerchants().test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(4, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshMerchants() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.merchants_valid)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == AggregationAPI.URL_MERCHANTS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshMerchants { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchMerchants().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(1200, models?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(AggregationAPI.URL_MERCHANTS, request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshMerchantByID() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.merchant_id_197)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == "${NetworkHelper.API_VERSION_PATH}/aggregation/merchants/197") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshMerchant(197L) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchMerchant(197L).test()
+            testObserver.awaitValue()
+            val model = testObserver.value().data
+            assertNotNull(model)
+            assertEquals(197L, model?.merchantId)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${NetworkHelper.API_VERSION_PATH}/aggregation/merchants/197", request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshMerchantsByIds() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.merchants_by_id)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == "${AggregationAPI.URL_MERCHANTS}?merchant_ids=22,30,31,106,691") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshMerchants(longArrayOf(22, 30, 31, 106, 691)) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchMerchants().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(5, models?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${AggregationAPI.URL_MERCHANTS}?merchant_ids=22,30,31,106,691", request.path)
 
         wait(3)
 

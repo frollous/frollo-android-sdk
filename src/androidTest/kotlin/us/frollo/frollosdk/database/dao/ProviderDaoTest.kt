@@ -12,8 +12,8 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.mapping.toProvider
-import us.frollo.frollosdk.model.testProviderResponseData
+import us.frollo.frollosdk.mapping.*
+import us.frollo.frollosdk.model.*
 
 class ProviderDaoTest {
 
@@ -168,5 +168,41 @@ class ProviderDaoTest {
         val testObserver = db.providers().load().test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isEmpty())
+    }
+
+    @Test
+    fun testLoadAllWithRelation() {
+        db.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 235, providerId = 123).toProviderAccount())
+
+        val testObserver = db.providers().loadWithRelation().test()
+        testObserver.awaitValue()
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(1, testObserver.value().size)
+
+        val model = testObserver.value()[0]
+
+        assertEquals(123L, model.provider?.providerId)
+        assertEquals(2, model.providerAccounts?.size)
+        assertEquals(234L, model.providerAccounts?.get(0)?.providerAccountId)
+        assertEquals(235L, model.providerAccounts?.get(1)?.providerAccountId)
+    }
+
+    @Test
+    fun testLoadByProviderIdWithRelation() {
+        db.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 235, providerId = 123).toProviderAccount())
+
+        val testObserver = db.providers().loadWithRelation(providerId = 123).test()
+        testObserver.awaitValue()
+
+        val model = testObserver.value()
+
+        assertEquals(123L, model?.provider?.providerId)
+        assertEquals(2, model?.providerAccounts?.size)
+        assertEquals(234L, model?.providerAccounts?.get(0)?.providerAccountId)
+        assertEquals(235L, model?.providerAccounts?.get(1)?.providerAccountId)
     }
 }

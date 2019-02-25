@@ -12,8 +12,8 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.mapping.toProviderAccount
-import us.frollo.frollosdk.model.testProviderAccountResponseData
+import us.frollo.frollosdk.mapping.*
+import us.frollo.frollosdk.model.*
 
 class ProviderAccountDaoTest {
 
@@ -104,6 +104,24 @@ class ProviderAccountDaoTest {
     }
 
     @Test
+    fun testGetIdsByProviderIds() {
+        val data1 = testProviderAccountResponseData(providerAccountId = 100, providerId = 1)
+        val data2 = testProviderAccountResponseData(providerAccountId = 101, providerId = 2)
+        val data3 = testProviderAccountResponseData(providerAccountId = 102, providerId = 2)
+        val data4 = testProviderAccountResponseData(providerAccountId = 103, providerId = 1)
+        val data5 = testProviderAccountResponseData(providerAccountId = 104, providerId = 3)
+        val data6 = testProviderAccountResponseData(providerAccountId = 105, providerId = 1)
+        val list = mutableListOf(data1, data2, data3, data4, data5, data6)
+
+        db.providerAccounts().insertAll(*list.map { it.toProviderAccount() }.toList().toTypedArray())
+
+        val ids = db.providerAccounts().getIdsByProviderIds(providerIds = longArrayOf(2, 3))
+        assertTrue(ids.isNotEmpty())
+        assertEquals(3, ids.size)
+        assertTrue(ids.toList().containsAll(listOf<Long>(101, 102, 104)))
+    }
+
+    @Test
     fun testGetStaleIds() {
         val data1 = testProviderAccountResponseData(providerAccountId = 100)
         val data2 = testProviderAccountResponseData(providerAccountId = 101)
@@ -169,5 +187,77 @@ class ProviderAccountDaoTest {
         val testObserver = db.providerAccounts().load().test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isEmpty())
+    }
+
+    @Test
+    fun testLoadAllWithRelation() {
+        db.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        db.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
+        db.accounts().insert(testAccountResponseData(accountId = 346, providerAccountId = 234).toAccount())
+
+        val testObserver = db.providerAccounts().loadWithRelation().test()
+        testObserver.awaitValue()
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(1, testObserver.value().size)
+
+        val model = testObserver.value()[0]
+
+        assertEquals(123L, model.provider?.providerId)
+        assertEquals(234L, model.providerAccount?.providerAccountId)
+        assertEquals(2, model.accounts?.size)
+        assertEquals(345L, model.accounts?.get(0)?.accountId)
+        assertEquals(346L, model.accounts?.get(1)?.accountId)
+    }
+
+    @Test
+    fun testLoadByProviderAccountIdWithRelation() {
+        db.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        db.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
+        db.accounts().insert(testAccountResponseData(accountId = 346, providerAccountId = 234).toAccount())
+
+        val testObserver = db.providerAccounts().loadWithRelation(providerAccountId = 234).test()
+        testObserver.awaitValue()
+
+        val model = testObserver.value()
+
+        assertEquals(123L, model?.provider?.providerId)
+        assertEquals(234L, model?.providerAccount?.providerAccountId)
+        assertEquals(2, model?.accounts?.size)
+        assertEquals(345L, model?.accounts?.get(0)?.accountId)
+        assertEquals(346L, model?.accounts?.get(1)?.accountId)
+    }
+
+    @Test
+    fun testLoadByProviderIdWithRelation() {
+        db.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        db.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
+        db.accounts().insert(testAccountResponseData(accountId = 346, providerAccountId = 234).toAccount())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 235, providerId = 123).toProviderAccount())
+        db.accounts().insert(testAccountResponseData(accountId = 347, providerAccountId = 235).toAccount())
+        db.accounts().insert(testAccountResponseData(accountId = 348, providerAccountId = 235).toAccount())
+
+        val testObserver = db.providerAccounts().loadByProviderIdWithRelation(providerId = 123).test()
+        testObserver.awaitValue()
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(2, testObserver.value().size)
+
+        val model1 = testObserver.value()[0]
+
+        assertEquals(123L, model1.provider?.providerId)
+        assertEquals(234L, model1.providerAccount?.providerAccountId)
+        assertEquals(2, model1.accounts?.size)
+        assertEquals(345L, model1.accounts?.get(0)?.accountId)
+        assertEquals(346L, model1.accounts?.get(1)?.accountId)
+
+        val model2 = testObserver.value()[1]
+
+        assertEquals(123L, model2.provider?.providerId)
+        assertEquals(235L, model2.providerAccount?.providerAccountId)
+        assertEquals(2, model2.accounts?.size)
+        assertEquals(347L, model2.accounts?.get(0)?.accountId)
+        assertEquals(348L, model2.accounts?.get(1)?.accountId)
     }
 }

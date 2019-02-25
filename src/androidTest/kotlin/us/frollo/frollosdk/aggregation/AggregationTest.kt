@@ -113,6 +113,54 @@ class AggregationTest {
     }
 
     @Test
+    fun testFetchProviderByIDWithRelation() {
+        initSetup()
+
+        database.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 235, providerId = 123).toProviderAccount())
+
+        val testObserver = aggregation.fetchProviderWithRelation(providerId = 123).test()
+        testObserver.awaitValue()
+
+        val model = testObserver.value().data
+
+        assertEquals(123L, model?.provider?.providerId)
+        assertEquals(2, model?.providerAccounts?.size)
+        assertEquals(234L, model?.providerAccounts?.get(0)?.providerAccountId)
+        assertEquals(235L, model?.providerAccounts?.get(1)?.providerAccountId)
+
+        val data = testProviderResponseData()
+        val list = mutableListOf(testProviderResponseData(), data, testProviderResponseData())
+        database.providers().insertAll(*list.map { it.toProvider() }.toList().toTypedArray())
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchProvidersWithRelation() {
+        initSetup()
+
+        database.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 235, providerId = 123).toProviderAccount())
+
+        val testObserver = aggregation.fetchProvidersWithRelation().test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(1, testObserver.value().data?.size)
+
+        val model = testObserver.value().data?.get(0)
+
+        assertEquals(123L, model?.provider?.providerId)
+        assertEquals(2, model?.providerAccounts?.size)
+        assertEquals(234L, model?.providerAccounts?.get(0)?.providerAccountId)
+        assertEquals(235L, model?.providerAccounts?.get(1)?.providerAccountId)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshProviders() {
         initSetup()
 
@@ -236,6 +284,90 @@ class AggregationTest {
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
         assertEquals(3, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchProviderAccountByIDWithRelation() {
+        initSetup()
+
+        database.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        database.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
+        database.accounts().insert(testAccountResponseData(accountId = 346, providerAccountId = 234).toAccount())
+
+        val testObserver = aggregation.fetchProviderAccountWithRelation(providerAccountId = 234).test()
+        testObserver.awaitValue()
+
+        val model = testObserver.value().data
+
+        assertEquals(123L, model?.provider?.providerId)
+        assertEquals(234L, model?.providerAccount?.providerAccountId)
+        assertEquals(2, model?.accounts?.size)
+        assertEquals(345L, model?.accounts?.get(0)?.accountId)
+        assertEquals(346L, model?.accounts?.get(1)?.accountId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchProviderAccountsWithRelation() {
+        initSetup()
+
+        database.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        database.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
+        database.accounts().insert(testAccountResponseData(accountId = 346, providerAccountId = 234).toAccount())
+
+        val testObserver = aggregation.fetchProviderAccountsWithRelation().test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(1, testObserver.value().data?.size)
+
+        val model = testObserver.value().data?.get(0)
+
+        assertEquals(123L, model?.provider?.providerId)
+        assertEquals(234L, model?.providerAccount?.providerAccountId)
+        assertEquals(2, model?.accounts?.size)
+        assertEquals(345L, model?.accounts?.get(0)?.accountId)
+        assertEquals(346L, model?.accounts?.get(1)?.accountId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchProviderAccountsByProviderIdWithRelation() {
+        initSetup()
+
+        database.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        database.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
+        database.accounts().insert(testAccountResponseData(accountId = 346, providerAccountId = 234).toAccount())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 235, providerId = 123).toProviderAccount())
+        database.accounts().insert(testAccountResponseData(accountId = 347, providerAccountId = 235).toAccount())
+        database.accounts().insert(testAccountResponseData(accountId = 348, providerAccountId = 235).toAccount())
+
+        val testObserver = aggregation.fetchProviderAccountsByProviderIdWithRelation(providerId = 123).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(2, testObserver.value().data?.size)
+
+        val model1 = testObserver.value().data?.get(0)
+
+        assertEquals(123L, model1?.provider?.providerId)
+        assertEquals(234L, model1?.providerAccount?.providerAccountId)
+        assertEquals(2, model1?.accounts?.size)
+        assertEquals(345L, model1?.accounts?.get(0)?.accountId)
+        assertEquals(346L, model1?.accounts?.get(1)?.accountId)
+
+        val model2 = testObserver.value().data?.get(1)
+
+        assertEquals(123L, model2?.provider?.providerId)
+        assertEquals(235L, model2?.providerAccount?.providerAccountId)
+        assertEquals(2, model2?.accounts?.size)
+        assertEquals(347L, model2?.accounts?.get(0)?.accountId)
+        assertEquals(348L, model2?.accounts?.get(1)?.accountId)
 
         tearDown()
     }
@@ -520,6 +652,93 @@ class AggregationTest {
     }
 
     @Test
+    fun testFetchAccountByIDWithRelation() {
+        initSetup()
+
+        database.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        database.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
+        database.transactions().insert(testTransactionResponseData(transactionId = 456, accountId = 345).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 457, accountId = 345).toTransaction())
+
+        val testObserver = aggregation.fetchAccountWithRelation(accountId = 345).test()
+        testObserver.awaitValue()
+
+        val model = testObserver.value().data
+
+        assertEquals(345L, model?.account?.accountId)
+        assertEquals(234L, model?.providerAccount?.providerAccount?.providerAccountId)
+        assertEquals(2, model?.transactions?.size)
+        assertEquals(456L, model?.transactions?.get(0)?.transactionId)
+        assertEquals(457L, model?.transactions?.get(1)?.transactionId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchAccountsWithRelation() {
+        initSetup()
+
+        database.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        database.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
+        database.transactions().insert(testTransactionResponseData(transactionId = 456, accountId = 345).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 457, accountId = 345).toTransaction())
+
+        val testObserver = aggregation.fetchAccountsWithRelation().test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(1, testObserver.value().data?.size)
+
+        val model = testObserver.value().data?.get(0)
+
+        assertEquals(345L, model?.account?.accountId)
+        assertEquals(234L, model?.providerAccount?.providerAccount?.providerAccountId)
+        assertEquals(2, model?.transactions?.size)
+        assertEquals(456L, model?.transactions?.get(0)?.transactionId)
+        assertEquals(457L, model?.transactions?.get(1)?.transactionId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchAccountsByProviderAccountIdWithRelation() {
+        initSetup()
+
+        database.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        database.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
+        database.transactions().insert(testTransactionResponseData(transactionId = 456, accountId = 345).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 457, accountId = 345).toTransaction())
+        database.accounts().insert(testAccountResponseData(accountId = 346, providerAccountId = 234).toAccount())
+        database.transactions().insert(testTransactionResponseData(transactionId = 458, accountId = 346).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 459, accountId = 346).toTransaction())
+
+        val testObserver = aggregation.fetchAccountsByProviderAccountIdWithRelation(providerAccountId = 234).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(2, testObserver.value().data?.size)
+
+        val model1 = testObserver.value().data?.get(0)
+
+        assertEquals(345L, model1?.account?.accountId)
+        assertEquals(234L, model1?.providerAccount?.providerAccount?.providerAccountId)
+        assertEquals(2, model1?.transactions?.size)
+        assertEquals(456L, model1?.transactions?.get(0)?.transactionId)
+        assertEquals(457L, model1?.transactions?.get(1)?.transactionId)
+
+        val model2 = testObserver.value().data?.get(1)
+
+        assertEquals(346L, model2?.account?.accountId)
+        assertEquals(234L, model2?.providerAccount?.providerAccount?.providerAccountId)
+        assertEquals(2, model2?.transactions?.size)
+        assertEquals(458L, model2?.transactions?.get(0)?.transactionId)
+        assertEquals(459L, model2?.transactions?.get(1)?.transactionId)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshAccounts() {
         initSetup()
 
@@ -743,6 +962,127 @@ class AggregationTest {
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
         assertEquals(3, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionByIDWithRelation() {
+        initSetup()
+
+        database.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        database.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 345, providerId = 456).toProviderAccount())
+        database.providers().insert(testProviderResponseData(providerId = 456).toProvider())
+        database.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
+        database.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
+
+        val testObserver = aggregation.fetchTransactionWithRelation(transactionId = 123).test()
+        testObserver.awaitValue()
+
+        val model = testObserver.value().data
+
+        assertEquals(123L, model?.transaction?.transactionId)
+        assertEquals(678L, model?.merchant?.merchantId)
+        assertEquals(567L, model?.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model?.account?.account?.accountId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionsWithRelation() {
+        initSetup()
+
+        database.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        database.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 345, providerId = 456).toProviderAccount())
+        database.providers().insert(testProviderResponseData(providerId = 456).toProvider())
+        database.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
+        database.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
+
+        val testObserver = aggregation.fetchTransactionsWithRelation().test()
+        testObserver.awaitValue()
+
+        assertNotNull(testObserver.value().data)
+        assertEquals(1, testObserver.value().data?.size)
+
+        val model = testObserver.value().data?.get(0)
+
+        assertEquals(123L, model?.transaction?.transactionId)
+        assertEquals(678L, model?.merchant?.merchantId)
+        assertEquals(567L, model?.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model?.account?.account?.accountId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionByIdsWithRelation() {
+        initSetup()
+
+        database.transactions().insert(testTransactionResponseData(transactionId = 122, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        database.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 345, providerId = 456).toProviderAccount())
+        database.providers().insert(testProviderResponseData(providerId = 456).toProvider())
+        database.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
+        database.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
+
+        val testObserver = aggregation.fetchTransactionsWithRelation(transactionIds = longArrayOf(122, 123)).test()
+        testObserver.awaitValue()
+
+        assertNotNull(testObserver.value().data)
+        assertEquals(2, testObserver.value().data?.size)
+
+        val model1 = testObserver.value().data?.get(0)
+
+        assertEquals(122L, model1?.transaction?.transactionId)
+        assertEquals(678L, model1?.merchant?.merchantId)
+        assertEquals(567L, model1?.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model1?.account?.account?.accountId)
+
+        val model2 = testObserver.value().data?.get(1)
+
+        assertEquals(123L, model2?.transaction?.transactionId)
+        assertEquals(678L, model2?.merchant?.merchantId)
+        assertEquals(567L, model2?.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model2?.account?.account?.accountId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionsByAccountIdWithRelation() {
+        initSetup()
+
+        database.transactions().insert(testTransactionResponseData(transactionId = 122, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        database.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 345, providerId = 456).toProviderAccount())
+        database.providers().insert(testProviderResponseData(providerId = 456).toProvider())
+        database.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
+        database.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
+
+        val testObserver = aggregation.fetchTransactionsByAccountIdWithRelation(accountId = 234).test()
+        testObserver.awaitValue()
+
+        assertNotNull(testObserver.value().data)
+        assertEquals(2, testObserver.value().data?.size)
+
+        val model1 = testObserver.value().data?.get(0)
+
+        assertEquals(122L, model1?.transaction?.transactionId)
+        assertEquals(678L, model1?.merchant?.merchantId)
+        assertEquals(567L, model1?.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model1?.account?.account?.accountId)
+
+        val model2 = testObserver.value().data?.get(1)
+
+        assertEquals(123L, model2?.transaction?.transactionId)
+        assertEquals(678L, model2?.merchant?.merchantId)
+        assertEquals(567L, model2?.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model2?.account?.account?.accountId)
 
         tearDown()
     }
@@ -1211,6 +1551,78 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals("${AggregationAPI.URL_MERCHANTS}?merchant_ids=22,30,31,106,691", request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testLinkingRemoveCachedCascade() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.providers_valid)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == AggregationAPI.URL_PROVIDERS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        database.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        database.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
+        database.transactions().insert(testTransactionResponseData(transactionId = 456, accountId = 345).toTransaction())
+
+        val testObserver1 = aggregation.fetchProvider(providerId = 123).test()
+        testObserver1.awaitValue()
+        assertEquals(123L, testObserver1.value().data?.providerId)
+
+        val testObserver2 = aggregation.fetchProviderAccount(providerAccountId = 234).test()
+        testObserver2.awaitValue()
+        assertEquals(234L, testObserver2.value().data?.providerAccountId)
+
+        val testObserver3 = aggregation.fetchAccount(accountId = 345).test()
+        testObserver3.awaitValue()
+        assertEquals(345L, testObserver3.value().data?.accountId)
+
+        val testObserver4 = aggregation.fetchTransaction(transactionId = 456).test()
+        testObserver4.awaitValue()
+        assertEquals(456L, testObserver4.value().data?.transactionId)
+
+        aggregation.refreshProviders { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver5 = aggregation.fetchProviders().test()
+            testObserver5.awaitValue()
+            val models = testObserver5.value().data
+            assertNotNull(models)
+            assertEquals(311, models?.size)
+
+            val testObserver6 = aggregation.fetchProvider(providerId = 123).test()
+            testObserver6.awaitValue()
+            assertNull(testObserver6.value().data)
+
+            val testObserver7 = aggregation.fetchProviderAccount(providerAccountId = 234).test()
+            testObserver7.awaitValue()
+            assertNull(testObserver7.value().data)
+
+            val testObserver8 = aggregation.fetchAccount(accountId = 345).test()
+            testObserver8.awaitValue()
+            assertNull(testObserver8.value().data)
+
+            val testObserver9 = aggregation.fetchTransaction(transactionId = 456).test()
+            testObserver9.awaitValue()
+            assertNull(testObserver9.value().data)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(AggregationAPI.URL_PROVIDERS, request.path)
 
         wait(3)
 

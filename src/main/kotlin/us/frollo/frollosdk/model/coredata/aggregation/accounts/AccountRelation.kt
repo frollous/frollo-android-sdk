@@ -18,9 +18,9 @@ data class AccountRelation(
         var transactions: List<Transaction>? = null
 ): IAdapterModel {
 
-   val providerAccount: ProviderAccount?
+   val providerAccount: ProviderAccountRelation?
        get() {
            val models = providerAccounts
-           return if (models?.isNotEmpty() == true) models[0].providerAccount else null
+           return if (models?.isNotEmpty() == true) models[0] else null
        }
 }

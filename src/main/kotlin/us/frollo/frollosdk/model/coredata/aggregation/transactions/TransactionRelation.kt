@@ -22,10 +22,10 @@ data class TransactionRelation(
         var merchants: List<Merchant>? = null
 ): IAdapterModel {
 
-    val account: Account?
+    val account: AccountRelation?
         get() {
             val models = accounts
-            return if (models?.isNotEmpty() == true) models[0].account else null
+            return if (models?.isNotEmpty() == true) models[0] else null
         }
 
     val transactionCategory: TransactionCategory?

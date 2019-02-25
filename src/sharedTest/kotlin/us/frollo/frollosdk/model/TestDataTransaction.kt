@@ -14,6 +14,7 @@ import java.math.BigDecimal
 import kotlin.random.Random
 
 internal fun testTransactionResponseData(transactionId: Long? = null, accountId: Long? = null,
+                                         categoryId: Long? = null, merchantId: Long? = null,
                                          transactionDate: String? = null, included: Boolean? = null) : TransactionResponse {
     return TransactionResponse(
             transactionId = transactionId ?: randomNumber().toLong(),
@@ -22,8 +23,8 @@ internal fun testTransactionResponseData(transactionId: Long? = null, accountId:
             baseType = TransactionBaseType.values()[Random.nextInt(TransactionBaseType.values().size)],
             billId = randomNumber().toLong(),
             billPaymentId = randomNumber().toLong(),
-            categoryId = randomNumber().toLong(),
-            merchantId = randomNumber().toLong(),
+            categoryId = categoryId ?: randomNumber().toLong(),
+            merchantId = merchantId ?: randomNumber().toLong(),
             budgetCategory = BudgetCategory.values()[Random.nextInt(BudgetCategory.values().size)],
             description = TransactionDescription(original = randomUUID(), user = null, simple = null),
             included = included ?: randomBoolean(),

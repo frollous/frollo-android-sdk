@@ -13,8 +13,8 @@ import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.extensions.sqlForTransactionStaleIds
-import us.frollo.frollosdk.mapping.toTransaction
-import us.frollo.frollosdk.model.testTransactionResponseData
+import us.frollo.frollosdk.mapping.*
+import us.frollo.frollosdk.model.*
 
 class TransactionDaoTest {
 
@@ -93,7 +93,7 @@ class TransactionDaoTest {
     }
 
     @Test
-    fun testLoadByQuery() {
+    fun testLoadIdsByQuery() {
         val data1 = testTransactionResponseData(transactionId = 100, accountId = 1, transactionDate = "2019-01-04", included = false)
         val data2 = testTransactionResponseData(transactionId = 101, accountId = 1, transactionDate = "2019-01-20", included = false)
         val data3 = testTransactionResponseData(transactionId = 102, accountId = 1, transactionDate = "2018-12-31", included = false)
@@ -139,6 +139,23 @@ class TransactionDaoTest {
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(data.transactionId, testObserver.value()[0].transactionId)
+    }
+
+    @Test
+    fun testGetIdsByAccountIds() {
+        val data1 = testTransactionResponseData(transactionId = 100, accountId = 1)
+        val data2 = testTransactionResponseData(transactionId = 101, accountId = 2)
+        val data3 = testTransactionResponseData(transactionId = 102, accountId = 2)
+        val data4 = testTransactionResponseData(transactionId = 103, accountId = 1)
+        val data5 = testTransactionResponseData(transactionId = 104, accountId = 3)
+        val data6 = testTransactionResponseData(transactionId = 105, accountId = 1)
+        val list = mutableListOf(data1, data2, data3, data4, data5, data6)
+        db.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+
+        val ids = db.transactions().getIdsByAccountIds(longArrayOf(2, 3))
+        assertTrue(ids.isNotEmpty())
+        assertEquals(3, ids.size)
+        assertTrue(ids.toList().containsAll(listOf<Long>(101, 102, 104)))
     }
 
     @Test
@@ -243,5 +260,110 @@ class TransactionDaoTest {
         val testObserver = db.transactions().load().test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isEmpty())
+    }
+
+    @Test
+    fun testLoadAllWithRelation() {
+        db.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        db.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 345, providerId = 456).toProviderAccount())
+        db.providers().insert(testProviderResponseData(providerId = 456).toProvider())
+        db.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
+        db.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
+
+        val testObserver = db.transactions().loadWithRelation().test()
+        testObserver.awaitValue()
+
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(1, testObserver.value().size)
+
+        val model = testObserver.value()[0]
+
+        assertEquals(123L, model.transaction?.transactionId)
+        assertEquals(678L, model.merchant?.merchantId)
+        assertEquals(567L, model.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model.account?.account?.accountId)
+    }
+
+    @Test
+    fun testLoadByTransactionIdWithRelation() {
+        db.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        db.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 345, providerId = 456).toProviderAccount())
+        db.providers().insert(testProviderResponseData(providerId = 456).toProvider())
+        db.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
+        db.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
+
+        val testObserver = db.transactions().loadWithRelation(transactionId = 123).test()
+        testObserver.awaitValue()
+
+        val model = testObserver.value()
+
+        assertEquals(123L, model?.transaction?.transactionId)
+        assertEquals(678L, model?.merchant?.merchantId)
+        assertEquals(567L, model?.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model?.account?.account?.accountId)
+    }
+
+    @Test
+    fun testLoadByTransactionIdsWithRelation() {
+        db.transactions().insert(testTransactionResponseData(transactionId = 122, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        db.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        db.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 345, providerId = 456).toProviderAccount())
+        db.providers().insert(testProviderResponseData(providerId = 456).toProvider())
+        db.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
+        db.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
+
+        val testObserver = db.transactions().loadWithRelation(transactionIds = longArrayOf(122, 123)).test()
+        testObserver.awaitValue()
+
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(2, testObserver.value().size)
+
+        val model1 = testObserver.value()[0]
+
+        assertEquals(122L, model1.transaction?.transactionId)
+        assertEquals(678L, model1.merchant?.merchantId)
+        assertEquals(567L, model1.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model1.account?.account?.accountId)
+
+        val model2 = testObserver.value()[1]
+
+        assertEquals(123L, model2.transaction?.transactionId)
+        assertEquals(678L, model2.merchant?.merchantId)
+        assertEquals(567L, model2.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model2.account?.account?.accountId)
+    }
+
+    @Test
+    fun testLoadByAccountIdWithRelation() {
+        db.transactions().insert(testTransactionResponseData(transactionId = 122, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        db.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        db.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 345, providerId = 456).toProviderAccount())
+        db.providers().insert(testProviderResponseData(providerId = 456).toProvider())
+        db.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
+        db.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
+
+        val testObserver = db.transactions().loadByAccountIdWithRelation(accountId = 234).test()
+        testObserver.awaitValue()
+
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(2, testObserver.value().size)
+
+        val model1 = testObserver.value()[0]
+
+        assertEquals(122L, model1.transaction?.transactionId)
+        assertEquals(678L, model1.merchant?.merchantId)
+        assertEquals(567L, model1.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model1.account?.account?.accountId)
+
+        val model2 = testObserver.value()[1]
+
+        assertEquals(123L, model2.transaction?.transactionId)
+        assertEquals(678L, model2.merchant?.merchantId)
+        assertEquals(567L, model2.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model2.account?.account?.accountId)
     }
 }

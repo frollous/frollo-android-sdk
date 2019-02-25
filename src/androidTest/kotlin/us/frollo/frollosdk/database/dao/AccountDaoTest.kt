@@ -13,7 +13,13 @@ import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.mapping.toAccount
+import us.frollo.frollosdk.mapping.toProvider
+import us.frollo.frollosdk.mapping.toProviderAccount
+import us.frollo.frollosdk.mapping.toTransaction
 import us.frollo.frollosdk.model.testAccountResponseData
+import us.frollo.frollosdk.model.testProviderAccountResponseData
+import us.frollo.frollosdk.model.testProviderResponseData
+import us.frollo.frollosdk.model.testTransactionResponseData
 
 class AccountDaoTest {
 
@@ -104,6 +110,24 @@ class AccountDaoTest {
     }
 
     @Test
+    fun testGetIdsByProviderAccountIds() {
+        val data1 = testAccountResponseData(accountId = 100, providerAccountId = 1)
+        val data2 = testAccountResponseData(accountId = 101, providerAccountId = 2)
+        val data3 = testAccountResponseData(accountId = 102, providerAccountId = 2)
+        val data4 = testAccountResponseData(accountId = 103, providerAccountId = 1)
+        val data5 = testAccountResponseData(accountId = 104, providerAccountId = 3)
+        val data6 = testAccountResponseData(accountId = 105, providerAccountId = 1)
+        val list = mutableListOf(data1, data2, data3, data4, data5, data6)
+
+        db.accounts().insertAll(*list.map { it.toAccount() }.toList().toTypedArray())
+
+        val ids = db.accounts().getIdsByProviderAccountIds(providerAccountIds = longArrayOf(2, 3))
+        assertTrue(ids.isNotEmpty())
+        assertEquals(3, ids.size)
+        assertTrue(ids.toList().containsAll(listOf<Long>(101, 102, 104)))
+    }
+
+    @Test
     fun testGetStaleIds() {
         val data1 = testAccountResponseData(accountId = 100)
         val data2 = testAccountResponseData(accountId = 101)
@@ -187,5 +211,80 @@ class AccountDaoTest {
         val testObserver = db.accounts().load().test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isEmpty())
+    }
+
+    @Test
+    fun testLoadAllWithRelation() {
+        db.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        db.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
+        db.transactions().insert(testTransactionResponseData(transactionId = 456, accountId = 345).toTransaction())
+        db.transactions().insert(testTransactionResponseData(transactionId = 457, accountId = 345).toTransaction())
+
+        val testObserver = db.accounts().loadWithRelation().test()
+        testObserver.awaitValue()
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(1, testObserver.value().size)
+
+        val model = testObserver.value()[0]
+
+        assertEquals(345L, model.account?.accountId)
+        assertEquals(234L, model.providerAccount?.providerAccount?.providerAccountId)
+        assertEquals(2, model.transactions?.size)
+        assertEquals(456L, model.transactions?.get(0)?.transactionId)
+        assertEquals(457L, model.transactions?.get(1)?.transactionId)
+    }
+
+    @Test
+    fun testLoadByAccountIdWithRelation() {
+        db.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        db.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
+        db.transactions().insert(testTransactionResponseData(transactionId = 456, accountId = 345).toTransaction())
+        db.transactions().insert(testTransactionResponseData(transactionId = 457, accountId = 345).toTransaction())
+
+        val testObserver = db.accounts().loadWithRelation(accountId = 345).test()
+        testObserver.awaitValue()
+
+        val model = testObserver.value()
+
+        assertEquals(345L, model?.account?.accountId)
+        assertEquals(234L, model?.providerAccount?.providerAccount?.providerAccountId)
+        assertEquals(2, model?.transactions?.size)
+        assertEquals(456L, model?.transactions?.get(0)?.transactionId)
+        assertEquals(457L, model?.transactions?.get(1)?.transactionId)
+    }
+
+    @Test
+    fun testLoadByProviderAccountIdWithRelation() {
+        db.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        db.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
+        db.transactions().insert(testTransactionResponseData(transactionId = 456, accountId = 345).toTransaction())
+        db.transactions().insert(testTransactionResponseData(transactionId = 457, accountId = 345).toTransaction())
+        db.accounts().insert(testAccountResponseData(accountId = 346, providerAccountId = 234).toAccount())
+        db.transactions().insert(testTransactionResponseData(transactionId = 458, accountId = 346).toTransaction())
+        db.transactions().insert(testTransactionResponseData(transactionId = 459, accountId = 346).toTransaction())
+
+        val testObserver = db.accounts().loadWithRelation().test()
+        testObserver.awaitValue()
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(2, testObserver.value().size)
+
+        val model1 = testObserver.value()[0]
+
+        assertEquals(345L, model1.account?.accountId)
+        assertEquals(234L, model1.providerAccount?.providerAccount?.providerAccountId)
+        assertEquals(2, model1.transactions?.size)
+        assertEquals(456L, model1.transactions?.get(0)?.transactionId)
+        assertEquals(457L, model1.transactions?.get(1)?.transactionId)
+
+        val model2 = testObserver.value()[1]
+
+        assertEquals(346L, model2.account?.accountId)
+        assertEquals(234L, model2.providerAccount?.providerAccount?.providerAccountId)
+        assertEquals(2, model2.transactions?.size)
+        assertEquals(458L, model2.transactions?.get(0)?.transactionId)
+        assertEquals(459L, model2.transactions?.get(1)?.transactionId)
     }
 }

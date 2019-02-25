@@ -16,7 +16,7 @@ import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
-import us.frollo.frollosdk.core.SetupParams
+import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.network.NetworkHelper
 import us.frollo.frollosdk.network.NetworkService
@@ -53,13 +53,14 @@ class AggregationTest {
         mockServer.start()
         val baseUrl = mockServer.url("/")
 
-        if (!FrolloSDK.isSetup) FrolloSDK.setup(app, SetupParams.Builder().serverUrl(baseUrl.toString()).build()) {}
+        val config = testSDKConfig(serverUrl = baseUrl.toString())
+        if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
 
         keystore = Keystore()
         keystore.setup()
         preferences = Preferences(app)
         database = SDKDatabase.getInstance(app)
-        network = NetworkService(baseUrl.toString(), keystore, preferences)
+        network = NetworkService(serverUrl = config.serverUrl, authorizationUrl = config.authorizationUrl, tokenUrl = config.tokenUrl, keystore = keystore, pref = preferences)
 
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")

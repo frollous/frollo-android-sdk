@@ -14,7 +14,7 @@ import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.base.Result
-import us.frollo.frollosdk.core.SetupParams
+import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.model.testUserResponseData
@@ -58,7 +58,7 @@ class FrolloSDKAndroidUnitTest {
         assertFalse(FrolloSDK.isSetup)
 
         try {
-            FrolloSDK.setup(app, SetupParams.Builder().build()) { }
+            FrolloSDK.setup(app, testSDKConfig(serverUrl = "")) { }
         } catch (e: FrolloSDKError) {
             assertEquals("Server URL cannot be empty", e.localizedMessage)
         }
@@ -66,11 +66,9 @@ class FrolloSDKAndroidUnitTest {
 
     @Test
     fun testSDKSetupSuccess() {
-        val url = "https://api.example.com"
-
         assertFalse(FrolloSDK.isSetup)
 
-        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { result ->
+        FrolloSDK.setup(app, testSDKConfig()) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -140,9 +138,7 @@ class FrolloSDKAndroidUnitTest {
 
     @Test
     fun testPauseScheduledRefresh() {
-        val url = "https://api.example.com"
-
-        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { result ->
+        FrolloSDK.setup(app, testSDKConfig()) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -153,9 +149,7 @@ class FrolloSDKAndroidUnitTest {
 
     @Test
     fun testResumeScheduledRefresh() {
-        val url = "https://api.example.com"
-
-        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { result ->
+        FrolloSDK.setup(app, testSDKConfig()) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -187,7 +181,7 @@ class FrolloSDKAndroidUnitTest {
             }
         })
 
-        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(baseUrl.toString()).build()) {
+        FrolloSDK.setup(app, testSDKConfig()) {
 
             FrolloSDK.authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password") { error ->
                 assertNull(error)
@@ -230,7 +224,7 @@ class FrolloSDKAndroidUnitTest {
         testObserver.awaitValue()
         assertNotNull(testObserver.value())
 
-        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { result ->
+        FrolloSDK.setup(app, testSDKConfig()) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -270,7 +264,7 @@ class FrolloSDKAndroidUnitTest {
         testObserver.awaitValue()
         assertNotNull(testObserver.value())
 
-        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { result ->
+        FrolloSDK.setup(app, testSDKConfig()) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -308,7 +302,7 @@ class FrolloSDKAndroidUnitTest {
         testObserver.awaitValue()
         assertNotNull(testObserver.value())
 
-        FrolloSDK.setup(app, SetupParams.Builder().serverUrl(url).build()) { result ->
+        FrolloSDK.setup(app, testSDKConfig()) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 

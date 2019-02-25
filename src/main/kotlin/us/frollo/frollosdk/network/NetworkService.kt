@@ -17,7 +17,12 @@ import us.frollo.frollosdk.preferences.Preferences
 import okhttp3.CertificatePinner
 import us.frollo.frollosdk.BuildConfig
 
-class NetworkService internal constructor(internal val serverUrl: String, keystore: Keystore, pref: Preferences) : IApiProvider {
+class NetworkService internal constructor(
+        internal val authorizationUrl: String,
+        internal val serverUrl: String,
+        internal val tokenUrl: String,
+        keystore: Keystore,
+        pref: Preferences) : IApiProvider {
 
     companion object {
         private const val TAG = "NetworkService"

@@ -30,11 +30,16 @@ Import the FrolloSDK and ensure you run setup with your tenant URL provided by u
 
             val serverUrl = "https://<tenant>.frollo.us"
 
-            val setupParams = SetupParams.Builder()
-                    .serverUrl(serverUrl = serverUrl)
-                    .build()
+            val configuration = FrolloSDKConfiguration(
+                                      clientId = "",
+                                      clientSecret = "",
+                                      redirectUri = "",
+                                      authorizationUrl = "",
+                                      tokenUrl = "",
+                                      serverUrl = serverUrl,
+                                      logLevel = LogLevel.DEBUG)
 
-            FrolloSDK.setup(application, setupParams = setupParams) { error ->
+            FrolloSDK.setup(application, configuration = configuration) { error ->
                 if (error != null)
                     Log.e(TAG, error.localizedDescription)
                 else

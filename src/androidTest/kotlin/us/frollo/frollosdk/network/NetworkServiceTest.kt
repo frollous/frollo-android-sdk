@@ -42,7 +42,7 @@ class NetworkServiceTest {
         keystore = Keystore()
         keystore.setup()
         preferences = Preferences(app)
-        network = NetworkService(baseUrl.toString(), keystore, preferences)
+        network = NetworkService(serverUrl = baseUrl.toString(), authorizationUrl = "", tokenUrl = "", keystore = keystore, pref = preferences)
 
         AndroidThreeTen.init(app)
     }

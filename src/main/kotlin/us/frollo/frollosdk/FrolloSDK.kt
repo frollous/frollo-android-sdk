@@ -16,7 +16,7 @@ import us.frollo.frollosdk.core.ACTION.ACTION_AUTHENTICATION_CHANGED
 import us.frollo.frollosdk.core.ARGUMENT.ARG_AUTHENTICATION_STATUS
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
-import us.frollo.frollosdk.core.SetupParams
+import us.frollo.frollosdk.core.FrolloSDKConfiguration
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.error.FrolloSDKError
@@ -101,17 +101,17 @@ object FrolloSDK {
      * Sets up the SDK for use by performing any database migrations or other underlying setup needed. Must be called and completed before using the SDK.
      *
      * @param application Application instance of the client app.
-     * @param setupParams Parameters to configure SDK setup. See [SetupParams] for details.
+     * @param configuration Configuration and preferences needed to setup the SDK. See [FrolloSDKConfiguration] for details.
      * @param completion Completion handler with optional error if something goes wrong during the setup process.
      *
      * @throws FrolloSDKError if SDK is already setup or Server URL is empty.
      */
     @Throws(FrolloSDKError::class)
-    fun setup(application: Application, setupParams: SetupParams, completion: OnFrolloSDKCompletionListener<Result>) {
+    fun setup(application: Application, configuration: FrolloSDKConfiguration, completion: OnFrolloSDKCompletionListener<Result>) {
         this.app = application
 
         if (_setup) throw FrolloSDKError("SDK already setup")
-        if (setupParams.serverUrl.isBlank()) throw FrolloSDKError("Server URL cannot be empty")
+        if (configuration.serverUrl.isBlank()) throw FrolloSDKError("Server URL cannot be empty")
 
         try {
             // 1. Initialize ThreeTenABP
@@ -126,10 +126,15 @@ object FrolloSDK {
             // 5. Setup Version Manager
             version = Version(preferences)
             // 6. Setup Network Stack
-            network = NetworkService(setupParams.serverUrl, keyStore, preferences)
+            network = NetworkService(
+                    authorizationUrl = configuration.authorizationUrl,
+                    serverUrl = configuration.serverUrl,
+                    tokenUrl = configuration.tokenUrl,
+                    keystore = keyStore,
+                    pref = preferences)
             // 7. Setup Logger
             Log.network = network // Initialize Log.network before Log.logLevel as Log.logLevel is dependant on Log.network
-            Log.logLevel = setupParams.logLevel
+            Log.logLevel = configuration.logLevel
             // 8. Setup Authentication
             _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
             // 9. Setup Aggregation

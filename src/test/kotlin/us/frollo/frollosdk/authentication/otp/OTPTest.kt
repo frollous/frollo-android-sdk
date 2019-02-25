@@ -1,8 +1,6 @@
-package us.frollo.frollosdk.auth.otp
+package us.frollo.frollosdk.authentication.otp
 
 import org.junit.Test
-
-import org.junit.Assert.*
 
 class OTPTest {
 

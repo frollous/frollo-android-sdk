@@ -6,7 +6,7 @@ import org.junit.Test
 
 import org.junit.Assert.*
 import org.junit.Before
-import us.frollo.frollosdk.auth.FeatureType
+import us.frollo.frollosdk.authentication.FeatureType
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.coredata.user.FeatureFlag
 

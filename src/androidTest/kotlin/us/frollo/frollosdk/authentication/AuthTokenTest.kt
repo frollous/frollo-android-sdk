@@ -1,4 +1,4 @@
-package us.frollo.frollosdk.auth
+package us.frollo.frollosdk.authentication
 
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.After

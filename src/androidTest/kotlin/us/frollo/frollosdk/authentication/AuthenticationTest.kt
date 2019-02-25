@@ -1,4 +1,4 @@
-package us.frollo.frollosdk.auth
+package us.frollo.frollosdk.authentication
 
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule

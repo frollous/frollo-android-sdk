@@ -12,7 +12,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.auth.AuthenticationStatus
+import us.frollo.frollosdk.authentication.AuthenticationStatus
 import us.frollo.frollosdk.core.ARGUMENT.ARG_AUTHENTICATION_STATUS
 import us.frollo.frollosdk.core.ARGUMENT.ARG_DATA
 

@@ -1,4 +1,4 @@
-package us.frollo.frollosdk.auth
+package us.frollo.frollosdk.authentication
 
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName

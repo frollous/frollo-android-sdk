@@ -7,7 +7,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import us.frollo.frollosdk.auth.AuthToken
+import us.frollo.frollosdk.authentication.AuthToken
 import us.frollo.frollosdk.base.LiveDataCallAdapterFactory
 import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.keystore.Keystore

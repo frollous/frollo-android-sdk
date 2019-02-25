@@ -1,7 +1,7 @@
 package us.frollo.frollosdk.notifications
 
 import android.os.Bundle
-import us.frollo.frollosdk.auth.Authentication
+import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.events.Events
 import us.frollo.frollosdk.extensions.toNotificationPayload
 import us.frollo.frollosdk.logging.Log

@@ -1,4 +1,4 @@
-package us.frollo.frollosdk.auth.otp
+package us.frollo.frollosdk.authentication.otp
 
 internal class OTP {
 

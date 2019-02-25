@@ -1,7 +1,7 @@
 package us.frollo.frollosdk.preferences
 
 import android.content.Context
-import us.frollo.frollosdk.auth.FeatureType
+import us.frollo.frollosdk.authentication.FeatureType
 import us.frollo.frollosdk.database.Converters
 import us.frollo.frollosdk.model.coredata.user.FeatureFlag
 

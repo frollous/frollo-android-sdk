@@ -7,7 +7,7 @@ import org.junit.Before
 import org.junit.Test
 
 import org.junit.Assert.*
-import us.frollo.frollosdk.auth.AuthToken
+import us.frollo.frollosdk.authentication.AuthToken
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.preferences.Preferences
 

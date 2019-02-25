@@ -1,7 +1,7 @@
 package us.frollo.frollosdk.model.api.user
 
 import com.google.gson.annotations.SerializedName
-import us.frollo.frollosdk.auth.AuthType
+import us.frollo.frollosdk.authentication.AuthType
 
 internal data class UserLoginRequest(
         @SerializedName("auth_type") val authType: AuthType,

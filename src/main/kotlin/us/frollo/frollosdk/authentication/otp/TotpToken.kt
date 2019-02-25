@@ -17,7 +17,7 @@
  * along with Android Token.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package us.frollo.frollosdk.auth.otp
+package us.frollo.frollosdk.authentication.otp
 
 import java.util.Calendar
 import java.util.TimeZone

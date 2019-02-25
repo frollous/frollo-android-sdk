@@ -1,4 +1,4 @@
-package us.frollo.frollosdk.auth
+package us.frollo.frollosdk.authentication
 
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.api.user.TokenResponse

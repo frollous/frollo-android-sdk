@@ -1,6 +1,6 @@
 package us.frollo.frollosdk.model
 
-import us.frollo.frollosdk.auth.AuthType
+import us.frollo.frollosdk.authentication.AuthType
 import us.frollo.frollosdk.model.api.user.UserLoginRequest
 import us.frollo.frollosdk.model.api.user.UserRegisterRequest
 import us.frollo.frollosdk.model.api.user.UserResetPasswordRequest

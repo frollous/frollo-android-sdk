@@ -142,6 +142,9 @@ dependencies {
     implementation "com.madgag.spongycastle:prov:1.58.0.0"
     implementation "com.madgag.spongycastle:bcpkix-jdk15on:1.58.0.0"
     implementation "com.madgag.spongycastle:bcpg-jdk15on:1.58.0.0"
+
+    // AppAuth
+    implementation "net.openid:appauth:0.7.1"
 }
 repositories {
     mavenCentral()

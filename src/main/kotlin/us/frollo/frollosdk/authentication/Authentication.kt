@@ -1,4 +1,4 @@
-package us.frollo.frollosdk.auth
+package us.frollo.frollosdk.authentication
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations

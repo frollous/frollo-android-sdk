@@ -2,8 +2,8 @@ package us.frollo.frollosdk.network
 
 import android.os.Build
 import us.frollo.frollosdk.BuildConfig
-import us.frollo.frollosdk.auth.AuthToken
-import us.frollo.frollosdk.auth.otp.OTP
+import us.frollo.frollosdk.authentication.AuthToken
+import us.frollo.frollosdk.authentication.otp.OTP
 
 /**
  * This class wraps the rules for interacting with the Frollo API such as the headers used, API version and so on

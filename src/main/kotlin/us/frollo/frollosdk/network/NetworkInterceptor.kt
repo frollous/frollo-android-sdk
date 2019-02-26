@@ -13,8 +13,6 @@ import us.frollo.frollosdk.network.NetworkHelper.Companion.HEADER_BUNDLE_ID
 import us.frollo.frollosdk.network.NetworkHelper.Companion.HEADER_DEVICE_VERSION
 import us.frollo.frollosdk.network.NetworkHelper.Companion.HEADER_SOFTWARE_VERSION
 import us.frollo.frollosdk.network.NetworkHelper.Companion.HEADER_USER_AGENT
-import us.frollo.frollosdk.network.api.DeviceAPI.Companion.URL_TOKEN_REFRESH
-import us.frollo.frollosdk.network.api.UserAPI.Companion.URL_LOGIN
 import us.frollo.frollosdk.network.api.UserAPI.Companion.URL_REGISTER
 import us.frollo.frollosdk.network.api.UserAPI.Companion.URL_PASSWORD_RESET
 import us.frollo.frollosdk.error.DataError
@@ -41,7 +39,7 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
         val builder = request.newBuilder()
 
         try {
-            if (request?.url()?.host() == Uri.parse(network.serverUrl).host) { // Precautionary check to not append headers for any external requests
+            if (request?.url()?.host() == Uri.parse(network.oAuth.config.serverUrl).host) { // Precautionary check to not append headers for any external requests
                 addAuthorizationHeader(request, builder)
                 addAdditionalHeaders(builder)
             }
@@ -79,10 +77,9 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
         if (request.headers().get(HEADER_AUTHORIZATION) == null) {
             if (url.contains(URL_REGISTER) || url.contains(URL_PASSWORD_RESET)) {
                 // OTP auth header for register & password reset
+                // TODO: Remove this ??
                 appendOTP(builder)
-            } else if (url.contains(URL_TOKEN_REFRESH)) {
-                appendRefreshToken(builder)
-            } else if (!url.contains(URL_LOGIN)) { // No auth header for login
+            } else {
                 validateAndAppendAccessToken(builder)
             }
         }
@@ -98,15 +95,6 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
 
     private fun appendOTP(builder: Request.Builder) {
         builder.addHeader(HEADER_AUTHORIZATION, helper.otp)
-    }
-
-    @Throws(DataError::class)
-    private fun appendRefreshToken(builder: Request.Builder) {
-        helper.authRefreshToken?.let {
-            builder.addHeader(HEADER_AUTHORIZATION, it)
-        } ?: run {
-            throw DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_REFRESH_TOKEN)
-        }
     }
 
     fun authenticateRequest(request: Request): Request {

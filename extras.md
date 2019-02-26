@@ -32,7 +32,6 @@ Import the FrolloSDK and ensure you run setup with your tenant URL provided by u
 
             val configuration = FrolloSDKConfiguration(
                                       clientId = "",
-                                      clientSecret = "",
                                       redirectUri = "",
                                       authorizationUrl = "",
                                       tokenUrl = "",

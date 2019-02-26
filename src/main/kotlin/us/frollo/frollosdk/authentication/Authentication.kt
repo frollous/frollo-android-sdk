@@ -23,13 +23,14 @@ import us.frollo.frollosdk.model.api.user.*
 import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.coredata.user.User
+import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.preferences.Preferences
 import java.util.*
 
 /**
  * Manages authentication, login, registration, logout and the user profile.
  */
-class Authentication(private val di: DeviceInfo, private val network: NetworkService, private val db: SDKDatabase, private val pref: Preferences) {
+class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, private val network: NetworkService, private val db: SDKDatabase, private val pref: Preferences) {
 
     companion object {
         private const val TAG = "Authentication"
@@ -44,6 +45,7 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
 
     private val userAPI: UserAPI = network.create(UserAPI::class.java)
     private val deviceAPI: DeviceAPI = network.create(DeviceAPI::class.java)
+    private val tokenAPI: TokenAPI = network.createAuth(TokenAPI::class.java)
 
     /**
      * Fetch the first available user model from the cache
@@ -58,47 +60,60 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     /**
      * Login a user using various authentication methods
      *
-     * @param method Login method to be used. See [AuthType] for details
-     * @param email Email address of the user (optional)
-     * @param password Password for the user (optional)
-     * @param userId Unique identifier for the user depending on authentication method (optional)
-     * @param userToken Token for the user depending on authentication method (optional)
+     * @param email Email address of the user
+     * @param password Password for the user
      * @param completion: Completion handler with any error that occurred
      */
-    fun loginUser(method: AuthType, email: String? = null, password: String? = null, userId: String? = null,
-                  userToken: String? = null, completion: OnFrolloSDKCompletionListener<Result>) {
+    fun loginUser(email: String, password: String, completion: OnFrolloSDKCompletionListener<Result>) {
         if (loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
             completion.invoke(Result.error(error))
             return
         }
 
-        val request = UserLoginRequest(
-                deviceId = di.deviceId,
-                deviceName = di.deviceName,
-                deviceType = di.deviceType,
-                email = email,
-                password = password,
-                authType = method,
-                userId = userId,
-                userToken = userToken)
+        val request = oAuth.getLoginRequest(username = email, password = password)
+        if (!request.valid) {
+            completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
+            return
+        }
 
-        if (request.valid()) {
-            userAPI.login(request).enqueue { resource ->
-                when(resource.status) {
-                    Resource.Status.SUCCESS -> {
-                        resource.data?.fetchTokens()?.let { network.handleTokens(it) }
-                        handleUserResponse(resource.data?.stripTokens(), completion)
-                    }
-                    Resource.Status.ERROR -> {
-                        Log.e("$TAG#loginUser", resource.error?.localizedDescription)
-                        completion.invoke(Result.error(resource.error))
+        // Authorize the user
+        tokenAPI.refreshTokens(request).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#loginUser.refreshTokens", resource.error?.localizedDescription)
+
+                    network.reset()
+
+                    completion.invoke(Result.error(resource.error))
+                }
+
+                Resource.Status.SUCCESS -> {
+                    resource.data?.let { response ->
+                        network.handleTokens(response)
+
+                        // Fetch core details about the user. Fail and logout if we don't get necessary details
+                        userAPI.fetchUser().enqueue { resource ->
+                            when(resource.status) {
+                                Resource.Status.ERROR -> {
+                                    network.reset()
+
+                                    Log.e("$TAG#loginUser.fetchUser", resource.error?.localizedDescription)
+                                    completion.invoke(Result.error(resource.error))
+                                }
+
+                                Resource.Status.SUCCESS -> {
+                                    handleUserResponse(resource.data, completion)
+                                    updateDevice()
+                                }
+                            }
+                        }
+
+                    } ?: run {
+                        completion.invoke(Result.error(DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_ACCESS_TOKEN)))
                     }
                 }
             }
-        } else {
-            val error = DataError(type = DataErrorType.API, subType = DataErrorSubType.INVALID_DATA)
-            completion.invoke(Result.error(error))
         }
     }
 
@@ -123,10 +138,8 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
             return
         }
 
+        // Create the user on the server and at the authorization endpoint
         val request = UserRegisterRequest(
-                deviceId = di.deviceId,
-                deviceName = di.deviceName,
-                deviceType = di.deviceType,
                 firstName = firstName,
                 lastName = lastName,
                 email = email,
@@ -135,15 +148,44 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
                 mobileNumber = mobileNumber,
                 dateOfBirth = dateOfBirth?.toString("yyyy-MM"))
 
-        userAPI.register(request).enqueue { resource ->
-            when(resource.status) {
-                Resource.Status.SUCCESS -> {
-                    resource.data?.fetchTokens()?.let { network.handleTokens(it) }
-                    handleUserResponse(resource.data?.stripTokens(), completion)
-                }
+        userAPI.register(request).enqueue { userResource ->
+            when(userResource.status) {
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#registerUser", resource.error?.localizedDescription)
-                    completion.invoke(Result.error(resource.error))
+                    Log.e("$TAG#registerUser.register", userResource.error?.localizedDescription)
+                    completion.invoke(Result.error(userResource.error))
+                }
+
+                Resource.Status.SUCCESS -> {
+                    // Authenticate the user at the token endpoint after creation
+                    val authRequest = oAuth.getRegisterRequest(username = email, password = password)
+                    if (!authRequest.valid) {
+                        completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
+                        return@enqueue
+                    }
+
+                    tokenAPI.refreshTokens(authRequest).enqueue { authResource ->
+                        when (authResource.status) {
+                            Resource.Status.ERROR -> {
+                                Log.e("$TAG#refreshUser.refreshTokens", authResource.error?.localizedDescription)
+
+                                network.reset()
+
+                                completion.invoke(Result.error(authResource.error))
+                            }
+
+                            Resource.Status.SUCCESS -> {
+                                authResource.data?.let { authResponse ->
+                                    network.handleTokens(authResponse)
+
+                                    handleUserResponse(userResource.data, completion)
+
+                                    updateDevice()
+                                } ?: run {
+                                    completion.invoke(Result.error(DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_ACCESS_TOKEN)))
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -309,12 +351,57 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
     }
 
     /**
+     * Exchange a legacy access token for a new valid refresh access token pair.
+     *
+     * @param legacyToken Legacy access token to be exchanged
+     * @param completion Completion handler with any error that occurred
+     */
+    fun exchangeToken(legacyToken: String, completion: OnFrolloSDKCompletionListener<Result>) {
+        if (!loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            completion.invoke(Result.error(error))
+            return
+        }
+
+        val request = oAuth.getExchangeTokenRequest(legacyToken = legacyToken)
+        if (!request.valid) {
+            completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
+            return
+        }
+
+        // Authorize the user
+        tokenAPI.refreshTokens(request).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#exchangeToken.refreshTokens", resource.error?.localizedDescription)
+
+                    network.reset()
+
+                    completion.invoke(Result.error(resource.error))
+                }
+
+                Resource.Status.SUCCESS -> {
+                    resource.data?.let { response ->
+                        network.handleTokens(response)
+
+                        completion.invoke(Result.success())
+                    } ?: run {
+                        completion.invoke(Result.error(DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_ACCESS_TOKEN)))
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Refresh Access and Refresh Tokens
      *
      * Forces a refresh of the access and refresh tokens if a 401 was encountered. For advanced usage only in combination with web request authentication.
+     *
+     * @param completion Completion handler with any error that occurred (Optional)
      */
-    fun refreshTokens() {
-        network.refreshTokens()
+    fun refreshTokens(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        network.refreshTokens(completion)
     }
 
     /**
@@ -352,6 +439,8 @@ class Authentication(private val di: DeviceInfo, private val network: NetworkSer
         }
 
         val request = DeviceUpdateRequest(
+                deviceId = di.deviceId,
+                deviceType = di.deviceType,
                 deviceName = di.deviceName,
                 notificationToken = notificationToken,
                 timezone = TimeZone.getDefault().id,

@@ -19,9 +19,6 @@ internal interface UserAPI {
     @POST(URL_REGISTER)
     fun register(@Body request: UserRegisterRequest): Call<UserResponse>
 
-    @POST(URL_LOGIN)
-    fun login(@Body request: UserLoginRequest): Call<UserResponse>
-
     @GET(URL_USER_DETAILS)
     fun fetchUser(): Call<UserResponse>
 

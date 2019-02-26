@@ -14,10 +14,6 @@ data class FrolloSDKConfiguration(
          */
         val clientId: String,
         /**
-         * OAuth2 Client secret. The client secret of the application implementing the SDK. Required due to legacy reasons and should not be considered secure
-         */
-        val clientSecret: String,
-        /**
          * OAuth2 Redirection URI. URI to redirect to after the authorization flow is complete. This should be a deep or universal link to the host app
          */
         val redirectUri: String,

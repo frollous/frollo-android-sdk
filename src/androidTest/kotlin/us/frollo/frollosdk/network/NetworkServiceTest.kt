@@ -16,6 +16,9 @@ import org.junit.Assert.*
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.authentication.AuthToken
+import us.frollo.frollosdk.authentication.OAuth
+import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.api.user.TokenResponse
@@ -37,12 +40,14 @@ class NetworkServiceTest {
         mockServer = MockWebServer()
         mockServer.start()
         val baseUrl = mockServer.url("/")
+        val config = testSDKConfig(serverUrl = baseUrl.toString())
 
         FrolloSDK.app = app
         keystore = Keystore()
         keystore.setup()
         preferences = Preferences(app)
-        network = NetworkService(serverUrl = baseUrl.toString(), authorizationUrl = "", tokenUrl = "", keystore = keystore, pref = preferences)
+        val oAuth = OAuth(config = config)
+        network = NetworkService(oAuth = oAuth, keystore = keystore, pref = preferences)
 
         AndroidThreeTen.init(app)
     }

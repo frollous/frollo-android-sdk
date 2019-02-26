@@ -66,9 +66,10 @@ class AuthenticationTest {
         keystore.setup()
         preferences = Preferences(app)
         database = SDKDatabase.getInstance(app)
-        val network = NetworkService(serverUrl = config.serverUrl, authorizationUrl = config.authorizationUrl, tokenUrl = config.tokenUrl, keystore = keystore, pref = preferences)
+        val oAuth = OAuth(config = config)
+        val network = NetworkService(oAuth = oAuth, keystore = keystore, pref = preferences)
 
-        authentication = Authentication(DeviceInfo(app), network, database, preferences)
+        authentication = Authentication(oAuth, DeviceInfo(app), network, database, preferences)
 
         AndroidThreeTen.init(app)
     }

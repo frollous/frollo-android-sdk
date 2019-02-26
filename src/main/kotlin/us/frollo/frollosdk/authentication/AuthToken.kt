@@ -1,7 +1,9 @@
 package us.frollo.frollosdk.authentication
 
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.keystore.Keystore
-import us.frollo.frollosdk.model.api.user.TokenResponse
+import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
 import us.frollo.frollosdk.preferences.Preferences
 
 internal class AuthToken(private val keystore: Keystore, private val pref: Preferences) {
@@ -30,13 +32,17 @@ internal class AuthToken(private val keystore: Keystore, private val pref: Prefe
         return accessTokenExpiry
     }
 
-    fun saveTokens(tokenResponse: TokenResponse) {
+    fun saveTokens(tokenResponse: OAuthTokenResponse) {
         accessToken = tokenResponse.accessToken
         pref.encryptedAccessToken = keystore.encrypt(accessToken)
         refreshToken = tokenResponse.refreshToken
         pref.encryptedRefreshToken = keystore.encrypt(tokenResponse.refreshToken)
-        accessTokenExpiry = tokenResponse.accessTokenExp
-        pref.accessTokenExpiry = tokenResponse.accessTokenExp
+
+        val createdAt = LocalDateTime.ofEpochSecond(tokenResponse.createdAt, 0, ZoneOffset.UTC) ?: LocalDateTime.now(ZoneOffset.UTC)
+        val tokenExpiry = createdAt.plusSeconds(tokenResponse.expiresIn).toEpochSecond(ZoneOffset.UTC)
+
+        accessTokenExpiry = tokenExpiry
+        pref.accessTokenExpiry = tokenExpiry
     }
 
     fun clearTokens() {

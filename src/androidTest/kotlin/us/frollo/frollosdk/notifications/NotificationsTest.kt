@@ -15,7 +15,9 @@ import org.junit.Rule
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.authentication.AuthToken
 import us.frollo.frollosdk.authentication.Authentication
+import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
@@ -59,7 +61,8 @@ class NotificationsTest {
         keystore.setup()
         preferences = Preferences(app)
         database = SDKDatabase.getInstance(app)
-        network = NetworkService(serverUrl = config.serverUrl, authorizationUrl = config.authorizationUrl, tokenUrl = config.tokenUrl, keystore = keystore, pref = preferences)
+        val oAuth = OAuth(config = config)
+        network = NetworkService(oAuth = oAuth, keystore = keystore, pref = preferences)
 
         preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
@@ -68,7 +71,7 @@ class NotificationsTest {
 
         messages = Messages(network, database)
         events = Events(network)
-        authentication = Authentication(DeviceInfo(app), network, database, preferences)
+        authentication = Authentication(oAuth, DeviceInfo(app), network, database, preferences)
 
         notifications = Notifications(authentication, events, messages)
     }

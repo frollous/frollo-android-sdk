@@ -12,6 +12,8 @@ import org.junit.Assert.*
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.authentication.AuthToken
+import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.DeviceAPI
@@ -37,7 +39,8 @@ class NetworkLoggerTest {
         keystore = Keystore()
         keystore.setup()
         preferences = Preferences(app)
-        network = NetworkService(serverUrl = config.serverUrl, authorizationUrl = config.authorizationUrl, tokenUrl = config.tokenUrl, keystore = keystore, pref = preferences)
+        val oAuth = OAuth(config = config)
+        network = NetworkService(oAuth = oAuth, keystore = keystore, pref = preferences)
 
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")

@@ -4,10 +4,6 @@ import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.user.Address
 
 internal data class UserRegisterRequest(
-        @SerializedName("device_id") val deviceId: String,
-        @SerializedName("device_name") val deviceName: String,
-        @SerializedName("device_type") val deviceType: String,
-
         @SerializedName("email") val email: String,
         @SerializedName("first_name") val firstName: String,
         @SerializedName("password") val password: String,

@@ -11,6 +11,7 @@ import org.threeten.bp.temporal.TemporalAdjusters
 import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.AuthenticationStatus
+import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.ACTION.ACTION_AUTHENTICATION_CHANGED
 import us.frollo.frollosdk.core.ARGUMENT.ARG_AUTHENTICATION_STATUS
@@ -126,17 +127,13 @@ object FrolloSDK {
             // 5. Setup Version Manager
             version = Version(preferences)
             // 6. Setup Network Stack
-            network = NetworkService(
-                    authorizationUrl = configuration.authorizationUrl,
-                    serverUrl = configuration.serverUrl,
-                    tokenUrl = configuration.tokenUrl,
-                    keystore = keyStore,
-                    pref = preferences)
+            val oAuth = OAuth(config = configuration)
+            network = NetworkService(oAuth = oAuth, keystore = keyStore, pref = preferences)
             // 7. Setup Logger
             Log.network = network // Initialize Log.network before Log.logLevel as Log.logLevel is dependant on Log.network
             Log.logLevel = configuration.logLevel
             // 8. Setup Authentication
-            _authentication = Authentication(DeviceInfo(application.applicationContext), network, database, preferences)
+            _authentication = Authentication(oAuth, DeviceInfo(application.applicationContext), network, database, preferences)
             // 9. Setup Aggregation
             _aggregation = Aggregation(network, database)
             // 10. Setup Messages

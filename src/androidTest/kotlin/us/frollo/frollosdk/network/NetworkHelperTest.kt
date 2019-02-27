@@ -81,10 +81,4 @@ class NetworkHelperTest {
         val networkHelper = NetworkHelper(authToken)
         assertNotNull(networkHelper.userAgent)
     }
-
-    @Test
-    fun testOtp() {
-        val networkHelper = NetworkHelper(authToken)
-        assertNotNull(networkHelper.otp)
-    }
 }

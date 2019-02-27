@@ -77,14 +77,11 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
 
     private fun addAuthorizationHeader(request: Request, builder: Request.Builder) {
         val url = request.url().toString()
-        if (request.headers().get(HEADER_AUTHORIZATION) == null) {
-            if (url.contains(URL_REGISTER) || url.contains(URL_PASSWORD_RESET)) {
-                // OTP auth header for register & password reset
-                // TODO: Remove this ??
-                appendOTP(builder)
-            } else {
-                validateAndAppendAccessToken(builder)
-            }
+        if (request.headers().get(HEADER_AUTHORIZATION) == null
+                && !url.contains(URL_REGISTER)
+                && !url.contains(URL_PASSWORD_RESET)) {
+
+            validateAndAppendAccessToken(builder)
         }
     }
 
@@ -94,10 +91,6 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
         builder.removeHeader(HEADER_DEVICE_VERSION).addHeader(HEADER_DEVICE_VERSION, helper.deviceVersion)
         builder.removeHeader(HEADER_SOFTWARE_VERSION).addHeader(HEADER_SOFTWARE_VERSION, helper.softwareVersion)
         builder.removeHeader(HEADER_USER_AGENT).addHeader(HEADER_USER_AGENT, helper.userAgent)
-    }
-
-    private fun appendOTP(builder: Request.Builder) {
-        builder.addHeader(HEADER_AUTHORIZATION, helper.otp)
     }
 
     fun authenticateRequest(request: Request): Request {

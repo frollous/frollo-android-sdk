@@ -3,7 +3,6 @@ package us.frollo.frollosdk.network
 import android.os.Build
 import us.frollo.frollosdk.BuildConfig
 import us.frollo.frollosdk.authentication.AuthToken
-import us.frollo.frollosdk.authentication.otp.OTP
 
 /**
  * This class wraps the rules for interacting with the Frollo API such as the headers used, API version and so on
@@ -18,7 +17,7 @@ internal class NetworkHelper(private val authToken: AuthToken) {
         internal const val HEADER_DEVICE_VERSION = "X-Device-Version"
         internal const val HEADER_API_VERSION = "X-Api-Version"
         internal const val HEADER_BACKGROUND = "X-Background"
-        internal const val API_VERSION = "2.0"
+        internal const val API_VERSION = "2.1"
         internal const val API_VERSION_PATH = "/api/v2"
     }
 
@@ -49,11 +48,4 @@ internal class NetworkHelper(private val authToken: AuthToken) {
     // "us.frollo.frollosdk|SDK1.0.0|B777|Android8.1.0|API2.0"
     internal val userAgent: String
         get() = "${BuildConfig.APPLICATION_ID}|SDK${BuildConfig.VERSION_NAME}|B${BuildConfig.VERSION_CODE}|Android${Build.VERSION.RELEASE}|API$API_VERSION"
-
-    /**
-     * Returns the temporary otp token formatted and ready for header authorization for registering the user.
-     * @return "Bearer xxx.yyy.zzz"
-     */
-    internal val otp: String
-        get() = "Bearer ${OTP.generateOTP(BuildConfig.APPLICATION_ID)}"
 }

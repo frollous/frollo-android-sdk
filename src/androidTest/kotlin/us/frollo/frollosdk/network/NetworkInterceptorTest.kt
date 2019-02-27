@@ -18,7 +18,6 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.OAuth
-import us.frollo.frollosdk.authentication.otp.OTP
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.network.api.UserAPI
 import us.frollo.frollosdk.extensions.enqueue
@@ -102,7 +101,7 @@ class NetworkInterceptorTest {
     }
 
     @Test
-    fun testOTPHeaderAppendedToRegistrationRequest() {
+    fun testNoHeaderAppendedToRegistrationRequest() {
         initSetup()
 
         mockServer.setDispatcher(object: Dispatcher() {
@@ -116,20 +115,18 @@ class NetworkInterceptorTest {
             }
         })
 
-        val bearer = "Bearer ${OTP.generateOTP("us.frollo.frollosdk")}"
         userAPI.register(testValidRegisterData()).enqueue { }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_REGISTER, request.path)
         val authHeader = request.getHeader("Authorization")
-        assertNotNull(authHeader)
-        assertEquals(bearer, authHeader)
+        assertNull(authHeader)
 
         tearDown()
     }
 
     @Test
-    fun testOTPHeaderAppendedToResetPasswordRequest() {
+    fun testNoHeaderAppendedToResetPasswordRequest() {
         initSetup()
 
         mockServer.setDispatcher(object: Dispatcher() {
@@ -142,14 +139,12 @@ class NetworkInterceptorTest {
             }
         })
 
-        val bearer = "Bearer ${OTP.generateOTP("us.frollo.frollosdk")}"
         userAPI.resetPassword(testResetPasswordData()).enqueue { }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_PASSWORD_RESET, request.path)
         val authHeader = request.getHeader("Authorization")
-        assertNotNull(authHeader)
-        assertEquals(bearer, authHeader)
+        assertNull(authHeader)
 
         tearDown()
     }

@@ -9,6 +9,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 
 data class TransactionRelation(
+
         @Embedded
         var transaction: Transaction? = null,
 
@@ -20,6 +21,7 @@ data class TransactionRelation(
 
         @Relation(parentColumn = "merchant_id", entityColumn = "merchant_id", entity = Merchant::class)
         var merchants: List<Merchant>? = null
+
 ): IAdapterModel {
 
     val account: AccountRelation?

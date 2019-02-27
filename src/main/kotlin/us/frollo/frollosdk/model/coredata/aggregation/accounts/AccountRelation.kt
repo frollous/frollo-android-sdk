@@ -8,6 +8,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderA
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 
 data class AccountRelation(
+
         @Embedded
         var account: Account? = null,
 
@@ -16,6 +17,7 @@ data class AccountRelation(
 
         @Relation(parentColumn = "account_id", entityColumn = "account_id", entity = Transaction::class)
         var transactions: List<Transaction>? = null
+
 ): IAdapterModel {
 
    val providerAccount: ProviderAccountRelation?

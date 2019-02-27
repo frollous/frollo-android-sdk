@@ -12,6 +12,7 @@ import androidx.room.*
  * Data representation of User
  */
 data class User(
+
         /** Unique ID of the user */
         @PrimaryKey
         @ColumnInfo(name = "user_id") val userId: Long,

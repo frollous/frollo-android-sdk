@@ -113,6 +113,7 @@ object FrolloSDK {
 
         if (_setup) throw FrolloSDKError("SDK already setup")
         if (configuration.serverUrl.isBlank()) throw FrolloSDKError("Server URL cannot be empty")
+        //TODO: More checks for other config validity. May be create a valid() method for FrolloSDKConfiguration
 
         try {
             // 1. Initialize ThreeTenABP

@@ -32,6 +32,7 @@ import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.testUserResponseData
+import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.randomString
@@ -49,6 +50,7 @@ class AuthenticationTest {
     private lateinit var authentication: Authentication
 
     private lateinit var mockServer: MockWebServer
+    private lateinit var mockTokenServer: MockWebServer
     private lateinit var preferences: Preferences
     private lateinit var keystore: Keystore
     private lateinit var database: SDKDatabase
@@ -56,11 +58,14 @@ class AuthenticationTest {
     private fun initSetup() {
         mockServer = MockWebServer()
         mockServer.start()
-        val baseUrl = mockServer.url("/")
+        val baseUrl = mockServer.url("/server/")
 
-        val config = testSDKConfig(serverUrl = baseUrl.toString())
+        mockTokenServer = MockWebServer()
+        mockTokenServer.start()
+        val baseTokenUrl = mockTokenServer.url("/token/")
+
+        val config = testSDKConfig(serverUrl = baseUrl.toString(), tokenUrl = baseTokenUrl.toString())
         if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
-        FrolloSDK.app = app
 
         keystore = Keystore()
         keystore.setup()
@@ -76,6 +81,7 @@ class AuthenticationTest {
 
     private fun tearDown() {
         mockServer.shutdown()
+        mockTokenServer.shutdown()
         authentication.reset()
         preferences.resetAll()
         database.clearAllTables()
@@ -85,33 +91,12 @@ class AuthenticationTest {
     fun testFetchUser() {
         initSetup()
 
-        val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_LOGIN) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
+        database.users().insert(testUserResponseData(userId = 12345))
 
-        val testObserver = authentication.fetchUser().test()
-        testObserver.awaitValue()
-        assertNull(testObserver.value().data)
-
-        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password") { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            val testObserver2 = authentication.fetchUser().test()
-            testObserver2.awaitValue()
-            assertNotNull(testObserver2.value().data)
-
-            val expectedResponse = Gson().fromJson<UserResponse>(body)
-            assertEquals(expectedResponse.toUser(), testObserver2.value().data)
-        }
+        val testObserver2 = authentication.fetchUser().test()
+        testObserver2.awaitValue()
+        assertNotNull(testObserver2.value().data)
+        assertEquals(12345L, testObserver2.value().data?.userId)
 
         wait(3)
 
@@ -122,40 +107,23 @@ class AuthenticationTest {
     fun testGetLoggedIn() {
         initSetup()
 
-        val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_LOGIN) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
         assertFalse(authentication.loggedIn)
 
-        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password") { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        preferences.loggedIn = true
 
-            assertTrue(authentication.loggedIn)
-        }
-
-        wait(3)
+        assertTrue(authentication.loggedIn)
 
         tearDown()
     }
 
     @Test
-    fun testLoginUserEmail() {
+    fun testLoginUser() {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_LOGIN) {
+                if (request?.path == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -164,7 +132,18 @@ class AuthenticationTest {
             }
         })
 
-        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password") { result ->
+        mockTokenServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == TokenAPI.URL_TOKEN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        authentication.loginUser("user@frollo.us", "password") { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -175,10 +154,17 @@ class AuthenticationTest {
             val expectedResponse = Gson().fromJson<UserResponse>(body)
             assertEquals(expectedResponse.toUser(), testObserver.value().data)
             assertTrue(authentication.loggedIn)
+
+            assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
+            assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
+            assertEquals(2550794799, preferences.accessTokenExpiry)
         }
 
-        val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_LOGIN, request.path)
+        val request1 = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_USER_DETAILS, request1.path)
+
+        val request2 = mockTokenServer.takeRequest()
+        assertEquals(TokenAPI.URL_TOKEN, request2.path)
 
         wait(3)
 
@@ -189,19 +175,18 @@ class AuthenticationTest {
     fun testInvalidLoginUser() {
         initSetup()
 
-        val body = readStringFromJson(app, R.raw.error_invalid_username_password)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_LOGIN) {
+                if (request?.path == TokenAPI.URL_TOKEN) {
                     return MockResponse()
                             .setResponseCode(401)
-                            .setBody(body)
+                            .setBody(readStringFromJson(app, R.raw.error_invalid_username_password))
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
-        authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "wrong_password") { result ->
+        authentication.loginUser("user@frollo.us", "wrong_password") { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
@@ -209,12 +194,16 @@ class AuthenticationTest {
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
-            assertEquals(401, (result.error as APIError).statusCode)
+            assertEquals(APIErrorType.INVALID_USERNAME_PASSWORD, (result.error as APIError).type)
             assertFalse(authentication.loggedIn)
+
+            assertNull(preferences.encryptedAccessToken)
+            assertNull(preferences.encryptedRefreshToken)
+            assertEquals(-1L, preferences.accessTokenExpiry)
         }
 
-        val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_LOGIN, request.path)
+        val request = mockTokenServer.takeRequest()
+        assertEquals(TokenAPI.URL_TOKEN, request.path)
 
         wait(3)
 
@@ -222,10 +211,32 @@ class AuthenticationTest {
     }
 
     @Test
-    fun testInvalidLoginData() {
+    fun testInvalidLoginUserSecondaryFailure() {
         initSetup()
 
-        authentication.loginUser(AuthType.FACEBOOK) { result ->
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_USER_DETAILS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.error_invalid_auth_head))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        mockTokenServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == TokenAPI.URL_TOKEN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        authentication.loginUser("user@frollo.us", "password") { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
@@ -233,9 +244,66 @@ class AuthenticationTest {
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
-            assertEquals((result.error as DataError).type, DataErrorType.API)
-            assertEquals((result.error as DataError).subType, DataErrorSubType.INVALID_DATA)
+            assertEquals(APIErrorType.OTHER_AUTHORISATION, (result.error as APIError).type)
+            assertFalse(authentication.loggedIn)
+
+            assertNull(preferences.encryptedAccessToken)
+            assertNull(preferences.encryptedRefreshToken)
+            assertEquals(-1L, preferences.accessTokenExpiry)
         }
+
+        val request1 = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_USER_DETAILS, request1.path)
+
+        val request2 = mockTokenServer.takeRequest()
+        assertEquals(TokenAPI.URL_TOKEN, request2.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testLoginUserFailsIfLoggedIn() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.user_details_complete)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_USER_DETAILS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        mockTokenServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == TokenAPI.URL_TOKEN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        preferences.loggedIn = true
+
+        authentication.loginUser("user@frollo.us", "password") { result ->
+            assertTrue(authentication.loggedIn)
+
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.ALREADY_LOGGED_IN, (result.error as DataError).subType)
+        }
+
+        assertEquals(0, mockServer.requestCount)
+        assertEquals(0, mockTokenServer.requestCount)
 
         wait(3)
 
@@ -253,6 +321,17 @@ class AuthenticationTest {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        mockTokenServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == TokenAPI.URL_TOKEN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.token_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -277,10 +356,189 @@ class AuthenticationTest {
             val expectedResponse = Gson().fromJson<UserResponse>(body)
             assertEquals(expectedResponse.toUser(), testObserver.value().data)
             assertTrue(authentication.loggedIn)
+
+            assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
+            assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
+            assertEquals(2550794799, preferences.accessTokenExpiry)
         }
 
-        val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_REGISTER, request.path)
+        val request1 = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_REGISTER, request1.path)
+
+        val request2 = mockTokenServer.takeRequest()
+        assertEquals(TokenAPI.URL_TOKEN, request2.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRegisterUserInvalid() {
+        initSetup()
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_REGISTER) {
+                    return MockResponse()
+                            .setResponseCode(409)
+                            .setBody(readStringFromJson(app, R.raw.error_duplicate))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        mockTokenServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == TokenAPI.URL_TOKEN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        authentication.registerUser(
+                firstName = "Frollo",
+                lastName = "User",
+                mobileNumber = "0412345678",
+                postcode = "2060",
+                dateOfBirth = Date(),
+                email = "user@frollo.us",
+                password = "password") { result ->
+
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+
+            val testObserver = authentication.fetchUser().test()
+            testObserver.awaitValue()
+            assertNull(testObserver.value().data)
+
+            assertEquals(APIErrorType.ALREADY_EXISTS, (result.error as APIError).type)
+            assertFalse(authentication.loggedIn)
+
+            assertNull(preferences.encryptedAccessToken)
+            assertNull(preferences.encryptedRefreshToken)
+            assertEquals(-1L, preferences.accessTokenExpiry)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRegisterUserInvalidSecondaryFailure() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.user_details_complete)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_REGISTER) {
+                    return MockResponse()
+                            .setResponseCode(201)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        mockTokenServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == TokenAPI.URL_TOKEN) {
+                    return MockResponse()
+                            .setResponseCode(401)
+                            .setBody(readStringFromJson(app, R.raw.error_invalid_username_password))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        authentication.registerUser(
+                firstName = "Frollo",
+                lastName = "User",
+                mobileNumber = "0412345678",
+                postcode = "2060",
+                dateOfBirth = Date(),
+                email = "user@frollo.us",
+                password = "password") { result ->
+
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+
+            val testObserver = authentication.fetchUser().test()
+            testObserver.awaitValue()
+            assertNull(testObserver.value().data)
+
+            assertEquals(APIErrorType.INVALID_USERNAME_PASSWORD, (result.error as APIError).type)
+            assertFalse(authentication.loggedIn)
+
+            assertNull(preferences.encryptedAccessToken)
+            assertNull(preferences.encryptedRefreshToken)
+            assertEquals(-1L, preferences.accessTokenExpiry)
+        }
+
+        val request1 = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_REGISTER, request1.path)
+
+        val request2 = mockTokenServer.takeRequest()
+        assertEquals(TokenAPI.URL_TOKEN, request2.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRegisterUserFailsIfLoggedIn() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.user_details_complete)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_REGISTER) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        mockTokenServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == TokenAPI.URL_TOKEN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        preferences.loggedIn = true
+
+        authentication.registerUser(
+                firstName = "Frollo",
+                lastName = "User",
+                mobileNumber = "0412345678",
+                postcode = "2060",
+                dateOfBirth = Date(),
+                email = "user@frollo.us",
+                password = "password") { result ->
+
+            assertTrue(authentication.loggedIn)
+
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.ALREADY_LOGGED_IN, (result.error as DataError).subType)
+        }
+
+        assertEquals(0, mockServer.requestCount)
+        assertEquals(0, mockTokenServer.requestCount)
 
         wait(3)
 
@@ -363,6 +621,40 @@ class AuthenticationTest {
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_USER_DETAILS, request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testUpdateUserFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_USER_DETAILS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.user_details_complete))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        authentication.updateUser(testUserResponseData().toUser()) { result ->
+            assertFalse(authentication.loggedIn)
+
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        assertEquals(0, mockServer.requestCount)
 
         wait(3)
 
@@ -590,6 +882,40 @@ class AuthenticationTest {
     }
 
     @Test
+    fun testDeleteUserFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == UserAPI.URL_DELETE_USER) {
+                    return MockResponse()
+                            .setResponseCode(204)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        authentication.deleteUser { result ->
+            assertFalse(authentication.loggedIn)
+
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        assertEquals(0, mockServer.requestCount)
+
+        wait(3)
+
+        tearDown()
+    }
+
+
+    @Test
     fun testResetPassword() {
         initSetup()
 
@@ -625,8 +951,7 @@ class AuthenticationTest {
         val body = readStringFromJson(app, R.raw.user_details_complete)
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_USER_DETAILS
-                        || request?.path == UserAPI.URL_LOGIN) {
+                if (request?.path == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -723,6 +1048,45 @@ class AuthenticationTest {
     }
 
     @Test
+    fun testExchangeLegacyAccessToken() {
+        initSetup()
+
+        mockTokenServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == TokenAPI.URL_TOKEN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val legacyToken = randomString(32)
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt(legacyToken)
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        authentication.exchangeToken(legacyToken = legacyToken) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
+            assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
+            assertEquals(2550794799, preferences.accessTokenExpiry)
+        }
+
+        val request = mockTokenServer.takeRequest()
+        assertEquals(TokenAPI.URL_TOKEN, request.path)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testAuthenticatingRequestManually() {
         initSetup()
 
@@ -744,51 +1108,20 @@ class AuthenticationTest {
     fun testReset() {
         initSetup()
 
-        val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_LOGIN) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        authentication.loginUser(AuthType.EMAIL, "deepak@frollo.us", "pass1234") { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        assertTrue(authentication.loggedIn)
 
-            assertTrue(authentication.loggedIn)
+        authentication.reset()
 
-            authentication.reset()
-
-            assertFalse(authentication.loggedIn)
-            assertNull(preferences.encryptedAccessToken)
-            assertNull(preferences.encryptedRefreshToken)
-            assertEquals(-1, preferences.accessTokenExpiry)
-        }
-
-        wait(3)
+        assertFalse(authentication.loggedIn)
+        assertNull(preferences.encryptedAccessToken)
+        assertNull(preferences.encryptedRefreshToken)
+        assertEquals(-1, preferences.accessTokenExpiry)
 
         tearDown()
     }
-
-    /*
-     * Example test for livedata observer
-     *
-     * @get:Rule val testRule = InstantTaskExecutorRule()
-     *
-     * @Test
-     * fun testLivedata() {
-     *     val testObserver = yourFunctionToGetLiveData().test() //com.jraska.livedata.test
-     *     testObserver.awaitNextValue()
-     *
-     *     testObserver.assertHasValue()
-     *     assertEquals(Resource.Status.SUCCESS, testObserver.value().status)
-     *     assertEquals(expectedValue, testObserver.value().data)
-     * }
-     *
-     */
 }

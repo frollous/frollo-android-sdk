@@ -6,11 +6,11 @@ import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.coredata.user.*
 import us.frollo.frollosdk.testutils.*
 
-internal fun testUserResponseData() : UserResponse {
+internal fun testUserResponseData(userId: Long? = null) : UserResponse {
     val name = randomUUID()
 
     return UserResponse(
-                userId = randomNumber().toLong(),
+                userId = userId ?: randomNumber().toLong(),
                 firstName = name,
                 email = "$name@frollo.us",
                 emailVerified = true,
@@ -68,56 +68,9 @@ internal fun UserResponse.testModifyUserResponseData(firstName: String) : UserRe
             accessTokenExp = accessTokenExp)
 }
 
-internal fun testEmailLoginData() : UserLoginRequest {
-    val name = randomUUID()
-
-    return UserLoginRequest(
-            authType = AuthType.EMAIL,
-            deviceId = randomString(8),
-            deviceName = randomString(8),
-            deviceType = "Android",
-            email = "$name@frollo.us",
-            password = randomString(8))
-}
-
-internal fun testFacebookLoginData() : UserLoginRequest {
-    val name = randomUUID()
-
-    return UserLoginRequest(
-            authType = AuthType.FACEBOOK,
-            deviceId = randomString(8),
-            deviceName = randomString(8),
-            deviceType = "Android",
-            email = "$name@frollo.us",
-            userId = randomNumber().toString(),
-            userToken = randomString(8))
-}
-
-internal fun testVoltLoginData() : UserLoginRequest {
-    return UserLoginRequest(
-            authType = AuthType.VOLT,
-            deviceId = randomString(8),
-            deviceName = randomString(8),
-            deviceType = "Android",
-            userId = randomNumber().toString(),
-            userToken = randomString(8))
-}
-
-internal fun testInvalidLoginData() : UserLoginRequest {
-    return UserLoginRequest(
-            authType = AuthType.FACEBOOK,
-            deviceId = randomString(8),
-            deviceName = randomString(8),
-            deviceType = "Android",
-            userId = randomNumber().toString())
-}
-
 internal fun testValidRegisterData() : UserRegisterRequest {
     val name = randomUUID()
     return UserRegisterRequest(
-            deviceId = randomString(8),
-            deviceName = randomString(8),
-            deviceType = "Android",
             firstName = name,
             lastName = randomUUID(),
             mobileNumber = "0411111111",

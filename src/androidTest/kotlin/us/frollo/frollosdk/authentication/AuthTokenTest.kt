@@ -7,7 +7,7 @@ import org.junit.Test
 
 import org.junit.Assert.*
 import us.frollo.frollosdk.keystore.Keystore
-import us.frollo.frollosdk.model.api.user.TokenResponse
+import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
 import us.frollo.frollosdk.preferences.Preferences
 
 class AuthTokenTest {
@@ -62,13 +62,18 @@ class AuthTokenTest {
         assertNull(authToken.getRefreshToken())
         assertNull(authToken.getAccessToken())
         assertEquals(-1, authToken.getAccessTokenExpiry())
-        authToken.saveTokens(TokenResponse(refreshToken = "DummyRefreshToken", accessToken = "DummyAccessToken", accessTokenExp = 14529375950))
-        assertEquals("DummyAccessToken", authToken.getAccessToken())
-        assertEquals("DummyRefreshToken", authToken.getRefreshToken())
-        assertEquals(14529375950, authToken.getAccessTokenExpiry())
-        assertEquals("DummyAccessToken", keyStore.decrypt(preferences.encryptedAccessToken))
-        assertEquals("DummyRefreshToken", keyStore.decrypt(preferences.encryptedRefreshToken))
-        assertEquals(14529375950, preferences.accessTokenExpiry)
+        authToken.saveTokens(OAuthTokenResponse(
+                refreshToken = "IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk",
+                accessToken = "MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3",
+                createdAt = 2550792999,
+                expiresIn = 1800,
+                tokenType = "Bearer"))
+        assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", authToken.getAccessToken())
+        assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", authToken.getRefreshToken())
+        assertEquals(2550794799, authToken.getAccessTokenExpiry())
+        assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keyStore.decrypt(preferences.encryptedAccessToken))
+        assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keyStore.decrypt(preferences.encryptedRefreshToken))
+        assertEquals(2550794799, preferences.accessTokenExpiry)
     }
 
     @Test

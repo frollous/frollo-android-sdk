@@ -7,7 +7,6 @@ import us.frollo.frollosdk.model.api.user.*
 
 internal interface UserAPI {
     companion object {
-        const val URL_LOGIN = "$API_VERSION_PATH/user/login/"
         const val URL_REGISTER = "$API_VERSION_PATH/user/register/"
         const val URL_PASSWORD_RESET = "$API_VERSION_PATH/user/reset/"
         const val URL_USER_DETAILS = "$API_VERSION_PATH/user/details/"

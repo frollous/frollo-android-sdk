@@ -14,14 +14,13 @@ import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.authentication.AuthToken
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.testSDKConfig
-import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.network.api.UserAPI
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.keystore.Keystore
+import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
@@ -34,6 +33,7 @@ class NetworkAuthenticatorTest {
     private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
 
     private lateinit var mockServer: MockWebServer
+    private lateinit var mockTokenServer: MockWebServer
     private lateinit var keystore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var network: NetworkService
@@ -42,9 +42,13 @@ class NetworkAuthenticatorTest {
     private fun initSetup() {
         mockServer = MockWebServer()
         mockServer.start()
-        val baseUrl = mockServer.url("/")
+        val baseUrl = mockServer.url("/server/")
 
-        val config = testSDKConfig(serverUrl = baseUrl.toString())
+        mockTokenServer = MockWebServer()
+        mockTokenServer.start()
+        val baseTokenUrl = mockTokenServer.url("/token/")
+
+        val config = testSDKConfig(serverUrl = baseUrl.toString(), tokenUrl = baseTokenUrl.toString())
         if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
 
         keystore = Keystore()
@@ -57,6 +61,7 @@ class NetworkAuthenticatorTest {
 
     private fun tearDown() {
         mockServer.shutdown()
+        mockTokenServer.shutdown()
         network.reset()
         preferences.resetAll()
     }
@@ -67,14 +72,21 @@ class NetworkAuthenticatorTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == DeviceAPI.URL_TOKEN_REFRESH) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.refresh_token_valid))
-                } else if (request?.path == UserAPI.URL_USER_DETAILS) {
+                if (request?.path == UserAPI.URL_USER_DETAILS) {
                         return MockResponse()
                                 .setResponseCode(200)
                                 .setBody(readStringFromJson(app, R.raw.user_details_complete))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        mockTokenServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == TokenAPI.URL_TOKEN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.token_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -88,10 +100,11 @@ class NetworkAuthenticatorTest {
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
 
-            assertEquals(2, mockServer.requestCount)
-            assertEquals("AValidAccessTokenFromHost", keystore.decrypt(preferences.encryptedAccessToken))
-            assertEquals("AValidRefreshTokenFromHost", keystore.decrypt(preferences.encryptedRefreshToken))
-            assertEquals(1721259268, preferences.accessTokenExpiry)
+            assertEquals(1, mockServer.requestCount)
+            assertEquals(1, mockTokenServer.requestCount)
+            assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
+            assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
+            assertEquals(2550794799, preferences.accessTokenExpiry)
         }
 
         wait(3)
@@ -107,11 +120,7 @@ class NetworkAuthenticatorTest {
             var failedOnce = false
 
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == DeviceAPI.URL_TOKEN_REFRESH) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.refresh_token_valid))
-                } else if (request?.path == UserAPI.URL_USER_DETAILS) {
+                if (request?.path == UserAPI.URL_USER_DETAILS) {
                     if (failedOnce) {
                         return MockResponse()
                                 .setResponseCode(200)
@@ -127,18 +136,30 @@ class NetworkAuthenticatorTest {
             }
         })
 
+        mockTokenServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == TokenAPI.URL_TOKEN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900 //
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         userAPI.fetchUser().enqueue { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
 
-            assertEquals(3, mockServer.requestCount)
-            assertEquals("AValidAccessTokenFromHost", keystore.decrypt(preferences.encryptedAccessToken))
-            assertEquals("AValidRefreshTokenFromHost", keystore.decrypt(preferences.encryptedRefreshToken))
-            assertEquals(1721259268, preferences.accessTokenExpiry)
+            assertEquals(2, mockServer.requestCount)
+            assertEquals(1, mockTokenServer.requestCount)
+            assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
+            assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
+            assertEquals(2550794799, preferences.accessTokenExpiry)
         }
 
         wait(3)
@@ -160,7 +181,7 @@ class NetworkAuthenticatorTest {
 
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 30
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         userAPI.fetchUser().enqueue { resource ->
             assertEquals(Resource.Status.ERROR, resource.status)
@@ -186,11 +207,7 @@ class NetworkAuthenticatorTest {
             var userRequestCount = 0
 
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == DeviceAPI.URL_TOKEN_REFRESH) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.refresh_token_valid))
-                } else if (request?.path == UserAPI.URL_USER_DETAILS) {
+                if (request?.path == UserAPI.URL_USER_DETAILS) {
                     if (userRequestCount < 3) {
                         userRequestCount++
                         return MockResponse()
@@ -206,6 +223,17 @@ class NetworkAuthenticatorTest {
             }
         })
 
+        mockTokenServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == TokenAPI.URL_TOKEN) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
@@ -216,9 +244,9 @@ class NetworkAuthenticatorTest {
 
             assertNotNull(resource.data)
 
-            assertEquals("AValidAccessTokenFromHost", keystore.decrypt(preferences.encryptedAccessToken))
-            assertEquals("AValidRefreshTokenFromHost", keystore.decrypt(preferences.encryptedRefreshToken))
-            assertEquals(1721259268, preferences.accessTokenExpiry)
+            assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
+            assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
+            assertEquals(2550794799, preferences.accessTokenExpiry)
         }
 
         userAPI.fetchUser().enqueue { resource ->
@@ -246,14 +274,21 @@ class NetworkAuthenticatorTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == DeviceAPI.URL_TOKEN_REFRESH) {
-                    return MockResponse()
-                            .setResponseCode(401)
-                            .setBody(readStringFromJson(app, R.raw.error_invalid_refresh_token))
-                } else if (request?.path == UserAPI.URL_USER_DETAILS) {
+                if (request?.path == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
                             .setResponseCode(401)
                             .setBody(readStringFromJson(app, R.raw.error_invalid_access_token))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        mockTokenServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.path == TokenAPI.URL_TOKEN) {
+                    return MockResponse()
+                            .setResponseCode(401)
+                            .setBody(readStringFromJson(app, R.raw.error_invalid_refresh_token))
                 }
                 return MockResponse().setResponseCode(404)
             }

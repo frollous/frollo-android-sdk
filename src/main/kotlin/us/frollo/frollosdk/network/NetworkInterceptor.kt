@@ -35,23 +35,9 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
-        val builder = request.newBuilder()
+        val request = adaptRequest(chain.request())
 
-        try {
-            if (request?.url()?.host() == Uri.parse(network.oAuth.config.serverUrl).host) { // Precautionary check to not append headers for any external requests
-                addAuthorizationHeader(request, builder)
-                addAdditionalHeaders(builder)
-            }
-        } catch (error: DataError) {
-            if (error.type == DataErrorType.AUTHENTICATION && error.subType == DataErrorSubType.MISSING_REFRESH_TOKEN)
-                FrolloSDK.forcedLogout()
-            throw IOException(error.toJson())
-        }
-
-        val req = builder.build()
-
-        var response = chain.proceed(req)
+        var response = chain.proceed(request)
 
         //TODO: Review 429 Rate Limiting
         if (!response.isSuccessful && response.code() == 429) {
@@ -70,6 +56,23 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
         }
 
         return response
+    }
+
+    internal fun adaptRequest(originalRequest: Request): Request {
+        val builder = originalRequest.newBuilder()
+
+        try {
+            if (originalRequest.url()?.host() == Uri.parse(network.oAuth.config.serverUrl).host) { // Precautionary check to not append headers for any external requests
+                addAuthorizationHeader(originalRequest, builder)
+                addAdditionalHeaders(builder)
+            }
+        } catch (error: DataError) {
+            if (error.type == DataErrorType.AUTHENTICATION && error.subType == DataErrorSubType.MISSING_REFRESH_TOKEN)
+                FrolloSDK.forcedLogout()
+            throw IOException(error.toJson())
+        }
+
+        return builder.build()
     }
 
     private fun addAuthorizationHeader(request: Request, builder: Request.Builder) {

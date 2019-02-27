@@ -45,6 +45,11 @@ class FrolloSDKAndroidUnitTest {
 
         preferences = Preferences(app)
         database = SDKDatabase.getInstance(app)
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = "EncryptedAccessToken"
+        preferences.encryptedRefreshToken = "EncryptedRefreshToken"
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
     }
 
     private fun tearDown() {
@@ -211,13 +216,6 @@ class FrolloSDKAndroidUnitTest {
     fun testLogout() {
         initSetup()
 
-        val url = "https://api.example.com"
-
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = "EncryptedAccessToken"
-        preferences.encryptedRefreshToken = "EncryptedRefreshToken"
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
         database.users().insert(testUserResponseData())
 
         val testObserver = database.users().load().test()
@@ -251,13 +249,6 @@ class FrolloSDKAndroidUnitTest {
     fun testForcedLogout() {
         initSetup()
 
-        val url = "https://api.example.com"
-
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = "EncryptedAccessToken"
-        preferences.encryptedRefreshToken = "EncryptedRefreshToken"
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
         database.users().insert(testUserResponseData())
 
         val testObserver = database.users().load().test()
@@ -288,13 +279,6 @@ class FrolloSDKAndroidUnitTest {
     @Test
     fun testSDKResetSuccess() {
         initSetup()
-
-        val url = "https://api.example.com"
-
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = "EncryptedAccessToken"
-        preferences.encryptedRefreshToken = "EncryptedRefreshToken"
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         database.users().insert(testUserResponseData())
 

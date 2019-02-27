@@ -32,7 +32,8 @@ class NetworkService internal constructor(
 
     internal val authToken = AuthToken(keystore, pref)
     private val helper = NetworkHelper(authToken)
-    private val interceptor = NetworkInterceptor(this, helper)
+    private val serverInterceptor = NetworkInterceptor(this, helper)
+    private val tokenInterceptor = TokenInterceptor()
     private var apiRetrofit = createRetrofit(oAuth.config.serverUrl)
     private var authRetrofit = createRetrofit(oAuth.config.tokenUrl)
 
@@ -43,7 +44,7 @@ class NetworkService internal constructor(
                 .create()
 
         val httpClientBuilder = OkHttpClient.Builder()
-                .addInterceptor(interceptor)
+                .addInterceptor(if (baseUrl == oAuth.config.tokenUrl) tokenInterceptor else serverInterceptor)
                 .authenticator(NetworkAuthenticator(this))
 
         if (!BuildConfig.DEBUG && Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
@@ -97,7 +98,7 @@ class NetworkService internal constructor(
     }
 
     internal fun authenticateRequest(request: Request): Request {
-        return interceptor.authenticateRequest(request)
+        return serverInterceptor.authenticateRequest(request)
     }
 
     internal fun reset() {

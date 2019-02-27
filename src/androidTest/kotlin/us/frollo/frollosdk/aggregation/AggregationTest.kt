@@ -14,7 +14,6 @@ import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.authentication.AuthToken
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result

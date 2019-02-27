@@ -54,7 +54,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      */
     fun fetchUser(): LiveData<Resource<User>> =
             Transformations.map(db.users().load()) {
-                Resource.success(it?.toUser())
+                Resource.success(it)
             }
 
     /**
@@ -492,7 +492,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
             it.features?.let { features -> pref.features = features }
 
             doAsync {
-                db.users().insert(it)
+                db.users().insert(it.toUser())
 
                 uiThread {
                     completion?.invoke(Result.success())

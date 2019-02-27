@@ -7,16 +7,16 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import us.frollo.frollosdk.database.dao.*
 import us.frollo.frollosdk.model.api.messages.MessageResponse
-import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
+import us.frollo.frollosdk.model.coredata.user.User
 
 @Database(entities = [
-    UserResponse::class,
+    User::class,
     MessageResponse::class,
     Provider::class,
     ProviderAccount::class,

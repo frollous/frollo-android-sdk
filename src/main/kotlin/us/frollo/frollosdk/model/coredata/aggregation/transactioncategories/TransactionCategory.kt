@@ -4,10 +4,8 @@ import androidx.room.*
 import us.frollo.frollosdk.model.IAdapterModel
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 
-/**
- * Declaring the column info allows for the renaming of variables without implementing a
- * database migration, as the column name would not change.
- */
+// Declaring the ColumnInfo allows for the renaming of variables without
+// implementing a database migration, as the column name would not change.
 @Entity(tableName = "transaction_category",
         indices = [Index("transaction_category_id")])
 data class TransactionCategory(

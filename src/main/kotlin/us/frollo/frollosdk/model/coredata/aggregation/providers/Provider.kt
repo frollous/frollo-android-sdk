@@ -3,10 +3,8 @@ package us.frollo.frollosdk.model.coredata.aggregation.providers
 import androidx.room.*
 import us.frollo.frollosdk.model.IAdapterModel
 
-/**
- * Declaring the column info allows for the renaming of variables without implementing a
- * database migration, as the column name would not change.
- */
+// Declaring the ColumnInfo allows for the renaming of variables without
+// implementing a database migration, as the column name would not change.
 @Entity(tableName = "provider",
         indices = [Index("provider_id")])
 data class Provider(

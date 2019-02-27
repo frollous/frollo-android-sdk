@@ -6,10 +6,8 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.RefreshSt
 import java.math.BigDecimal
 import java.util.*
 
-/**
- * Declaring the column info allows for the renaming of variables without implementing a
- * database migration, as the column name would not change.
- */
+// Declaring the ColumnInfo allows for the renaming of variables without
+// implementing a database migration, as the column name would not change.
 @Entity(tableName = "account",
         indices = [Index("account_id"),
                    Index("provider_account_id")])

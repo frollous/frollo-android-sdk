@@ -12,6 +12,7 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.testModifyUserResponseData
 
 import us.frollo.frollosdk.model.testUserResponseData
@@ -39,7 +40,7 @@ class UserDaoTest {
         testObserver.awaitValue()
         assertNull(testObserver.value())
 
-        db.users().insert(testUserResponseData())
+        db.users().insert(testUserResponseData().toUser())
 
         val testObserver2 = db.users().load().test()
         testObserver2.awaitValue()
@@ -49,14 +50,14 @@ class UserDaoTest {
     @Test
     fun testInsert() {
         val data = testUserResponseData()
-        db.users().insert(data)
+        db.users().insert(data.toUser())
 
         val testObserver = db.users().load().test()
         testObserver.awaitValue()
         assertNotNull(testObserver.value())
         assertEquals(data.userId, testObserver.value()?.userId)
 
-        db.users().insert(data.testModifyUserResponseData("New first name"))
+        db.users().insert(data.testModifyUserResponseData("New first name").toUser())
 
         val testObserver2 = db.users().load().test()
         testObserver2.awaitValue()
@@ -68,7 +69,7 @@ class UserDaoTest {
     @Test
     fun testClear() {
         val data = testUserResponseData()
-        db.users().insert(data)
+        db.users().insert(data.toUser())
 
         db.users().clear()
         val testObserver = db.users().load().test()

@@ -91,7 +91,7 @@ class AuthenticationTest {
     fun testFetchUser() {
         initSetup()
 
-        database.users().insert(testUserResponseData(userId = 12345))
+        database.users().insert(testUserResponseData(userId = 12345).toUser())
 
         val testObserver2 = authentication.fetchUser().test()
         testObserver2.awaitValue()

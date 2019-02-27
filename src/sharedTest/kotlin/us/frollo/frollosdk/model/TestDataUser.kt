@@ -32,10 +32,7 @@ internal fun testUserResponseData(userId: Long? = null) : UserResponse {
                 industry = Industry.ELECTRICITY_GAS_WATER_AND_WASTE_SERVICES,
                 dateOfBirth = "1990-01",
                 driverLicense = "12345678",
-                features = listOf(FeatureFlag(feature = "aggregation", enabled = true)),
-                refreshToken = "AValidRefreshTokenFromHost",
-                accessToken = "AValidAccessTokenFromHost",
-                accessTokenExp = 1721259268)
+                features = listOf(FeatureFlag(feature = "aggregation", enabled = true)))
 }
 
 internal fun UserResponse.testModifyUserResponseData(firstName: String) : UserResponse {
@@ -62,10 +59,7 @@ internal fun UserResponse.testModifyUserResponseData(firstName: String) : UserRe
             industry = industry,
             dateOfBirth = dateOfBirth,
             driverLicense = driverLicense,
-            features = features,
-            refreshToken = refreshToken,
-            accessToken = accessToken,
-            accessTokenExp = accessTokenExp)
+            features = features)
 }
 
 internal fun testValidRegisterData() : UserRegisterRequest {

@@ -3,10 +3,8 @@ package us.frollo.frollosdk.model.coredata.aggregation.merchants
 import androidx.room.*
 import us.frollo.frollosdk.model.IAdapterModel
 
-/**
- * Declaring the column info allows for the renaming of variables without implementing a
- * database migration, as the column name would not change.
- */
+// Declaring the ColumnInfo allows for the renaming of variables without
+// implementing a database migration, as the column name would not change.
 @Entity(tableName = "merchant",
         indices = [Index("merchant_id")])
 data class Merchant(

@@ -17,6 +17,7 @@ import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.error.FrolloSDKError
+import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.testUserResponseData
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.testutils.wait
@@ -216,7 +217,7 @@ class FrolloSDKAndroidUnitTest {
     fun testLogout() {
         initSetup()
 
-        database.users().insert(testUserResponseData())
+        database.users().insert(testUserResponseData().toUser())
 
         val testObserver = database.users().load().test()
         testObserver.awaitValue()
@@ -249,7 +250,7 @@ class FrolloSDKAndroidUnitTest {
     fun testForcedLogout() {
         initSetup()
 
-        database.users().insert(testUserResponseData())
+        database.users().insert(testUserResponseData().toUser())
 
         val testObserver = database.users().load().test()
         testObserver.awaitValue()
@@ -280,7 +281,7 @@ class FrolloSDKAndroidUnitTest {
     fun testSDKResetSuccess() {
         initSetup()
 
-        database.users().insert(testUserResponseData())
+        database.users().insert(testUserResponseData().toUser())
 
         val testObserver = database.users().load().test()
         testObserver.awaitValue()

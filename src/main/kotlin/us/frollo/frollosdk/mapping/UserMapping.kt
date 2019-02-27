@@ -12,6 +12,7 @@ internal fun UserResponse.toUser() =
                 status = status,
                 primaryCurrency = primaryCurrency,
                 validPassword = validPassword,
+                registerComplete = registerComplete,
                 registrationDate = registrationDate,
                 facebookId = facebookId,
                 attribution = attribution,
@@ -26,5 +27,4 @@ internal fun UserResponse.toUser() =
                 industry = industry,
                 dateOfBirth = dateOfBirth,
                 driverLicense = driverLicense,
-                features = features
-        )
+                features = features)

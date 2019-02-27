@@ -5,10 +5,8 @@ import us.frollo.frollosdk.model.IAdapterModel
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Balance
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 
-/**
- * Declaring the column info allows for the renaming of variables without implementing a
- * database migration, as the column name would not change.
- */
+// Declaring the ColumnInfo allows for the renaming of variables without
+// implementing a database migration, as the column name would not change.
 // Since `transaction` is a reserved keyword for SQLite, use `transaction_model` instead
 @Entity(tableName = "transaction_model",
         indices = [Index("transaction_id"),

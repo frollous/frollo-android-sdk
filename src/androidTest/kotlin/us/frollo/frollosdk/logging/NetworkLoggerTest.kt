@@ -18,6 +18,7 @@ import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.preferences.Preferences
+import us.frollo.frollosdk.testutils.trimmedPath
 
 class NetworkLoggerTest {
 
@@ -57,7 +58,7 @@ class NetworkLoggerTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == DeviceAPI.URL_LOG) {
+                if (request?.trimmedPath == DeviceAPI.URL_LOG) {
                     return MockResponse()
                             .setResponseCode(201)
                 }
@@ -69,7 +70,7 @@ class NetworkLoggerTest {
         logger.writeMessage("Test Message", LogLevel.ERROR)
 
         val request = mockServer.takeRequest()
-        assertEquals(DeviceAPI.URL_LOG, request.path)
+        assertEquals(DeviceAPI.URL_LOG, request.trimmedPath)
 
         tearDown()
     }

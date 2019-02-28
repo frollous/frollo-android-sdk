@@ -23,6 +23,7 @@ import retrofit2.Response
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.network.ApiResponse
 import us.frollo.frollosdk.error.*
+import us.frollo.frollosdk.testutils.trimmedPath
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.security.cert.CertPathValidatorException
@@ -73,7 +74,7 @@ class NetworkExtensionTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == TestAPI.URL_TEST) {
+                if (request?.trimmedPath == TestAPI.URL_TEST) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody("{}")
@@ -88,7 +89,7 @@ class NetworkExtensionTest {
         }
 
         val request = mockServer.takeRequest()
-        assertEquals(TestAPI.URL_TEST, request.path)
+        assertEquals(TestAPI.URL_TEST, request.trimmedPath)
 
         wait(3)
 
@@ -101,7 +102,7 @@ class NetworkExtensionTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == TestAPI.URL_TEST) {
+                if (request?.trimmedPath == TestAPI.URL_TEST) {
                     return MockResponse()
                             .setResponseCode(401)
                             .setBody("{}")
@@ -118,7 +119,7 @@ class NetworkExtensionTest {
         }
 
         val request = mockServer.takeRequest()
-        assertEquals(TestAPI.URL_TEST, request.path)
+        assertEquals(TestAPI.URL_TEST, request.trimmedPath)
 
         wait(3)
 

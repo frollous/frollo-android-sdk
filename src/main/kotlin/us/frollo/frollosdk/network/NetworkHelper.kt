@@ -18,7 +18,6 @@ internal class NetworkHelper(private val authToken: AuthToken) {
         internal const val HEADER_API_VERSION = "X-Api-Version"
         internal const val HEADER_BACKGROUND = "X-Background"
         internal const val API_VERSION = "2.1"
-        internal const val API_VERSION_PATH = "/api/v2"
     }
 
     internal val authAccessToken: String?

@@ -7,7 +7,7 @@ import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
 
 internal interface TokenAPI {
     companion object {
-        const val URL_TOKEN = "/"
+        const val URL_TOKEN = "." // Use . to indicate the endpoint url is same as base url
     }
 
     @POST(URL_TOKEN)

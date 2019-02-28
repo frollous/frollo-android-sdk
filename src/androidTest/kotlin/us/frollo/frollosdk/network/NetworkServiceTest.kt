@@ -24,8 +24,13 @@ import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
+import us.frollo.frollosdk.testutils.trimmedPath
 
 class NetworkServiceTest {
+
+    companion object {
+        private const val TOKEN_URL = "token/"
+    }
 
     private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
 
@@ -38,7 +43,7 @@ class NetworkServiceTest {
     fun setUp() {
         mockTokenServer = MockWebServer()
         mockTokenServer.start()
-        val baseUrl = mockTokenServer.url("/token/")
+        val baseUrl = mockTokenServer.url("/$TOKEN_URL")
         val config = testSDKConfig(tokenUrl = baseUrl.toString())
 
         FrolloSDK.app = app
@@ -91,7 +96,7 @@ class NetworkServiceTest {
     fun testForceRefreshingAccessTokens() {
         mockTokenServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == TokenAPI.URL_TOKEN) {
+                if (request?.trimmedPath == "token/") {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(readStringFromJson(app, R.raw.token_valid))

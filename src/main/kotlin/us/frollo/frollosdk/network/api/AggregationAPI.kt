@@ -2,7 +2,6 @@ package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
 import retrofit2.http.*
-import us.frollo.frollosdk.network.NetworkHelper.Companion.API_VERSION_PATH
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
@@ -18,28 +17,28 @@ import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateR
 internal interface AggregationAPI {
     companion object {
         // Provider URLs
-        const val URL_PROVIDERS = "$API_VERSION_PATH/aggregation/providers/"
-        const val URL_PROVIDER = "$API_VERSION_PATH/aggregation/providers/{provider_id}"
+        const val URL_PROVIDERS = "aggregation/providers"
+        const val URL_PROVIDER = "aggregation/providers/{provider_id}"
 
         // Provider Account URLs
-        const val URL_PROVIDER_ACCOUNTS = "$API_VERSION_PATH/aggregation/provideraccounts/"
-        const val URL_PROVIDER_ACCOUNT = "$API_VERSION_PATH/aggregation/provideraccounts/{provider_account_id}"
+        const val URL_PROVIDER_ACCOUNTS = "aggregation/provideraccounts"
+        const val URL_PROVIDER_ACCOUNT = "aggregation/provideraccounts/{provider_account_id}"
 
         // Account URLs
-        const val URL_ACCOUNTS = "$API_VERSION_PATH/aggregation/accounts/"
-        const val URL_ACCOUNT = "$API_VERSION_PATH/aggregation/accounts/{account_id}"
+        const val URL_ACCOUNTS = "aggregation/accounts"
+        const val URL_ACCOUNT = "aggregation/accounts/{account_id}"
 
         // Transaction URLs
-        const val URL_TRANSACTIONS = "$API_VERSION_PATH/aggregation/transactions/"
-        const val URL_TRANSACTION = "$API_VERSION_PATH/aggregation/transactions/{transaction_id}"
-        const val URL_TRANSACTIONS_SUMMARY = "$API_VERSION_PATH/aggregation/transactions/summary/"
+        const val URL_TRANSACTIONS = "aggregation/transactions"
+        const val URL_TRANSACTION = "aggregation/transactions/{transaction_id}"
+        const val URL_TRANSACTIONS_SUMMARY = "aggregation/transactions/summary"
 
         // Transaction Category URLs
-        const val URL_TRANSACTION_CATEGORIES = "$API_VERSION_PATH/aggregation/transactions/categories/"
+        const val URL_TRANSACTION_CATEGORIES = "aggregation/transactions/categories"
 
         // Merchant URLs
-        const val URL_MERCHANTS = "$API_VERSION_PATH/aggregation/merchants/"
-        const val URL_MERCHANT = "$API_VERSION_PATH/aggregation/merchants/{merchant_id}"
+        const val URL_MERCHANTS = "aggregation/merchants"
+        const val URL_MERCHANT = "aggregation/merchants/{merchant_id}"
     }
 
     // Provider API

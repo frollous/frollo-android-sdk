@@ -20,7 +20,6 @@ import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.network.NetworkHelper
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.events.Events
@@ -31,6 +30,7 @@ import us.frollo.frollosdk.model.testMessageNotificationBundle
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
+import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
 
 class NotificationsTest {
@@ -87,7 +87,7 @@ class NotificationsTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == DeviceAPI.URL_DEVICE) {
+                if (request?.trimmedPath == DeviceAPI.URL_DEVICE) {
                     return MockResponse()
                             .setResponseCode(204)
                 }
@@ -100,7 +100,7 @@ class NotificationsTest {
         notifications.registerPushNotificationToken(tokenString)
 
         val request = mockServer.takeRequest()
-        assertEquals(DeviceAPI.URL_DEVICE, request.path)
+        assertEquals(DeviceAPI.URL_DEVICE, request.trimmedPath)
 
         tearDown()
     }
@@ -123,7 +123,7 @@ class NotificationsTest {
         val body = readStringFromJson(app, R.raw.message_id_12345)
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == "${NetworkHelper.API_VERSION_PATH}/messages/12345") {
+                if (request?.trimmedPath == "messages/12345") {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -137,7 +137,7 @@ class NotificationsTest {
         wait(3)
 
         val request = mockServer.takeRequest()
-        assertEquals("${NetworkHelper.API_VERSION_PATH}/messages/12345", request.path)
+        assertEquals("messages/12345", request.trimmedPath)
 
         val testObserver = messages.fetchMessage(12345L).test()
         testObserver.awaitValue()

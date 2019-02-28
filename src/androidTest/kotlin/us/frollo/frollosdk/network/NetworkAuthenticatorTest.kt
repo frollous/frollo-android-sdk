@@ -24,9 +24,14 @@ import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
+import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
 
 class NetworkAuthenticatorTest {
+
+    companion object {
+        private const val TOKEN_URL = "token/"
+    }
 
     @get:Rule val testRule = InstantTaskExecutorRule()
 
@@ -42,11 +47,11 @@ class NetworkAuthenticatorTest {
     private fun initSetup() {
         mockServer = MockWebServer()
         mockServer.start()
-        val baseUrl = mockServer.url("/server/")
+        val baseUrl = mockServer.url("/")
 
         mockTokenServer = MockWebServer()
         mockTokenServer.start()
-        val baseTokenUrl = mockTokenServer.url("/token/")
+        val baseTokenUrl = mockTokenServer.url("/$TOKEN_URL")
 
         val config = testSDKConfig(serverUrl = baseUrl.toString(), tokenUrl = baseTokenUrl.toString())
         if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
@@ -72,7 +77,7 @@ class NetworkAuthenticatorTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_USER_DETAILS) {
+                if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                         return MockResponse()
                                 .setResponseCode(200)
                                 .setBody(readStringFromJson(app, R.raw.user_details_complete))
@@ -83,7 +88,7 @@ class NetworkAuthenticatorTest {
 
         mockTokenServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == TokenAPI.URL_TOKEN) {
+                if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(readStringFromJson(app, R.raw.token_valid))
@@ -120,7 +125,7 @@ class NetworkAuthenticatorTest {
             var failedOnce = false
 
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_USER_DETAILS) {
+                if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     if (failedOnce) {
                         return MockResponse()
                                 .setResponseCode(200)
@@ -138,7 +143,7 @@ class NetworkAuthenticatorTest {
 
         mockTokenServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == TokenAPI.URL_TOKEN) {
+                if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(readStringFromJson(app, R.raw.token_valid))
@@ -207,7 +212,7 @@ class NetworkAuthenticatorTest {
             var userRequestCount = 0
 
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_USER_DETAILS) {
+                if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     if (userRequestCount < 3) {
                         userRequestCount++
                         return MockResponse()
@@ -225,7 +230,7 @@ class NetworkAuthenticatorTest {
 
         mockTokenServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == TokenAPI.URL_TOKEN) {
+                if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(readStringFromJson(app, R.raw.token_valid))
@@ -274,7 +279,7 @@ class NetworkAuthenticatorTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_USER_DETAILS) {
+                if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
                             .setResponseCode(401)
                             .setBody(readStringFromJson(app, R.raw.error_invalid_access_token))
@@ -285,7 +290,7 @@ class NetworkAuthenticatorTest {
 
         mockTokenServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == TokenAPI.URL_TOKEN) {
+                if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
                             .setResponseCode(401)
                             .setBody(readStringFromJson(app, R.raw.error_invalid_refresh_token))

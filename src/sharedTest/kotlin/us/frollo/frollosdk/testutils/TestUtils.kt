@@ -8,6 +8,7 @@ import java.util.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.RecordedRequest
 
 internal fun randomNumber(range: IntRange? = null)
         = if (range == null) Random().nextInt() else range.random()
@@ -56,3 +57,6 @@ fun get429Response(): MockResponse {
 fun wait(seconds: Int) {
     Thread.sleep(seconds * 1000L)
 }
+
+val RecordedRequest.trimmedPath: String
+    get() = path.replace(Regex("^/+"), "")

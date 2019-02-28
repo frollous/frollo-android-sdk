@@ -19,7 +19,6 @@ import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.network.NetworkHelper
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.MessagesAPI
 import us.frollo.frollosdk.keystore.Keystore
@@ -29,6 +28,7 @@ import us.frollo.frollosdk.model.testMessageResponseData
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
+import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
 
 class MessagesTest {
@@ -154,7 +154,7 @@ class MessagesTest {
         val body = readStringFromJson(app, R.raw.messages_valid)
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == MessagesAPI.URL_MESSAGES) {
+                if (request?.trimmedPath == MessagesAPI.URL_MESSAGES) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -183,7 +183,7 @@ class MessagesTest {
         }
 
         val request = mockServer.takeRequest()
-        assertEquals(MessagesAPI.URL_MESSAGES, request.path)
+        assertEquals(MessagesAPI.URL_MESSAGES, request.trimmedPath)
 
         wait(3)
 
@@ -197,7 +197,7 @@ class MessagesTest {
         val body = readStringFromJson(app, R.raw.messages_invalid)
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == MessagesAPI.URL_MESSAGES) {
+                if (request?.trimmedPath == MessagesAPI.URL_MESSAGES) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -226,7 +226,7 @@ class MessagesTest {
         }
 
         val request = mockServer.takeRequest()
-        assertEquals(MessagesAPI.URL_MESSAGES, request.path)
+        assertEquals(MessagesAPI.URL_MESSAGES, request.trimmedPath)
 
         wait(3)
 
@@ -240,7 +240,7 @@ class MessagesTest {
         val body = readStringFromJson(app, R.raw.message_id_12345)
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == "${NetworkHelper.API_VERSION_PATH}/messages/12345") {
+                if (request?.trimmedPath == "messages/12345") {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -261,7 +261,7 @@ class MessagesTest {
         }
 
         val request = mockServer.takeRequest()
-        assertEquals("${NetworkHelper.API_VERSION_PATH}/messages/12345", request.path)
+        assertEquals("messages/12345", request.trimmedPath)
 
         wait(3)
 
@@ -275,7 +275,7 @@ class MessagesTest {
         val body = readStringFromJson(app, R.raw.messages_unread)
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == MessagesAPI.URL_UNREAD) {
+                if (request?.trimmedPath == MessagesAPI.URL_UNREAD) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -304,7 +304,7 @@ class MessagesTest {
         }
 
         val request = mockServer.takeRequest()
-        assertEquals(MessagesAPI.URL_UNREAD, request.path)
+        assertEquals(MessagesAPI.URL_UNREAD, request.trimmedPath)
 
         wait(3)
 
@@ -318,7 +318,7 @@ class MessagesTest {
         val body = readStringFromJson(app, R.raw.message_id_12345)
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == "${NetworkHelper.API_VERSION_PATH}/messages/12345") {
+                if (request?.trimmedPath == "messages/12345") {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -339,7 +339,7 @@ class MessagesTest {
         }
 
         val request = mockServer.takeRequest()
-        assertEquals("${NetworkHelper.API_VERSION_PATH}/messages/12345", request.path)
+        assertEquals("messages/12345", request.trimmedPath)
 
         wait(3)
 
@@ -353,7 +353,7 @@ class MessagesTest {
         val body = readStringFromJson(app, R.raw.message_id_12345)
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == "${NetworkHelper.API_VERSION_PATH}/messages/12345") {
+                if (request?.trimmedPath == "messages/12345") {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -367,7 +367,7 @@ class MessagesTest {
         wait(3)
 
         val request = mockServer.takeRequest()
-        assertEquals("${NetworkHelper.API_VERSION_PATH}/messages/12345", request.path)
+        assertEquals("messages/12345", request.trimmedPath)
 
         val testObserver = messages.fetchMessage(12345L).test()
         testObserver.awaitValue()

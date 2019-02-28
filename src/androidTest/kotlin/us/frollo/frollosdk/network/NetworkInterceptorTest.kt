@@ -28,6 +28,7 @@ import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.TestAPI
 import us.frollo.frollosdk.testutils.readStringFromJson
+import us.frollo.frollosdk.testutils.trimmedPath
 
 class NetworkInterceptorTest {
 
@@ -45,7 +46,7 @@ class NetworkInterceptorTest {
     private fun initSetup() {
         mockServer = MockWebServer()
         mockServer.start()
-        val baseUrl = mockServer.url("/server/")
+        val baseUrl = mockServer.url("/")
 
         val config = testSDKConfig(serverUrl = baseUrl.toString())
         if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
@@ -73,7 +74,7 @@ class NetworkInterceptorTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_USER_DETAILS) {
+                if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(readStringFromJson(app, R.raw.user_details_complete))
@@ -89,7 +90,7 @@ class NetworkInterceptorTest {
         userAPI.fetchUser().enqueue { }
 
         val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_USER_DETAILS, request.path)
+        assertEquals(UserAPI.URL_USER_DETAILS, request.trimmedPath)
         assertEquals("Bearer ExistingAccessToken", request.getHeader("Authorization"))
         assertNotNull(request.getHeader("X-Api-Version"))
         assertEquals("us.frollo.frollosdk", request.getHeader("X-Bundle-Id"))
@@ -106,7 +107,7 @@ class NetworkInterceptorTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_REGISTER) {
+                if (request?.trimmedPath == UserAPI.URL_REGISTER) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(readStringFromJson(app, R.raw.user_details_complete))
@@ -118,7 +119,7 @@ class NetworkInterceptorTest {
         userAPI.register(testValidRegisterData()).enqueue { }
 
         val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_REGISTER, request.path)
+        assertEquals(UserAPI.URL_REGISTER, request.trimmedPath)
         val authHeader = request.getHeader("Authorization")
         assertNull(authHeader)
 
@@ -131,7 +132,7 @@ class NetworkInterceptorTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_PASSWORD_RESET) {
+                if (request?.trimmedPath == UserAPI.URL_PASSWORD_RESET) {
                     return MockResponse()
                             .setResponseCode(200)
                 }
@@ -142,7 +143,7 @@ class NetworkInterceptorTest {
         userAPI.resetPassword(testResetPasswordData()).enqueue { }
 
         val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_PASSWORD_RESET, request.path)
+        assertEquals(UserAPI.URL_PASSWORD_RESET, request.trimmedPath)
         val authHeader = request.getHeader("Authorization")
         assertNull(authHeader)
 
@@ -155,7 +156,7 @@ class NetworkInterceptorTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_USER_DETAILS) {
+                if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(readStringFromJson(app, R.raw.user_details_complete))
@@ -171,7 +172,7 @@ class NetworkInterceptorTest {
         userAPI.fetchUser().enqueue { }
 
         val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_USER_DETAILS, request.path)
+        assertEquals(UserAPI.URL_USER_DETAILS, request.trimmedPath)
         assertEquals("Bearer ExistingAccessToken", request.getHeader("Authorization"))
 
         tearDown()

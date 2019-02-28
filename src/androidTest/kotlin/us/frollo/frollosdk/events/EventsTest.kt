@@ -19,6 +19,7 @@ import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.EventsAPI
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.preferences.Preferences
+import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
 
 class EventsTest {
@@ -63,7 +64,7 @@ class EventsTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == EventsAPI.URL_EVENT) {
+                if (request?.trimmedPath == EventsAPI.URL_EVENT) {
                     return MockResponse()
                             .setResponseCode(201)
                 }
@@ -77,7 +78,7 @@ class EventsTest {
         }
 
         val request = mockServer.takeRequest()
-        assertEquals(EventsAPI.URL_EVENT, request.path)
+        assertEquals(EventsAPI.URL_EVENT, request.trimmedPath)
 
         wait(3)
 

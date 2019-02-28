@@ -170,15 +170,15 @@ class FrolloSDKAndroidUnitTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.path == UserAPI.URL_LOGIN) {
+                if (request?.trimmedPath == UserAPI.URL_LOGIN) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(readStringFromJson(app, R.raw.user_details_complete))
-                } else if (request?.path == UserAPI.URL_USER_DETAILS) {
+                } else if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(readStringFromJson(app, R.raw.user_details_complete))
-                } else if (request?.path == MessagesAPI.URL_UNREAD) {
+                } else if (request?.trimmedPath == MessagesAPI.URL_UNREAD) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(readStringFromJson(app, R.raw.messages_unread))

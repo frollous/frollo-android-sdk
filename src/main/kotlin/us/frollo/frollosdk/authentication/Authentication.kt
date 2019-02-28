@@ -83,8 +83,6 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#loginUser.refreshTokens", resource.error?.localizedDescription)
 
-                    network.reset()
-
                     completion.invoke(Result.error(resource.error))
                 }
 
@@ -167,8 +165,6 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
                         when (authResource.status) {
                             Resource.Status.ERROR -> {
                                 Log.e("$TAG#refreshUser.refreshTokens", authResource.error?.localizedDescription)
-
-                                network.reset()
 
                                 completion.invoke(Result.error(authResource.error))
                             }
@@ -351,12 +347,70 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     }
 
     /**
+     * Exchange an authorization code and code verifier for a token
+     *
+     * @param code Authorization code
+     * @param codeVerifier Authorization code verifier for PKCE (Optional)
+     * @param completion Completion handler with any error that occurred
+     */
+    fun exchangeAuthorizationCode(code: String, codeVerifier: String? = null, completion: OnFrolloSDKCompletionListener<Result>) {
+        if (loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
+            completion.invoke(Result.error(error))
+            return
+        }
+
+        val request = oAuth.getExchangeAuthorizationCodeRequest(code = code, codeVerifier = codeVerifier)
+        if (!request.valid) {
+            completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
+            return
+        }
+
+        // Authorize the user
+        tokenAPI.refreshTokens(request).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#exchangeAuthorizationCode.refreshTokens", resource.error?.localizedDescription)
+
+                    completion.invoke(Result.error(resource.error))
+                }
+
+                Resource.Status.SUCCESS -> {
+                    resource.data?.let { response ->
+                        network.handleTokens(response)
+
+                        // Fetch core details about the user. Fail and logout if we don't get necessary details
+                        userAPI.fetchUser().enqueue { resource ->
+                            when(resource.status) {
+                                Resource.Status.ERROR -> {
+                                    network.reset()
+
+                                    Log.e("$TAG#exchangeAuthorizationCode.fetchUser", resource.error?.localizedDescription)
+                                    completion.invoke(Result.error(resource.error))
+                                }
+
+                                Resource.Status.SUCCESS -> {
+                                    handleUserResponse(resource.data, completion)
+                                    updateDevice()
+                                }
+                            }
+                        }
+
+                    } ?: run {
+                        completion.invoke(Result.error(DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_ACCESS_TOKEN)))
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Exchange a legacy access token for a new valid refresh access token pair.
      *
      * @param legacyToken Legacy access token to be exchanged
      * @param completion Completion handler with any error that occurred
      */
-    fun exchangeToken(legacyToken: String, completion: OnFrolloSDKCompletionListener<Result>) {
+    fun exchangeLegacyToken(legacyToken: String, completion: OnFrolloSDKCompletionListener<Result>) {
         if (!loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
             completion.invoke(Result.error(error))
@@ -369,7 +423,6 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
             return
         }
 
-        // Authorize the user
         tokenAPI.refreshTokens(request).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {

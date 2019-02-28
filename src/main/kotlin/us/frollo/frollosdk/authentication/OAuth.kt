@@ -33,6 +33,14 @@ class OAuth(val config: FrolloSDKConfiguration) {
                     username = username,
                     password = password)
 
+    internal fun getExchangeAuthorizationCodeRequest(code: String, codeVerifier: String? = null) =
+            OAuthTokenRequest(
+                    grantType = OAuthGrantType.AUTHORIZATION_CODE,
+                    clientId = config.clientId,
+                    domain = domain,
+                    code = code,
+                    codeVerifier = codeVerifier)
+
     internal fun getExchangeTokenRequest(legacyToken: String) =
             OAuthTokenRequest(
                     grantType = OAuthGrantType.PASSWORD,

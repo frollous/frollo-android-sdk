@@ -40,6 +40,17 @@ class OAuthTest {
     }
 
     @Test
+    fun testGetExchangeAuthorizationCodeRequest() {
+        val code = randomString(32)
+        val codeVerifier = randomString(32)
+        val request = oAuth.getExchangeAuthorizationCodeRequest(code = code, codeVerifier = codeVerifier)
+        assertNotNull(request)
+        assertTrue(request.valid)
+        assertEquals(code, request.code)
+        assertEquals(codeVerifier, request.codeVerifier)
+    }
+
+    @Test
     fun testGetExchangeTokenRequest() {
         val legacyToken = randomString(32)
         val request = oAuth.getExchangeTokenRequest(legacyToken = legacyToken)

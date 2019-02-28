@@ -7,6 +7,7 @@ internal data class OAuthTokenRequest(
         @SerializedName("client_id") val clientId: String,
         @SerializedName("domain") val domain: String,
         @SerializedName("code") val code: String? = null,
+        @SerializedName("code_verifier") val codeVerifier: String? = null,
         @SerializedName("state") val state: String? = null,
         @SerializedName("refresh_token") val refreshToken: String? = null,
         @SerializedName("frollo_legacy_token") val legacyToken: String? = null,

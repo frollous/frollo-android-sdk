@@ -1,6 +1,8 @@
 package us.frollo.frollosdk.core
 
+import android.net.Uri
 import us.frollo.frollosdk.logging.LogLevel
+import java.lang.Exception
 
 /**
  * Configuration of the SDK and additional optional preferences.
@@ -14,9 +16,9 @@ data class FrolloSDKConfiguration(
          */
         val clientId: String,
         /**
-         * OAuth2 Redirection URI. URI to redirect to after the authorization flow is complete. This should be a deep or universal link to the host app
+         * OAuth2 Redirection URL. URL to redirect to after the authorization flow is complete. This should be a deep or universal link to the host app
          */
-        val redirectUri: String,
+        val redirectUrl: String,
         /**
          * URL of the OAuth2 authorization endpoint for web based login
          */
@@ -32,4 +34,44 @@ data class FrolloSDKConfiguration(
         /**
          * Level of logging for debug and error messages. Default is [LogLevel.ERROR]
          */
-        val logLevel: LogLevel = LogLevel.ERROR)
+        val logLevel: LogLevel = LogLevel.ERROR) {
+
+    fun validForROPC() : Boolean {
+        if (clientId.isBlank() || tokenUrl.isBlank() || serverUrl.isBlank())
+            return false
+
+        return try {
+            Uri.parse(tokenUrl)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    fun validForAuthorizationCodeFlow() : Boolean {
+         if (clientId.isBlank() || tokenUrl.isBlank() || redirectUrl.isBlank() || authorizationUrl.isBlank() || serverUrl.isBlank())
+             return false
+
+         return try {
+             Uri.parse(tokenUrl)
+             Uri.parse(redirectUrl)
+             Uri.parse(authorizationUrl)
+             true
+         } catch (e: Exception) {
+             false
+         }
+    }
+
+    /**
+     * OAuth2 Redirection URL. URL to redirect to after the authorization flow is complete. This should be a deep or universal link to the host app
+     */
+    val redirectUri: Uri = Uri.parse(redirectUrl)
+    /**
+     * URL of the OAuth2 authorization endpoint for web based login
+     */
+    val authorizationUri: Uri = Uri.parse(authorizationUrl)
+    /**
+     * URL of the OAuth2 token endpoint for getting tokens and native login
+     */
+    val tokenUri: Uri = Uri.parse(tokenUrl)
+}

@@ -1,8 +1,11 @@
 package us.frollo.frollosdk.mapping
 
 import com.google.gson.Gson
+import net.openid.appauth.AuthorizationException
+import net.openid.appauth.AuthorizationException.*
 import us.frollo.frollosdk.error.APIErrorType
 import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.OAuthErrorType
 import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import us.frollo.frollosdk.model.api.shared.APIErrorResponse
@@ -51,8 +54,45 @@ internal fun Int.toAPIErrorType(errorCode: APIErrorCode?): APIErrorType {
 internal fun String.toDataError(): DataError? {
     return try {
         val error = Gson().fromJson<DataError>(this)
-        if (error.type != null) error else null // This check is needed because Gson().fromJson() can return object with null values for its members
+        // I know it says "is always true", BUT, this "!= null" check is NEEDED
+        // because Gson().fromJson() can return object with null values for its members
+        if (error.type != null) error else null
     } catch (e: Exception) {
         null
+    }
+}
+
+internal fun AuthorizationException.toOAuthErrorType(): OAuthErrorType {
+    val exception = this
+    return when (exception) {
+        AuthorizationRequestErrors.ACCESS_DENIED -> OAuthErrorType.ACCESS_DENIED
+        AuthorizationRequestErrors.CLIENT_ERROR -> OAuthErrorType.CLIENT_ERROR
+        AuthorizationRequestErrors.INVALID_REQUEST -> OAuthErrorType.INVALID_REQUEST
+        AuthorizationRequestErrors.INVALID_SCOPE -> OAuthErrorType.INVALID_SCOPE
+        AuthorizationRequestErrors.OTHER -> OAuthErrorType.OTHER_AUTHORISATION
+        AuthorizationRequestErrors.SERVER_ERROR -> OAuthErrorType.SERVER_ERROR
+        AuthorizationRequestErrors.TEMPORARILY_UNAVAILABLE -> OAuthErrorType.SERVER_ERROR
+        AuthorizationRequestErrors.UNAUTHORIZED_CLIENT -> OAuthErrorType.UNAUTHORIZED_CLIENT
+        AuthorizationRequestErrors.UNSUPPORTED_RESPONSE_TYPE -> OAuthErrorType.UNSUPPORTED_RESPONSE_TYPE
+
+        TokenRequestErrors.INVALID_REQUEST -> OAuthErrorType.INVALID_REQUEST
+        TokenRequestErrors.CLIENT_ERROR -> OAuthErrorType.CLIENT_ERROR
+        TokenRequestErrors.INVALID_CLIENT -> OAuthErrorType.INVALID_CLIENT
+        TokenRequestErrors.INVALID_GRANT -> OAuthErrorType.INVALID_GRANT
+        TokenRequestErrors.OTHER -> OAuthErrorType.OTHER_AUTHORISATION
+        TokenRequestErrors.UNAUTHORIZED_CLIENT -> OAuthErrorType.UNAUTHORIZED_CLIENT
+        TokenRequestErrors.UNSUPPORTED_GRANT_TYPE -> OAuthErrorType.UNSUPPORTED_GRANT_TYPE
+        TokenRequestErrors.INVALID_SCOPE -> OAuthErrorType.INVALID_SCOPE
+
+        RegistrationRequestErrors.INVALID_REDIRECT_URI -> OAuthErrorType.INVALID_REDIRECT_URI
+        RegistrationRequestErrors.INVALID_CLIENT_METADATA -> OAuthErrorType.INVALID_CLIENT_METADATA
+        RegistrationRequestErrors.CLIENT_ERROR -> OAuthErrorType.CLIENT_ERROR
+        RegistrationRequestErrors.INVALID_REQUEST -> OAuthErrorType.INVALID_REQUEST
+        RegistrationRequestErrors.OTHER -> OAuthErrorType.OTHER_AUTHORISATION
+
+        GeneralErrors.USER_CANCELED_AUTH_FLOW -> OAuthErrorType.USER_CANCELLED
+        GeneralErrors.SERVER_ERROR -> OAuthErrorType.SERVER_ERROR
+        GeneralErrors.NETWORK_ERROR -> OAuthErrorType.NETWORK_ERROR
+        else -> OAuthErrorType.OTHER_AUTHORISATION
     }
 }

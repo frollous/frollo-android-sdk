@@ -9,6 +9,7 @@ internal data class OAuthTokenRequest(
         @SerializedName("code") val code: String? = null,
         @SerializedName("code_verifier") val codeVerifier: String? = null,
         @SerializedName("state") val state: String? = null,
+        @SerializedName("redirect_uri") val redirectUrl: String? = null,
         @SerializedName("refresh_token") val refreshToken: String? = null,
         @SerializedName("frollo_legacy_token") val legacyToken: String? = null,
         @SerializedName("username") val username: String? = null,
@@ -16,7 +17,7 @@ internal data class OAuthTokenRequest(
 ) {
     val valid: Boolean
         get() = when (grantType) {
-                    OAuthGrantType.AUTHORIZATION_CODE -> code != null
+                    OAuthGrantType.AUTHORIZATION_CODE -> code != null && redirectUrl != null
                     OAuthGrantType.PASSWORD -> (password != null && username != null) || legacyToken != null
                     OAuthGrantType.REFRESH_TOKEN -> refreshToken != null
                 }

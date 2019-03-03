@@ -1,7 +1,11 @@
 package us.frollo.frollosdk.authentication
 
+import android.app.Activity
+import android.app.PendingIntent
+import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import net.openid.appauth.*
 import okhttp3.Request
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -34,6 +38,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
 
     companion object {
         private const val TAG = "Authentication"
+        private const val RC_AUTH = 100
     }
 
     /**
@@ -47,6 +52,8 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     private val deviceAPI: DeviceAPI = network.create(DeviceAPI::class.java)
     private val tokenAPI: TokenAPI = network.createAuth(TokenAPI::class.java)
 
+    private var codeVerifier: String? = null
+
     /**
      * Fetch the first available user model from the cache
      *
@@ -56,6 +63,83 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
             Transformations.map(db.users().load()) {
                 Resource.success(it)
             }
+
+    /**
+     * Login a user via WebView
+     *
+     * Initiate the authorization code login flow using a WebView
+     *
+     * @param activity Activity from which the ChromeTabs/Browser should be launched
+     * @param intent PendingIntent of an Activity to which the response from the ChromeTabs/Browser is delivered
+     * @param toolBarColor Color of the CustomTabs toolbar using getColor() method
+     *
+     * NOTE: When using this method you need to call [handleAuthorizationResponse]
+     * in the onCreate() of the pending intent activity
+     */
+    @Throws(DataError::class)
+    fun loginUserUsingWeb(activity: Activity, intent: PendingIntent, toolBarColor: Int? = null) {
+        if (!oAuth.config.validForAuthorizationCodeFlow()) {
+            throw DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)
+        }
+
+        val authRequest = oAuth.getAuthorizationRequest()
+
+        codeVerifier = authRequest.codeVerifier
+
+        val authService = AuthorizationService(activity)
+        val intentBuilder = authService.createCustomTabsIntentBuilder(authRequest.toUri())
+        toolBarColor?.let { intentBuilder.setToolbarColor(it) }
+        val authIntent = intentBuilder.build()
+        authService.performAuthorizationRequest(authRequest, intent, authIntent)
+    }
+
+    /**
+     * Login a user via WebView
+     *
+     * Initiate the authorization code login flow using a WebView
+     *
+     * @param activity Activity from which the ChromeTabs/Browser should be launched
+     *
+     * NOTE: When using this method you need to call [handleAuthorizationResponse]
+     * in the onActivityResult() of the activity from which you call this method
+     */
+    @Throws(DataError::class)
+    fun loginUserUsingWeb(activity: Activity) {
+        if (!oAuth.config.validForAuthorizationCodeFlow()) {
+            throw DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)
+        }
+
+        val authRequest = oAuth.getAuthorizationRequest()
+
+        codeVerifier = authRequest.codeVerifier
+
+        val authService = AuthorizationService(activity)
+        val authIntent = authService.getAuthorizationRequestIntent(authRequest)
+        activity.startActivityForResult(authIntent, RC_AUTH)
+    }
+
+    /**
+     * Process the authorization response to continue WebView login flow
+     *
+     * @param authIntent intent received in onActivityResult from WebView
+     * @param completion: Completion handler with any error that occurred
+     */
+    fun handleAuthorizationResponse(authIntent: Intent?, completion: OnFrolloSDKCompletionListener<Result>) {
+        authIntent?.let {
+            val response = AuthorizationResponse.fromIntent(authIntent)
+            val exception = AuthorizationException.fromIntent(authIntent)
+
+            val authorizationCode = response?.authorizationCode
+
+            if (authorizationCode != null) {
+                exchangeAuthorizationCode(code = authorizationCode, codeVerifier = codeVerifier, completion = completion)
+            } else {
+                completion.invoke(Result.error(OAuthError(exception)))
+            }
+        } ?: run {
+            completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
+        }
+    }
 
     /**
      * Login a user using various authentication methods
@@ -68,6 +152,11 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
         if (loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
             completion.invoke(Result.error(error))
+            return
+        }
+
+        if (!oAuth.config.validForROPC()) {
+            completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
             return
         }
 
@@ -133,6 +222,11 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
         if (loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
             completion.invoke(Result.error(error))
+            return
+        }
+
+        if (!oAuth.config.validForROPC()) {
+            completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
             return
         }
 

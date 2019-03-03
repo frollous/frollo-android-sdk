@@ -1,6 +1,9 @@
 package us.frollo.frollosdk.authentication
 
 import android.net.Uri
+import net.openid.appauth.AuthorizationRequest
+import net.openid.appauth.AuthorizationServiceConfiguration
+import net.openid.appauth.ResponseTypeValues
 import us.frollo.frollosdk.core.FrolloSDKConfiguration
 import us.frollo.frollosdk.model.oauth.OAuthGrantType
 import us.frollo.frollosdk.model.oauth.OAuthTokenRequest
@@ -39,7 +42,8 @@ class OAuth(val config: FrolloSDKConfiguration) {
                     clientId = config.clientId,
                     domain = domain,
                     code = code,
-                    codeVerifier = codeVerifier)
+                    codeVerifier = codeVerifier,
+                    redirectUrl = config.redirectUrl)
 
     internal fun getExchangeTokenRequest(legacyToken: String) =
             OAuthTokenRequest(
@@ -47,4 +51,19 @@ class OAuth(val config: FrolloSDKConfiguration) {
                     clientId = config.clientId,
                     domain = domain,
                     legacyToken = legacyToken)
+
+    internal fun getAuthorizationRequest(): AuthorizationRequest {
+        val serviceConfig = AuthorizationServiceConfiguration(config.authorizationUri, config.tokenUri)
+
+        val authRequestBuilder = AuthorizationRequest.Builder(
+                serviceConfig,
+                config.clientId,
+                ResponseTypeValues.CODE,
+                config.redirectUri)
+
+        return authRequestBuilder
+                .setScope("offline_access")
+                .setAdditionalParameters(mutableMapOf(Pair("domain", domain)))
+                .build()
+    }
 }

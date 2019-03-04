@@ -2,6 +2,7 @@ package us.frollo.frollosdk.authentication
 
 import android.net.Uri
 import net.openid.appauth.AuthorizationRequest
+import net.openid.appauth.AuthorizationRequest.Scope
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ResponseTypeValues
 import us.frollo.frollosdk.core.FrolloSDKConfiguration
@@ -62,9 +63,9 @@ class OAuth(val config: FrolloSDKConfiguration) {
                 config.redirectUri)
 
         return authRequestBuilder
-                .setScope("offline_access")
+                .setScopes(Scope.OFFLINE_ACCESS, Scope.OPENID, Scope.EMAIL)
                 //.setPrompt("login") // Specifies whether the Authorization Server prompts the End-User for re-authentication
-                .setAdditionalParameters(mutableMapOf(Pair("domain", domain)))
+                .setAdditionalParameters(mutableMapOf(Pair("audience", config.serverUrl), Pair("domain", domain)))
                 .build()
     }
 }

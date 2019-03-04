@@ -35,8 +35,14 @@ internal class AuthToken(private val keystore: Keystore, private val pref: Prefe
     fun saveTokens(tokenResponse: OAuthTokenResponse) {
         accessToken = tokenResponse.accessToken
         pref.encryptedAccessToken = keystore.encrypt(accessToken)
-        refreshToken = tokenResponse.refreshToken
-        pref.encryptedRefreshToken = keystore.encrypt(tokenResponse.refreshToken)
+
+        // With OAuth you get refresh token only the very first time and it is for lifetime.
+        // Subsequent token refresh responses does not contain refresh token.
+        // Hence hold on to the old refresh token if the response does not has a refresh token.
+        tokenResponse.refreshToken?.let {
+            refreshToken = it
+            pref.encryptedRefreshToken = keystore.encrypt(it)
+        }
 
         val createdAt = LocalDateTime.ofEpochSecond(tokenResponse.createdAt, 0, ZoneOffset.UTC) ?: LocalDateTime.now(ZoneOffset.UTC)
         val tokenExpiry = createdAt.plusSeconds(tokenResponse.expiresIn).toEpochSecond(ZoneOffset.UTC)

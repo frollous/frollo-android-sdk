@@ -1,5 +1,8 @@
 package us.frollo.frollosdk.authentication
 
+import net.openid.appauth.AuthorizationRequest.Scope.OFFLINE_ACCESS
+import net.openid.appauth.AuthorizationRequest.Scope.EMAIL
+import net.openid.appauth.AuthorizationRequest.Scope.OPENID
 import org.junit.Assert.*
 import org.junit.Test
 import us.frollo.frollosdk.core.testSDKConfig
@@ -65,7 +68,7 @@ class OAuthTest {
         assertNotNull(request)
         assertEquals(oAuth.config.clientId, request.clientId)
         assertEquals(oAuth.config.redirectUrl, request.redirectUri.toString())
-        assertEquals("offline_access", request.scope)
+        assertTrue(request.scopeSet?.containsAll(setOf(OFFLINE_ACCESS, EMAIL, OPENID)) == true)
         assertEquals(oAuth.config.authorizationUri, request.configuration.authorizationEndpoint)
         assertEquals(oAuth.config.tokenUri, request.configuration.tokenEndpoint)
     }

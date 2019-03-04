@@ -1192,6 +1192,86 @@ class AggregationTest {
     }
 
     @Test
+    fun testExcludeTransaction() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.transaction_id_99703_excluded)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == "aggregation/transactions/99703") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val transaction = testTransactionResponseData(transactionId = 99703, included = true).toTransaction()
+        database.transactions().insert(transaction)
+
+        aggregation.excludeTransaction(transactionId = 99703, excluded = true, applyToAll = true) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchTransactions().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(1, models?.size)
+            assertEquals(99703L, models?.get(0)?.transactionId)
+            assertTrue(models?.get(0)?.included == false)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("aggregation/transactions/99703", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRecategoriseTransaction() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.transaction_id_99703)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == "aggregation/transactions/99703") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val transaction = testTransactionResponseData(transactionId = 99703, categoryId = 123).toTransaction()
+        database.transactions().insert(transaction)
+
+        aggregation.recategoriseTransaction(transactionId = 99703, transactionCategoryId = 81, applyToAll = true) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchTransactions().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(1, models?.size)
+            assertEquals(99703L, models?.get(0)?.transactionId)
+            assertEquals(81L, models?.get(0)?.categoryId)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("aggregation/transactions/99703", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testUpdateTransaction() {
         initSetup()
 

@@ -93,6 +93,18 @@ class TransactionDaoTest {
     }
 
     @Test
+    fun testLoadTransaction() {
+        val data1 = testTransactionResponseData(transactionId = 100)
+        val data2 = testTransactionResponseData(transactionId = 101)
+        val list = mutableListOf(data1, data2)
+        db.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+
+        val model = db.transactions().loadTransaction(transactionId = 101)
+        assertNotNull(model)
+        assertEquals(101L, model?.transactionId)
+    }
+
+    @Test
     fun testLoadIdsByQuery() {
         val data1 = testTransactionResponseData(transactionId = 100, accountId = 1, transactionDate = "2019-01-04", included = false)
         val data2 = testTransactionResponseData(transactionId = 101, accountId = 1, transactionDate = "2019-01-20", included = false)

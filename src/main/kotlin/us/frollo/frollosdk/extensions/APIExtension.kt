@@ -10,7 +10,7 @@ internal fun AggregationAPI.fetchTransactionsByQuery(
         fromDate: String, // yyyy-MM-dd
         toDate: String, // yyyy-MM-dd
         accountIds: LongArray? = null,
-        accountIncluded: Boolean? = null,
+        accountIncluded: Boolean? = null, // TODO: not using this currently as this requires refactoring handleTransactionsResponse
         transactionIncluded: Boolean? = null,
         skip: Int? = null,
         count: Int? = null

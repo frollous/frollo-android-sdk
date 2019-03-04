@@ -490,6 +490,68 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
+    fun excludeTransaction(transactionId: Long, excluded: Boolean, applyToAll: Boolean,
+                           completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        doAsync {
+
+            val transaction = db.transactions().loadTransaction(transactionId)
+
+            uiThread {
+                transaction?.let { model ->
+                    val request = TransactionUpdateRequest(
+                            budgetCategory = model.budgetCategory,
+                            included = !excluded,
+                            includeApplyAll = applyToAll)
+
+                    aggregationAPI.updateTransaction(transactionId, request).enqueue { resource ->
+                        when(resource.status) {
+                            Resource.Status.SUCCESS -> {
+                                handleTransactionResponse(response = resource.data, completion = completion)
+                            }
+                            Resource.Status.ERROR -> {
+                                Log.e("$TAG#excludeTransaction", resource.error?.localizedDescription)
+                                completion?.invoke(Result.error(resource.error))
+                            }
+                        }
+                    }
+                } ?: run {
+                    completion?.invoke(Result.error(DataError(DataErrorType.DATABASE, DataErrorSubType.NOT_FOUND)))
+                }
+            }
+        }
+    }
+
+    fun recategoriseTransaction(transactionId: Long, transactionCategoryId: Long, applyToAll: Boolean,
+                                completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        doAsync {
+
+            val transaction = db.transactions().loadTransaction(transactionId)
+
+            uiThread {
+                transaction?.let { model ->
+                    val request = TransactionUpdateRequest(
+                            budgetCategory = model.budgetCategory,
+                            categoryId = transactionCategoryId,
+                            recategoriseAll = applyToAll)
+
+                    aggregationAPI.updateTransaction(transactionId, request).enqueue { resource ->
+                        when(resource.status) {
+                            Resource.Status.SUCCESS -> {
+                                handleTransactionResponse(response = resource.data, completion = completion)
+                            }
+                            Resource.Status.ERROR -> {
+                                Log.e("$TAG#recategoriseTransaction", resource.error?.localizedDescription)
+                                completion?.invoke(Result.error(resource.error))
+                            }
+                        }
+                    }
+                } ?: run {
+                    completion?.invoke(Result.error(DataError(DataErrorType.DATABASE, DataErrorSubType.NOT_FOUND)))
+                }
+            }
+        }
+    }
+
     fun updateTransaction(transactionId: Long, transaction: Transaction,
                           recategoriseAll: Boolean? = null, includeApplyAll: Boolean? = null,
                           completion: OnFrolloSDKCompletionListener<Result>? = null) {

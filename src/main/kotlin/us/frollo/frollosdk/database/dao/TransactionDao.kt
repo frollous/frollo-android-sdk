@@ -21,6 +21,9 @@ internal interface TransactionDao {
     @Query("SELECT * FROM transaction_model WHERE account_id = :accountId")
     fun loadByAccountId(accountId: Long): LiveData<List<Transaction>>
 
+    @Query("SELECT * FROM transaction_model WHERE transaction_id = :transactionId LIMIT 1")
+    fun loadTransaction(transactionId: Long): Transaction?
+
     @RawQuery
     fun getIdsQuery(queryStr: SupportSQLiteQuery): MutableList<Long>
 

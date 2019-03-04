@@ -1094,7 +1094,7 @@ class AggregationTest {
         val body = readStringFromJson(app, R.raw.transactions_2018_08_01_valid)
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?from_date=2018-06-01&to_date=2018-08-08") {
+                if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?from_date=2018-06-01&to_date=2018-08-08&skip=0&count=200") {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -1115,7 +1115,42 @@ class AggregationTest {
         }
 
         val request = mockServer.takeRequest()
-        assertEquals("${AggregationAPI.URL_TRANSACTIONS}?from_date=2018-06-01&to_date=2018-08-08", request.trimmedPath)
+        assertEquals("${AggregationAPI.URL_TRANSACTIONS}?from_date=2018-06-01&to_date=2018-08-08&skip=0&count=200", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshPaginatedTransactions() {
+        initSetup()
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?from_date=2018-08-01&to_date=2018-08-31&skip=0&count=200") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.transactions_2018_12_04_count_200_skip_0))
+                } else if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?from_date=2018-08-01&to_date=2018-08-31&skip=200&count=200") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.transactions_2018_12_04_count_200_skip_200))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshTransactions(fromDate = "2018-08-01", toDate = "2018-08-31") { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchTransactions().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(315, models?.size)
+        }
 
         wait(3)
 
@@ -1317,7 +1352,7 @@ class AggregationTest {
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?from_date=2018-06-01&to_date=2018-08-08") {
+                if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?from_date=2018-06-01&to_date=2018-08-08&skip=0&count=200") {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(readStringFromJson(app, R.raw.transactions_2018_08_01_valid))

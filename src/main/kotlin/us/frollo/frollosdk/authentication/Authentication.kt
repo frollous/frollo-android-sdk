@@ -73,7 +73,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      * @param intent PendingIntent of an Activity to which the response from the ChromeTabs/Browser is delivered
      * @param toolBarColor Color of the CustomTabs toolbar using getColor() method
      *
-     * NOTE: When using this method you need to call [handleAuthorizationResponse]
+     * NOTE: When using this method you need to call [handleWebLoginResponse]
      * in the onCreate() of the pending intent activity
      */
     @Throws(DataError::class)
@@ -100,7 +100,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      *
      * @param activity Activity from which the ChromeTabs/Browser should be launched
      *
-     * NOTE: When using this method you need to call [handleAuthorizationResponse]
+     * NOTE: When using this method you need to call [handleWebLoginResponse]
      * in the onActivityResult() of the activity from which you call this method
      */
     @Throws(DataError::class)
@@ -124,7 +124,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      * @param authIntent intent received in onActivityResult from WebView
      * @param completion: Completion handler with any error that occurred
      */
-    fun handleAuthorizationResponse(authIntent: Intent?, completion: OnFrolloSDKCompletionListener<Result>) {
+    fun handleWebLoginResponse(authIntent: Intent?, completion: OnFrolloSDKCompletionListener<Result>) {
         authIntent?.let {
             val response = AuthorizationResponse.fromIntent(authIntent)
             val exception = AuthorizationException.fromIntent(authIntent)

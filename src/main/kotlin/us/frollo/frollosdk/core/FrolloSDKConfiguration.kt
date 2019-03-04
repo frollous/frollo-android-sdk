@@ -36,31 +36,10 @@ data class FrolloSDKConfiguration(
          */
         val logLevel: LogLevel = LogLevel.ERROR) {
 
-    fun validForROPC() : Boolean {
-        if (clientId.isBlank() || tokenUrl.isBlank() || serverUrl.isBlank())
-            return false
+    fun validForROPC() = clientId.isNotBlank() && tokenUrl.isNotBlank() && serverUrl.isNotBlank()
 
-        return try {
-            Uri.parse(tokenUrl)
-            true
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    fun validForAuthorizationCodeFlow() : Boolean {
-         if (clientId.isBlank() || tokenUrl.isBlank() || redirectUrl.isBlank() || authorizationUrl.isBlank() || serverUrl.isBlank())
-             return false
-
-         return try {
-             Uri.parse(tokenUrl)
-             Uri.parse(redirectUrl)
-             Uri.parse(authorizationUrl)
-             true
-         } catch (e: Exception) {
-             false
-         }
-    }
+    fun validForAuthorizationCodeFlow() = clientId.isNotBlank() && tokenUrl.isNotBlank()
+            && redirectUrl.isNotBlank() && authorizationUrl.isNotBlank() && serverUrl.isNotBlank()
 
     /**
      * OAuth2 Redirection URL. URL to redirect to after the authorization flow is complete. This should be a deep or universal link to the host app

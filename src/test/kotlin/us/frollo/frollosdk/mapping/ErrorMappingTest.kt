@@ -5,9 +5,9 @@ import org.junit.Test
 import us.frollo.frollosdk.error.APIErrorType
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
-import us.frollo.frollosdk.mapping.toAPIErrorResponse
-import us.frollo.frollosdk.mapping.toAPIErrorType
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
+import net.openid.appauth.AuthorizationException
+import us.frollo.frollosdk.error.OAuthErrorType
 
 class ErrorMappingTest {
 
@@ -40,5 +40,12 @@ class ErrorMappingTest {
         Assert.assertNotNull(value)
         Assert.assertEquals(DataErrorType.AUTHENTICATION, value?.type)
         Assert.assertEquals(DataErrorSubType.MISSING_REFRESH_TOKEN, value?.subType)
+    }
+
+    @Test
+    fun testAuthorizationExceptionToOAuthErrorType() {
+        val exception = AuthorizationException.AuthorizationRequestErrors.ACCESS_DENIED
+        val type = exception.toOAuthErrorType()
+        Assert.assertEquals(OAuthErrorType.ACCESS_DENIED, type)
     }
 }

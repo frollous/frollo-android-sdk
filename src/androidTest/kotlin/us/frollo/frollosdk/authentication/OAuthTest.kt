@@ -58,4 +58,15 @@ class OAuthTest {
         assertTrue(request.valid)
         assertEquals(legacyToken, request.legacyToken)
     }
+
+    @Test
+    fun testGetAuthorizationRequest() {
+        val request = oAuth.getAuthorizationRequest()
+        assertNotNull(request)
+        assertEquals(oAuth.config.clientId, request.clientId)
+        assertEquals(oAuth.config.redirectUrl, request.redirectUri.toString())
+        assertEquals("offline_access", request.scope)
+        assertEquals(oAuth.config.authorizationUri, request.configuration.authorizationEndpoint)
+        assertEquals(oAuth.config.tokenUri, request.configuration.tokenEndpoint)
+    }
 }

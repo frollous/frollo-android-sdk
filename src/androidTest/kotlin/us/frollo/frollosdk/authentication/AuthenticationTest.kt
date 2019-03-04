@@ -1,11 +1,13 @@
 package us.frollo.frollosdk.authentication
 
 import android.app.Application
+import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.gson.Gson
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
+import net.openid.appauth.AuthorizationException
 import okhttp3.Request
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -32,7 +34,6 @@ import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.testUserResponseData
-import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.*
@@ -307,6 +308,99 @@ class AuthenticationTest {
         assertEquals(0, mockTokenServer.requestCount)
 
         wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testLoginUserViaWebPendingIntent() {
+        // TODO: to be implemented
+    }
+
+    @Test
+    fun testLoginUserViaWeb() {
+        // TODO: to be implemented
+    }
+
+    @Test
+    fun testHandleWebLoginResponse() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.user_details_complete)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        mockTokenServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == TOKEN_URL) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val json = readStringFromJson(app, R.raw.authorization_code_valid)
+        val intent = Intent().putExtra("net.openid.appauth.AuthorizationResponse", json)
+
+        authentication.handleWebLoginResponse(intent) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = authentication.fetchUser().test()
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
+
+            val expectedResponse = Gson().fromJson<UserResponse>(body)
+            assertEquals(expectedResponse.toUser(), testObserver.value().data)
+            assertTrue(authentication.loggedIn)
+
+            assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
+            assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
+            assertEquals(2550794799, preferences.accessTokenExpiry)
+        }
+
+        val request1 = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_USER_DETAILS, request1.trimmedPath)
+
+        val request2 = mockTokenServer.takeRequest()
+        assertEquals(TOKEN_URL, request2.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testHandleWebLoginResponseFail() {
+        initSetup()
+
+        val intent = AuthorizationException.AuthorizationRequestErrors.ACCESS_DENIED.toIntent()
+
+        authentication.handleWebLoginResponse(intent) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+
+            val testObserver = authentication.fetchUser().test()
+            testObserver.awaitValue()
+            assertNull(testObserver.value().data)
+
+            assertEquals(OAuthErrorType.ACCESS_DENIED, (result.error as OAuthError).type)
+            assertFalse(authentication.loggedIn)
+
+            assertNull(preferences.encryptedAccessToken)
+            assertNull(preferences.encryptedRefreshToken)
+            assertEquals(-1L, preferences.accessTokenExpiry)
+        }
 
         tearDown()
     }

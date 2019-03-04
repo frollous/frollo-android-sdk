@@ -1,0 +1,22 @@
+{
+  "request": {
+    "configuration": {
+      "authorizationEndpoint": "https://id-sandbox.frollo.us/oauth/authorize/",
+      "tokenEndpoint": "https://id-sandbox.frollo.us/oauth/token/"
+    },
+    "clientId": "243ffc404803ee5a567d93e1f2dd322a0df911557a5283dd3dd7ebed3258ddeb",
+    "responseType": "code",
+    "redirectUri": "frollo-sdk-example://authorize",
+    "scope": "offline_access",
+    "state": "S9_IQjA3Y9tWf7P-g72w5Q",
+    "codeVerifier": "HhW2TU7kURgnhaCP9GVwC58mYGRpE6TEJobod7fPEZprz9H0_VOAampzesRdIPcUa9h_cGWbpk-I6uRQHSwR2g",
+    "codeVerifierChallenge": "l3dnbxFfjzKwfSmOaDG4G_bsc8M5dvgowAKiWRGueSw",
+    "codeVerifierChallengeMethod": "S256",
+    "additionalParameters": {
+      "domain":"api-sandbox.frollo.us"
+    }
+  },
+  "state": "S9_IQjA3Y9tWf7P-g72w5Q",
+  "code": "c44274ccbfb9f5c7b677f5c1dcc2258108ace6f651747fc939e72d8018fee2f8",
+  "additional_parameters": {}
+}

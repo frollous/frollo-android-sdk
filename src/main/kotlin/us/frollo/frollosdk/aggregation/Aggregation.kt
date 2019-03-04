@@ -516,10 +516,13 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    fun fetchTransactionsSummary(fromDate: String, toDate: String, accountIds: LongArray? = null, transactionIncluded: Boolean? = null,
+    fun fetchTransactionsSummary(fromDate: String, toDate: String, accountIds: LongArray? = null,
+                                 onlyIncludedTransactions: Boolean? = null, onlyIncludedAccounts: Boolean? = null,
                                  completion: OnFrolloSDKCompletionListener<Resource<TransactionsSummary>>) {
-        aggregationAPI.fetchTransactionsSummaryByQuery(fromDate = fromDate, toDate = toDate,
-                accountIds = accountIds, transactionIncluded = transactionIncluded).enqueue { resource ->
+        aggregationAPI.fetchTransactionsSummaryByQuery(
+                fromDate = fromDate, toDate = toDate,
+                accountIds = accountIds, transactionIncluded = onlyIncludedTransactions,
+                accountIncluded = onlyIncludedAccounts).enqueue { resource ->
 
             if (resource.status == Resource.Status.ERROR)
                 Log.e("$TAG#fetchTransactionsSummary", resource.error?.localizedDescription)

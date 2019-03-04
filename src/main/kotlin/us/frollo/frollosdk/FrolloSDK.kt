@@ -3,6 +3,7 @@ package us.frollo.frollosdk
 import android.app.Application
 import android.os.Handler
 import androidx.core.os.bundleOf
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalDate
@@ -114,6 +115,8 @@ object FrolloSDK {
         if (_setup) throw FrolloSDKError("SDK already setup")
         if (configuration.serverUrl.isBlank()) throw FrolloSDKError("Server URL cannot be empty")
 
+        val localBroadcastManager = LocalBroadcastManager.getInstance(app)
+
         try {
             // 1. Initialize ThreeTenABP
             initializeThreeTenABP()
@@ -135,7 +138,7 @@ object FrolloSDK {
             // 8. Setup Authentication
             _authentication = Authentication(oAuth, DeviceInfo(application.applicationContext), network, database, preferences)
             // 9. Setup Aggregation
-            _aggregation = Aggregation(network, database)
+            _aggregation = Aggregation(network, database, localBroadcastManager)
             // 10. Setup Messages
             _messages = Messages(network, database)
             // 11. Setup Events

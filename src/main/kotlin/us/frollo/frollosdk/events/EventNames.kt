@@ -4,7 +4,8 @@ import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
 internal enum class EventNames {
-    @SerializedName("TEST_EVENT") TEST;
+    @SerializedName("TEST_EVENT") TEST,
+    @SerializedName("T_UPDATED") TRANSACTIONS_UPDATED;
 
     //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =

@@ -22,3 +22,9 @@ internal fun testMessageNotificationBundle() =
                 Pair("link", "frollo://dashboard"),
                 Pair("user_event_id", "98765"),
                 Pair("user_message_id", "12345"))
+
+internal fun testTransactionUpdatedNotificationPayload() =
+        NotificationPayload(
+                event = "T_UPDATED",
+                transactionIDs = listOf(45123, 986, 7000072),
+                userEventID = 98765L)

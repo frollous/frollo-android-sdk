@@ -1,11 +1,19 @@
 package us.frollo.frollosdk.aggregation
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.core.ACTION.ACTION_REFRESH_TRANSACTIONS
+import us.frollo.frollosdk.core.ARGUMENT.ARG_DATA
+import us.frollo.frollosdk.core.ARGUMENT.ARG_TRANSACTION_IDS
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.network.NetworkService
@@ -44,10 +52,11 @@ import kotlin.collections.ArrayList
 /**
  * Manages all aggregation data including accounts, transactions, categories and merchants.
  */
-class Aggregation(network: NetworkService, private val db: SDKDatabase) {
+class Aggregation(network: NetworkService, private val db: SDKDatabase, localBroadcastManager: LocalBroadcastManager) {
 
     companion object {
         private const val TAG = "Aggregation"
+
     }
 
     private val aggregationAPI: AggregationAPI = network.create(AggregationAPI::class.java)
@@ -55,7 +64,18 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase) {
     private var refreshingMerchantIDs = setOf<Long>()
     private var refreshingProviderIDs = setOf<Long>()
 
-    //TODO: Refresh Transactions Broadcast local implementation
+    private val refreshTransactionsReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+
+            val transactionIds = intent.getBundleExtra(ARG_DATA).getLongArray(ARG_TRANSACTION_IDS)
+            transactionIds?.let { refreshTransactions(it) }
+        }
+    }
+
+    init {
+        localBroadcastManager.registerReceiver(refreshTransactionsReceiver,
+                IntentFilter(ACTION_REFRESH_TRANSACTIONS))
+    }
 
     // Provider
 

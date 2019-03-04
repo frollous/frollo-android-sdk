@@ -1,6 +1,11 @@
 package us.frollo.frollosdk.events
 
 import android.app.Application
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.test.platform.app.InstrumentationRegistry
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -14,10 +19,13 @@ import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.core.ACTION.ACTION_REFRESH_TRANSACTIONS
+import us.frollo.frollosdk.core.ARGUMENT
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.EventsAPI
 import us.frollo.frollosdk.keystore.Keystore
+import us.frollo.frollosdk.model.testTransactionUpdatedNotificationPayload
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
@@ -31,6 +39,9 @@ class EventsTest {
     private lateinit var network: NetworkService
 
     private lateinit var events: Events
+
+    private var notifyFlag = false
+    private var transactionIds: LongArray? = null
 
     private fun initSetup() {
         mockServer = MockWebServer()
@@ -56,6 +67,7 @@ class EventsTest {
     private fun tearDown() {
         mockServer.shutdown()
         preferences.resetAll()
+        notifyFlag = false
     }
 
     @Test
@@ -98,6 +110,30 @@ class EventsTest {
     }
 
     @Test
+    fun testHandleTransactionsUpdatedEvent() {
+        initSetup()
+
+        val lbm = LocalBroadcastManager.getInstance(app)
+        lbm.registerReceiver(receiver, IntentFilter(ACTION_REFRESH_TRANSACTIONS))
+
+        val payload = testTransactionUpdatedNotificationPayload()
+
+        events.handleEvent("T_UPDATED", notificationPayload = payload) { handled, error  ->
+            assertNull(error)
+            assertTrue(handled)
+        }
+
+        wait(2)
+
+        assertTrue(notifyFlag)
+        assertTrue(transactionIds?.toList()?.containsAll(listOf(45123L, 986L, 7000072L)) == true)
+
+        lbm.unregisterReceiver(receiver)
+
+        tearDown()
+    }
+
+    @Test
     fun testEventNotHandled() {
         initSetup()
 
@@ -107,5 +143,12 @@ class EventsTest {
         }
 
         tearDown()
+    }
+
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            notifyFlag = true
+            transactionIds = intent.getBundleExtra(ARGUMENT.ARG_DATA).getLongArray(ARGUMENT.ARG_TRANSACTION_IDS)
+        }
     }
 }

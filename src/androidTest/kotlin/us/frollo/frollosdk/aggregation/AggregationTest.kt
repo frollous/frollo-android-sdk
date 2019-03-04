@@ -2,6 +2,7 @@ package us.frollo.frollosdk.aggregation
 
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jraska.livedata.test
 import okhttp3.mockwebserver.Dispatcher
@@ -64,7 +65,7 @@ class AggregationTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        aggregation = Aggregation(network, database)
+        aggregation = Aggregation(network, database, LocalBroadcastManager.getInstance(app))
     }
 
     private fun tearDown() {

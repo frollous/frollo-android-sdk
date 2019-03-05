@@ -24,6 +24,9 @@ internal interface TransactionDao {
     @Query("SELECT * FROM transaction_model WHERE transaction_id = :transactionId LIMIT 1")
     fun loadTransaction(transactionId: Long): Transaction?
 
+    @RawQuery(observedEntities = [Transaction::class])
+    fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<Transaction>>
+
     @RawQuery
     fun getIdsQuery(queryStr: SupportSQLiteQuery): MutableList<Long>
 
@@ -71,4 +74,7 @@ internal interface TransactionDao {
     @androidx.room.Transaction
     @Query("SELECT * FROM transaction_model WHERE account_id = :accountId")
     fun loadByAccountIdWithRelation(accountId: Long): LiveData<List<TransactionRelation>>
+
+    @RawQuery(observedEntities = [Transaction::class])
+    fun loadByQueryWithRelation(queryStr: SupportSQLiteQuery): LiveData<List<TransactionRelation>>
 }

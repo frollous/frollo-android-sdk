@@ -3,6 +3,7 @@ package us.frollo.frollosdk.aggregation
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jraska.livedata.test
 import okhttp3.mockwebserver.Dispatcher
@@ -967,6 +968,29 @@ class AggregationTest {
     }
 
     @Test
+    fun testFetchTransactionsByQuery() {
+        initSetup()
+
+        val data1 = testTransactionResponseData(transactionId = 100)
+        val data2 = testTransactionResponseData(transactionId = 101)
+        val data3 = testTransactionResponseData(transactionId = 102)
+        val data4 = testTransactionResponseData(transactionId = 103)
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+
+        val query = SimpleSQLiteQuery("SELECT * FROM transaction_model WHERE transaction_id IN (101,102,103)")
+
+        val testObserver = aggregation.fetchTransactions(query).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(3, testObserver.value().data?.size)
+        assertTrue(testObserver.value().data?.map { it.transactionId }?.toList()?.containsAll(listOf(101L,102L,103L)) == true)
+
+        tearDown()
+    }
+
+    @Test
     fun testFetchTransactionByIDWithRelation() {
         initSetup()
 
@@ -1083,6 +1107,46 @@ class AggregationTest {
         assertEquals(678L, model2?.merchant?.merchantId)
         assertEquals(567L, model2?.transactionCategory?.transactionCategoryId)
         assertEquals(234L, model2?.account?.account?.accountId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionsByQueryWithRelation() {
+        initSetup()
+
+        database.transactions().insert(testTransactionResponseData(transactionId = 122, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 124, accountId = 235, categoryId = 567, merchantId = 678).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 125, accountId = 235, categoryId = 567, merchantId = 678).toTransaction())
+        database.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())
+        database.accounts().insert(testAccountResponseData(accountId = 235, providerAccountId = 345).toAccount())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 345, providerId = 456).toProviderAccount())
+        database.providers().insert(testProviderResponseData(providerId = 456).toProvider())
+        database.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
+        database.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
+
+        val query = SimpleSQLiteQuery("SELECT * FROM transaction_model WHERE account_id = 235")
+
+        val testObserver = aggregation.fetchTransactionsWithRelation(query).test()
+        testObserver.awaitValue()
+
+        assertNotNull(testObserver.value().data)
+        assertEquals(2, testObserver.value().data?.size)
+
+        val model1 = testObserver.value().data?.get(0)
+
+        assertEquals(124L, model1?.transaction?.transactionId)
+        assertEquals(678L, model1?.merchant?.merchantId)
+        assertEquals(567L, model1?.transactionCategory?.transactionCategoryId)
+        assertEquals(235L, model1?.account?.account?.accountId)
+
+        val model2 = testObserver.value().data?.get(1)
+
+        assertEquals(125L, model2?.transaction?.transactionId)
+        assertEquals(678L, model2?.merchant?.merchantId)
+        assertEquals(567L, model2?.transactionCategory?.transactionCategoryId)
+        assertEquals(235L, model2?.account?.account?.accountId)
 
         tearDown()
     }

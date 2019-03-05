@@ -2,6 +2,7 @@ package us.frollo.frollosdk.database.dao
 
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
@@ -102,6 +103,24 @@ class TransactionDaoTest {
         val model = db.transactions().loadTransaction(transactionId = 101)
         assertNotNull(model)
         assertEquals(101L, model?.transactionId)
+    }
+
+    @Test
+    fun testLoadByQuery() {
+        val data1 = testTransactionResponseData(transactionId = 100)
+        val data2 = testTransactionResponseData(transactionId = 101)
+        val data3 = testTransactionResponseData(transactionId = 102)
+        val data4 = testTransactionResponseData(transactionId = 103)
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        db.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+
+        val query = SimpleSQLiteQuery("SELECT * FROM transaction_model WHERE transaction_id IN (101,102,103)")
+
+        val testObserver = db.transactions().loadByQuery(query).test()
+        testObserver.awaitValue()
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(3, testObserver.value().size)
     }
 
     @Test
@@ -377,5 +396,41 @@ class TransactionDaoTest {
         assertEquals(678L, model2.merchant?.merchantId)
         assertEquals(567L, model2.transactionCategory?.transactionCategoryId)
         assertEquals(234L, model2.account?.account?.accountId)
+    }
+
+    @Test
+    fun testLoadByQueryWithRelation() {
+        db.transactions().insert(testTransactionResponseData(transactionId = 122, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        db.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678).toTransaction())
+        db.transactions().insert(testTransactionResponseData(transactionId = 124, accountId = 235, categoryId = 567, merchantId = 678).toTransaction())
+        db.transactions().insert(testTransactionResponseData(transactionId = 125, accountId = 235, categoryId = 567, merchantId = 678).toTransaction())
+        db.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())
+        db.accounts().insert(testAccountResponseData(accountId = 235, providerAccountId = 345).toAccount())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 345, providerId = 456).toProviderAccount())
+        db.providers().insert(testProviderResponseData(providerId = 456).toProvider())
+        db.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
+        db.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
+
+        val query = SimpleSQLiteQuery("SELECT * FROM transaction_model WHERE account_id = 235")
+
+        val testObserver = db.transactions().loadByQueryWithRelation(query).test()
+        testObserver.awaitValue()
+
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(2, testObserver.value().size)
+
+        val model1 = testObserver.value()[0]
+
+        assertEquals(124L, model1.transaction?.transactionId)
+        assertEquals(678L, model1.merchant?.merchantId)
+        assertEquals(567L, model1.transactionCategory?.transactionCategoryId)
+        assertEquals(235L, model1.account?.account?.accountId)
+
+        val model2 = testObserver.value()[1]
+
+        assertEquals(125L, model2.transaction?.transactionId)
+        assertEquals(678L, model2.merchant?.merchantId)
+        assertEquals(567L, model2.transactionCategory?.transactionCategoryId)
+        assertEquals(235L, model2.account?.account?.accountId)
     }
 }

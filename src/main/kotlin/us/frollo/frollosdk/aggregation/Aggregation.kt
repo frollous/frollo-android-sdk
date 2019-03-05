@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.sqlite.db.SimpleSQLiteQuery
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.base.Resource
@@ -440,6 +441,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    fun fetchTransactions(query: SimpleSQLiteQuery): LiveData<Resource<List<Transaction>>> =
+        Transformations.map(db.transactions().loadByQuery(query)) { model ->
+            Resource.success(model)
+        }
+
     fun fetchTransactionsByAccountId(accountId: Long): LiveData<Resource<List<Transaction>>> =
             Transformations.map(db.transactions().loadByAccountId(accountId)) { models ->
                 Resource.success(models)
@@ -458,6 +464,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
             Resource.success(models)
         }
     }
+
+    fun fetchTransactionsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<TransactionRelation>>> =
+            Transformations.map(db.transactions().loadByQueryWithRelation(query)) { model ->
+                Resource.success(model)
+            }
 
     fun fetchTransactionsByAccountIdWithRelation(accountId: Long): LiveData<Resource<List<TransactionRelation>>> =
             Transformations.map(db.transactions().loadByAccountIdWithRelation(accountId)) { models ->

@@ -519,7 +519,7 @@ class ProviderLoginFormTest {
 
             assertTrue(error is LoginFormError)
             assertEquals(LoginFormErrorType.MISSING_REQUIRED_FIELD, (error as LoginFormError).type)
-            assertEquals("LOGIN", error.fieldName)
+            assertEquals("User ID", error.fieldName)
         }
     }
 
@@ -533,7 +533,7 @@ class ProviderLoginFormTest {
 
             assertTrue(error is LoginFormError)
             assertEquals(LoginFormErrorType.MAX_LENGTH_EXCEEDED, (error as LoginFormError).type)
-            assertEquals("MEMBER_NO", error.fieldName)
+            assertEquals("Member Number", error.fieldName)
         }
     }
 
@@ -547,7 +547,7 @@ class ProviderLoginFormTest {
 
             assertTrue(error is LoginFormError)
             assertEquals(LoginFormErrorType.VALIDATION_FAILED, (error as LoginFormError).type)
-            assertEquals("PASSWORD", error.fieldName)
+            assertEquals("Password", error.fieldName)
             assertEquals("Please enter a valid Access Code", error.additionalError)
         }
     }

@@ -127,7 +127,7 @@ internal fun loginFormValidationField(): ProviderFormRow {
             form = "0001",
             hint = null,
             rowId = "151124",
-            label = "PASSWORD")
+            label = "Password")
 }
 
 internal fun loginFormRegexValidation(): ProviderFieldValidation {

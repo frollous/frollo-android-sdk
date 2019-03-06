@@ -75,18 +75,18 @@ data class ProviderLoginForm(
 
                 if (!field.isOptional && (value == null || value.isBlank())) {
                     // Required field not filled
-                    completion.invoke(false, LoginFormError(LoginFormErrorType.MISSING_REQUIRED_FIELD, field.name))
+                    completion.invoke(false, LoginFormError(LoginFormErrorType.MISSING_REQUIRED_FIELD, row.label))
 
                     return
                 } else if (value != null && maxLength != null && value.length > maxLength) {
                     // Value is too long
-                    completion.invoke(false, LoginFormError(LoginFormErrorType.MAX_LENGTH_EXCEEDED, field.name))
+                    completion.invoke(false, LoginFormError(LoginFormErrorType.MAX_LENGTH_EXCEEDED, row.label))
 
                     return
                 } else {
                     field.validations?.forEach { validation ->
                         if (value?.regexValidate(validation.regExp) == false) {
-                            val error = LoginFormError(LoginFormErrorType.VALIDATION_FAILED, field.name)
+                            val error = LoginFormError(LoginFormErrorType.VALIDATION_FAILED, row.label)
                             error.additionalError = validation.errorMsg
                             completion.invoke(false, error)
                             return

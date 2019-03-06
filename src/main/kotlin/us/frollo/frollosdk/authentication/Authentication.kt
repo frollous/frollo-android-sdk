@@ -77,7 +77,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      * in the onCreate() of the pending intent activity
      */
     @Throws(DataError::class)
-    fun loginUserUsingWeb(activity: Activity, intent: PendingIntent, toolBarColor: Int? = null) {
+    fun loginUserUsingWeb(activity: Activity, completedIntent: PendingIntent, cancelledIntent: PendingIntent, toolBarColor: Int? = null) {
         if (!oAuth.config.validForAuthorizationCodeFlow()) {
             throw DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)
         }
@@ -90,7 +90,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
         val intentBuilder = authService.createCustomTabsIntentBuilder(authRequest.toUri())
         toolBarColor?.let { intentBuilder.setToolbarColor(it) }
         val authIntent = intentBuilder.build()
-        authService.performAuthorizationRequest(authRequest, intent, authIntent)
+        authService.performAuthorizationRequest(authRequest, completedIntent, cancelledIntent, authIntent)
     }
 
     /**

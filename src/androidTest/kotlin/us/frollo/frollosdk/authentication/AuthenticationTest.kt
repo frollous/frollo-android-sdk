@@ -221,7 +221,7 @@ class AuthenticationTest {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
                             .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.error_invalid_auth_head))
+                            .setBody(readStringFromJson(app, R.raw.error_invalid_access_token))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -246,7 +246,7 @@ class AuthenticationTest {
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
-            assertEquals(APIErrorType.OTHER_AUTHORISATION, (result.error as APIError).type)
+            assertEquals(APIErrorType.INVALID_ACCESS_TOKEN, (result.error as APIError).type)
             assertFalse(authentication.loggedIn)
 
             assertNull(preferences.encryptedAccessToken)

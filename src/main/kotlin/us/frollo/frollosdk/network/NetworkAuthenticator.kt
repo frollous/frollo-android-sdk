@@ -22,30 +22,36 @@ import us.frollo.frollosdk.extensions.clonedBodyString
 internal class NetworkAuthenticator(private val network: NetworkService) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response?): Request? {
-        // TODO: This may not be needed
-        /*if (response?.request().header(HEADER_AUTHORIZATION) != null) {
-            return null // Give up, we've already failed to authenticate.
-        }*/
 
         var newRequest: Request? = null
 
         response?.clonedBodyString?.let { body ->
             val apiError = APIError(response.code(), body)
+
             when (apiError.type) {
                 APIErrorType.INVALID_ACCESS_TOKEN -> {
-                    val newToken = network.refreshTokens()
-                    if (newToken != null)
-                        newRequest = response.request().newBuilder()
-                            .header(HEADER_AUTHORIZATION, "Bearer $newToken")
-                            .build()
-                    else FrolloSDK.forcedLogout()
+                    if (network.invalidTokenRetries < 5) {
+                        val newToken = network.refreshTokens()
+
+                        if (newToken != null) {
+                            newRequest = response.request().newBuilder()
+                                    .header(HEADER_AUTHORIZATION, "Bearer $newToken")
+                                    .build()
+                        } else {
+                            network.triggerForcedLogout()
+                        }
+                    }
+
+                    network.invalidTokenRetries++
                 }
+
                 APIErrorType.INVALID_REFRESH_TOKEN, APIErrorType.SUSPENDED_DEVICE, APIErrorType.SUSPENDED_USER, APIErrorType.OTHER_AUTHORISATION -> {
-                    network.reset()
-                    FrolloSDK.forcedLogout()
+                    network.triggerForcedLogout()
                 }
+
                 else -> {
-                    // Do nothing
+                    // Any other 401
+                    network.triggerForcedLogout()
                 }
             }
         }

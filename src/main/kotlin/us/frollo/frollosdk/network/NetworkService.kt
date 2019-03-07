@@ -12,6 +12,7 @@ import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.logging.Log
 import okhttp3.CertificatePinner
 import us.frollo.frollosdk.BuildConfig
+import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.AuthToken
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Result
@@ -36,6 +37,8 @@ class NetworkService internal constructor(
     private val tokenInterceptor = TokenInterceptor()
     private var apiRetrofit = createRetrofit(oAuth.config.serverUrl)
     private var authRetrofit = createRetrofit(oAuth.config.tokenUrl)
+
+    internal var invalidTokenRetries: Int = 0
 
     private fun createRetrofit(baseUrl: String): Retrofit {
         val gson = GsonBuilder()
@@ -102,6 +105,12 @@ class NetworkService internal constructor(
     }
 
     internal fun reset() {
+        invalidTokenRetries = 0
         authToken.clearTokens()
+    }
+
+    internal fun triggerForcedLogout() {
+        reset()
+        FrolloSDK.forcedLogout()
     }
 }

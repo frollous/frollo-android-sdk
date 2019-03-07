@@ -55,6 +55,9 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
             response = chain.proceed(chain.request())
         }
 
+        if (response.isSuccessful)
+            network.invalidTokenRetries = 0
+
         return response
     }
 
@@ -68,7 +71,7 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
             }
         } catch (error: DataError) {
             if (error.type == DataErrorType.AUTHENTICATION && error.subType == DataErrorSubType.MISSING_REFRESH_TOKEN)
-                FrolloSDK.forcedLogout()
+                network.triggerForcedLogout()
             throw IOException(error.toJson())
         }
 

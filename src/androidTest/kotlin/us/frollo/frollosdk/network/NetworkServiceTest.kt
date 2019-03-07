@@ -132,6 +132,7 @@ class NetworkServiceTest {
 
     @Test
     fun testReset() {
+        network.invalidTokenRetries = 6
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = 14529375950
@@ -141,6 +142,7 @@ class NetworkServiceTest {
 
         network.reset()
 
+        assertEquals(0, network.invalidTokenRetries)
         assertNull(preferences.encryptedAccessToken)
         assertNull(preferences.encryptedRefreshToken)
         assertEquals(-1, preferences.accessTokenExpiry)

@@ -38,7 +38,9 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
 
     companion object {
         private const val TAG = "Authentication"
-        private const val RC_AUTH = 100
+
+        /** Request Code for the Authorization Intent for Web based login */
+        const val RC_AUTH = 100
     }
 
     /**
@@ -70,7 +72,8 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      * Initiate the authorization code login flow using a WebView
      *
      * @param activity Activity from which the ChromeTabs/Browser should be launched
-     * @param intent PendingIntent of an Activity to which the response from the ChromeTabs/Browser is delivered
+     * @param completedIntent PendingIntent of an Activity to which the completed response from the ChromeTabs/Browser is delivered
+     * @param cancelledIntent PendingIntent of an Activity to which the cancelled response from the ChromeTabs/Browser is delivered
      * @param toolBarColor Color of the CustomTabs toolbar using getColor() method
      *
      * NOTE: When using this method you need to call [handleWebLoginResponse]
@@ -87,9 +90,8 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
         codeVerifier = authRequest.codeVerifier
 
         val authService = AuthorizationService(activity)
-        val intentBuilder = authService.createCustomTabsIntentBuilder(authRequest.toUri())
-        toolBarColor?.let { intentBuilder.setToolbarColor(it) }
-        val authIntent = intentBuilder.build()
+        val authIntent = oAuth.getCustomTabsIntent(authService, authRequest, toolBarColor)
+
         authService.performAuthorizationRequest(authRequest, completedIntent, cancelledIntent, authIntent)
     }
 
@@ -99,12 +101,13 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      * Initiate the authorization code login flow using a WebView
      *
      * @param activity Activity from which the ChromeTabs/Browser should be launched
+     * @param toolBarColor Color of the CustomTabs toolbar using getColor() method
      *
      * NOTE: When using this method you need to call [handleWebLoginResponse]
      * in the onActivityResult() of the activity from which you call this method
      */
     @Throws(DataError::class)
-    fun loginUserUsingWeb(activity: Activity) {
+    fun loginUserUsingWeb(activity: Activity, toolBarColor: Int? = null) {
         if (!oAuth.config.validForAuthorizationCodeFlow()) {
             throw DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)
         }
@@ -114,14 +117,16 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
         codeVerifier = authRequest.codeVerifier
 
         val authService = AuthorizationService(activity)
-        val authIntent = authService.getAuthorizationRequestIntent(authRequest)
+        val tabsIntent = oAuth.getCustomTabsIntent(authService, authRequest, toolBarColor)
+        val authIntent = authService.getAuthorizationRequestIntent(authRequest, tabsIntent)
+
         activity.startActivityForResult(authIntent, RC_AUTH)
     }
 
     /**
      * Process the authorization response to continue WebView login flow
      *
-     * @param authIntent intent received in onActivityResult from WebView
+     * @param authIntent Response intent received from WebView in onActivityResult or in onCreate of the pending intent Activity
      * @param completion: Completion handler with any error that occurred
      */
     fun handleWebLoginResponse(authIntent: Intent?, completion: OnFrolloSDKCompletionListener<Result>) {
@@ -142,7 +147,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     }
 
     /**
-     * Login a user using various authentication methods
+     * Login a user using email and password
      *
      * @param email Email address of the user
      * @param password Password for the user
@@ -541,9 +546,9 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     }
 
     /**
-     * Refresh Access and Refresh Tokens
+     * Refresh Access Token
      *
-     * Forces a refresh of the access and refresh tokens if a 401 was encountered. For advanced usage only in combination with web request authentication.
+     * Forces a refresh of the access token using the refresh token if a 401 was encountered. For advanced usage only in combination with web request authentication.
      *
      * @param completion Completion handler with any error that occurred (Optional)
      */

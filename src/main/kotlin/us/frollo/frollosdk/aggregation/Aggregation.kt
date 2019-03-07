@@ -80,26 +80,56 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
     // Provider
 
+    /**
+     * Fetch provider by ID from the cache
+     *
+     * @param providerId Unique provider ID to fetch
+     *
+     * @return LiveData object of Resource<Provider> which can be observed using an Observer for future changes as well.
+     */
     fun fetchProvider(providerId: Long): LiveData<Resource<Provider>> =
             Transformations.map(db.providers().load(providerId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch providers from the cache
+     *
+     * @return LiveData object of Resource<List<Provider>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchProviders(): LiveData<Resource<List<Provider>>> =
             Transformations.map(db.providers().load()) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Fetch provider by ID from the cache along with other associated data.
+     *
+     * @param providerId Unique provider ID to fetch
+     *
+     * @return LiveData object of Resource<ProviderRelation> which can be observed using an Observer for future changes as well.
+     */
     fun fetchProviderWithRelation(providerId: Long): LiveData<Resource<ProviderRelation>> =
             Transformations.map(db.providers().loadWithRelation(providerId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch providers from the cache along with other associated data.
+     *
+     * @return LiveData object of Resource<List<ProviderRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchProvidersWithRelation(): LiveData<Resource<List<ProviderRelation>>> =
             Transformations.map(db.providers().loadWithRelation()) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Refresh a specific provider by ID from the host
+     *
+     * @param providerId ID of the provider to fetch
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshProvider(providerId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchProvider(providerId).enqueue { resource ->
             when(resource.status) {
@@ -114,6 +144,13 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Refresh all available providers from the host.
+     *
+     * Includes beta and supported providers. Unsupported and Disabled providers must be fetched by ID.
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshProviders(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchProviders().enqueue { resource ->
             when(resource.status) {
@@ -163,36 +200,80 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
     // Provider Account
 
+    /**
+     * Fetch provider account by ID from the cache
+     *
+     * @param providerAccountId Unique ID of the provider account to fetch
+     *
+     * @return LiveData object of Resource<ProviderAccount> which can be observed using an Observer for future changes as well.
+     */
     fun fetchProviderAccount(providerAccountId: Long): LiveData<Resource<ProviderAccount>> =
             Transformations.map(db.providerAccounts().load(providerAccountId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch provider accounts from the cache
+     *
+     * @return LiveData object of Resource<List<ProviderAccount>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchProviderAccounts(): LiveData<Resource<List<ProviderAccount>>> =
             Transformations.map(db.providerAccounts().load()) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Fetch provider accounts by provider ID from the cache
+     *
+     * @param providerId Provider ID of the provider accounts to fetch
+     *
+     * @return LiveData object of Resource<List<ProviderAccount>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchProviderAccountsByProviderId(providerId: Long): LiveData<Resource<List<ProviderAccount>>> =
             Transformations.map(db.providerAccounts().loadByProviderId(providerId)) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Fetch provider account by ID from the cache along with other associated data.
+     *
+     * @param providerAccountId Unique provider account ID to fetch
+     *
+     * @return LiveData object of Resource<ProviderAccountRelation> which can be observed using an Observer for future changes as well.
+     */
     fun fetchProviderAccountWithRelation(providerAccountId: Long): LiveData<Resource<ProviderAccountRelation>> =
             Transformations.map(db.providerAccounts().loadWithRelation(providerAccountId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch provider accounts from the cache along with other associated data.
+     *
+     * @return LiveData object of Resource<List<ProviderAccountRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchProviderAccountsWithRelation(): LiveData<Resource<List<ProviderAccountRelation>>> =
             Transformations.map(db.providerAccounts().loadWithRelation()) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Fetch provider accounts by provider ID from the cache along with other associated data.
+     *
+     * @param providerId Provider ID of the provider accounts to fetch
+     *
+     * @return LiveData object of Resource<List<ProviderAccountRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchProviderAccountsByProviderIdWithRelation(providerId: Long): LiveData<Resource<List<ProviderAccountRelation>>> =
             Transformations.map(db.providerAccounts().loadByProviderIdWithRelation(providerId)) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Refresh a specific provider account by ID from the host
+     *
+     * @param providerAccountId ID of the provider account to fetch
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshProviderAccount(providerAccountId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchProviderAccount(providerAccountId).enqueue { resource ->
             when(resource.status) {
@@ -207,6 +288,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Refresh all provider accounts from the host
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshProviderAccounts(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchProviderAccounts().enqueue { resource ->
             when(resource.status) {
@@ -221,6 +307,13 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Create a provider account
+     *
+     * @param providerId ID of the provider which an account should be created for
+     * @param loginForm Provider login form with validated and encrypted values with the user's details
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun createProviderAccount(providerId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val request = ProviderAccountCreateRequest(loginForm = loginForm, providerID = providerId)
 
@@ -237,6 +330,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Delete a provider account from the host
+     *
+     * @param providerAccountId ID of the provider account to be deleted
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun deleteProviderAccount(providerAccountId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.deleteProviderAccount(providerAccountId).enqueue { resource ->
             when(resource.status) {
@@ -252,6 +351,13 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Update a provider account on the host
+     *
+     * @param providerAccountId ID of the provider account to be updated
+     * @param loginForm Provider account login form with validated and encrypted values with the user's details
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun updateProviderAccount(providerAccountId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val request = ProviderAccountUpdateRequest(loginForm = loginForm)
 
@@ -305,36 +411,80 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
     // Account
 
+    /**
+     * Fetch account by ID from the cache
+     *
+     * @param accountId Unique ID of the account to fetch
+     *
+     * @return LiveData object of Resource<Account> which can be observed using an Observer for future changes as well.
+     */
     fun fetchAccount(accountId: Long): LiveData<Resource<Account>> =
             Transformations.map(db.accounts().load(accountId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch accounts from the cache
+     *
+     * @return LiveData object of Resource<List<Account>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchAccounts(): LiveData<Resource<List<Account>>> =
             Transformations.map(db.accounts().load()) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Fetch accounts by provider account ID from the cache
+     *
+     * @param providerAccountId Provider account ID of the accounts to fetch
+     *
+     * @return LiveData object of Resource<List<Account>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchAccountsByProviderAccountId(providerAccountId: Long): LiveData<Resource<List<Account>>> =
             Transformations.map(db.accounts().loadByProviderAccountId(providerAccountId)) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Fetch account by ID from the cache along with other associated data.
+     *
+     * @param accountId Unique provider account ID to fetch
+     *
+     * @return LiveData object of Resource<AccountRelation> which can be observed using an Observer for future changes as well.
+     */
     fun fetchAccountWithRelation(accountId: Long): LiveData<Resource<AccountRelation>> =
             Transformations.map(db.accounts().loadWithRelation(accountId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch accounts from the cache along with other associated data.
+     *
+     * @return LiveData object of Resource<List<AccountRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchAccountsWithRelation(): LiveData<Resource<List<AccountRelation>>> =
             Transformations.map(db.accounts().loadWithRelation()) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Fetch accounts by provider account ID from the cache along with other associated data.
+     *
+     * @param providerAccountId Provider account ID of the accounts to fetch
+     *
+     * @return LiveData object of Resource<List<AccountRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchAccountsByProviderAccountIdWithRelation(providerAccountId: Long): LiveData<Resource<List<AccountRelation>>> =
             Transformations.map(db.accounts().loadByProviderAccountIdWithRelation(providerAccountId)) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Refresh a specific account by ID from the host
+     *
+     * @param accountId ID of the account to fetch
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshAccount(accountId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchAccount(accountId).enqueue { resource ->
             when(resource.status) {
@@ -349,6 +499,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Refresh all accounts from the host
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshAccounts(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchAccounts().enqueue { resource ->
             when(resource.status) {
@@ -363,6 +518,17 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Update an account on the host
+     *
+     * @param accountId ID of the account to be updated
+     * @param hidden Used to hide the account in the UI
+     * @param included Used to exclude accounts from counting towards the user's budgets
+     * @param favourite Mark the account as favourite for UI purposes (optional)
+     * @param accountSubType Sub type of the account indicating more detail what the account is (optional)
+     * @param nickName Nickname given to the account for display and identification purposes (optional)
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun updateAccount(accountId: Long, hidden: Boolean, included: Boolean, favourite: Boolean? = null,
                       accountSubType: AccountSubType? = null, nickName: String? = null,
                       completion: OnFrolloSDKCompletionListener<Result>? = null) {
@@ -427,11 +593,25 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
     // Transaction
 
+    /**
+     * Fetch transaction by ID from the cache
+     *
+     * @param transactionId Unique ID of the transaction to fetch
+     *
+     * @return LiveData object of Resource<Transaction> which can be observed using an Observer for future changes as well.
+     */
     fun fetchTransaction(transactionId: Long): LiveData<Resource<Transaction>> =
             Transformations.map(db.transactions().load(transactionId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch transactions from the cache
+     *
+     * @param transactionIds Unique list of IDs of the transactions to fetch (optional). If not specified this method returns all transactions from cache.
+     *
+     * @return LiveData object of Resource<List<Transaction>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchTransactions(transactionIds: LongArray? = null): LiveData<Resource<List<Transaction>>> {
         val result = if (transactionIds != null) db.transactions().load(transactionIds)
                      else db.transactions().load()
@@ -441,21 +621,49 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Advanced method to fetch transactions by SQL query from the cache
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches transactions from the cache
+     *
+     * @return LiveData object of Resource<List<Transaction>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchTransactions(query: SimpleSQLiteQuery): LiveData<Resource<List<Transaction>>> =
         Transformations.map(db.transactions().loadByQuery(query)) { model ->
             Resource.success(model)
         }
 
+    /**
+     * Fetch transactions by account ID from the cache.
+     *
+     * @param accountId Account ID of the transactions to fetch
+     *
+     * @return LiveData object of Resource<List<Transaction>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchTransactionsByAccountId(accountId: Long): LiveData<Resource<List<Transaction>>> =
             Transformations.map(db.transactions().loadByAccountId(accountId)) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Fetch transaction by ID from the cache along with other associated data.
+     *
+     * @param transactionId Unique transaction ID to fetch
+     *
+     * @return LiveData object of Resource<TransactionRelation> which can be observed using an Observer for future changes as well.
+     */
     fun fetchTransactionWithRelation(transactionId: Long): LiveData<Resource<TransactionRelation>> =
             Transformations.map(db.transactions().loadWithRelation(transactionId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch transactions from the cache along with other associated data.
+     *
+     * @param transactionIds Unique list of IDs of the transactions to fetch (optional). If not specified this method returns all transactions from cache.
+     *
+     * @return LiveData object of Resource<List<TransactionRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchTransactionsWithRelation(transactionIds: LongArray? = null): LiveData<Resource<List<TransactionRelation>>> {
         val result = if (transactionIds != null) db.transactions().loadWithRelation(transactionIds)
         else db.transactions().loadWithRelation()
@@ -465,16 +673,36 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Advanced method to fetch transactions by SQL query from the cache with other associated data.
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches transactions from the cache
+     *
+     * @return LiveData object of Resource<List<TransactionRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchTransactionsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<TransactionRelation>>> =
             Transformations.map(db.transactions().loadByQueryWithRelation(query)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch transactions by account ID from the cache with other associated data.
+     *
+     * @param accountId Account ID of the transactions to fetch
+     *
+     * @return LiveData object of Resource<List<TransactionRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchTransactionsByAccountIdWithRelation(accountId: Long): LiveData<Resource<List<TransactionRelation>>> =
             Transformations.map(db.transactions().loadByAccountIdWithRelation(accountId)) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Refresh a specific transaction by ID from the host
+     *
+     * @param transactionId ID of the transaction to fetch
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshTransaction(transactionId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchTransaction(transactionId).enqueue { resource ->
             when(resource.status) {
@@ -489,6 +717,15 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Refresh transactions from a certain period from the host
+     *
+     * @param fromDate Start date to fetch transactions from (inclusive)
+     * @param toDate End date to fetch transactions up to (inclusive)
+     * @param accountIds Specific account IDs of the transactions to fetch (optional)
+     * @param transactionIncluded Boolean flag to indicate to fetch only those transactions that are excluded/included in budget (optional)
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshTransactions(fromDate: String, toDate: String, accountIds: LongArray? = null,
                             transactionIncluded: Boolean? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         doAsync {
@@ -529,6 +766,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Refresh specific transactions by IDs from the host
+     *
+     * @param transactionIds List of transaction IDs to fetch
+     * @param  completion Optional completion handler with optional error if the request fails
+     */
     fun refreshTransactions(transactionIds: LongArray, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchTransactionsByIDs(transactionIds).enqueue { resource ->
             when(resource.status) {
@@ -543,6 +786,14 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Exclude a transaction from budgets and reports and update on the host
+     *
+     * @param transactionId ID of the transaction to be updated
+     * @param excluded Exclusion status of the transaction. True will mark a transaction as no longer included in budgets etc
+     * @param applyToAll Apply exclusion status to all similar transactions
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun excludeTransaction(transactionId: Long, excluded: Boolean, applyToAll: Boolean,
                            completion: OnFrolloSDKCompletionListener<Result>? = null) {
         doAsync {
@@ -574,6 +825,14 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Recategorise a transaction and update on the host
+     *
+     * @param transactionId ID of the transaction to be updated
+     * @param transactionCategoryId The transaction category ID to recategorise the transaction to
+     * @param applyToAll Apply recategorisation to all similar transactions
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun recategoriseTransaction(transactionId: Long, transactionCategoryId: Long, applyToAll: Boolean,
                                 completion: OnFrolloSDKCompletionListener<Result>? = null) {
         doAsync {
@@ -605,6 +864,14 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Update a transaction on the host
+     *
+     * @param transactionId ID of the transaction to be updated
+     * @param recategoriseAll Apply recategorisation to all similar transactions (Optional)
+     * @param includeApplyAll Apply included flag to all similar transactions (Optional)
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun updateTransaction(transactionId: Long, transaction: Transaction,
                           recategoriseAll: Boolean? = null, includeApplyAll: Boolean? = null,
                           completion: OnFrolloSDKCompletionListener<Result>? = null) {
@@ -631,6 +898,16 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Fetch transactions summary from a certain period from the host
+     *
+     * @param fromDate Start date to fetch transactions summary from (inclusive)
+     * @param toDate End date to fetch transactions summary up to (inclusive)
+     * @param accountIds Specific account IDs of the transactions to fetch summary (optional)
+     * @param onlyIncludedTransactions Boolean flag to indicate to fetch summary for only those transactions that are excluded/included in budget (optional)
+     * @param onlyIncludedAccounts Boolean flag to indicate to fetch summary for only those transactions of excluded/included Accounts (optional)
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun fetchTransactionsSummary(fromDate: String, toDate: String, accountIds: LongArray? = null,
                                  onlyIncludedTransactions: Boolean? = null, onlyIncludedAccounts: Boolean? = null,
                                  completion: OnFrolloSDKCompletionListener<Resource<TransactionsSummary>>) {
@@ -646,6 +923,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Fetch transactions summary of specific transaction IDs from the host
+     *
+     * @param transactionIds List of transaction IDs to fetch summary of
+     * @param  completion Optional completion handler with optional error if the request fails
+     */
     fun fetchTransactionsSummary(transactionIds: LongArray, completion: OnFrolloSDKCompletionListener<Resource<TransactionsSummary>>) {
         aggregationAPI.fetchTransactionsSummaryByIDs(transactionIds).enqueue { resource ->
 
@@ -714,16 +997,33 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
     // Transaction Category
 
+    /**
+     * Fetch transaction category by ID from the cache
+     *
+     * @param transactionCategoryId Unique ID of the transaction category to fetch
+     *
+     * @return LiveData object of Resource<TransactionCategory> which can be observed using an Observer for future changes as well.
+     */
     fun fetchTransactionCategory(transactionCategoryId: Long): LiveData<Resource<TransactionCategory>> =
             Transformations.map(db.transactionCategories().load(transactionCategoryId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch transaction categories from the cache
+     *
+     * @return LiveData object of Resource<List<TransactionCategory>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchTransactionCategories(): LiveData<Resource<List<TransactionCategory>>> =
             Transformations.map(db.transactionCategories().load()) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Refresh all transaction categories from the host
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshTransactionCategories(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchTransactionCategories().enqueue { resource ->
             when(resource.status) {
@@ -761,16 +1061,34 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
     // Merchant
 
+    /**
+     * Fetch merchant by ID from the cache
+     *
+     * @param merchantId Unique ID of the merchant to fetch
+     *
+     * @return LiveData object of Resource<Merchant> which can be observed using an Observer for future changes as well.
+     */
     fun fetchMerchant(merchantId: Long): LiveData<Resource<Merchant>> =
             Transformations.map(db.merchants().load(merchantId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch merchants from the cache
+     *
+     * @return LiveData object of Resource<List<Merchant>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchMerchants(): LiveData<Resource<List<Merchant>>> =
             Transformations.map(db.merchants().load()) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Refresh a specific merchant by ID from the host
+     *
+     * @param merchantId ID of the merchant to fetch
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshMerchant(merchantId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchMerchant(merchantId).enqueue { resource ->
             when(resource.status) {
@@ -785,6 +1103,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Refresh all merchants by IDs from the host
+     *
+     * @param merchantIds IDs of the merchants to fetch
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshMerchants(merchantIds: LongArray, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchMerchantsByIDs(merchantIds).enqueue { resource ->
             when(resource.status) {
@@ -799,6 +1123,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Refresh all merchants from the host
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     internal fun refreshMerchants(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchMerchants().enqueue { resource ->
             when(resource.status) {

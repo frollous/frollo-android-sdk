@@ -7,22 +7,30 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderA
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccountRelation
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 
+/** Account with associated data */
 data class AccountRelation(
 
+        /** Account */
         @Embedded
         var account: Account? = null,
 
+        /** Associated Provider Account
+         *
+         * Even though its a list this will have only one element. It is requirement of Room database for this to be a list.
+         */
         @Relation(parentColumn = "provider_account_id", entityColumn = "provider_account_id", entity = ProviderAccount::class)
         var providerAccounts: List<ProviderAccountRelation>? = null,
 
+        /** Associated Transactions */
         @Relation(parentColumn = "account_id", entityColumn = "account_id", entity = Transaction::class)
         var transactions: List<Transaction>? = null
 
 ): IAdapterModel {
 
-   val providerAccount: ProviderAccountRelation?
-       get() {
-           val models = providerAccounts
-           return if (models?.isNotEmpty() == true) models[0] else null
-       }
+    /** Associated Provider Account */
+    val providerAccount: ProviderAccountRelation?
+        get() {
+            val models = providerAccounts
+            return if (models?.isNotEmpty() == true) models[0] else null
+        }
 }

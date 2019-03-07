@@ -14,17 +14,41 @@ import java.io.StringReader
 import java.nio.charset.Charset
 import javax.crypto.Cipher
 
+/**
+ * Models a login form for collecting details needed to link an account and provides validation and encryption features. Use ProviderLoginFormDisplay for easier handling of the login form at a UI level.
+ */
 data class ProviderLoginForm(
+
+        /** ID of the login form (optional) */
         @SerializedName("id") val formId: String?,
+
+        /** Forgot password URL for the selected provider (optional) */
         @SerializedName("forgetPasswordURL") val forgetPasswordUrl: String?,
+
+        /** Additional help message for the current login form (optional) */
         @SerializedName("help") val help: String?,
+
+        /** Additional information title for MFA login forms (optional) */
         @SerializedName("mfaInfoTitle") val mfaInfoTitle: String?,
+
+        /** Additional information on how to complete the MFA challenge login form (optional) */
         @SerializedName("mfaInfoText") val mfaInfoText: String?,
+
+        /** Time before the MFA challenge times out (optional) */
         @SerializedName("mfaTimeout") val mfaTimeout: Long?,
+
+        /** Type of login form see [ProviderFormType] for details */
         @SerializedName("formType") val formType: ProviderFormType,
+
+        /** List of login form rows. Use a ProviderLoginFormDisplay to collate multiple choice rows together for easier UI display */
         @SerializedName("row") val rows: List<ProviderFormRow>
 ) {
 
+    /**
+     * Tells whether the values of the login form must encrypted or not based on type of [encryptionType] and [formType]
+     *
+     * @param encryptionType Provider encryption type
+     */
     fun shouldEncrypt(encryptionType: ProviderEncryptionType): Boolean {
         return if (encryptionType == ProviderEncryptionType.ENCRYPT_VALUES) {
             when (formType) {
@@ -38,6 +62,12 @@ data class ProviderLoginForm(
         }
     }
 
+    /**
+     * Encrypt values on the login form using a provider's encryption key
+     *
+     * @param encryptionKey PEM formatted public key to use for encryption
+     * @param encryptionAlias Alias of the encryption key appended to the value fields
+     */
     fun encryptValues(encryptionKey: String, encryptionAlias: String) {
         rows.forEach { row ->
             row.fields.forEach { field ->
@@ -67,6 +97,11 @@ data class ProviderLoginForm(
         }
     }
 
+    /**
+     * Validate the form values. Checks max length, required fields and evaluates any regex provided
+     *
+     * @param completion Validation completion handler with valid result and optional error if validation fails
+     */
     fun validateForm(completion: FormValidationCompletionListener) {
         rows.forEach { row ->
             row.fields.forEach { field ->

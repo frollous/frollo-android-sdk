@@ -8,6 +8,6 @@ import us.frollo.frollosdk.error.LoginFormError
 typealias OnFrolloSDKCompletionListener<T> = (T) -> Unit
 
 /**
- * Frollo SDK Validation Completion Handler with optional error if validation fails
+ * Frollo SDK Validation Completion Handler with valid result and optional error if validation fails
  */
 typealias FormValidationCompletionListener = (valid: Boolean, error: LoginFormError?) -> Unit

@@ -1,8 +1,11 @@
 package us.frollo.frollosdk.authentication
 
+import android.app.Application
+import androidx.test.platform.app.InstrumentationRegistry
 import net.openid.appauth.AuthorizationRequest.Scope.OFFLINE_ACCESS
 import net.openid.appauth.AuthorizationRequest.Scope.EMAIL
 import net.openid.appauth.AuthorizationRequest.Scope.OPENID
+import net.openid.appauth.AuthorizationService
 import org.junit.Assert.*
 import org.junit.Test
 import us.frollo.frollosdk.core.testSDKConfig
@@ -10,6 +13,7 @@ import us.frollo.frollosdk.testutils.randomString
 
 class OAuthTest {
     val oAuth = OAuth(testSDKConfig())
+    private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
 
     @Test
     fun testGetRefreshTokensRequest() {
@@ -71,5 +75,14 @@ class OAuthTest {
         assertTrue(request.scopeSet?.containsAll(setOf(OFFLINE_ACCESS, EMAIL, OPENID)) == true)
         assertEquals(oAuth.config.authorizationUri, request.configuration.authorizationEndpoint)
         assertEquals(oAuth.config.tokenUri, request.configuration.tokenEndpoint)
+    }
+
+    @Test
+    fun testGetCustomTabsIntent() {
+        val service = AuthorizationService(app)
+        val request = oAuth.getAuthorizationRequest()
+        val intent = oAuth.getCustomTabsIntent(service, request)
+
+        assertNotNull(intent)
     }
 }

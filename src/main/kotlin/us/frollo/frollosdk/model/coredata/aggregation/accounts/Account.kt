@@ -12,72 +12,106 @@ import java.util.*
 @Entity(tableName = "account",
         indices = [Index("account_id"),
                    Index("provider_account_id")])
-
+/**
+ * Data representation of Account
+ */
 data class Account(
 
+        /** Unique ID of the account */
         @PrimaryKey
         @ColumnInfo(name = "account_id") val accountId: Long,
 
+        /** Name of the account */
         @ColumnInfo(name = "account_name") val accountName: String,
 
+        /** Account number (optional) */
         @ColumnInfo(name = "account_number") val accountNumber: String?,
 
+        /** Account BSB (optional) */
         @ColumnInfo(name = "bsb") val bsb: String?,
 
+        /** Nickname given to the account for display and identification purposes (optional) */
         @ColumnInfo(name = "nick_name") val nickName: String?,
 
+        /** Parent provider account ID */
         @ColumnInfo(name = "provider_account_id") val providerAccountId: Long,
 
+        /** Name of the provider convenience property (optional) */
         @ColumnInfo(name = "provider_name") val providerName: String,
 
+        /** Aggregator (optional) */
         @ColumnInfo(name = "aggregator") val aggregator: String?,
 
+        /** ID of the aggregator */
         @ColumnInfo(name = "aggregator_id") val aggregatorId: Long,
 
+        /** Account holder profile */
         @Embedded(prefix = "h_profile_") val holderProfile: HolderProfile?,
 
+        /** Account status */
         @ColumnInfo(name = "account_status") val accountStatus: AccountStatus,
 
+        /** Account attributes */
         @Embedded(prefix = "attr_") val attributes: AccountAttributes,
 
+        /** Included in budget. Used to exclude accounts from counting towards the user's budgets */
         @ColumnInfo(name = "included") val included: Boolean,
 
+        /** Favourited */
         @ColumnInfo(name = "favourite") val favourite: Boolean,
 
+        /** Hidden. Used to hide the account in the UI */
         @ColumnInfo(name = "hidden") val hidden: Boolean,
 
+        /** Refresh status */
         @Embedded(prefix = "r_status_") val refreshStatus: RefreshStatus?,
 
+        /** Current balance (optional) */
         @Embedded(prefix = "c_balance_") val currentBalance: Balance?,
 
+        /** Available balance (optional) */
         @Embedded(prefix = "a_balance_") val availableBalance: Balance?,
 
+        /** Available cash (optional) */
         @Embedded(prefix = "a_cash_") val availableCash: Balance?,
 
+        /** Available credit (optional) */
         @Embedded(prefix = "a_credit_") val availableCredit: Balance?,
 
+        /** Total cash limit (optional) */
         @Embedded(prefix = "t_cash_") val totalCashLimit: Balance?,
 
+        /** Total credit line (optional) */
         @Embedded(prefix = "t_credit_") val totalCreditLine: Balance?,
 
+        /** Interest total (optional) */
         @Embedded(prefix = "int_total") val interestTotal: Balance?,
 
+        /** APR percentage (optional) */
         @ColumnInfo(name = "apr") val apr: BigDecimal?,
 
+        /** Interest rate (optional) */
         @ColumnInfo(name = "interest_rate") val interestRate: BigDecimal?,
 
+        /** Amount due (optional) */
         @Embedded(prefix = "a_due_") val amountDue: Balance?,
 
+        /** Minimum amount due (optional) */
         @Embedded(prefix = "m_amount_") val minimumAmountDue: Balance?,
 
+        /** Last payment amount (optional) */
         @Embedded(prefix = "l_payment_") val lastPaymentAmount: Balance?,
 
+        /** Last payment date (optional) */
         @ColumnInfo(name = "last_payment_date") val lastPaymentDate: String?, // ISO8601 format Eg: 2011-12-03T10:15:30+01:00
 
+        /** Due date (optional) */
         @ColumnInfo(name = "due_date") val dueDate: String?, // ISO8601 format Eg: 2011-12-03T10:15:30+01:00
 
+        /** End date (optional) */
         @ColumnInfo(name = "end_date") val endDate: String?, // yyyy-MM-dd
 
+        /** Balance details (optional) */
         @Embedded(prefix = "b_details_") val balanceDetails: BalanceDetails?
 
 ): IAdapterModel

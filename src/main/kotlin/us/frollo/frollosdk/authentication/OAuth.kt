@@ -1,14 +1,19 @@
 package us.frollo.frollosdk.authentication
 
 import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationRequest.Scope
+import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ResponseTypeValues
 import us.frollo.frollosdk.core.FrolloSDKConfiguration
 import us.frollo.frollosdk.model.oauth.OAuthGrantType
 import us.frollo.frollosdk.model.oauth.OAuthTokenRequest
 
+/**
+ * @suppress
+ */
 class OAuth(val config: FrolloSDKConfiguration) {
 
     private val domain: String
@@ -67,5 +72,11 @@ class OAuth(val config: FrolloSDKConfiguration) {
                 //.setPrompt("login") // Specifies whether the Authorization Server prompts the End-User for re-authentication
                 .setAdditionalParameters(mutableMapOf(Pair("audience", config.serverUrl), Pair("domain", domain)))
                 .build()
+    }
+
+    internal fun getCustomTabsIntent(service: AuthorizationService, request: AuthorizationRequest, toolBarColor: Int? = null): CustomTabsIntent {
+        val intentBuilder = service.createCustomTabsIntentBuilder(request.toUri())
+        toolBarColor?.let { intentBuilder.setToolbarColor(it) }
+        return intentBuilder.build()
     }
 }

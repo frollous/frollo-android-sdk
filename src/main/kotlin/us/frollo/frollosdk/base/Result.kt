@@ -3,7 +3,7 @@ package us.frollo.frollosdk.base
 import us.frollo.frollosdk.error.FrolloSDKError
 
 /**
- * Wrapper class around the data with different fetch states
+ * A value that represents either a success or a failure, including an associated error on failure.
  */
 class Result private constructor(
         /**

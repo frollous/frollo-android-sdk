@@ -5,20 +5,47 @@ import android.graphics.BitmapFactory
 import com.google.gson.annotations.SerializedName
 import java.lang.Exception
 
+/** Field representing a piece of information to be entered and validated */
 data class ProviderFormField(
+
+        /** Unique ID of the field */
         @SerializedName("id") val fieldId: String,
+
+        /** Byte array representing an image (optional) */
         @SerializedName("image") val image: List<Byte>?,
+
+        /** Name of the field to be displayed to the user */
         @SerializedName("name") val name: String,
+
+        /** Maximum length of the text to be entered (optional) */
         @SerializedName("maxLength") val maxLength: Int?,
+
+        /** Type of field. This will affect the display of the field. See [ProviderFieldType] for details */
         @SerializedName("type") val type: ProviderFieldType,
+
+        /** Value entered into the field (optional) */
         @SerializedName("value") var value: String?,
+
+        /** Prefix to be displayed before the field to user (optional) */
         @SerializedName("prefix") var prefix: String?,
+
+        /** Suffix to be displayed after the field to the user (optional) */
         @SerializedName("suffix") var suffix: String?,
+
+        /** Optional field indicator indicating if this is required to be filled by the user */
         @SerializedName("isOptional") val isOptional: Boolean,
+
+        /** Indicates if the user can edit the value */
         @SerializedName("valueEditable") val valueEditable: Boolean,
+
+        /** List of options to be selected if [type] is [ProviderFieldType.OPTION] (optional) */
         @SerializedName("option") val options: List<ProviderFieldOption>?,
+
+        /** List of validations to be performed on the field (optional) */
         @SerializedName("validation") val validations: List<ProviderFieldValidation>?
 ) {
+
+    /** Bitmap of the [image] bytes */
     val imageBitmap: Bitmap?
         get() {
             return image?.let {

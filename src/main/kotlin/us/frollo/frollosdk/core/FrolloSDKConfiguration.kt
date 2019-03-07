@@ -2,7 +2,6 @@ package us.frollo.frollosdk.core
 
 import android.net.Uri
 import us.frollo.frollosdk.logging.LogLevel
-import java.lang.Exception
 
 /**
  * Configuration of the SDK and additional optional preferences.
@@ -36,9 +35,9 @@ data class FrolloSDKConfiguration(
          */
         val logLevel: LogLevel = LogLevel.ERROR) {
 
-    fun validForROPC() = clientId.isNotBlank() && tokenUrl.isNotBlank() && serverUrl.isNotBlank()
+    internal fun validForROPC() = clientId.isNotBlank() && tokenUrl.isNotBlank() && serverUrl.isNotBlank()
 
-    fun validForAuthorizationCodeFlow() = clientId.isNotBlank() && tokenUrl.isNotBlank()
+    internal fun validForAuthorizationCodeFlow() = clientId.isNotBlank() && tokenUrl.isNotBlank()
             && redirectUrl.isNotBlank() && authorizationUrl.isNotBlank() && serverUrl.isNotBlank()
 
     /**

@@ -61,7 +61,7 @@ android {
         skipDeprecated = false
         skipEmptyPackages = true
 
-        includes = ['packages.md','extras.md']
+        includes = ['changelog.md','README.md','extras.md','packages.md']
 
         packageOptions {
             prefix = "us.frollo.frollosdk.database"

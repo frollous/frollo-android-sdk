@@ -3,7 +3,7 @@ package us.frollo.frollosdk.model.oauth
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
-enum class OAuthGrantType {
+internal enum class OAuthGrantType {
     @SerializedName("authorization_code") AUTHORIZATION_CODE,
     @SerializedName("password") PASSWORD,
     @SerializedName("refresh_token") REFRESH_TOKEN;

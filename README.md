@@ -4,12 +4,12 @@
 
 - Android Studio 3.3.2+
 - Kotlin version 1.3.21+
-- Gradle plugin version 3.3.2+ - In your project level **build.gradle**
-    ```kotlin
-        dependencies {
-            classpath "com.android.tools.build:gradle:3.3.2"
-            //..
-        }
+- Gradle plugin version 3.3.2+ - In your project level **build.gradle**    
+    ```    
+        dependencies {    
+            classpath "com.android.tools.build:gradle:3.3.2"    
+            //..    
+        }    
     ```
 - **minSdkVersion** in your gradle file must be **23** or above. Frollo SDK does not support Android versions below Marshmallow (6.0).
 - Frollo SDK disables auto-backup by default to ensure no data persists between installs. You might run into conflicts during integration if your app has defined **android:allowBackup="true"** in its manifest. Either you can disable auto-backup for your app or override by adding **tools:replace="android:allowBackup"** to **`<application>`** element in your **AndroidManifest.xml**.
@@ -39,11 +39,11 @@ To integrate Frollo Android SDK to your Android app use the following steps:
 
     `include ':app', ':frollo-android-sdk'`
 
-3. Add below line to the dependencies in your **app/build.gradle** file
-    ```kotlin
+3. Add below line to the dependencies in your **app/build.gradle** file    
+    ```    
         dependencies {    
             //..    
             implementation project(":frollo-android-sdk")    
-        }
+        }    
     ```
 4. Build! 👷‍♂️

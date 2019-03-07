@@ -67,7 +67,7 @@ If you are going to authenticate using Authorization Code, some extra setup step
 - Jetifier version must be 1.0.0-beta04+
 
     Add below line in your project level **build.gradle** dependencies section
-    ```kotlin
+    ```
         dependencies {
             //..
             classpath "com.android.tools.build.jetifier:jetifier-processor:1.0.0-beta04"
@@ -77,7 +77,7 @@ If you are going to authenticate using Authorization Code, some extra setup step
 
 - You need to define a **appAuthRedirectScheme** in you module level **build.gradle**. This should be unique redirect uri for your app.
 
-    ```kotlin
+    ```
         defaultConfig {
             //..
             manifestPlaceholders = [

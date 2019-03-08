@@ -1,21 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
+
+    <domain-config>
+        <domain includeSubdomains="true">frollo.us</domain>
+        <pin-set>
+            <!-- Production pin, checked 06/11/18 -->
+            <pin digest="SHA-256">XysGYqMH3Ml0kZoh6zTTaTzR4wYBGgUWfvbxgh4V4QA=</pin>
+            <!-- Production backup pin, checked 10/01/17 - Not in use -->
+            <pin digest="SHA-256">UgMkdW5Xlo5dOndGZIdWLSrMu7DD3gwmnyqSOg+gz3I=</pin>
+        </pin-set>
+    </domain-config>
+
     <debug-overrides>
         <trust-anchors>
             <!-- Trust user added CAs while debuggable only -->
             <certificates src="user" />
         </trust-anchors>
     </debug-overrides>
-    <domain-config>
-        <domain includeSubdomains="true">frollo.us</domain>
-        <pin-set>
-            <pin digest="SHA-256">XysGYqMH3Ml0kZoh6zTTaTzR4wYBGgUWfvbxgh4V4QA=</pin>
-            <pin digest="SHA-256">UgMkdW5Xlo5dOndGZIdWLSrMu7DD3gwmnyqSOg+gz3I=</pin>
-        </pin-set>
-    </domain-config>
+
     <!-- TODO: Review if below breaks the SSL Pinning -->
     <!-- Below is required for MockWebServer -->
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">localhost</domain>
     </domain-config>
+
 </network-security-config>

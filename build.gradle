@@ -17,7 +17,6 @@ android {
         ]
     }
     buildTypes {
-        // TODO: Signing
         // TODO: Configure proguard - debugging crash logs might be a problem due to obfuscation
         // TODO: Make sure to test release version after obfuscation, especially serializable classes
         release {

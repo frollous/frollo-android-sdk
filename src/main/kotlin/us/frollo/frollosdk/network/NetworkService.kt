@@ -29,6 +29,7 @@ class NetworkService internal constructor(
 
     companion object {
         private const val TAG = "NetworkService"
+        private const val PINNING_PATTERN = "*.frollo.us"
     }
 
     internal val authToken = AuthToken(keystore, pref)
@@ -52,8 +53,8 @@ class NetworkService internal constructor(
 
         if (!BuildConfig.DEBUG && Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             val certPinner = CertificatePinner.Builder()
-                    .add("*.frollo.us", "sha256/XysGYqMH3Ml0kZoh6zTTaTzR4wYBGgUWfvbxgh4V4QA=")
-                    .add("*.frollo.us", "sha256/UgMkdW5Xlo5dOndGZIdWLSrMu7DD3gwmnyqSOg+gz3I=")
+                    .add(PINNING_PATTERN, PublicKey.ACTIVE)
+                    .add(PINNING_PATTERN, PublicKey.BACKUP)
                     .build()
             httpClientBuilder.certificatePinner(certPinner)
         }

@@ -118,6 +118,8 @@ object FrolloSDK {
         val localBroadcastManager = LocalBroadcastManager.getInstance(app)
 
         try {
+            val deviceInfo = DeviceInfo(application.applicationContext)
+
             // 1. Initialize ThreeTenABP
             initializeThreeTenABP()
             // 2. Setup Keystore
@@ -133,10 +135,15 @@ object FrolloSDK {
             val oAuth = OAuth(config = configuration)
             network = NetworkService(oAuth = oAuth, keystore = keyStore, pref = preferences)
             // 7. Setup Logger
-            Log.network = network // Initialize Log.network before Log.logLevel as Log.logLevel is dependant on Log.network
+            // Initialize Log.network, Log.deviceId, Log.deviceName and Log.deviceType
+            // before Log.logLevel as Log.logLevel is dependant on Log.network
+            Log.network = network
+            Log.deviceId = deviceInfo.deviceId
+            Log.deviceName = deviceInfo.deviceName
+            Log.deviceType = deviceInfo.deviceType
             Log.logLevel = configuration.logLevel
             // 8. Setup Authentication
-            _authentication = Authentication(oAuth, DeviceInfo(application.applicationContext), network, database, preferences)
+            _authentication = Authentication(oAuth, deviceInfo, network, database, preferences)
             // 9. Setup Aggregation
             _aggregation = Aggregation(network, database, localBroadcastManager)
             // 10. Setup Messages

@@ -628,29 +628,14 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     }
 
     /**
-     * Log out the user from the server. This revokes the refresh token for the current device if not already revoked and resets the token storage.
-     *
-     * @param completion Completion handler with optional error if something goes wrong during the logout process
+     * Log out the user and reset the token storage.
      */
-    internal fun logoutUser(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    internal fun logoutUser() {
         if (!loggedIn) {
             return
         }
 
-        userAPI.logout().enqueue { resource ->
-
-            reset()
-
-            when(resource.status) {
-                Resource.Status.SUCCESS -> {
-                    completion?.invoke(Result.success())
-                }
-                Resource.Status.ERROR -> {
-                    Log.e("$TAG#logoutUser", resource.error?.localizedDescription)
-                    completion?.invoke(Result.error(resource.error))
-                }
-            }
-        }
+        reset()
     }
 
     private fun handleUserResponse(userResponse: UserResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {

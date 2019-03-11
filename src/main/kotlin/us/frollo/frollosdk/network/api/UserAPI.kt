@@ -25,7 +25,6 @@ internal interface UserAPI {
         const val URL_REGISTER = "user/register"
         const val URL_PASSWORD_RESET = "user/reset"
         const val URL_USER_DETAILS = "user/details"
-        const val URL_LOGOUT = "user/logout"
         const val URL_CHANGE_PASSWORD = "user"
         const val URL_DELETE_USER = "user"
     }
@@ -47,7 +46,4 @@ internal interface UserAPI {
 
     @DELETE(URL_DELETE_USER)
     fun deleteUser(): Call<Void>
-
-    @PUT(URL_LOGOUT)
-    fun logout(): Call<Void>
 }

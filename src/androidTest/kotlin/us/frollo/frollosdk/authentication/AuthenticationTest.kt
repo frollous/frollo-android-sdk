@@ -817,35 +817,19 @@ class AuthenticationTest {
     fun testLogoutUser() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_LOGOUT) {
-                    return MockResponse()
-                            .setResponseCode(204)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
         preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        authentication.logoutUser { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        authentication.logoutUser()
 
-            assertFalse(authentication.loggedIn)
-            assertNull(preferences.encryptedAccessToken)
-            assertNull(preferences.encryptedRefreshToken)
-            assertEquals(-1, preferences.accessTokenExpiry)
-        }
+        wait(2)
 
-        val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_LOGOUT, request.trimmedPath)
-
-        wait(3)
+        assertFalse(authentication.loggedIn)
+        assertNull(preferences.encryptedAccessToken)
+        assertNull(preferences.encryptedRefreshToken)
+        assertEquals(-1, preferences.accessTokenExpiry)
 
         tearDown()
     }

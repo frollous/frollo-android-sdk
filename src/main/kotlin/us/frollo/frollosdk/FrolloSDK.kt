@@ -182,13 +182,12 @@ object FrolloSDK {
     }
 
     /**
-     * Logout the currently authenticated user from Frollo backend. Resets all caches, preferences and databases.
-     * This revokes the refresh token for the current device if not already revoked and resets the token storage.
+     * Logout the currently authenticated user. Resets all caches, preferences and databases.
+     * This resets the token storage.
      */
     fun logout() {
-        authentication.logoutUser {
-            reset()
-        }
+        authentication.logoutUser()
+        reset()
     }
 
     /**

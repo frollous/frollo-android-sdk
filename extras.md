@@ -75,7 +75,9 @@ If you are going to authenticate using Authorization Code, some extra setup step
         }
     ```
 
-- You need to define a **appAuthRedirectScheme** in you module level **build.gradle**. This should be unique redirect uri for your app.
+- You need to define a **appAuthRedirectScheme** in your module level **build.gradle**. This should be unique redirect uri for your app.
+
+    Example:
 
     ```
         defaultConfig {

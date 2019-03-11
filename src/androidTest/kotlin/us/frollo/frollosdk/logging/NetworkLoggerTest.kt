@@ -34,6 +34,8 @@ import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.preferences.Preferences
+import us.frollo.frollosdk.testutils.randomString
+import us.frollo.frollosdk.testutils.randomUUID
 import us.frollo.frollosdk.testutils.trimmedPath
 
 class NetworkLoggerTest {
@@ -82,7 +84,7 @@ class NetworkLoggerTest {
             }
         })
 
-        val logger = NetworkLogger(network)
+        val logger = NetworkLogger(network, deviceId = randomUUID(), deviceName = randomString(12), deviceType = randomString(12))
         logger.writeMessage("Test Message", LogLevel.ERROR)
 
         val request = mockServer.takeRequest()

@@ -1290,8 +1290,20 @@ class AuthenticationTest {
     }
 
     @Test
-    fun testExchangeLegacyAccessToken() {
+    fun testExchangeLegacyRefreshToken() {
         initSetup()
+
+        val body = readStringFromJson(app, R.raw.user_details_complete)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         mockTokenServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -1306,11 +1318,6 @@ class AuthenticationTest {
 
         val legacyToken = randomString(32)
 
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        preferences.encryptedRefreshToken = keystore.encrypt(legacyToken)
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
         authentication.exchangeLegacyToken(legacyToken = legacyToken) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
@@ -1318,10 +1325,76 @@ class AuthenticationTest {
             assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
             assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
             assertEquals(2550794799, preferences.accessTokenExpiry)
+
+            val testObserver = authentication.fetchUser().test()
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
+
+            val expectedResponse = Gson().fromJson<UserResponse>(body)
+            assertEquals(expectedResponse.toUser(), testObserver.value().data)
+            assertTrue(authentication.loggedIn)
         }
 
-        val request = mockTokenServer.takeRequest()
-        assertEquals(TOKEN_URL, request.trimmedPath)
+        val request1 = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_USER_DETAILS, request1.trimmedPath)
+
+        val request2 = mockTokenServer.takeRequest()
+        assertEquals(TOKEN_URL, request2.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testExchangeLegacyRefreshTokenSecondaryFailure() {
+        initSetup()
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.error_invalid_refresh_token))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        mockTokenServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == TOKEN_URL) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val legacyToken = randomString(32)
+
+        authentication.exchangeLegacyToken(legacyToken = legacyToken) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+
+            val testObserver = authentication.fetchUser().test()
+            testObserver.awaitValue()
+            assertNull(testObserver.value().data)
+
+            assertEquals(APIErrorType.INVALID_REFRESH_TOKEN, (result.error as APIError).type)
+            assertFalse(authentication.loggedIn)
+
+            assertNull(preferences.encryptedAccessToken)
+            assertNull(preferences.encryptedRefreshToken)
+            assertEquals(-1L, preferences.accessTokenExpiry)
+        }
+
+        val request1 = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_USER_DETAILS, request1.trimmedPath)
+
+        val request2 = mockTokenServer.takeRequest()
+        assertEquals(TOKEN_URL, request2.trimmedPath)
 
         wait(3)
 

@@ -520,18 +520,12 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     }
 
     /**
-     * Exchange a legacy access token for a new valid refresh access token pair.
+     * Exchange a legacy refresh token for a new valid refresh access token pair.
      *
-     * @param legacyToken Legacy access token to be exchanged
+     * @param legacyToken Legacy refresh token to be exchanged
      * @param completion Completion handler with any error that occurred
      */
     fun exchangeLegacyToken(legacyToken: String, completion: OnFrolloSDKCompletionListener<Result>) {
-        if (!loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            completion.invoke(Result.error(error))
-            return
-        }
-
         val request = oAuth.getExchangeTokenRequest(legacyToken = legacyToken)
         if (!request.valid) {
             completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
@@ -552,7 +546,23 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
                     resource.data?.let { response ->
                         network.handleTokens(response)
 
-                        completion.invoke(Result.success())
+                        // Fetch core details about the user. Fail and logout if we don't get necessary details
+                        userAPI.fetchUser().enqueue { resource ->
+                            when(resource.status) {
+                                Resource.Status.ERROR -> {
+                                    network.reset()
+
+                                    Log.e("$TAG#loginUser.fetchUser", resource.error?.localizedDescription)
+                                    completion.invoke(Result.error(resource.error))
+                                }
+
+                                Resource.Status.SUCCESS -> {
+                                    handleUserResponse(resource.data, completion)
+                                    updateDevice()
+                                }
+                            }
+                        }
+
                     } ?: run {
                         completion.invoke(Result.error(DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_ACCESS_TOKEN)))
                     }

@@ -23,11 +23,11 @@ internal class Version(private val pref: Preferences) {
 
     private var currentVersion = BuildConfig.VERSION_NAME
     private var previousVersion: String? = null
-    private var versionHistory: MutableList<String>
+    private var versionHistory: MutableSet<String>
 
     init {
         previousVersion = pref.sdkVersion
-        versionHistory = pref.sdkVersionHistory
+        versionHistory = pref.sdkVersionHistory.toMutableSet()
     }
 
     fun migrationNeeded(): Boolean {
@@ -59,6 +59,6 @@ internal class Version(private val pref: Preferences) {
         versionHistory.add(currentVersion)
 
         pref.sdkVersion = currentVersion
-        pref.sdkVersionHistory = versionHistory
+        pref.sdkVersionHistory = versionHistory.toMutableList()
     }
 }

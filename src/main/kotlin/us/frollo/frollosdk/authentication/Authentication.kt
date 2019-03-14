@@ -19,6 +19,7 @@ package us.frollo.frollosdk.authentication
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.Intent
+import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import net.openid.appauth.*
@@ -27,7 +28,9 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.core.ACTION
 import us.frollo.frollosdk.core.ACTION.ACTION_USER_UPDATED
+import us.frollo.frollosdk.core.ARGUMENT
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
@@ -650,7 +653,12 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
 
     private fun handleUserResponse(userResponse: UserResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         userResponse?.let {
-            if (!loggedIn) loggedIn = true
+            if (!loggedIn) {
+                loggedIn = true
+
+                notify(ACTION.ACTION_AUTHENTICATION_CHANGED,
+                        bundleOf(Pair(ARGUMENT.ARG_AUTHENTICATION_STATUS, AuthenticationStatus.AUTHENTICATED)))
+            }
 
             it.features?.let { features -> pref.features = features }
 

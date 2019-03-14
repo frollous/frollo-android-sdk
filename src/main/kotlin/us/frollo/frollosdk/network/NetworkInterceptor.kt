@@ -22,13 +22,7 @@ import okhttp3.Request
 import okhttp3.Response
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
-import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.network.NetworkHelper.Companion.HEADER_API_VERSION
 import us.frollo.frollosdk.network.NetworkHelper.Companion.HEADER_AUTHORIZATION
-import us.frollo.frollosdk.network.NetworkHelper.Companion.HEADER_BUNDLE_ID
-import us.frollo.frollosdk.network.NetworkHelper.Companion.HEADER_DEVICE_VERSION
-import us.frollo.frollosdk.network.NetworkHelper.Companion.HEADER_SOFTWARE_VERSION
-import us.frollo.frollosdk.network.NetworkHelper.Companion.HEADER_USER_AGENT
 import us.frollo.frollosdk.network.api.UserAPI.Companion.URL_REGISTER
 import us.frollo.frollosdk.network.api.UserAPI.Companion.URL_PASSWORD_RESET
 import us.frollo.frollosdk.error.DataError
@@ -83,7 +77,7 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
         try {
             if (originalRequest.url()?.host() == Uri.parse(network.oAuth.config.serverUrl).host) { // Precautionary check to not append headers for any external requests
                 addAuthorizationHeader(originalRequest, builder)
-                addAdditionalHeaders(builder)
+                helper.addAdditionalHeaders(builder)
             }
         } catch (error: DataError) {
             if (error.type == DataErrorType.AUTHENTICATION && error.subType == DataErrorSubType.MISSING_REFRESH_TOKEN)
@@ -102,14 +96,6 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
 
             validateAndAppendAccessToken(builder)
         }
-    }
-
-    private fun addAdditionalHeaders(builder: Request.Builder) {
-        builder.removeHeader(HEADER_API_VERSION).addHeader(HEADER_API_VERSION, NetworkHelper.API_VERSION)
-        builder.removeHeader(HEADER_BUNDLE_ID).addHeader(HEADER_BUNDLE_ID, helper.bundleId)
-        builder.removeHeader(HEADER_DEVICE_VERSION).addHeader(HEADER_DEVICE_VERSION, helper.deviceVersion)
-        builder.removeHeader(HEADER_SOFTWARE_VERSION).addHeader(HEADER_SOFTWARE_VERSION, helper.softwareVersion)
-        builder.removeHeader(HEADER_USER_AGENT).addHeader(HEADER_USER_AGENT, helper.userAgent)
     }
 
     fun authenticateRequest(request: Request): Request {

@@ -17,11 +17,12 @@
 package us.frollo.frollosdk.network
 
 import okhttp3.Interceptor
+import okhttp3.Request
 import okhttp3.Response
 import us.frollo.frollosdk.logging.Log
 import java.io.IOException
 
-internal class TokenInterceptor : Interceptor {
+internal class TokenInterceptor(private val helper: NetworkHelper) : Interceptor {
 
     companion object {
         private const val TAG = "TokenInterceptor"
@@ -33,7 +34,7 @@ internal class TokenInterceptor : Interceptor {
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
+        val request = adaptRequest(chain.request())
 
         var response = chain.proceed(request)
 
@@ -54,5 +55,11 @@ internal class TokenInterceptor : Interceptor {
         }
 
         return response
+    }
+
+    private fun adaptRequest(originalRequest: Request): Request {
+        val builder = originalRequest.newBuilder()
+        helper.addAdditionalHeaders(builder)
+        return builder.build()
     }
 }

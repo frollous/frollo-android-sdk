@@ -51,7 +51,7 @@ class NetworkService internal constructor(
     internal val authToken = AuthToken(keystore, pref)
     private val helper = NetworkHelper(authToken)
     private val serverInterceptor = NetworkInterceptor(this, helper)
-    private val tokenInterceptor = TokenInterceptor()
+    private val tokenInterceptor = TokenInterceptor(helper)
     private var apiRetrofit = createRetrofit(oAuth.config.serverUrl)
     private var authRetrofit = createRetrofit(oAuth.config.tokenUrl)
 

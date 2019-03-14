@@ -17,6 +17,7 @@
 package us.frollo.frollosdk.network
 
 import android.os.Build
+import okhttp3.Request
 import us.frollo.frollosdk.BuildConfig
 import us.frollo.frollosdk.authentication.AuthToken
 
@@ -63,4 +64,12 @@ internal class NetworkHelper(private val authToken: AuthToken) {
     // "us.frollo.frollosdk|SDK1.0.0|B777|Android8.1.0|API2.0"
     internal val userAgent: String
         get() = "${BuildConfig.APPLICATION_ID}|SDK${BuildConfig.VERSION_NAME}|B${BuildConfig.VERSION_CODE}|Android${Build.VERSION.RELEASE}|API$API_VERSION"
+
+    internal fun addAdditionalHeaders(builder: Request.Builder) {
+        builder.removeHeader(NetworkHelper.HEADER_API_VERSION).addHeader(NetworkHelper.HEADER_API_VERSION, NetworkHelper.API_VERSION)
+        builder.removeHeader(NetworkHelper.HEADER_BUNDLE_ID).addHeader(NetworkHelper.HEADER_BUNDLE_ID, bundleId)
+        builder.removeHeader(NetworkHelper.HEADER_DEVICE_VERSION).addHeader(NetworkHelper.HEADER_DEVICE_VERSION, deviceVersion)
+        builder.removeHeader(NetworkHelper.HEADER_SOFTWARE_VERSION).addHeader(NetworkHelper.HEADER_SOFTWARE_VERSION, softwareVersion)
+        builder.removeHeader(NetworkHelper.HEADER_USER_AGENT).addHeader(NetworkHelper.HEADER_USER_AGENT, userAgent)
+    }
 }

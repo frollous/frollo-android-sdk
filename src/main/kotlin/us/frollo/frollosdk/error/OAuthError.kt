@@ -17,25 +17,37 @@
 package us.frollo.frollosdk.error
 
 import net.openid.appauth.AuthorizationException
+import us.frollo.frollosdk.mapping.toOAuth2ErrorResponse
 import us.frollo.frollosdk.mapping.toOAuthErrorType
+import us.frollo.frollosdk.model.oauth.OAuth2ErrorResponse
 
 /**
- * Represents errors that can be returned from the authorization flow
+ * Represents OAuth2 error that can be returned from the authentication server
  */
-class OAuthError(private val exception: AuthorizationException?) : FrolloSDKError(exception?.message) {
+class OAuthError(private val exception: AuthorizationException? = null, response: String? = null) : FrolloSDKError(exception?.message ?: response) {
 
-    /** Type of OAuth Error */
+    private var oAuth2ErrorResponse: OAuth2ErrorResponse? = null
+
+    init {
+        oAuth2ErrorResponse = response?.toOAuth2ErrorResponse()
+    }
+
+    /** Type of OAuth2 Error */
     val type : OAuthErrorType
-        get() = exception?.toOAuthErrorType() ?: OAuthErrorType.UNKNOWN
+        get() = oAuth2ErrorResponse?.errorType ?: exception?.toOAuthErrorType() ?: OAuthErrorType.UNKNOWN
+
+    /** Optional error url returned from authentication server */
+    val errorUrl: String?
+        get() = oAuth2ErrorResponse?.errorUri
 
     /** Localized description */
     override val localizedDescription: String?
-        get() = type.toLocalizedString(context)
+        get() = oAuth2ErrorResponse?.errorDescription ?: type.toLocalizedString(context)
 
     /** Debug description */
     override val debugDescription: String?
         get() {
-            var debug = "OAuthError: Type [${ type.name }] "
+            var debug = "OAuth2Error: Type [${ type.name }] "
             debug = debug.plus(localizedDescription)
             return debug
         }

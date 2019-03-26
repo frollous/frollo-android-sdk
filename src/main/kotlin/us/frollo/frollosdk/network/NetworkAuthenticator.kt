@@ -17,7 +17,6 @@
 package us.frollo.frollosdk.network
 
 import okhttp3.*
-import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.network.NetworkHelper.Companion.HEADER_AUTHORIZATION
 import us.frollo.frollosdk.error.APIError
 import us.frollo.frollosdk.error.APIErrorType
@@ -53,9 +52,11 @@ internal class NetworkAuthenticator(private val network: NetworkService) : Authe
                             newRequest = response.request().newBuilder()
                                     .header(HEADER_AUTHORIZATION, "Bearer $newToken")
                                     .build()
-                        } else {
-                            network.triggerForcedLogout()
                         }
+
+                        // NOTE: No need for force logout in this block if newToken == null
+                        // as the failures of network.refreshTokens() is handled
+                        // in NetworkService, TokenAuthenticator and NetworkExtensions
                     }
 
                     network.invalidTokenRetries++

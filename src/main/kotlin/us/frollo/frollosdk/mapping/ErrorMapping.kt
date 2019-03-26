@@ -26,6 +26,7 @@ import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import us.frollo.frollosdk.model.api.shared.APIErrorResponse
 import us.frollo.frollosdk.model.api.shared.APIErrorResponseWrapper
+import us.frollo.frollosdk.model.oauth.OAuth2ErrorResponse
 
 internal fun String.toAPIErrorResponse(): APIErrorResponse? {
     return try {
@@ -110,5 +111,13 @@ internal fun AuthorizationException.toOAuthErrorType(): OAuthErrorType {
         GeneralErrors.SERVER_ERROR -> OAuthErrorType.SERVER_ERROR
         GeneralErrors.NETWORK_ERROR -> OAuthErrorType.NETWORK_ERROR
         else -> OAuthErrorType.OTHER_AUTHORISATION
+    }
+}
+
+internal fun String.toOAuth2ErrorResponse(): OAuth2ErrorResponse? {
+    return try {
+        Gson().fromJson<OAuth2ErrorResponse>(this)
+    } catch (e: Exception) {
+        null
     }
 }

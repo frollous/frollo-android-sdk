@@ -33,7 +33,8 @@ import us.frollo.frollosdk.authentication.AuthToken
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
-import us.frollo.frollosdk.error.FrolloSDKError
+import us.frollo.frollosdk.error.*
+import us.frollo.frollosdk.extensions.handleOAuth2Failure
 import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
 import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.preferences.Preferences
@@ -65,7 +66,7 @@ class NetworkService internal constructor(
 
         val httpClientBuilder = OkHttpClient.Builder()
                 .addInterceptor(if (baseUrl == oAuth.config.tokenUrl) tokenInterceptor else serverInterceptor)
-                .authenticator(NetworkAuthenticator(this))
+                .authenticator(if (baseUrl == oAuth.config.tokenUrl) TokenAuthenticator(this) else NetworkAuthenticator(this))
 
         if (!BuildConfig.DEBUG && Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             val certPinner = CertificatePinner.Builder()
@@ -97,15 +98,23 @@ class NetworkService internal constructor(
         val tokenEndpoint = createAuth(TokenAPI::class.java)
 
         val response = tokenEndpoint.refreshTokens(request).execute()
+        val apiResponse = ApiResponse(response)
 
-        if (response.isSuccessful) {
-            response.body()?.let { handleTokens(it) }
+        if (apiResponse.isSuccessful) {
+            apiResponse.body?.let { handleTokens(it) }
+
             completion?.invoke(Result.success())
-            return response.body()?.accessToken
+
+            return apiResponse.body?.accessToken
         } else {
-            val errorMsg = "Refreshing token failed due to authorisation error."
-            Log.e("$TAG#refreshTokens", errorMsg)
-            completion?.invoke(Result.error(FrolloSDKError(errorMsg)))
+            val error = OAuthError(response = apiResponse.errorMessage)
+
+            Log.e("$TAG#refreshTokens", error.localizedMessage)
+
+            handleOAuth2Failure(error)
+
+            completion?.invoke(Result.error(error))
+
             return null
         }
     }

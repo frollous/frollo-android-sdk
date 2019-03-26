@@ -18,7 +18,9 @@ package us.frollo.frollosdk.error
 
 import android.content.Context
 import androidx.annotation.StringRes
+import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.R
+import us.frollo.frollosdk.extensions.serializedName
 
 /**
  * Type of error that has occurred during authorization
@@ -28,57 +30,64 @@ enum class OAuthErrorType(
         @StringRes val textResource: Int) {
 
     /** Access denied */
-    ACCESS_DENIED(R.string.FrolloSDK_Error_OAuth_AccessDenied),
+    @SerializedName("access_denied") ACCESS_DENIED(R.string.FrolloSDK_Error_OAuth_AccessDenied),
 
     /** Client error */
-    CLIENT_ERROR(R.string.FrolloSDK_Error_OAuth_BrowserError),
+    @SerializedName("client_error") CLIENT_ERROR(R.string.FrolloSDK_Error_OAuth_BrowserError),
 
     /** Invalid client */
-    INVALID_CLIENT(R.string.FrolloSDK_Error_OAuth_ClientError),
+    @SerializedName("invalid_client") INVALID_CLIENT(R.string.FrolloSDK_Error_OAuth_ClientError),
 
     /** Invalid client metadata */
-    INVALID_CLIENT_METADATA(R.string.FrolloSDK_Error_OAuth_InvalidClient),
+    @SerializedName("invalid_client_metadata") INVALID_CLIENT_METADATA(R.string.FrolloSDK_Error_OAuth_InvalidClient),
 
     /** Invalid grant */
-    INVALID_GRANT(R.string.FrolloSDK_Error_OAuth_InvalidGrant),
+    @SerializedName("invalid_grant") INVALID_GRANT(R.string.FrolloSDK_Error_OAuth_InvalidGrant),
 
     /** Invalid redirect URL */
-    INVALID_REDIRECT_URI(R.string.FrolloSDK_Error_OAuth_InvalidRedirectURI),
+    @SerializedName("invalid_redirect_uri") INVALID_REDIRECT_URI(R.string.FrolloSDK_Error_OAuth_InvalidRedirectURI),
 
     /** Invalid request */
-    INVALID_REQUEST(R.string.FrolloSDK_Error_OAuth_InvalidRequest),
+    @SerializedName("invalid_request") INVALID_REQUEST(R.string.FrolloSDK_Error_OAuth_InvalidRequest),
 
     /** Invalid scope */
-    INVALID_SCOPE(R.string.FrolloSDK_Error_OAuth_InvalidScope),
+    @SerializedName("invalid_scope") INVALID_SCOPE(R.string.FrolloSDK_Error_OAuth_InvalidScope),
 
     /** Unauthorized client */
-    UNAUTHORIZED_CLIENT(R.string.FrolloSDK_Error_OAuth_UnauthorizedClient),
+    @SerializedName("unauthorized_client") UNAUTHORIZED_CLIENT(R.string.FrolloSDK_Error_OAuth_UnauthorizedClient),
 
     /** Unsupported grant type */
-    UNSUPPORTED_GRANT_TYPE(R.string.FrolloSDK_Error_OAuth_UnsupportedGrantType),
+    @SerializedName("unsupported_grant_type") UNSUPPORTED_GRANT_TYPE(R.string.FrolloSDK_Error_OAuth_UnsupportedGrantType),
 
     /** Unsupported response type */
-    UNSUPPORTED_RESPONSE_TYPE(R.string.FrolloSDK_Error_OAuth_UnsupportedResponseType),
+    @SerializedName("unsupported_response_type") UNSUPPORTED_RESPONSE_TYPE(R.string.FrolloSDK_Error_OAuth_UnsupportedResponseType),
 
     /** The browser could not be opened */
-    BROWSER_ERROR(R.string.FrolloSDK_Error_OAuth_BrowserError),
+    @SerializedName("browser_error") BROWSER_ERROR(R.string.FrolloSDK_Error_OAuth_BrowserError),
 
     /** A network error occurred during authentication */
-    NETWORK_ERROR(R.string.FrolloSDK_Error_OAuth_NetworkError),
+    @SerializedName("network_error") NETWORK_ERROR(R.string.FrolloSDK_Error_OAuth_NetworkError),
 
     /** A server error occurred during authentication */
-    SERVER_ERROR(R.string.FrolloSDK_Error_OAuth_ServerError),
+    @SerializedName("server_error") SERVER_ERROR(R.string.FrolloSDK_Error_OAuth_ServerError),
 
     /** User cancelled the authentication request */
-    USER_CANCELLED(R.string.FrolloSDK_Error_OAuth_UserCancelled),
+    @SerializedName("user_cancelled") USER_CANCELLED(R.string.FrolloSDK_Error_OAuth_UserCancelled),
 
     /** An unknown issue with authorisation has occurred */
-    OTHER_AUTHORISATION(R.string.FrolloSDK_Error_OAuth_OtherAuthorisation),
+    @SerializedName("other_authorisation") OTHER_AUTHORISATION(R.string.FrolloSDK_Error_OAuth_OtherAuthorisation),
 
     /** Unknown error */
-    UNKNOWN(R.string.FrolloSDK_Error_OAuth_Unknown);
+    @SerializedName("unknown") UNKNOWN(R.string.FrolloSDK_Error_OAuth_Unknown);
 
     /** Enum to localized message */
     fun toLocalizedString(context: Context?, arg1: String? = null): String? =
             context?.resources?.getString(textResource, arg1)
+
+    /** Enum to serialized string */
+    //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
+    override fun toString(): String =
+    //Try to get the annotation value if available instead of using plain .toString()
+    //Fallback to super.toString() in case annotation is not present/available
+            serializedName() ?: super.toString()
 }

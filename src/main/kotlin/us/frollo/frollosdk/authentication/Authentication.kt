@@ -46,6 +46,7 @@ import us.frollo.frollosdk.model.api.user.*
 import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.coredata.user.User
+import us.frollo.frollosdk.network.ErrorResponseType
 import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.preferences.Preferences
 import java.util.*
@@ -158,7 +159,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
             if (authorizationCode != null) {
                 exchangeAuthorizationCode(code = authorizationCode, codeVerifier = codeVerifier, completion = completion)
             } else {
-                completion.invoke(Result.error(OAuthError(exception)))
+                completion.invoke(Result.error(OAuthError(exception = exception)))
             }
         } ?: run {
             completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
@@ -191,7 +192,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
         }
 
         // Authorize the user
-        tokenAPI.refreshTokens(request).enqueue { resource ->
+        tokenAPI.refreshTokens(request).enqueue(ErrorResponseType.OAUTH2) { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#loginUser.refreshTokens", resource.error?.localizedDescription)
@@ -279,7 +280,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
                         return@enqueue
                     }
 
-                    tokenAPI.refreshTokens(authRequest).enqueue { authResource ->
+                    tokenAPI.refreshTokens(authRequest).enqueue(ErrorResponseType.OAUTH2) { authResource ->
                         when (authResource.status) {
                             Resource.Status.ERROR -> {
                                 Log.e("$TAG#refreshUser.refreshTokens", authResource.error?.localizedDescription)
@@ -485,7 +486,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
         }
 
         // Authorize the user
-        tokenAPI.refreshTokens(request).enqueue { resource ->
+        tokenAPI.refreshTokens(request).enqueue(ErrorResponseType.OAUTH2) { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#exchangeAuthorizationCode.refreshTokens", resource.error?.localizedDescription)
@@ -535,7 +536,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
             return
         }
 
-        tokenAPI.refreshTokens(request).enqueue { resource ->
+        tokenAPI.refreshTokens(request).enqueue(ErrorResponseType.OAUTH2) { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#exchangeToken.refreshTokens", resource.error?.localizedDescription)

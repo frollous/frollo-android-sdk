@@ -75,9 +75,8 @@ internal fun handleOAuth2Failure(error: OAuthError) {
         OAuthErrorType.INVALID_SCOPE,
         OAuthErrorType.UNAUTHORIZED_CLIENT,
         OAuthErrorType.UNSUPPORTED_GRANT_TYPE,
-        OAuthErrorType.SERVER_ERROR,
-        OAuthErrorType.UNKNOWN -> {
-            FrolloSDK.forcedLogout()
+        OAuthErrorType.SERVER_ERROR -> {
+            if (FrolloSDK.isSetup) FrolloSDK.forcedLogout()
         }
 
         else -> {

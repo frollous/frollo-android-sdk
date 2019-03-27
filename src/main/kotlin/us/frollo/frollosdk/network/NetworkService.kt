@@ -137,6 +137,6 @@ class NetworkService internal constructor(
 
     internal fun triggerForcedLogout() {
         reset()
-        FrolloSDK.forcedLogout()
+        if (FrolloSDK.isSetup) FrolloSDK.forcedLogout()
     }
 }

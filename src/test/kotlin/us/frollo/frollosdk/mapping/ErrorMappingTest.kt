@@ -64,4 +64,21 @@ class ErrorMappingTest {
         val type = exception.toOAuthErrorType()
         Assert.assertEquals(OAuthErrorType.ACCESS_DENIED, type)
     }
+
+    @Test
+    fun testStringToOAuth2ErrorResponseSuccess() {
+        val jsonStr = "{\"error_description\":\"Request was missing the redirect_uri parameter.\",\"error_uri\":\"https://authorization-server.com/docs/access_token\",\"error\":\"invalid_request\"}"
+        val response = jsonStr.toOAuth2ErrorResponse()
+        Assert.assertNotNull(response)
+        Assert.assertEquals("Request was missing the redirect_uri parameter.", response?.errorDescription)
+        Assert.assertEquals("https://authorization-server.com/docs/access_token", response?.errorUri)
+        Assert.assertEquals(OAuthErrorType.INVALID_REQUEST, response?.errorType)
+    }
+
+    @Test
+    fun testStringToOAuth2ErrorResponseFail() {
+        val jsonStr = "Unknown Error"
+        val response = jsonStr.toOAuth2ErrorResponse()
+        Assert.assertNull(response)
+    }
 }

@@ -198,7 +198,7 @@ class AuthenticationTest {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
                             .setResponseCode(401)
-                            .setBody(readStringFromJson(app, R.raw.error_invalid_username_password))
+                            .setBody(readStringFromJson(app, R.raw.error_oauth2_invalid_client))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -212,7 +212,7 @@ class AuthenticationTest {
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
-            assertEquals(APIErrorType.INVALID_USERNAME_PASSWORD, (result.error as APIError).type)
+            assertEquals(OAuthErrorType.INVALID_CLIENT, (result.error as OAuthError).type)
             assertFalse(authentication.loggedIn)
 
             assertNull(preferences.encryptedAccessToken)
@@ -560,7 +560,7 @@ class AuthenticationTest {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
                             .setResponseCode(401)
-                            .setBody(readStringFromJson(app, R.raw.error_invalid_username_password))
+                            .setBody(readStringFromJson(app, R.raw.error_oauth2_invalid_client))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -582,7 +582,7 @@ class AuthenticationTest {
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
-            assertEquals(APIErrorType.INVALID_USERNAME_PASSWORD, (result.error as APIError).type)
+            assertEquals(OAuthErrorType.INVALID_CLIENT, (result.error as OAuthError).type)
             assertFalse(authentication.loggedIn)
 
             assertNull(preferences.encryptedAccessToken)
@@ -1206,7 +1206,7 @@ class AuthenticationTest {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
                             .setResponseCode(401)
-                            .setBody(readStringFromJson(app, R.raw.error_invalid_username_password))
+                            .setBody(readStringFromJson(app, R.raw.error_oauth2_invalid_client))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1220,7 +1220,7 @@ class AuthenticationTest {
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
-            assertEquals(APIErrorType.INVALID_USERNAME_PASSWORD, (result.error as APIError).type)
+            assertEquals(OAuthErrorType.INVALID_CLIENT, (result.error as OAuthError).type)
             assertFalse(authentication.loggedIn)
 
             assertNull(preferences.encryptedAccessToken)

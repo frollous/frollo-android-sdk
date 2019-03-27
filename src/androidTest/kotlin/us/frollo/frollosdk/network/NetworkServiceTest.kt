@@ -33,7 +33,10 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.OAuth
+import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.testSDKConfig
+import us.frollo.frollosdk.error.OAuthError
+import us.frollo.frollosdk.error.OAuthErrorType
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
 import us.frollo.frollosdk.network.api.TokenAPI
@@ -60,16 +63,15 @@ class NetworkServiceTest {
         mockTokenServer = MockWebServer()
         mockTokenServer.start()
         val baseUrl = mockTokenServer.url("/$TOKEN_URL")
-        val config = testSDKConfig(tokenUrl = baseUrl.toString())
+        val config = testSDKConfig(serverUrl = baseUrl.toString(), tokenUrl = baseUrl.toString())
 
-        FrolloSDK.app = app
+        if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
+
         keystore = Keystore()
         keystore.setup()
         preferences = Preferences(app)
         val oAuth = OAuth(config = config)
         network = NetworkService(oAuth = oAuth, keystore = keystore, pref = preferences)
-
-        AndroidThreeTen.init(app)
     }
 
     @After
@@ -131,6 +133,37 @@ class NetworkServiceTest {
         assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
         assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
         assertEquals(2550794799, preferences.accessTokenExpiry)
+    }
+
+    @Test
+    fun testForceRefreshingInvalidAccessTokens() {
+        mockTokenServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == "token/") {
+                    return MockResponse()
+                            .setResponseCode(401)
+                            .setBody(readStringFromJson(app, R.raw.error_oauth2_invalid_client))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = 14529375950
+
+        network.refreshTokens { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+
+            assertEquals(OAuthErrorType.INVALID_CLIENT, (result.error as OAuthError).type)
+
+            assertFalse(preferences.loggedIn)
+            assertNull(preferences.encryptedAccessToken)
+            assertNull(preferences.encryptedRefreshToken)
+            assertEquals(-1, preferences.accessTokenExpiry)
+        }
     }
 
     @Test

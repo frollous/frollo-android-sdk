@@ -212,7 +212,7 @@ class AuthenticationTest {
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
-            assertEquals(OAuthErrorType.INVALID_CLIENT, (result.error as OAuthError).type)
+            assertEquals(OAuth2ErrorType.INVALID_CLIENT, (result.error as OAuth2Error).type)
             assertFalse(authentication.loggedIn)
 
             assertNull(preferences.encryptedAccessToken)
@@ -410,7 +410,7 @@ class AuthenticationTest {
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
-            assertEquals(OAuthErrorType.ACCESS_DENIED, (result.error as OAuthError).type)
+            assertEquals(OAuth2ErrorType.ACCESS_DENIED, (result.error as OAuth2Error).type)
             assertFalse(authentication.loggedIn)
 
             assertNull(preferences.encryptedAccessToken)
@@ -582,7 +582,7 @@ class AuthenticationTest {
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
-            assertEquals(OAuthErrorType.INVALID_CLIENT, (result.error as OAuthError).type)
+            assertEquals(OAuth2ErrorType.INVALID_CLIENT, (result.error as OAuth2Error).type)
             assertFalse(authentication.loggedIn)
 
             assertNull(preferences.encryptedAccessToken)
@@ -1220,7 +1220,7 @@ class AuthenticationTest {
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
-            assertEquals(OAuthErrorType.INVALID_CLIENT, (result.error as OAuthError).type)
+            assertEquals(OAuth2ErrorType.INVALID_CLIENT, (result.error as OAuth2Error).type)
             assertFalse(authentication.loggedIn)
 
             assertNull(preferences.encryptedAccessToken)

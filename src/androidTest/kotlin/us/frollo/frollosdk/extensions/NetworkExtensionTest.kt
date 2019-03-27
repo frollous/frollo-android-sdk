@@ -37,7 +37,6 @@ import okhttp3.mockwebserver.MockResponse
 import retrofit2.Response
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Resource
-import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.network.ApiResponse
 import us.frollo.frollosdk.error.*
 import us.frollo.frollosdk.network.ErrorResponseType
@@ -285,8 +284,8 @@ class NetworkExtensionTest {
         handleFailure<Void>(ErrorResponseType.OAUTH2, ApiResponse(Response.error(401, errorBody))) { result ->
             assertEquals(Resource.Status.ERROR, result.status)
             assertNotNull(result.error)
-            assertTrue(result.error is OAuthError)
-            assertEquals(OAuthErrorType.INVALID_CLIENT, (result.error as OAuthError).type)
+            assertTrue(result.error is OAuth2Error)
+            assertEquals(OAuth2ErrorType.INVALID_CLIENT, (result.error as OAuth2Error).type)
         }
 
         tearDown()

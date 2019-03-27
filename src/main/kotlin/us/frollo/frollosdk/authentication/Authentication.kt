@@ -159,7 +159,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
             if (authorizationCode != null) {
                 exchangeAuthorizationCode(code = authorizationCode, codeVerifier = codeVerifier, completion = completion)
             } else {
-                completion.invoke(Result.error(OAuthError(exception = exception)))
+                completion.invoke(Result.error(OAuth2Error(exception = exception)))
             }
         } ?: run {
             completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))

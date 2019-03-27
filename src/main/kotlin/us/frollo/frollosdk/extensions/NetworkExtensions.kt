@@ -55,7 +55,7 @@ internal fun <T> handleFailure(errorResponseType: ErrorResponseType, errorRespon
     if (dataError != null) {
         completion.invoke(Resource.error(error = DataError(dataError.type, dataError.subType))) // Re-create new DataError as the json converter does not has the context object
     } else if (errorResponseType == ErrorResponseType.OAUTH2 && oAuth2ErrorResponse != null) {
-        val oAuth2Error = OAuthError(response = errorMsg)
+        val oAuth2Error = OAuth2Error(response = errorMsg)
         handleOAuth2Failure(oAuth2Error)
         completion.invoke(Resource.error(error = oAuth2Error))
     } else if (errorResponseType == ErrorResponseType.NORMAL && code != null) {
@@ -67,15 +67,15 @@ internal fun <T> handleFailure(errorResponseType: ErrorResponseType, errorRespon
     }
 }
 
-internal fun handleOAuth2Failure(error: OAuthError) {
+internal fun handleOAuth2Failure(error: OAuth2Error) {
     when (error.type) {
-        OAuthErrorType.INVALID_REQUEST,
-        OAuthErrorType.INVALID_CLIENT,
-        OAuthErrorType.INVALID_GRANT,
-        OAuthErrorType.INVALID_SCOPE,
-        OAuthErrorType.UNAUTHORIZED_CLIENT,
-        OAuthErrorType.UNSUPPORTED_GRANT_TYPE,
-        OAuthErrorType.SERVER_ERROR -> {
+        OAuth2ErrorType.INVALID_REQUEST,
+        OAuth2ErrorType.INVALID_CLIENT,
+        OAuth2ErrorType.INVALID_GRANT,
+        OAuth2ErrorType.INVALID_SCOPE,
+        OAuth2ErrorType.UNAUTHORIZED_CLIENT,
+        OAuth2ErrorType.UNSUPPORTED_GRANT_TYPE,
+        OAuth2ErrorType.SERVER_ERROR -> {
             if (FrolloSDK.isSetup) FrolloSDK.forcedLogout()
         }
 

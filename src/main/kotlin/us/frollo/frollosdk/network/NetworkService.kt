@@ -107,7 +107,7 @@ class NetworkService internal constructor(
 
             return apiResponse.body?.accessToken
         } else {
-            val error = OAuthError(response = apiResponse.errorMessage)
+            val error = OAuth2Error(response = apiResponse.errorMessage)
 
             Log.e("$TAG#refreshTokens", error.localizedMessage)
 

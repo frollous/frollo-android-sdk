@@ -18,13 +18,13 @@ package us.frollo.frollosdk.error
 
 import net.openid.appauth.AuthorizationException
 import us.frollo.frollosdk.mapping.toOAuth2ErrorResponse
-import us.frollo.frollosdk.mapping.toOAuthErrorType
+import us.frollo.frollosdk.mapping.toOAuth2ErrorType
 import us.frollo.frollosdk.model.oauth.OAuth2ErrorResponse
 
 /**
  * Represents OAuth2 error that can be returned from the authentication server
  */
-class OAuthError(private val exception: AuthorizationException? = null, response: String? = null) : FrolloSDKError(exception?.message ?: response) {
+class OAuth2Error(private val exception: AuthorizationException? = null, response: String? = null) : FrolloSDKError(exception?.message ?: response) {
 
     private var oAuth2ErrorResponse: OAuth2ErrorResponse? = null
 
@@ -33,8 +33,8 @@ class OAuthError(private val exception: AuthorizationException? = null, response
     }
 
     /** Type of OAuth2 Error */
-    val type : OAuthErrorType
-        get() = oAuth2ErrorResponse?.errorType ?: exception?.toOAuthErrorType() ?: OAuthErrorType.UNKNOWN
+    val type : OAuth2ErrorType
+        get() = oAuth2ErrorResponse?.errorType ?: exception?.toOAuth2ErrorType() ?: OAuth2ErrorType.UNKNOWN
 
     /** Optional error uri returned from authentication server */
     val errorUri: String?

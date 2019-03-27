@@ -17,10 +17,10 @@
 package us.frollo.frollosdk.model.oauth
 
 import com.google.gson.annotations.SerializedName
-import us.frollo.frollosdk.error.OAuthErrorType
+import us.frollo.frollosdk.error.OAuth2ErrorType
 
 internal data class OAuth2ErrorResponse(
         @SerializedName("error_description") val errorDescription: String?,
         @SerializedName("error_uri") val errorUri: String?,
-        @SerializedName("error") val errorType: OAuthErrorType?
+        @SerializedName("error") val errorType: OAuth2ErrorType?
 )

@@ -23,7 +23,7 @@ import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import net.openid.appauth.AuthorizationException
-import us.frollo.frollosdk.error.OAuthErrorType
+import us.frollo.frollosdk.error.OAuth2ErrorType
 
 class ErrorMappingTest {
 
@@ -59,10 +59,10 @@ class ErrorMappingTest {
     }
 
     @Test
-    fun testAuthorizationExceptionToOAuthErrorType() {
+    fun testAuthorizationExceptionToOAuth2ErrorType() {
         val exception = AuthorizationException.AuthorizationRequestErrors.ACCESS_DENIED
-        val type = exception.toOAuthErrorType()
-        Assert.assertEquals(OAuthErrorType.ACCESS_DENIED, type)
+        val type = exception.toOAuth2ErrorType()
+        Assert.assertEquals(OAuth2ErrorType.ACCESS_DENIED, type)
     }
 
     @Test
@@ -72,7 +72,7 @@ class ErrorMappingTest {
         Assert.assertNotNull(response)
         Assert.assertEquals("Request was missing the redirect_uri parameter.", response?.errorDescription)
         Assert.assertEquals("https://authorization-server.com/docs/access_token", response?.errorUri)
-        Assert.assertEquals(OAuthErrorType.INVALID_REQUEST, response?.errorType)
+        Assert.assertEquals(OAuth2ErrorType.INVALID_REQUEST, response?.errorType)
     }
 
     @Test

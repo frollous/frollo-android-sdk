@@ -18,7 +18,6 @@ package us.frollo.frollosdk.network
 
 import android.app.Application
 import androidx.test.platform.app.InstrumentationRegistry
-import com.jakewharton.threetenabp.AndroidThreeTen
 import okhttp3.Request
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -35,11 +34,10 @@ import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.testSDKConfig
-import us.frollo.frollosdk.error.OAuthError
-import us.frollo.frollosdk.error.OAuthErrorType
+import us.frollo.frollosdk.error.OAuth2Error
+import us.frollo.frollosdk.error.OAuth2ErrorType
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
-import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
@@ -157,7 +155,7 @@ class NetworkServiceTest {
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
-            assertEquals(OAuthErrorType.INVALID_CLIENT, (result.error as OAuthError).type)
+            assertEquals(OAuth2ErrorType.INVALID_CLIENT, (result.error as OAuth2Error).type)
 
             assertFalse(preferences.loggedIn)
             assertNull(preferences.encryptedAccessToken)

@@ -25,7 +25,7 @@ import us.frollo.frollosdk.extensions.serializedName
 /**
  * Type of error that has occurred during authorization
  */
-enum class OAuthErrorType(
+enum class OAuth2ErrorType(
         /** Localized string resource id */
         @StringRes val textResource: Int) {
 

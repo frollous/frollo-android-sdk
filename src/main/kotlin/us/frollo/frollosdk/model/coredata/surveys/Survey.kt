@@ -18,9 +18,20 @@ package us.frollo.frollosdk.model.coredata.surveys
 
 import com.google.gson.annotations.SerializedName
 
+/**
+ * Data representation of Survey
+ */
 data class Survey(
+
+        /** Unique identifier of the survey. */
         @SerializedName("id") val id: Long,
+
+        /** Survey Key. Used for fetching the survey. */
         @SerializedName("key") val key: String,
+
+        /** Name of the survey */
         @SerializedName("name") val name: String?,
+
+        /** List of all questions within the survey. */
         @SerializedName("questions") val questions: List<SurveyQuestion>
 )

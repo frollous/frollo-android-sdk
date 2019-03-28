@@ -19,11 +19,22 @@ package us.frollo.frollosdk.model.coredata.surveys
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
+/**
+ * Type of a Survey Question
+ */
 enum class SurveyQuestionType {
+
+    /** Question with a multiple choice select view for answers */
     @SerializedName("multiple_choice") MULTIPLE_CHOICE,
+
+    /** Question with a checkbox view for answers */
     @SerializedName("checkbox") CHECKBOX,
+
+    /** Question with a slider view for answers */
     @SerializedName("slider") SLIDER;
 
+
+    /** Enum to serialized string */
     //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =
             //Try to get the annotation value if available instead of using plain .toString()

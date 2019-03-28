@@ -18,12 +18,29 @@ package us.frollo.frollosdk.model.coredata.surveys
 
 import com.google.gson.annotations.SerializedName
 
+/**
+ * Data representation of a Survey Answer
+ */
 data class SurveyAnswer(
+
+        /** Unique identifier of the survey answer. */
         @SerializedName("id") val id: Long,
+
+        /** Type the survey answer. Used for presentation purposes. */
         @SerializedName("type") val type: SurveyAnswerType,
+
+        /** Title of the survey answer */
         @SerializedName("title") val title: String?,
+
+        /** Additional information for the answer. */
         @SerializedName("display_text") val display_text: String?,
+
+        /** Url of the icon associated to the answer. */
         @SerializedName("icon_url") val icon_url: String?,
-        @SerializedName("value") val value: String,
+
+        /** Value of the answer */
+        @SerializedName("value") var value: String,
+
+        /** Indicates if this is the selected answer.  */
         @SerializedName("selected") var selected: Boolean
 )

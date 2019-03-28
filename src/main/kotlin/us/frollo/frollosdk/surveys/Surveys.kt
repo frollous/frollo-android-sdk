@@ -24,6 +24,9 @@ import us.frollo.frollosdk.model.coredata.surveys.Survey
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.SurveysAPI
 
+/**
+ * Manages fetching & submitting surveys
+ */
 class Surveys(network: NetworkService) {
 
     companion object {
@@ -32,15 +35,29 @@ class Surveys(network: NetworkService) {
 
     private val surveysAPI: SurveysAPI = network.create(SurveysAPI::class.java)
 
-    fun fetchSurvey(surveyKey: String, completion: OnFrolloSDKCompletionListener<Resource<Survey>>? = null) {
+    /**
+     * Fetch a specific survey by key from the host
+     *
+     * @param surveyKey Key of the survey to fetch
+     *
+     * @param completion Completion handler with optional error if the request fails and survey model if succeeds
+     */
+    fun fetchSurvey(surveyKey: String, completion: OnFrolloSDKCompletionListener<Resource<Survey>>) {
         surveysAPI.fetchSurvey(surveyKey = surveyKey).enqueue { resource ->
             if (resource.status == Resource.Status.ERROR) {
                 Log.e("$TAG#fetchSurvey", resource.error?.localizedDescription)
             }
-            completion?.invoke(resource)
+            completion.invoke(resource)
         }
     }
 
+    /**
+     * Submit answer to a survey
+     *
+     * @param survey Answered survey
+     *
+     * @param completion Completion handler with optional error if the request fails and survey model if succeeds (optional)
+     */
     fun submitSurvey(survey: Survey, completion: OnFrolloSDKCompletionListener<Resource<Survey>>? = null) {
         surveysAPI.submitSurvey(request = survey).enqueue { resource ->
             if (resource.status == Resource.Status.ERROR) {

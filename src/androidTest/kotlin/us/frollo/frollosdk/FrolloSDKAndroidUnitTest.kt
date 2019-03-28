@@ -159,6 +159,17 @@ class FrolloSDKAndroidUnitTest {
     }
 
     @Test
+    fun testSDKSurveysThrowsErrorBeforeSetup() {
+        assertFalse(FrolloSDK.isSetup)
+
+        try {
+            FrolloSDK.surveys
+        } catch (e: IllegalAccessException) {
+            assertEquals("SDK not setup", e.localizedMessage)
+        }
+    }
+
+    @Test
     fun testPauseScheduledRefresh() {
         FrolloSDK.setup(app, testSDKConfig()) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)

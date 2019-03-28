@@ -176,6 +176,8 @@ object FrolloSDK {
             _events = Events(network)
             // 12. Setup Notifications
             _notifications = Notifications(authentication, events, messages)
+            // 13. Setup Surveys
+            _surveys = Surveys(network)
 
             if (version.migrationNeeded()) {
                 version.migrateVersion()

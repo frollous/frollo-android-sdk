@@ -31,7 +31,7 @@ internal fun testSurveyData() : Survey {
                     icon_url = null,
                     value = "5",
                     selected = true,
-                    type = SurveyAnswerType.NORMAL_SELECTION))
+                    type = SurveyAnswerType.SELECTION))
 
     val questions = listOf(
             SurveyQuestion(

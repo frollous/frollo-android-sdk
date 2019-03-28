@@ -149,7 +149,7 @@ class SurveysTest {
             assertEquals(1L, model?.questions?.get(0)?.id)
             assertEquals(1, model?.questions?.get(0)?.answers?.size)
             assertEquals(1L, model?.questions?.get(0)?.answers?.get(0)?.id)
-            assertEquals(SurveyAnswerType.NORMAL_SELECTION, model?.questions?.get(0)?.answers?.get(0)?.type)
+            assertEquals(SurveyAnswerType.SELECTION, model?.questions?.get(0)?.answers?.get(0)?.type)
         }
 
         val request = mockServer.takeRequest()

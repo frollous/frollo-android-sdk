@@ -25,10 +25,10 @@ import us.frollo.frollosdk.extensions.serializedName
 enum class SurveyAnswerType {
 
     /** Answer which can accept only selected values */
-    @SerializedName("normal_selection") NORMAL_SELECTION,
+    @SerializedName("selection") SELECTION,
 
     /** Answer which can accept user entry */
-    @SerializedName("open_ended") OPEN_ENDED;
+    @SerializedName("freeform") FREE_FORM;
 
     /** Enum to serialized string */
     //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

@@ -29,6 +29,8 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderA
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
+import us.frollo.frollosdk.model.coredata.reports.ReportGroupTransactionCurrent
+import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
 import us.frollo.frollosdk.model.coredata.user.User
 
 @Database(entities = [
@@ -39,7 +41,9 @@ import us.frollo.frollosdk.model.coredata.user.User
     Account::class,
     Transaction::class,
     TransactionCategory::class,
-    Merchant::class
+    Merchant::class,
+    ReportTransactionCurrent::class,
+    ReportGroupTransactionCurrent::class
 ], version = 1, exportSchema = true)
 
 @TypeConverters(Converters::class)
@@ -53,6 +57,8 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun transactions(): TransactionDao
     internal abstract fun transactionCategories(): TransactionCategoryDao
     internal abstract fun merchants(): MerchantDao
+    internal abstract fun reportsTransactionCurrent(): ReportTransactionCurrentDao
+    internal abstract fun reportGroupsTransactionCurrent(): ReportGroupTransactionCurrentDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"
@@ -71,10 +77,9 @@ abstract class SDKDatabase : RoomDatabase() {
                         .fallbackToDestructiveMigration()
                         //.addMigrations(MIGRATION_1_2)
                         .build()
-        /**
-         * Copy-paste of auto-generated SQLs from room schema json file
-         * located in sandbox code after building under app/schemas/$version.json
-         */
+
+        // Copy-paste of auto-generated SQLs from room schema json file
+        // located in sandbox code after building under app/schemas/$version.json
         /*private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 //to be implemented

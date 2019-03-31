@@ -29,6 +29,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.Tran
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
 import us.frollo.frollosdk.model.coredata.messages.ContentType
+import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.user.*
 import java.math.BigDecimal
@@ -230,6 +231,14 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromMerchantType(value: MerchantType?): String? = value?.name ?: MerchantType.UNKNOWN.name
+
+    // Report
+
+    @TypeConverter
+    fun stringToReportGrouping(value: String?): ReportGrouping? = if (value == null) null else ReportGrouping.valueOf(value)
+
+    @TypeConverter
+    fun stringFromReportGrouping(value: ReportGrouping?): String? = value?.name
 
     // Shared
 

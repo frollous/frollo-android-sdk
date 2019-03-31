@@ -20,6 +20,7 @@ import android.os.Bundle
 import androidx.sqlite.db.SimpleSQLiteQuery
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
+import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.user.User
 import us.frollo.frollosdk.notifications.NotificationPayloadNames
 import java.lang.StringBuilder
@@ -97,5 +98,15 @@ internal fun createNotificationPayload(event: String? = null, link: String? = nu
                         ?.split(",")
                         ?.map { it.toLong() }
                         ?.toList(),
-                userEventID = userEventID?.let { it.trim().toLong() },
-                userMessageID = userMessageID?.let { it.trim().toLong() })
+                userEventID = userEventID?.trim()?.toLong(),
+                userMessageID = userMessageID?.trim()?.toLong())
+
+internal fun String.toBudgetCategory(): BudgetCategory? {
+    return when(this) {
+        BudgetCategory.INCOME.toString() -> BudgetCategory.INCOME
+        BudgetCategory.LIVING.toString() -> BudgetCategory.LIVING
+        BudgetCategory.LIFESTYLE.toString() -> BudgetCategory.LIFESTYLE
+        BudgetCategory.ONE_OFF.toString() -> BudgetCategory.ONE_OFF
+        else -> null
+    }
+}

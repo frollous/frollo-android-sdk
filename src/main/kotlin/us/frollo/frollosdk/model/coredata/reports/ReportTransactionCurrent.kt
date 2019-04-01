@@ -33,6 +33,8 @@ import java.math.BigDecimal
 
 data class ReportTransactionCurrent(
         @ColumnInfo(name = "day") val day: Int,
+        @ColumnInfo(name = "linked_id") val linkedId: Long?,
+        @ColumnInfo(name = "linked_name") val name: String?,
         @ColumnInfo(name = "spend_value") val amount: BigDecimal?,
         @ColumnInfo(name = "previous_period_value") val previous: BigDecimal?,
         @ColumnInfo(name = "average_value") val average: BigDecimal?,
@@ -44,6 +46,4 @@ data class ReportTransactionCurrent(
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "report_id") var reportId: Long? = null
-    fun getId(): Long? = reportId
-
 }

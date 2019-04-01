@@ -17,14 +17,39 @@
 package us.frollo.frollosdk.model.coredata.reports
 
 import androidx.room.*
+import us.frollo.frollosdk.extensions.toBudgetCategory
 import us.frollo.frollosdk.model.IAdapterModel
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
+import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
+import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 
 data class ReportTransactionCurrentRelation(
 
         @Embedded
         var report: ReportTransactionCurrent? = null,
 
-        @Relation(parentColumn = "report_id", entityColumn = "report_id", entity = ReportGroupTransactionCurrent::class)
-        var groups: List<ReportGroupTransactionCurrentRelation>? = null
+        @Relation(parentColumn = "linked_id", entityColumn = "transaction_category_id", entity = TransactionCategory::class)
+        var transactionCategories: List<TransactionCategory>? = null,
 
-): IAdapterModel
+        @Relation(parentColumn = "linked_id", entityColumn = "merchant_id", entity = Merchant::class)
+        var merchants: List<Merchant>? = null
+
+): IAdapterModel {
+
+        val budgetCategory: BudgetCategory?
+                get() {
+                        return report?.name?.toBudgetCategory()
+                }
+
+        val transactionCategory: TransactionCategory?
+                get() {
+                        val models = transactionCategories
+                        return if (models?.isNotEmpty() == true) models[0] else null
+                }
+
+        val merchant: Merchant?
+                get() {
+                        val models = merchants
+                        return if (models?.isNotEmpty() == true) models[0] else null
+                }
+}

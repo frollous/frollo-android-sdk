@@ -29,7 +29,6 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderA
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
-import us.frollo.frollosdk.model.coredata.reports.ReportGroupTransactionCurrent
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
 import us.frollo.frollosdk.model.coredata.user.User
 
@@ -42,8 +41,7 @@ import us.frollo.frollosdk.model.coredata.user.User
     Transaction::class,
     TransactionCategory::class,
     Merchant::class,
-    ReportTransactionCurrent::class,
-    ReportGroupTransactionCurrent::class
+    ReportTransactionCurrent::class
 ], version = 1, exportSchema = true)
 
 @TypeConverters(Converters::class)
@@ -58,7 +56,6 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun transactionCategories(): TransactionCategoryDao
     internal abstract fun merchants(): MerchantDao
     internal abstract fun reportsTransactionCurrent(): ReportTransactionCurrentDao
-    internal abstract fun reportGroupsTransactionCurrent(): ReportGroupTransactionCurrentDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"

@@ -27,20 +27,17 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 internal interface ReportTransactionCurrentDao {
 
     @androidx.room.Transaction
-    @Query("SELECT * FROM report_transaction_current WHERE report_grouping = :grouping AND filtered_budget_category = :budgetCategory")
+    @Query("SELECT * FROM report_transaction_current WHERE report_grouping = :grouping AND filtered_budget_category IS :budgetCategory")
     fun load(grouping: ReportGrouping, budgetCategory: BudgetCategory?): LiveData<List<ReportTransactionCurrentRelation>>
 
-    @Query("SELECT * FROM report_transaction_current WHERE report_grouping = :grouping AND filtered_budget_category = :budgetCategory AND linked_id = :linkedId AND day IN (:days)")
+    @Query("SELECT * FROM report_transaction_current WHERE report_grouping = :grouping AND filtered_budget_category IS :budgetCategory AND linked_id IS :linkedId AND day IN (:days)")
     fun find(grouping: ReportGrouping, budgetCategory: BudgetCategory?, linkedId: Long?, days: IntArray): MutableList<ReportTransactionCurrent>
 
-    @Query("SELECT report_id FROM report_transaction_current WHERE report_grouping = :grouping AND filtered_budget_category = :budgetCategory AND linked_id = :linkedId AND day NOT IN (:days)")
+    @Query("SELECT report_id FROM report_transaction_current WHERE report_grouping = :grouping AND filtered_budget_category IS :budgetCategory AND linked_id IS :linkedId AND day NOT IN (:days)")
     fun findStaleIds(grouping: ReportGrouping, budgetCategory: BudgetCategory?, linkedId: Long?, days: IntArray): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: ReportTransactionCurrent): LongArray
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(model: ReportTransactionCurrent): Long
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun updateAll(vararg models: ReportTransactionCurrent): Int

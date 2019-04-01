@@ -29,7 +29,7 @@ import java.math.BigDecimal
 
 @Entity(tableName = "report_transaction_current",
         indices = [Index("report_id"),
-            Index(value = ["day", "filtered_budget_category", "report_grouping"], unique = true)])
+            Index(value = ["linked_id", "day", "filtered_budget_category", "report_grouping"], unique = true)])
 
 data class ReportTransactionCurrent(
         @ColumnInfo(name = "day") val day: Int,

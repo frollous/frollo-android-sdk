@@ -21,6 +21,10 @@ import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
 import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
+import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
+import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
+import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.network.api.ReportsAPI
 
 internal fun AggregationAPI.fetchTransactionsByQuery(
         fromDate: String, // yyyy-MM-dd
@@ -66,3 +70,9 @@ internal fun AggregationAPI.fetchTransactionsSummaryByIDs(transactionIds: LongAr
 
 internal fun AggregationAPI.fetchMerchantsByIDs(merchantIds: LongArray) : Call<List<MerchantResponse>> =
         fetchMerchantsByIds(mapOf("merchant_ids" to merchantIds.joinToString(",")))
+
+internal fun ReportsAPI.fetchTransactionCurrentReports(grouping: ReportGrouping, budgetCategory: BudgetCategory? = null) : Call<TransactionCurrentReportResponse> {
+    var queryMap = mapOf("grouping" to grouping.toString())
+    budgetCategory?.let { queryMap = queryMap.plus(Pair("budget_category", it.toString())) }
+    return fetchTransactionCurrentReports(queryMap)
+}

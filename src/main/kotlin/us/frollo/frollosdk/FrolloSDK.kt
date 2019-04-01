@@ -47,6 +47,7 @@ import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.notifications.Notifications
 import us.frollo.frollosdk.preferences.Preferences
+import us.frollo.frollosdk.reports.Reports
 import us.frollo.frollosdk.surveys.Surveys
 import us.frollo.frollosdk.version.Version
 import java.lang.Exception
@@ -103,6 +104,12 @@ object FrolloSDK {
     val surveys: Surveys
         get() =_surveys ?: throw IllegalAccessException("SDK not setup")
 
+    /**
+     * Reports - Aggregation data reports. See [Reports] for details
+     */
+    val reports: Reports
+        get() =_reports ?: throw IllegalAccessException("SDK not setup")
+
     private var _setup = false
     private var _authentication: Authentication? = null
     private var _aggregation: Aggregation? = null
@@ -110,6 +117,7 @@ object FrolloSDK {
     private var _events: Events? = null
     private var _notifications: Notifications? = null
     private var _surveys: Surveys? = null
+    private var _reports: Reports? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
@@ -178,6 +186,8 @@ object FrolloSDK {
             _notifications = Notifications(authentication, events, messages)
             // 13. Setup Surveys
             _surveys = Surveys(network)
+            // 14. Setup Reports
+            _reports = Reports(network, database, aggregation)
 
             if (version.migrationNeeded()) {
                 version.migrateVersion()

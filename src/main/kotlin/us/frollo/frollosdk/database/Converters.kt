@@ -30,6 +30,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBa
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
+import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.user.*
 import java.math.BigDecimal
@@ -239,6 +240,12 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromReportGrouping(value: ReportGrouping?): String? = value?.name
+
+    @TypeConverter
+    fun stringToReportPeriod(value: String?): ReportPeriod? = if (value == null) null else ReportPeriod.valueOf(value)
+
+    @TypeConverter
+    fun stringFromReportPeriod(value: ReportPeriod?): String? = value?.name
 
     // Shared
 

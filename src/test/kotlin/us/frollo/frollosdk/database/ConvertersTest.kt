@@ -29,6 +29,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.Tran
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
 import us.frollo.frollosdk.model.coredata.messages.ContentType
+import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.user.*
 
@@ -544,5 +545,21 @@ class ConvertersTest {
         assertEquals("RETAILER", str)
 
         assertEquals("UNKNOWN", Converters.instance.stringFromMerchantType(null))
+    }
+
+    @Test
+    fun testStringToReportGrouping() {
+        val status = Converters.instance.stringToReportGrouping("BUDGET_CATEGORY")
+        assertEquals(ReportGrouping.BUDGET_CATEGORY, status)
+
+        assertNull(Converters.instance.stringToReportGrouping(null))
+    }
+
+    @Test
+    fun testStringFromReportGrouping() {
+        val str = Converters.instance.stringFromReportGrouping(ReportGrouping.BUDGET_CATEGORY)
+        assertEquals("BUDGET_CATEGORY", str)
+
+        assertNull(Converters.instance.stringFromReportGrouping(null))
     }
 }

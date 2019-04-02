@@ -106,6 +106,7 @@ internal fun String.toBudgetCategory(): BudgetCategory? {
         BudgetCategory.INCOME.toString() -> BudgetCategory.INCOME
         BudgetCategory.LIVING.toString() -> BudgetCategory.LIVING
         BudgetCategory.LIFESTYLE.toString() -> BudgetCategory.LIFESTYLE
+        BudgetCategory.SAVINGS.toString() -> BudgetCategory.SAVINGS
         BudgetCategory.ONE_OFF.toString() -> BudgetCategory.ONE_OFF
         else -> null
     }

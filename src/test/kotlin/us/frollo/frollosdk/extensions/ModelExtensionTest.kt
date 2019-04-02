@@ -17,8 +17,10 @@
 package us.frollo.frollosdk.extensions
 
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import us.frollo.frollosdk.mapping.toUser
+import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.testUserResponseData
 
 class ModelExtensionTest {
@@ -40,5 +42,21 @@ class ModelExtensionTest {
     fun testSQLForTransactionStaleIds() {
         val query = sqlForTransactionStaleIds(fromDate = "2019-01-03", toDate = "2019-02-03", accountIds = longArrayOf(123,456), transactionIncluded = false)
         Assert.assertEquals("SELECT transaction_id FROM transaction_model WHERE ((transaction_date BETWEEN Date('2019-01-03') AND Date('2019-02-03'))  AND account_id IN (123,456)  AND included = 0 )", query.sql)
+    }
+
+    @Test
+    fun testStringToBudgetCategory() {
+        var category = "living".toBudgetCategory()
+        assertEquals(BudgetCategory.LIVING, category)
+        category = "lifestyle".toBudgetCategory()
+        assertEquals(BudgetCategory.LIFESTYLE, category)
+        category = "income".toBudgetCategory()
+        assertEquals(BudgetCategory.INCOME, category)
+        category = "goals".toBudgetCategory()
+        assertEquals(BudgetCategory.SAVINGS, category)
+        category = "one_off".toBudgetCategory()
+        assertEquals(BudgetCategory.ONE_OFF, category)
+        category = "invalid_category".toBudgetCategory()
+        assertEquals(null, category)
     }
 }

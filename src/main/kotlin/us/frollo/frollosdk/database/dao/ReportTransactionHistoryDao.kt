@@ -31,11 +31,20 @@ internal interface ReportTransactionHistoryDao {
     @Query("SELECT * FROM report_transaction_history WHERE (date BETWEEN :fromDate AND :toDate) AND report_grouping = :grouping AND period = :period AND filtered_budget_category IS :budgetCategory")
     fun load(fromDate: String, toDate: String, grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory?): LiveData<List<ReportTransactionHistoryRelation>>
 
+    @Query("SELECT * FROM report_transaction_history WHERE (date BETWEEN :fromDate AND :toDate) AND report_grouping = :grouping AND period = :period AND filtered_budget_category IS :budgetCategory AND date IN (:dates)")
+    fun find(fromDate: String, toDate: String, grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory?, dates: Array<String>): MutableList<ReportTransactionHistory>
+
+    @Query("SELECT report_id FROM report_transaction_history WHERE (date BETWEEN :fromDate AND :toDate) AND report_grouping = :grouping AND period = :period AND filtered_budget_category IS :budgetCategory AND date NOT IN (:dates)")
+    fun findStaleIds(fromDate: String, toDate: String, grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory?, dates: Array<String>): LongArray
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: ReportTransactionHistory): LongArray
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(model: ReportTransactionHistory): Long
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun updateAll(vararg models: ReportTransactionHistory): Int
+    fun update(vararg models: ReportTransactionHistory): Int
 
     @Query("DELETE FROM report_transaction_history WHERE report_id IN (:reportIds)")
     fun deleteMany(reportIds: LongArray)

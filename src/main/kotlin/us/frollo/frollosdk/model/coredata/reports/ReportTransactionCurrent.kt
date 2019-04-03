@@ -45,5 +45,5 @@ data class ReportTransactionCurrent(
 ): IAdapterModel {
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "report_id") var reportId: Long? = null
+    @ColumnInfo(name = "report_id") var reportId: Long = 0
 }

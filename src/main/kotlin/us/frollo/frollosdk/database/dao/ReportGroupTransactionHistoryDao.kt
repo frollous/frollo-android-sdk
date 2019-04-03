@@ -22,14 +22,26 @@ import us.frollo.frollosdk.model.coredata.reports.ReportGroupTransactionHistory
 @Dao
 internal interface ReportGroupTransactionHistoryDao {
 
+    @Query("SELECT * FROM report_group_transaction_history WHERE report_id = :reportId AND linked_id IN (:linkedIds)")
+    fun find(reportId: Long, linkedIds: LongArray): MutableList<ReportGroupTransactionHistory>
+
+    @Query("SELECT report_group_id FROM report_group_transaction_history WHERE report_id = :reportId AND linked_id NOT IN (:linkedIds)")
+    fun findStaleIds(reportId: Long, linkedIds: LongArray): LongArray
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: ReportGroupTransactionHistory): LongArray
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(model: ReportGroupTransactionHistory): Long
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun updateAll(vararg models: ReportGroupTransactionHistory): Int
+    fun update(vararg models: ReportGroupTransactionHistory): Int
 
     @Query("DELETE FROM report_group_transaction_history WHERE report_group_id IN (:reportGroupIds)")
     fun deleteMany(reportGroupIds: LongArray)
+
+    @Query("DELETE FROM report_group_transaction_history WHERE report_id IN (:reportIds)")
+    fun deleteByReportIds(reportIds: LongArray)
 
     @Query("DELETE FROM report_group_transaction_history")
     fun clear()

@@ -42,7 +42,7 @@ data class ReportTransactionHistory(
 ): IAdapterModel {
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "report_id") var reportId: Long? = null
+    @ColumnInfo(name = "report_id") var reportId: Long = 0
 
     companion object {
         const val DATE_FORMAT_PATTERN_DAILY = "yyyy-MM-dd"

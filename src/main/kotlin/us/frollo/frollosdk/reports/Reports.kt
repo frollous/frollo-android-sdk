@@ -18,6 +18,7 @@ package us.frollo.frollosdk.reports
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import androidx.room.Transaction
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.aggregation.Aggregation
@@ -90,7 +91,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                 }
                 Resource.Status.SUCCESS -> {
                     handleTransactionHistoryReportsResponse(
-                            response = resource.data,
+                            reportsResponse = resource.data?.data?.toMutableList(),
                             fromDate = fromDate,
                             toDate = toDate,
                             grouping = grouping,
@@ -136,6 +137,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                             idsToDelete = idsToDelete)
                 }
 
+                // Refresh missing merchants
                 if (grouping == ReportGrouping.MERCHANT)
                     fetchMissingMerchants(linkedIds.toSet())
 
@@ -157,8 +159,10 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                                                            reportsToUpdate: MutableList<ReportTransactionCurrent>,
                                                            idsToDelete: MutableList<Long>) {
         try {
+            // Sort by day
             reportsResponse.sortBy { it.day }
 
+            // Fetch existing reports for updating
             val reportDays = reportsResponse.map { it.day }.toIntArray()
 
             val existingReports = db.reportsTransactionCurrent().find(
@@ -167,6 +171,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                     linkedId = linkedId,
                     days = reportDays)
 
+            // Sort by day
             existingReports.sortBy { it.day }
 
             var index = 0
@@ -191,6 +196,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                 }
             }
 
+            // Fetch and delete any leftovers
             val staleIds = db.reportsTransactionCurrent().findStaleIds(
                     grouping = grouping,
                     budgetCategory = budgetCategory,
@@ -203,11 +209,113 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         }
     }
 
-    private fun handleTransactionHistoryReportsResponse(response: TransactionHistoryReportResponse?,
+    @Transaction
+    private fun handleTransactionHistoryReportsResponse(reportsResponse: MutableList<TransactionHistoryReportResponse.Report>?,
                                                         fromDate: String, toDate: String, grouping: ReportGrouping,
                                                         period: ReportPeriod, budgetCategory: BudgetCategory?,
                                                         completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        //TODO: to be implemented
+        reportsResponse?.let {
+            doAsync {
+                // Sort by date
+                reportsResponse.sortBy { it.date }
+
+                // Fetch existing reports for updating
+                val reportDates = reportsResponse.map { it.date }.toTypedArray()
+
+                val existingReports = db.reportsTransactionHistory().find(
+                        fromDate = fromDate,
+                        toDate = toDate,
+                        grouping = grouping,
+                        period = period,
+                        budgetCategory = budgetCategory,
+                        dates = reportDates)
+
+                // Sort by date
+                existingReports.sortBy { it.date }
+
+                var index = 0
+
+                reportsResponse.forEach { response ->
+                    val report = response.toReportTransactionHistory(grouping = grouping, period = period, budgetCategory = budgetCategory)
+
+                    if (index < existingReports.size && existingReports[index].date == response.date) {
+                        // Update
+                        report.reportId = existingReports[index].reportId
+
+                        db.reportsTransactionHistory().update(report)
+
+                        index += 1
+                    } else {
+                        // Insert
+                        report.reportId = db.reportsTransactionHistory().insert(report)
+                    }
+
+                    handleTransactionHistoryGroupReportsResponse(response.groups.toMutableList(), report)
+                }
+
+                // Fetch and delete any leftovers
+                val staleReportIds = db.reportsTransactionHistory().findStaleIds(
+                        fromDate = fromDate,
+                        toDate = toDate,
+                        grouping = grouping,
+                        period = period,
+                        budgetCategory = budgetCategory,
+                        dates = reportDates)
+
+                db.reportsTransactionHistory().deleteMany(staleReportIds)
+                db.reportGroupsTransactionHistory().deleteByReportIds(staleReportIds)
+
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    // WARNING: Do not call this method on the main thread
+    @Transaction
+    private fun handleTransactionHistoryGroupReportsResponse(groupsResponse: MutableList<TransactionHistoryReportResponse.Report.GroupReport>, report: ReportTransactionHistory) {
+        val linkedIds = mutableListOf<Long>()
+
+        // Sort by linked id
+        groupsResponse.sortBy { it.id }
+        val categoryReportIds = groupsResponse.map { it.id }.toLongArray()
+
+        val existingReportGroups = db.reportGroupsTransactionHistory().find(report.reportId, categoryReportIds)
+
+        // Sort by linked id
+        existingReportGroups.sortBy { it.linkedId }
+
+        var index = 0
+
+        groupsResponse.forEach { response ->
+            linkedIds.add(response.id)
+
+            val reportGroup = response.toReportGroupTransactionHistory(
+                    grouping = report.grouping,
+                    period = report.period,
+                    budgetCategory = report.filteredBudgetCategory,
+                    date = report.date,
+                    reportId = report.reportId)
+
+            if (index < existingReportGroups.size && existingReportGroups[index].linkedId == response.id) {
+                // Update
+                reportGroup.reportGroupId = existingReportGroups[index].reportGroupId
+
+                db.reportGroupsTransactionHistory().update(reportGroup)
+
+                index += 1
+            } else {
+                // Insert
+                db.reportGroupsTransactionHistory().insert(reportGroup)
+            }
+        }
+
+        // Refresh missing merchants
+        if (report.grouping == ReportGrouping.MERCHANT)
+            fetchMissingMerchants(linkedIds.toSet())
+
+        // Fetch and delete any leftovers
+        val staleIds = db.reportGroupsTransactionHistory().findStaleIds(report.reportId, categoryReportIds)
+        db.reportGroupsTransactionHistory().deleteMany(staleIds)
     }
 
     private fun fetchMissingMerchants(merchantIds: Set<Long>) {

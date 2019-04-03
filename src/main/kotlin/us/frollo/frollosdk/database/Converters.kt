@@ -53,6 +53,12 @@ internal class Converters {
     fun stringFromListOfString(value: List<String>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|" , postfix = "|")
 
     @TypeConverter
+    fun stringToListOfLong(value: String?): List<Long>? = if (value == null) null else value.split("|").filter { it.isNotBlank() }.map { it.toLong() }
+
+    @TypeConverter
+    fun stringFromListOfLong(value: List<Long>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|" , postfix = "|")
+
+    @TypeConverter
     fun stringToBigDecimal(value: String?): BigDecimal? = if (value == null) null else BigDecimal(value)
 
     @TypeConverter

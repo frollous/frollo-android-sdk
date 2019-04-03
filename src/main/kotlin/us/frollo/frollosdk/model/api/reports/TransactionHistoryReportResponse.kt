@@ -34,7 +34,8 @@ internal data class TransactionHistoryReportResponse(
                 @SerializedName("id") val id: Long,
                 @SerializedName("name") val name: String,
                 @SerializedName("budget") val budget: BigDecimal?,
-                @SerializedName("value") val value: BigDecimal
+                @SerializedName("value") val value: BigDecimal,
+                @SerializedName("transaction_ids") val transactionIds: List<Long>
         )
     }
 }

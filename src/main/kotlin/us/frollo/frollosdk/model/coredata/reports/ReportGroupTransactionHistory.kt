@@ -40,6 +40,7 @@ data class ReportGroupTransactionHistory(
         @ColumnInfo(name = "period") val period: ReportPeriod,
         @ColumnInfo(name = "filtered_budget_category") val filteredBudgetCategory: BudgetCategory?,
         @ColumnInfo(name = "report_grouping") val grouping: ReportGrouping,
+        @ColumnInfo(name = "transaction_ids") val transactionIds: List<Long>,
         @ColumnInfo(name = "report_id") val reportId: Long
 ): IAdapterModel {
 

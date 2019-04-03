@@ -32,7 +32,7 @@ import java.math.BigDecimal
             Index(value = ["date", "period", "filtered_budget_category", "report_grouping"], unique = true)])
 
 data class ReportTransactionHistory(
-        @ColumnInfo(name = "date") val date: String, // yyyy-MM,
+        @ColumnInfo(name = "date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
         @ColumnInfo(name = "value") val value: BigDecimal,
         @ColumnInfo(name = "budget") val budget: BigDecimal?,
         @ColumnInfo(name = "period") val period: ReportPeriod,
@@ -43,4 +43,10 @@ data class ReportTransactionHistory(
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "report_id") var reportId: Long? = null
+
+    companion object {
+        const val DATE_FORMAT_PATTERN_DAILY = "yyyy-MM-dd"
+        const val DATE_FORMAT_PATTERN_MONTHLY = "yyyy-MM"
+        const val DATE_FORMAT_PATTERN_WEEKLY = "yyyy-MM-W"
+    }
 }

@@ -736,8 +736,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     /**
      * Refresh transactions from a certain period from the host
      *
-     * @param fromDate Start date to fetch transactions from (inclusive)
-     * @param toDate End date to fetch transactions up to (inclusive)
+     * @param fromDate Start date to fetch transactions from (inclusive). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param toDate End date to fetch transactions up to (inclusive). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
      * @param accountIds Specific account IDs of the transactions to fetch (optional)
      * @param transactionIncluded Boolean flag to indicate to fetch only those transactions that are excluded/included in budget (optional)
      * @param completion Optional completion handler with optional error if the request fails
@@ -917,8 +917,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     /**
      * Fetch transactions summary from a certain period from the host
      *
-     * @param fromDate Start date to fetch transactions summary from (inclusive)
-     * @param toDate End date to fetch transactions summary up to (inclusive)
+     * @param fromDate Start date to fetch transactions summary from (inclusive). Please use [TransactionsSummary.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param toDate End date to fetch transactions summary up to (inclusive). Please use [TransactionsSummary.DATE_FORMAT_PATTERN] for the format pattern.
      * @param accountIds Specific account IDs of the transactions to fetch summary (optional)
      * @param onlyIncludedTransactions Boolean flag to indicate to fetch summary for only those transactions that are excluded/included in budget (optional)
      * @param onlyIncludedAccounts Boolean flag to indicate to fetch summary for only those transactions of excluded/included Accounts (optional)

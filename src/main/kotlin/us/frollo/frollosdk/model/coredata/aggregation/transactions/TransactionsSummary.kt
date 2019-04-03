@@ -21,9 +21,14 @@ import java.math.BigDecimal
 /** Transaction summary */
 data class TransactionsSummary(
 
-        /** Number of transactions */
-        val count: Long,
+    /** Number of transactions */
+    val count: Long,
 
-        /** Sum of the transactions */
-        val sum: BigDecimal
-)
+    /** Sum of the transactions */
+    val sum: BigDecimal
+) {
+    companion object {
+        /** Date format for dates associated with Transaction summary */
+        const val DATE_FORMAT_PATTERN = "yyyy-MM-dd"
+    }
+}

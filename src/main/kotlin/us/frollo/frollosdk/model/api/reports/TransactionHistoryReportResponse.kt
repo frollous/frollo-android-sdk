@@ -24,7 +24,7 @@ internal data class TransactionHistoryReportResponse(
 ) {
 
     internal data class Report(
-            @SerializedName("date") val date: String, // yyyy-MM
+            @SerializedName("date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
             @SerializedName("value") val spendValue: BigDecimal,
             @SerializedName("budget") val budget: BigDecimal?,
             @SerializedName("groups") val groups: List<GroupReport>

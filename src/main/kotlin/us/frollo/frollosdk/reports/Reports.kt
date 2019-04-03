@@ -30,9 +30,8 @@ import us.frollo.frollosdk.extensions.*
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.*
 import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
-import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
-import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
-import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrentRelation
+import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
+import us.frollo.frollosdk.model.coredata.reports.*
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.network.api.ReportsAPI
 import java.lang.Exception
@@ -65,6 +64,37 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                     handleTransactionCurrentReportsResponse(
                             response = resource.data,
                             grouping = grouping,
+                            budgetCategory = budgetCategory,
+                            completion = completion)
+                }
+            }
+        }
+    }
+
+    // Transactions History Reports
+
+    fun historyTransactionReports(fromDate: String, toDate: String, grouping: ReportGrouping,
+                                  period: ReportPeriod, budgetCategory: BudgetCategory? = null): LiveData<Resource<List<ReportTransactionHistoryRelation>>> =
+            Transformations.map(db.reportsTransactionHistory().load(fromDate, toDate, grouping, period, budgetCategory)) { model ->
+                Resource.success(model)
+            }
+
+    fun refreshTransactionHistoryReports(fromDate: String, toDate: String, grouping: ReportGrouping,
+                                         period: ReportPeriod, budgetCategory: BudgetCategory? = null,
+                                         completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        reportsAPI.fetchTransactionHistoryReports(grouping, period, fromDate, toDate, budgetCategory).enqueue { resource ->
+            when(resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshTransactionHistoryReports", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleTransactionHistoryReportsResponse(
+                            response = resource.data,
+                            fromDate = fromDate,
+                            toDate = toDate,
+                            grouping = grouping,
+                            period = period,
                             budgetCategory = budgetCategory,
                             completion = completion)
                 }
@@ -171,6 +201,13 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         } catch (e: Exception) {
             Log.e("$TAG#handleTransactionCurrentDayReportsResponse", e.message)
         }
+    }
+
+    private fun handleTransactionHistoryReportsResponse(response: TransactionHistoryReportResponse?,
+                                                        fromDate: String, toDate: String, grouping: ReportGrouping,
+                                                        period: ReportPeriod, budgetCategory: BudgetCategory?,
+                                                        completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        //TODO: to be implemented
     }
 
     private fun fetchMissingMerchants(merchantIds: Set<Long>) {

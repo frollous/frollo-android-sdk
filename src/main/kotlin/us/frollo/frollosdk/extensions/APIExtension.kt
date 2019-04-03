@@ -22,7 +22,9 @@ import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
+import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
+import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.network.api.ReportsAPI
 
@@ -75,4 +77,12 @@ internal fun ReportsAPI.fetchTransactionCurrentReports(grouping: ReportGrouping,
     var queryMap = mapOf("grouping" to grouping.toString())
     budgetCategory?.let { queryMap = queryMap.plus(Pair("budget_category", it.toString())) }
     return fetchTransactionCurrentReports(queryMap)
+}
+
+internal fun ReportsAPI.fetchTransactionHistoryReports(grouping: ReportGrouping, period: ReportPeriod,
+                                                       fromDate: String, toDate: String,
+                                                       budgetCategory: BudgetCategory? = null) : Call<TransactionHistoryReportResponse> {
+    var queryMap = mapOf("grouping" to grouping.toString(), "period" to period.toString(), "from_date" to fromDate, "to_date" to toDate)
+    budgetCategory?.let { queryMap = queryMap.plus(Pair("budget_category", it.toString())) }
+    return fetchTransactionHistoryReports(queryMap)
 }

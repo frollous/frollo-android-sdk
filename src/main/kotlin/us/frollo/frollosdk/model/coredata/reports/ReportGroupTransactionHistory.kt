@@ -36,7 +36,7 @@ data class ReportGroupTransactionHistory(
         @ColumnInfo(name = "linked_name") val name: String,
         @ColumnInfo(name = "value") val value: BigDecimal,
         @ColumnInfo(name = "budget") val budget: BigDecimal?,
-        @ColumnInfo(name = "date") val date: String,
+        @ColumnInfo(name = "date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
         @ColumnInfo(name = "period") val period: ReportPeriod,
         @ColumnInfo(name = "filtered_budget_category") val filteredBudgetCategory: BudgetCategory?,
         @ColumnInfo(name = "report_grouping") val grouping: ReportGrouping,
@@ -45,4 +45,10 @@ data class ReportGroupTransactionHistory(
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "report_group_id") var reportGroupId: Long? = null
+
+    companion object {
+        const val DATE_FORMAT_PATTERN_DAILY = "yyyy-MM-dd"
+        const val DATE_FORMAT_PATTERN_MONTHLY = "yyyy-MM"
+        const val DATE_FORMAT_PATTERN_WEEKLY = "yyyy-MM-W"
+    }
 }

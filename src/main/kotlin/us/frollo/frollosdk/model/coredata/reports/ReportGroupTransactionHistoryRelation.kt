@@ -26,7 +26,7 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 data class ReportGroupTransactionHistoryRelation(
 
         @Embedded
-        var report: ReportGroupTransactionHistory? = null,
+        var groupReport: ReportGroupTransactionHistory? = null,
 
         @Relation(parentColumn = "report_id", entityColumn = "report_id", entity = ReportTransactionHistory::class)
         var overallReports: List<ReportTransactionHistory>? = null,
@@ -47,7 +47,7 @@ data class ReportGroupTransactionHistoryRelation(
 
         val budgetCategory: BudgetCategory?
                 get() {
-                        return report?.name?.toBudgetCategory()
+                        return groupReport?.name?.toBudgetCategory()
                 }
 
         val transactionCategory: TransactionCategory?

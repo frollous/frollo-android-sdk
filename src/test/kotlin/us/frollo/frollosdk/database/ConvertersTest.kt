@@ -30,6 +30,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBa
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
+import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.user.*
 
@@ -561,5 +562,41 @@ class ConvertersTest {
         assertEquals("BUDGET_CATEGORY", str)
 
         assertNull(Converters.instance.stringFromReportGrouping(null))
+    }
+
+    @Test
+    fun testStringToReportPeriod() {
+        val status = Converters.instance.stringToReportPeriod("MONTH")
+        assertEquals(ReportPeriod.MONTH, status)
+
+        assertNull(Converters.instance.stringToReportPeriod(null))
+    }
+
+    @Test
+    fun testStringFromReportPeriod() {
+        val str = Converters.instance.stringFromReportPeriod(ReportPeriod.MONTH)
+        assertEquals("MONTH", str)
+
+        assertNull(Converters.instance.stringFromReportPeriod(null))
+    }
+
+    @Test
+    fun testStringToListOfLong() {
+        val string = "|1024790|1024791|1024792|"
+        val list = Converters.instance.stringToListOfLong(string)
+        assertNotNull(list)
+        assertTrue(list?.size == 3)
+        assertEquals(1024790L, list?.get(0))
+        assertEquals(1024791L, list?.get(1))
+        assertEquals(1024792L, list?.get(2))
+
+        assertNull(Converters.instance.stringToListOfString(null))
+    }
+
+    @Test
+    fun testStringFromListOfLong() {
+        val list = mutableListOf<Long>(1024790, 1024791, 1024792)
+        val string = Converters.instance.stringFromListOfLong(list)
+        assertEquals("|1024790|1024791|1024792|", string)
     }
 }

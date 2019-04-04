@@ -17,8 +17,8 @@
 package us.frollo.frollosdk.model
 
 import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
-import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
-import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
+import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
+import us.frollo.frollosdk.model.coredata.reports.*
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.testutils.randomNumber
 import java.math.BigDecimal
@@ -46,6 +46,24 @@ internal fun testTransactionCurrentReportResponseData() : TransactionCurrentRepo
     return TransactionCurrentReportResponse(days = days, groups = groups)
 }
 
+internal fun testTransactionHistoryReportResponseData() : TransactionHistoryReportResponse {
+    val groups = listOf(
+            TransactionHistoryReportResponse.Report.GroupReport(
+                    id = 1,
+                    name = "living",
+                    value = randomNumber().toBigDecimal(),
+                    budget = randomNumber().toBigDecimal(),
+                    transactionIds = listOf(1093435, 2959945)))
+
+    val data = listOf(TransactionHistoryReportResponse.Report(
+            date = "2019-03",
+            value = randomNumber().toBigDecimal(),
+            budget = randomNumber().toBigDecimal(),
+            groups = groups))
+
+    return TransactionHistoryReportResponse(data = data)
+}
+
 internal fun testReportTransactionCurrentData(
         day: Int, linkedId: Long? = null, linkedName: String? = null,
         grouping: ReportGrouping? = null, budgetCategory: BudgetCategory? = null,
@@ -62,6 +80,43 @@ internal fun testReportTransactionCurrentData(
             grouping = grouping ?: ReportGrouping.values()[Random.nextInt(ReportGrouping.values().size)])
 
     id?.let { report.reportId = it }
+
+    return report
+}
+
+internal fun testReportTransactionHistoryData(
+        date: String, period: ReportPeriod, grouping: ReportGrouping? = null, budgetCategory: BudgetCategory? = null,
+        id: Long? = null, value: BigDecimal? = null): ReportTransactionHistory {
+    val report = ReportTransactionHistory(
+            date = date,
+            value = value ?: BigDecimal(34.67),
+            budget = BigDecimal(30.00),
+            period = period,
+            filteredBudgetCategory = budgetCategory,
+            grouping = grouping ?: ReportGrouping.values()[Random.nextInt(ReportGrouping.values().size)])
+
+    id?.let { report.reportId = it }
+
+    return report
+}
+
+internal fun testReportGroupTransactionHistoryData(
+        date: String, linkedId: Long, linkedName: String, period: ReportPeriod,
+        grouping: ReportGrouping? = null, budgetCategory: BudgetCategory? = null,
+        id: Long? = null, value: BigDecimal? = null, reportId: Long): ReportGroupTransactionHistory {
+    val report = ReportGroupTransactionHistory(
+            date = date,
+            linkedId = linkedId,
+            name = linkedName,
+            value = value ?: BigDecimal(34.67),
+            budget = BigDecimal(30.00),
+            transactionIds = null,
+            period = period,
+            filteredBudgetCategory = budgetCategory,
+            grouping = grouping ?: ReportGrouping.values()[Random.nextInt(ReportGrouping.values().size)],
+            reportId = reportId)
+
+    id?.let { report.reportGroupId = it }
 
     return report
 }

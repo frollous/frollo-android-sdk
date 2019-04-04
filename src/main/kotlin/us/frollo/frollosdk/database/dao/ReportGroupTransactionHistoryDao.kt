@@ -22,6 +22,9 @@ import us.frollo.frollosdk.model.coredata.reports.ReportGroupTransactionHistory
 @Dao
 internal interface ReportGroupTransactionHistoryDao {
 
+    @Query("SELECT * FROM report_group_transaction_history")
+    fun load(): List<ReportGroupTransactionHistory>
+
     @Query("SELECT * FROM report_group_transaction_history WHERE report_id = :reportId AND linked_id IN (:linkedIds)")
     fun find(reportId: Long, linkedIds: LongArray): MutableList<ReportGroupTransactionHistory>
 

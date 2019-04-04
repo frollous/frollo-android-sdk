@@ -18,14 +18,19 @@ package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
 import retrofit2.http.*
+import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
 
 internal interface ReportsAPI {
     companion object {
+        const val URL_REPORT_ACCOUNT_BALANCE = "reports/accounts/history/balances"
         const val URL_REPORT_TRANSACTIONS_CURRENT = "reports/transactions/current"
         const val URL_REPORT_TRANSACTIONS_HISTORY = "reports/transactions/history"
     }
+
+    @GET(URL_REPORT_ACCOUNT_BALANCE)
+    fun fetchAccountBalanceReports(@QueryMap options: Map<String, String>): Call<AccountBalanceReportResponse>
 
     @GET(URL_REPORT_TRANSACTIONS_CURRENT)
     fun fetchTransactionCurrentReports(@QueryMap options: Map<String, String>): Call<TransactionCurrentReportResponse>

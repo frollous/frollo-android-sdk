@@ -21,8 +21,10 @@ import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
 import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
+import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
@@ -72,6 +74,14 @@ internal fun AggregationAPI.fetchTransactionsSummaryByIDs(transactionIds: LongAr
 
 internal fun AggregationAPI.fetchMerchantsByIDs(merchantIds: LongArray) : Call<List<MerchantResponse>> =
         fetchMerchantsByIds(mapOf("merchant_ids" to merchantIds.joinToString(",")))
+
+internal fun ReportsAPI.fetchAccountBalanceReports(period: ReportPeriod, fromDate: String, toDate: String,
+                                                   accountId: Long? = null, accountType: AccountType? = null) : Call<AccountBalanceReportResponse> {
+    var queryMap = mapOf("period" to period.toString(), "from_date" to fromDate, "to_date" to toDate)
+    accountType?.let { queryMap = queryMap.plus(Pair("container", it.toString())) }
+    accountId?.let { queryMap = queryMap.plus(Pair("account_id", it.toString())) }
+    return fetchAccountBalanceReports(queryMap)
+}
 
 internal fun ReportsAPI.fetchTransactionCurrentReports(grouping: ReportGrouping, budgetCategory: BudgetCategory? = null) : Call<TransactionCurrentReportResponse> {
     var queryMap = mapOf("grouping" to grouping.toString())

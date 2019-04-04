@@ -30,8 +30,10 @@ import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.extensions.*
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.*
+import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.reports.*
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.network.api.ReportsAPI
@@ -46,6 +48,51 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
     private val reportsAPI: ReportsAPI = network.create(ReportsAPI::class.java)
 
     private var refreshingMerchantIDs = setOf<Long>()
+
+    // Account Balance Reports
+
+    fun accountBalanceReports(fromDate: String, toDate: String, period: ReportPeriod,
+                              accountId: Long? = null, accountType: AccountType? = null): LiveData<Resource<List<ReportAccountBalanceRelation>>> =
+            if (accountId != null && accountType != null) {
+                Transformations.map(db.reportAccountBalance().loadByAccountIdAndAccountType(fromDate, toDate, period, accountId, accountType)) { model ->
+                    Resource.success(model)
+                }
+            } else if (accountId != null && accountType == null) {
+                Transformations.map(db.reportAccountBalance().loadByAccountId(fromDate, toDate, period, accountId)) { model ->
+                    Resource.success(model)
+                }
+            } else if (accountId == null && accountType != null) {
+                Transformations.map(db.reportAccountBalance().loadByAccountType(fromDate, toDate, period, accountType)) { model ->
+                    Resource.success(model)
+                }
+            } else {
+                Transformations.map(db.reportAccountBalance().load(fromDate, toDate, period)) { model ->
+                    Resource.success(model)
+                }
+            }
+
+    fun refreshAccountBalanceReports(fromDate: String, toDate: String, period: ReportPeriod,
+                                     accountId: Long? = null, accountType: AccountType? = null,
+                                     completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        reportsAPI.fetchAccountBalanceReports(period, fromDate, toDate, accountId, accountType).enqueue { resource ->
+            when(resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshAccountBalanceReports", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleAccountBalanceReportsResponse(
+                            response = resource.data?.data?.toMutableList(),
+                            fromDate = fromDate,
+                            toDate = toDate,
+                            period = period,
+                            accountId = accountId,
+                            accountType = accountType,
+                            completion = completion)
+                }
+            }
+        }
+    }
 
     // Transactions Current Reports
 
@@ -104,6 +151,13 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
     }
 
     // Response Handlers
+
+    private fun handleAccountBalanceReportsResponse(response: MutableList<AccountBalanceReportResponse.Report>?,
+                                                    fromDate: String, toDate: String, period: ReportPeriod,
+                                                    accountId: Long?, accountType: AccountType?,
+                                                    completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        //TODO: to be implemented
+    }
 
     private fun handleTransactionCurrentReportsResponse(response: TransactionCurrentReportResponse?,
                                                         grouping: ReportGrouping, budgetCategory: BudgetCategory?,

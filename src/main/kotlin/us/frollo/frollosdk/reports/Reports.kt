@@ -53,22 +53,8 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
 
     fun accountBalanceReports(fromDate: String, toDate: String, period: ReportPeriod,
                               accountId: Long? = null, accountType: AccountType? = null): LiveData<Resource<List<ReportAccountBalanceRelation>>> =
-            if (accountId != null && accountType != null) {
-                Transformations.map(db.reportAccountBalance().loadByAccountIdAndAccountType(fromDate, toDate, period, accountId, accountType)) { model ->
-                    Resource.success(model)
-                }
-            } else if (accountId != null && accountType == null) {
-                Transformations.map(db.reportAccountBalance().loadByAccountId(fromDate, toDate, period, accountId)) { model ->
-                    Resource.success(model)
-                }
-            } else if (accountId == null && accountType != null) {
-                Transformations.map(db.reportAccountBalance().loadByAccountType(fromDate, toDate, period, accountType)) { model ->
-                    Resource.success(model)
-                }
-            } else {
-                Transformations.map(db.reportAccountBalance().load(fromDate, toDate, period)) { model ->
-                    Resource.success(model)
-                }
+            Transformations.map(db.reportAccountBalance().load(sqlForFetchingAccountBalanceReports(fromDate, toDate, period, accountId, accountType))) { model ->
+                Resource.success(model)
             }
 
     fun refreshAccountBalanceReports(fromDate: String, toDate: String, period: ReportPeriod,
@@ -83,8 +69,6 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                 Resource.Status.SUCCESS -> {
                     handleAccountBalanceReportsResponse(
                             response = resource.data?.data?.toMutableList(),
-                            fromDate = fromDate,
-                            toDate = toDate,
                             period = period,
                             accountId = accountId,
                             accountType = accountType,
@@ -152,11 +136,65 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
 
     // Response Handlers
 
+    @Transaction
     private fun handleAccountBalanceReportsResponse(response: MutableList<AccountBalanceReportResponse.Report>?,
-                                                    fromDate: String, toDate: String, period: ReportPeriod,
-                                                    accountId: Long?, accountType: AccountType?,
+                                                    period: ReportPeriod, accountId: Long?, accountType: AccountType?,
                                                     completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        //TODO: to be implemented
+        response?.let {
+            doAsync {
+                // Sort by date
+                response.sortBy { it.date }
+
+                response.forEach { report ->
+                    handleAccountBalanceReportsForDate(report.accounts.toMutableList(), report.date, period, accountId, accountType)
+                }
+
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    // WARNING: Do not call this method on the main thread
+    @Transaction
+    private fun handleAccountBalanceReportsForDate(reportsResponse: MutableList<AccountBalanceReportResponse.Report.BalanceReport>,
+                                                   date: String, period: ReportPeriod, accountId: Long?, accountType: AccountType?) {
+        try {
+            // Sort by id
+            reportsResponse.sortBy { it.id }
+
+            // Fetch existing reports for updating
+            val reportAccountsIds = reportsResponse.map { it.id }.toLongArray()
+
+            val existingReports = db.reportAccountBalance().find(sqlForExistingAccountBalanceReports(date, period, reportAccountsIds, accountId, accountType))
+
+            // Sort by date
+            existingReports.sortBy { it.date }
+
+            var index = 0
+
+            reportsResponse.forEach { response ->
+                val report = response.toReportAccountBalance(date, period)
+
+                if (index < existingReports.size && existingReports[index].accountId == response.id) {
+                    // Update
+                    report.reportId = existingReports[index].reportId
+
+                    db.reportAccountBalance().update(report)
+
+                    index += 1
+                } else {
+                    // Insert
+                    db.reportAccountBalance().insert(report)
+                }
+            }
+
+            // Fetch and delete any leftovers
+            val staleIds = db.reportAccountBalance().findStaleIds(sqlForStaleIdsAccountBalanceReports(date, period, reportAccountsIds, accountId, accountType))
+
+            db.reportAccountBalance().deleteMany(staleIds)
+        } catch (e: Exception) {
+            Log.e("$TAG#handleAccountBalanceReportsForDate", e.message)
+        }
     }
 
     private fun handleTransactionCurrentReportsResponse(response: TransactionCurrentReportResponse?,
@@ -270,54 +308,58 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                                                         completion: OnFrolloSDKCompletionListener<Result>? = null) {
         reportsResponse?.let {
             doAsync {
-                // Sort by date
-                reportsResponse.sortBy { it.date }
+                try {
+                    // Sort by date
+                    reportsResponse.sortBy { it.date }
 
-                // Fetch existing reports for updating
-                val reportDates = reportsResponse.map { it.date }.toTypedArray()
+                    // Fetch existing reports for updating
+                    val reportDates = reportsResponse.map { it.date }.toTypedArray()
 
-                val existingReports = db.reportsTransactionHistory().find(
-                        fromDate = fromDate,
-                        toDate = toDate,
-                        grouping = grouping,
-                        period = period,
-                        budgetCategory = budgetCategory,
-                        dates = reportDates)
+                    val existingReports = db.reportsTransactionHistory().find(
+                            fromDate = fromDate,
+                            toDate = toDate,
+                            grouping = grouping,
+                            period = period,
+                            budgetCategory = budgetCategory,
+                            dates = reportDates)
 
-                // Sort by date
-                existingReports.sortBy { it.date }
+                    // Sort by date
+                    existingReports.sortBy { it.date }
 
-                var index = 0
+                    var index = 0
 
-                reportsResponse.forEach { response ->
-                    val report = response.toReportTransactionHistory(grouping = grouping, period = period, budgetCategory = budgetCategory)
+                    reportsResponse.forEach { response ->
+                        val report = response.toReportTransactionHistory(grouping = grouping, period = period, budgetCategory = budgetCategory)
 
-                    if (index < existingReports.size && existingReports[index].date == response.date) {
-                        // Update
-                        report.reportId = existingReports[index].reportId
+                        if (index < existingReports.size && existingReports[index].date == response.date) {
+                            // Update
+                            report.reportId = existingReports[index].reportId
 
-                        db.reportsTransactionHistory().update(report)
+                            db.reportsTransactionHistory().update(report)
 
-                        index += 1
-                    } else {
-                        // Insert
-                        report.reportId = db.reportsTransactionHistory().insert(report)
+                            index += 1
+                        } else {
+                            // Insert
+                            report.reportId = db.reportsTransactionHistory().insert(report)
+                        }
+
+                        handleTransactionHistoryGroupReportsResponse(response.groups.toMutableList(), report)
                     }
 
-                    handleTransactionHistoryGroupReportsResponse(response.groups.toMutableList(), report)
+                    // Fetch and delete any leftovers
+                    val staleReportIds = db.reportsTransactionHistory().findStaleIds(
+                            fromDate = fromDate,
+                            toDate = toDate,
+                            grouping = grouping,
+                            period = period,
+                            budgetCategory = budgetCategory,
+                            dates = reportDates)
+
+                    db.reportsTransactionHistory().deleteMany(staleReportIds)
+                    db.reportGroupsTransactionHistory().deleteByReportIds(staleReportIds)
+                } catch (e: Exception) {
+                    Log.e("$TAG#handleTransactionHistoryReportsResponse", e.message)
                 }
-
-                // Fetch and delete any leftovers
-                val staleReportIds = db.reportsTransactionHistory().findStaleIds(
-                        fromDate = fromDate,
-                        toDate = toDate,
-                        grouping = grouping,
-                        period = period,
-                        budgetCategory = budgetCategory,
-                        dates = reportDates)
-
-                db.reportsTransactionHistory().deleteMany(staleReportIds)
-                db.reportGroupsTransactionHistory().deleteByReportIds(staleReportIds)
 
                 uiThread { completion?.invoke(Result.success()) }
             }

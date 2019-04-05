@@ -16,6 +16,7 @@
 
 package us.frollo.frollosdk.mapping
 
+import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
 import us.frollo.frollosdk.model.coredata.reports.*
@@ -54,3 +55,11 @@ internal fun TransactionHistoryReportResponse.Report.GroupReport.toReportGroupTr
                 filteredBudgetCategory = budgetCategory,
                 grouping = grouping,
                 reportId = reportId)
+
+internal fun AccountBalanceReportResponse.Report.BalanceReport.toReportAccountBalance(date: String, period: ReportPeriod) =
+        ReportAccountBalance(
+                date = date,
+                value = value,
+                period = period,
+                currency = currency,
+                accountId = id)

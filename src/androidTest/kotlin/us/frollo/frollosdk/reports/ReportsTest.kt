@@ -37,9 +37,11 @@ import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.keystore.Keystore
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.model.testReportAccountBalanceData
 import us.frollo.frollosdk.model.testReportTransactionCurrentData
 import us.frollo.frollosdk.model.testReportTransactionHistoryData
 import us.frollo.frollosdk.network.NetworkService
@@ -93,6 +95,488 @@ class ReportsTest {
         mockServer.shutdown()
         preferences.resetAll()
         database.clearAllTables()
+    }
+
+    // Account Balance Reports Tests
+
+    @Test
+    fun testFetchAccountBalanceReports() {
+        initSetup()
+
+        val data1 = testReportAccountBalanceData(date = "2018-02-01", period = ReportPeriod.DAY)
+        val data2 = testReportAccountBalanceData(date = "2018-01", period = ReportPeriod.MONTH)
+        val data3 = testReportAccountBalanceData(date = "2018-01-01", period = ReportPeriod.DAY)
+        val data4 = testReportAccountBalanceData(date = "2018-01-01", period = ReportPeriod.DAY)
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        database.reportsAccountBalance().insert(*list.toTypedArray())
+
+        val testObserver = reports.accountBalanceReports(fromDate = "2017-06-01", toDate = "2018-01-31", period = ReportPeriod.DAY).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(2, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchingAccountBalanceReportsByDay() {
+        initSetup()
+
+        val fromDate = "2018-10-28"
+        val toDate = "2019-01-29"
+        val period = ReportPeriod.DAY
+        val requestPath = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$fromDate&to_date=$toDate"
+
+        val body = readStringFromJson(app, R.raw.account_balance_reports_by_day_2018_10_29_2019_01_29)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        reports.refreshAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = reports.accountBalanceReports(period = period, fromDate = fromDate, toDate = toDate).test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+
+            // Check for overall reports
+            val fetchedReports = models?.sortedBy { it.report?.accountId }
+            assertEquals(661, fetchedReports?.size)
+
+            val report = fetchedReports?.first()
+            assertEquals("2018-10-28", report?.report?.date)
+            assertEquals(542L, report?.report?.accountId)
+            assertEquals("AUD", report?.report?.currency)
+            assertEquals(period, report?.report?.period)
+            assertEquals(BigDecimal("-1191.45"), report?.report?.value)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchingAccountBalanceReportsByMonth() {
+        initSetup()
+
+        val fromDate = "2018-10"
+        val toDate = "2019-01"
+        val period = ReportPeriod.MONTH
+        val requestPath = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$fromDate&to_date=$toDate"
+
+        val body = readStringFromJson(app, R.raw.account_balance_reports_by_month_2018_10_29_2019_01_29)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        reports.refreshAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = reports.accountBalanceReports(period = period, fromDate = fromDate, toDate = toDate).test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+
+            // Check for overall reports
+            val fetchedReports = models?.sortedBy { it.report?.accountId }
+            assertEquals(31, fetchedReports?.size)
+
+            val report = fetchedReports?.first()
+            assertEquals("2018-10", report?.report?.date)
+            assertEquals(542L, report?.report?.accountId)
+            assertEquals("AUD", report?.report?.currency)
+            assertEquals(period, report?.report?.period)
+            assertEquals(BigDecimal("208.55"), report?.report?.value)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchingAccountBalanceReportsByWeek() {
+        initSetup()
+
+        val fromDate = "2018-10-4"
+        val toDate = "2019-01-5"
+        val period = ReportPeriod.WEEK
+        val requestPath = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$fromDate&to_date=$toDate"
+
+        val body = readStringFromJson(app, R.raw.account_balance_reports_by_week_2018_10_29_2019_01_29)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        reports.refreshAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = reports.accountBalanceReports(period = period, fromDate = fromDate, toDate = toDate).test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+
+            // Check for overall reports
+            val fetchedReports = models?.sortedBy { it.report?.accountId }
+            assertEquals(122, fetchedReports?.size)
+
+            val report = fetchedReports?.first()
+            assertEquals("2018-10-4", report?.report?.date)
+            assertEquals(542L, report?.report?.accountId)
+            assertEquals("AUD", report?.report?.currency)
+            assertEquals(period, report?.report?.period)
+            assertEquals(BigDecimal("-1191.45"), report?.report?.value)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchingAccountBalanceReportsByAccountID() {
+        initSetup()
+
+        val fromDate = "2018-10-28"
+        val toDate = "2019-01-29"
+        val period = ReportPeriod.DAY
+        val accountId: Long = 937
+        val requestPath = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$fromDate&to_date=$toDate&account_id=$accountId"
+
+        val body = readStringFromJson(app, R.raw.account_balance_reports_by_day_account_id_937_2018_10_29_2019_01_29)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        reports.refreshAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate, accountId = accountId) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = reports.accountBalanceReports(period = period, fromDate = fromDate, toDate = toDate, accountId = accountId).test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+
+            // Check for overall reports
+            val fetchedReports = models?.sortedBy { it.report?.accountId }
+            assertEquals(94, fetchedReports?.size)
+
+            val report = fetchedReports?.first()
+            assertEquals("2018-10-28", report?.report?.date)
+            assertEquals(937L, report?.report?.accountId)
+            assertEquals("AUD", report?.report?.currency)
+            assertEquals(period, report?.report?.period)
+            assertEquals(BigDecimal("-2641.45"), report?.report?.value)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchingAccountBalanceReportsByAccountType() {
+        initSetup()
+
+        val fromDate = "2018-10-28"
+        val toDate = "2019-01-29"
+        val period = ReportPeriod.DAY
+        val accountType = AccountType.BANK
+        val requestPath = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$fromDate&to_date=$toDate&container=$accountType"
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_day_container_bank_2018_10_29_2019_01_29))
+                } else if (request?.trimmedPath == AggregationAPI.URL_ACCOUNTS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.accounts_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshAccounts { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+        }
+
+        wait(3)
+
+        reports.refreshAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate, accountType = accountType) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = reports.accountBalanceReports(period = period, fromDate = fromDate, toDate = toDate, accountType = accountType).test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+
+            // Check for overall reports
+            val fetchedReports = models?.sortedBy { it.report?.accountId }
+            assertEquals(188, fetchedReports?.size)
+
+            val report = fetchedReports?.last()
+            assertEquals("2019-01-29", report?.report?.date)
+            assertEquals(543L, report?.report?.accountId)
+            assertEquals("AUD", report?.report?.currency)
+            assertEquals(period, report?.report?.period)
+            assertEquals(BigDecimal("2309.12"), report?.report?.value)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchingAccountBalanceReportsUpdatesExisting() {
+        initSetup()
+
+        val oldFromDate = "2018-10"
+        val oldToDate = "2018-11"
+        val newFromDate = "2018-10"
+        val newToDate = "2019-02"
+        val period = ReportPeriod.MONTH
+        val requestPath1 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$oldFromDate&to_date=$oldToDate"
+        val requestPath2 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$newFromDate&to_date=$newToDate"
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath1) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_month_2018_10_29_2019_01_29))
+                } else if (request?.trimmedPath == requestPath2) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_month_2018_11_01_2019_02_01))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        // Fetch Old reports
+        reports.refreshAccountBalanceReports(period = period, fromDate = oldFromDate, toDate = oldToDate) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+        }
+
+        wait(3)
+
+        var testObserver = reports.accountBalanceReports(period = period, fromDate = oldFromDate, toDate = oldToDate).test()
+        testObserver.awaitValue()
+        var models = testObserver.value().data
+        assertNotNull(models)
+
+        // Check old reports exist
+        var fetchedReports = models?.sortedBy { it.report?.accountId }?.filter { it.report?.date == "2018-10" }
+        assertEquals(8, fetchedReports?.size)
+
+        var report = fetchedReports?.first()
+        assertEquals("2018-10", report?.report?.date)
+        assertEquals(542L, report?.report?.accountId)
+        assertEquals("AUD", report?.report?.currency)
+        assertEquals(period, report?.report?.period)
+        assertEquals(BigDecimal("208.55"), report?.report?.value)
+
+        // Check new reports don't exist
+        testObserver = reports.accountBalanceReports(period = period, fromDate = newFromDate, toDate = newToDate).test()
+        testObserver.awaitValue()
+        models = testObserver.value().data
+        fetchedReports = models?.sortedBy { it.report?.accountId }?.filter { it.report?.date == "2019-02" }
+        assertEquals(0, fetchedReports?.size)
+
+        // Fetch New reports
+        reports.refreshAccountBalanceReports(period = period, fromDate = newFromDate, toDate = newToDate) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+        }
+
+        wait(3)
+
+        testObserver = reports.accountBalanceReports(period = period, fromDate = oldFromDate, toDate = oldToDate).test()
+        testObserver.awaitValue()
+        models = testObserver.value().data
+
+        // Check old reports exist
+        fetchedReports = models?.sortedBy { it.report?.accountId }?.filter { it.report?.date == "2018-10" }
+        assertEquals(8, fetchedReports?.size)
+
+        report = fetchedReports?.first()
+        assertEquals("2018-10", report?.report?.date)
+        assertEquals(542L, report?.report?.accountId)
+        assertEquals("AUD", report?.report?.currency)
+        assertEquals(period, report?.report?.period)
+        assertEquals(BigDecimal("-1191.45"), report?.report?.value)
+
+        testObserver = reports.accountBalanceReports(period = period, fromDate = newFromDate, toDate = newToDate).test()
+        testObserver.awaitValue()
+        models = testObserver.value().data
+
+        // Check new reports exist
+        fetchedReports = models?.sortedBy { it.report?.accountId }?.filter { it.report?.date == "2019-02" }
+        assertEquals(7, fetchedReports?.size)
+
+        report = fetchedReports?.first()
+        assertEquals("2019-02", report?.report?.date)
+        assertEquals(542L, report?.report?.accountId)
+        assertEquals("AUD", report?.report?.currency)
+        assertEquals(period, report?.report?.period)
+        assertEquals(BigDecimal("1823.85"), report?.report?.value)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchingAccountBalanceReportsCommingling() {
+        initSetup()
+
+        val fromDate1 = "2018-10-28"
+        val toDate1 = "2019-01-29"
+        val fromDate2 = "2018-10-4"
+        val toDate2 = "2019-01-5"
+        val fromDate3 = "2018-10"
+        val toDate3 = "2019-01"
+        val period1 = ReportPeriod.DAY
+        val period2 = ReportPeriod.WEEK
+        val period3 = ReportPeriod.MONTH
+        val requestPath1 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period1&from_date=$fromDate1&to_date=$toDate1"
+        val requestPath2 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period2&from_date=$fromDate2&to_date=$toDate2"
+        val requestPath3 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period3&from_date=$fromDate3&to_date=$toDate3"
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath1) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_day_2018_10_29_2019_01_29))
+                } else if (request?.trimmedPath == requestPath2) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_week_2018_10_29_2019_01_29))
+                } else if (request?.trimmedPath == requestPath3) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_month_2018_10_29_2019_01_29))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        // Fetch Old reports
+        reports.refreshAccountBalanceReports(period = period1, fromDate = fromDate1, toDate = toDate1) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+        }
+
+        reports.refreshAccountBalanceReports(period = period2, fromDate = fromDate2, toDate = toDate2) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+        }
+
+        reports.refreshAccountBalanceReports(period = period3, fromDate = fromDate3, toDate = toDate3) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+        }
+
+        wait(5)
+
+        // Check for day reports
+        var testObserver = reports.accountBalanceReports(period = period1, fromDate = fromDate1, toDate = toDate1).test()
+        testObserver.awaitValue()
+        var models = testObserver.value().data
+
+        var fetchedReports = models?.sortedBy { it.report?.accountId }
+        assertEquals(661, fetchedReports?.size)
+
+        var report = fetchedReports?.first()
+        assertEquals("2018-10-28", report?.report?.date)
+        assertEquals(542L, report?.report?.accountId)
+        assertEquals("AUD", report?.report?.currency)
+        assertEquals(period1, report?.report?.period)
+        assertEquals(BigDecimal("-1191.45"), report?.report?.value)
+
+        // Check for week report
+        testObserver = reports.accountBalanceReports(period = period2, fromDate = fromDate2, toDate = toDate2).test()
+        testObserver.awaitValue()
+        models = testObserver.value().data
+
+        fetchedReports = models?.sortedBy { it.report?.accountId }
+        assertEquals(122, fetchedReports?.size)
+
+        report = fetchedReports?.first()
+        assertEquals("2018-10-4", report?.report?.date)
+        assertEquals(542L, report?.report?.accountId)
+        assertEquals("AUD", report?.report?.currency)
+        assertEquals(period2, report?.report?.period)
+        assertEquals(BigDecimal("-1191.45"), report?.report?.value)
+
+        // Check for month reports
+        testObserver = reports.accountBalanceReports(period = period3, fromDate = fromDate3, toDate = toDate3).test()
+        testObserver.awaitValue()
+        models = testObserver.value().data
+
+        fetchedReports = models?.sortedBy { it.report?.accountId }
+        assertEquals(31, fetchedReports?.size)
+
+        report = fetchedReports?.first()
+        assertEquals("2018-10", report?.report?.date)
+        assertEquals(542L, report?.report?.accountId)
+        assertEquals("AUD", report?.report?.currency)
+        assertEquals(period3, report?.report?.period)
+        assertEquals(BigDecimal("208.55"), report?.report?.value)
+
+        tearDown()
     }
 
     // Current Report Tests

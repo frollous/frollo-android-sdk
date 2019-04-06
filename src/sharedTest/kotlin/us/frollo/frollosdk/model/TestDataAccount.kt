@@ -28,7 +28,7 @@ import us.frollo.frollosdk.testutils.randomUUID
 import java.math.BigDecimal
 import kotlin.random.Random
 
-internal fun testAccountResponseData(accountId: Long? = null, providerAccountId: Long? = null) : AccountResponse {
+internal fun testAccountResponseData(accountId: Long? = null, providerAccountId: Long? = null, accountType: AccountType? = null) : AccountResponse {
 
     val balanceDetails = BalanceDetails(
             currentDescription = randomUUID(),
@@ -44,7 +44,7 @@ internal fun testAccountResponseData(accountId: Long? = null, providerAccountId:
             nextRefresh = "2019-01-01")
 
     val attributes = AccountAttributes(
-            accountType = AccountType.values()[Random.nextInt(AccountType.values().size)],
+            accountType = accountType ?: AccountType.values()[Random.nextInt(AccountType.values().size)],
             classification = AccountClassification.values()[Random.nextInt(AccountClassification.values().size)],
             accountSubType = AccountSubType.values()[Random.nextInt(AccountSubType.values().size)],
             group = AccountGroup.values()[Random.nextInt(AccountGroup.values().size)])

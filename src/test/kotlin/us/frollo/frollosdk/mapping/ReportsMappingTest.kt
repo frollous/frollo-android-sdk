@@ -26,6 +26,17 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 class ReportsMappingTest {
 
     @Test
+    fun testResponseToReportAccountBalance() {
+        val response = testAccountBalanceReportResponseData()
+        val model = response.data[0].accounts[0].toReportAccountBalance(period = ReportPeriod.MONTH, date = "2019-03")
+        assertEquals("2019-03", model.date)
+        assertNotNull(model.value)
+        assertEquals("AUD", model.currency)
+        assertEquals(ReportPeriod.MONTH, model.period)
+        assertEquals(1L, model.accountId)
+    }
+
+    @Test
     fun testResponseToReportTransactionCurrent() {
         val response = testTransactionCurrentReportResponseData()
         val model = response.days[0].toReportTransactionCurrent(ReportGrouping.BUDGET_CATEGORY, budgetCategory = BudgetCategory.SAVINGS, linkedId = 1, name = "Unknown")

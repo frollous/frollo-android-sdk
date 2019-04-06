@@ -64,7 +64,7 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun reportsTransactionCurrent(): ReportTransactionCurrentDao
     internal abstract fun reportsTransactionHistory(): ReportTransactionHistoryDao
     internal abstract fun reportGroupsTransactionHistory(): ReportGroupTransactionHistoryDao
-    internal abstract fun reportAccountBalance(): ReportAccountBalanceDao
+    internal abstract fun reportsAccountBalance(): ReportAccountBalanceDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"

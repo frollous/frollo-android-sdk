@@ -74,7 +74,7 @@ internal fun sqlForTransactionStaleIds(fromDate: String, toDate: String, account
     return SimpleSQLiteQuery(query)
 }
 
-internal fun sqlForExistingAccountBalanceReports(date: String, period: ReportPeriod, reportAccountIds: LongArray, accountId: Long?, accountType: AccountType?): SimpleSQLiteQuery {
+internal fun sqlForExistingAccountBalanceReports(date: String, period: ReportPeriod, reportAccountIds: LongArray, accountId: Long? = null, accountType: AccountType? = null): SimpleSQLiteQuery {
     val sb = StringBuilder()
 
     sb.append("SELECT rab.* FROM report_account_balance AS rab ")
@@ -90,7 +90,7 @@ internal fun sqlForExistingAccountBalanceReports(date: String, period: ReportPer
     return SimpleSQLiteQuery(sb.toString())
 }
 
-internal fun sqlForStaleIdsAccountBalanceReports(date: String, period: ReportPeriod, reportAccountIds: LongArray, accountId: Long?, accountType: AccountType?): SimpleSQLiteQuery {
+internal fun sqlForStaleIdsAccountBalanceReports(date: String, period: ReportPeriod, reportAccountIds: LongArray, accountId: Long? = null, accountType: AccountType? = null): SimpleSQLiteQuery {
     val sb = StringBuilder()
 
     sb.append("SELECT rab.* FROM report_account_balance AS rab ")
@@ -106,7 +106,7 @@ internal fun sqlForStaleIdsAccountBalanceReports(date: String, period: ReportPer
     return SimpleSQLiteQuery(sb.toString())
 }
 
-internal fun sqlForFetchingAccountBalanceReports(fromDate: String, toDate: String, period: ReportPeriod, accountId: Long?, accountType: AccountType?): SimpleSQLiteQuery {
+internal fun sqlForFetchingAccountBalanceReports(fromDate: String, toDate: String, period: ReportPeriod, accountId: Long? = null, accountType: AccountType? = null): SimpleSQLiteQuery {
     val sb = StringBuilder()
 
     sb.append("SELECT rab.* FROM report_account_balance AS rab ")

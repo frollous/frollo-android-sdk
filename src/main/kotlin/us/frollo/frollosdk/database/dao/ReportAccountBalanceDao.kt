@@ -27,7 +27,7 @@ internal interface ReportAccountBalanceDao {
 
     @Transaction
     @RawQuery(observedEntities = [ReportAccountBalance::class])
-    fun load(queryStr: SupportSQLiteQuery): LiveData<List<ReportAccountBalanceRelation>>
+    fun loadWithRelation(queryStr: SupportSQLiteQuery): LiveData<List<ReportAccountBalanceRelation>>
 
     @RawQuery
     fun find(queryStr: SupportSQLiteQuery): MutableList<ReportAccountBalance>

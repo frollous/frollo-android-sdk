@@ -22,6 +22,14 @@ import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
 import us.frollo.frollosdk.model.coredata.reports.*
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 
+internal fun AccountBalanceReportResponse.Report.BalanceReport.toReportAccountBalance(date: String, period: ReportPeriod) =
+        ReportAccountBalance(
+                date = date,
+                value = value,
+                period = period,
+                currency = currency,
+                accountId = id)
+
 internal fun TransactionCurrentReportResponse.Report.toReportTransactionCurrent(grouping: ReportGrouping, budgetCategory: BudgetCategory? = null, linkedId: Long?, name: String?) =
         ReportTransactionCurrent(
                 day = day,
@@ -55,11 +63,3 @@ internal fun TransactionHistoryReportResponse.Report.GroupReport.toReportGroupTr
                 filteredBudgetCategory = budgetCategory,
                 grouping = grouping,
                 reportId = reportId)
-
-internal fun AccountBalanceReportResponse.Report.BalanceReport.toReportAccountBalance(date: String, period: ReportPeriod) =
-        ReportAccountBalance(
-                date = date,
-                value = value,
-                period = period,
-                currency = currency,
-                accountId = id)

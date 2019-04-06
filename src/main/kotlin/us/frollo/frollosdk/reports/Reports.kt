@@ -53,7 +53,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
 
     fun accountBalanceReports(fromDate: String, toDate: String, period: ReportPeriod,
                               accountId: Long? = null, accountType: AccountType? = null): LiveData<Resource<List<ReportAccountBalanceRelation>>> =
-            Transformations.map(db.reportAccountBalance().load(sqlForFetchingAccountBalanceReports(fromDate, toDate, period, accountId, accountType))) { model ->
+            Transformations.map(db.reportsAccountBalance().loadWithRelation(sqlForFetchingAccountBalanceReports(fromDate, toDate, period, accountId, accountType))) { model ->
                 Resource.success(model)
             }
 
@@ -165,7 +165,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
             // Fetch existing reports for updating
             val reportAccountsIds = reportsResponse.map { it.id }.toLongArray()
 
-            val existingReports = db.reportAccountBalance().find(sqlForExistingAccountBalanceReports(date, period, reportAccountsIds, accountId, accountType))
+            val existingReports = db.reportsAccountBalance().find(sqlForExistingAccountBalanceReports(date, period, reportAccountsIds, accountId, accountType))
 
             // Sort by date
             existingReports.sortBy { it.date }
@@ -179,19 +179,19 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                     // Update
                     report.reportId = existingReports[index].reportId
 
-                    db.reportAccountBalance().update(report)
+                    db.reportsAccountBalance().update(report)
 
                     index += 1
                 } else {
                     // Insert
-                    db.reportAccountBalance().insert(report)
+                    db.reportsAccountBalance().insert(report)
                 }
             }
 
             // Fetch and delete any leftovers
-            val staleIds = db.reportAccountBalance().findStaleIds(sqlForStaleIdsAccountBalanceReports(date, period, reportAccountsIds, accountId, accountType))
+            val staleIds = db.reportsAccountBalance().findStaleIds(sqlForStaleIdsAccountBalanceReports(date, period, reportAccountsIds, accountId, accountType))
 
-            db.reportAccountBalance().deleteMany(staleIds)
+            db.reportsAccountBalance().deleteMany(staleIds)
         } catch (e: Exception) {
             Log.e("$TAG#handleAccountBalanceReportsForDate", e.message)
         }

@@ -21,16 +21,23 @@ import us.frollo.frollosdk.model.IAdapterModel
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountRelation
 
+/** Account Balance Report with associated data */
 data class ReportAccountBalanceRelation(
 
+        /** Account Balance Report */
         @Embedded
         var report: ReportAccountBalance? = null,
 
+        /** Associated Account
+         *
+         * Even though its a list this will have only one element. It is requirement of Room database for this to be a list.
+         */
         @Relation(parentColumn = "account_id", entityColumn = "account_id", entity = Account::class)
         var accounts: List<AccountRelation>? = null
 
 ): IAdapterModel {
 
+        /** Associated Account */
         val account: AccountRelation?
                 get() {
                         val models = accounts

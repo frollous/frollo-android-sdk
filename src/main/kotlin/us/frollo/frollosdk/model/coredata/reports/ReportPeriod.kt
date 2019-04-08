@@ -19,11 +19,21 @@ package us.frollo.frollosdk.model.coredata.reports
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
+/**
+ * Period - the time period the report is broken down to
+ */
 enum class ReportPeriod {
+
+    /** Days */
     @SerializedName("by_day") DAY,
+
+    /** Months */
     @SerializedName("by_month") MONTH,
+
+    /** Weeks */
     @SerializedName("by_week") WEEK;
 
+    /** Enum to serialized string */
     //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =
     //Try to get the annotation value if available instead of using plain .toString()

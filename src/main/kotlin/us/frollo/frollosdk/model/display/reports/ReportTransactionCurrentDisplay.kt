@@ -19,10 +19,22 @@ package us.frollo.frollosdk.model.display.reports
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrentRelation
 
+/**
+ * Better representation of the current transactions reports for display purposes
+ *
+ * Separates out the overall reports and the group reports from the combined list of current transactions reports.
+ */
 data class ReportTransactionCurrentDisplay(
+
+        /** Overall reports */
         val overallReports: List<ReportTransactionCurrent>,
+
+        /** Group reports */
         val groupReports: List<ReportTransactionCurrentRelation>)
 
+/**
+ * Transforms the combined list of current transactions reports into [ReportTransactionCurrentDisplay]
+ */
 fun List<ReportTransactionCurrentRelation>.toDisplay(): ReportTransactionCurrentDisplay {
     val reports = this.filter { it.report?.linkedId == null }.mapNotNull { it.report }.toList()
     val groups = this.filter { it.report?.linkedId != null }

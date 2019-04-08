@@ -31,22 +31,39 @@ import java.math.BigDecimal
         indices = [Index("report_id"),
             Index(value = ["date", "period", "filtered_budget_category", "report_grouping"], unique = true)])
 
+/** Data representation of history transaction overall report */
 data class ReportTransactionHistory(
+
+        /** Date of the report period */
         @ColumnInfo(name = "date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
+
+        /** Value of the report */
         @ColumnInfo(name = "value") val value: BigDecimal,
+
+        /** Budget value for the report (Optional) */
         @ColumnInfo(name = "budget") val budget: BigDecimal?,
+
+        /** Period of the report */
         @ColumnInfo(name = "period") val period: ReportPeriod,
+
+        /** Filter budget category if the report was filtered to a specific category */
         @ColumnInfo(name = "filtered_budget_category") val filteredBudgetCategory: BudgetCategory?,
+
+        /** Grouping - how the report response has been broken down */
         @ColumnInfo(name = "report_grouping") val grouping: ReportGrouping
 
 ): IAdapterModel {
 
+    /** Unique ID of the overall report */
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "report_id") var reportId: Long = 0
 
     companion object {
+        /** Date format to convert daily date from stored date string to user's current locale */
         const val DATE_FORMAT_PATTERN_DAILY = "yyyy-MM-dd"
+        /** Date format to convert monthly date from stored date string to user's current locale */
         const val DATE_FORMAT_PATTERN_MONTHLY = "yyyy-MM"
+        /** Date formatter to convert weekly date from stored date string to user's current locale */
         const val DATE_FORMAT_PATTERN_WEEKLY = "yyyy-MM-W"
     }
 }

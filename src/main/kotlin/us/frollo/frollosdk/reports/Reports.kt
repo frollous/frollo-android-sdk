@@ -39,6 +39,9 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.network.api.ReportsAPI
 import java.lang.Exception
 
+/**
+ * Manages all aspects of reporting of aggregation data including spending and balances
+ */
 class Reports(network: NetworkService, private val db: SDKDatabase, private val aggregation: Aggregation) {
 
     companion object {
@@ -51,12 +54,33 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
 
     // Account Balance Reports
 
+    /**
+     * Fetch account balance reports from the cache
+     *
+     * @param fromDate Start date to fetch reports from (inclusive)
+     * @param toDate End date to fetch reports up to (inclusive)
+     * @param period Period that reports should be broken down by
+     * @param accountId Fetch reports for a specific account ID (optional)
+     * @param accountType Fetch reports for a specific account type (optional)
+     *
+     * @return LiveData object of Resource<List<ReportAccountBalanceRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun accountBalanceReports(fromDate: String, toDate: String, period: ReportPeriod,
                               accountId: Long? = null, accountType: AccountType? = null): LiveData<Resource<List<ReportAccountBalanceRelation>>> =
             Transformations.map(db.reportsAccountBalance().loadWithRelation(sqlForFetchingAccountBalanceReports(fromDate, toDate, period, accountId, accountType))) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Refresh account balance reports from the host
+     *
+     * @param fromDate Start date to fetch reports from (inclusive)
+     * @param toDate End date to fetch reports up to (inclusive)
+     * @param period Period that reports should be broken down by
+     * @param accountId Fetch reports for a specific account ID (optional)
+     * @param accountType Fetch reports for a specific account type (optional)
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshAccountBalanceReports(fromDate: String, toDate: String, period: ReportPeriod,
                                      accountId: Long? = null, accountType: AccountType? = null,
                                      completion: OnFrolloSDKCompletionListener<Result>? = null) {
@@ -80,11 +104,26 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
 
     // Transactions Current Reports
 
+    /**
+     * Fetch current transaction reports from the cache
+     *
+     * @param grouping Grouping that reports should be broken down into
+     * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
+     *
+     * @return LiveData object of Resource<List<ReportTransactionCurrentRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun currentTransactionReports(grouping: ReportGrouping, budgetCategory: BudgetCategory? = null): LiveData<Resource<List<ReportTransactionCurrentRelation>>> =
             Transformations.map(db.reportsTransactionCurrent().load(grouping, budgetCategory)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Refresh transaction current reports from the host
+     *
+     * @param grouping Grouping that reports should be broken down into
+     * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshTransactionCurrentReports(grouping: ReportGrouping, budgetCategory: BudgetCategory? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         reportsAPI.fetchTransactionCurrentReports(grouping, budgetCategory).enqueue { resource ->
             when(resource.status) {
@@ -105,12 +144,33 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
 
     // Transactions History Reports
 
+    /**
+     * Fetch historic transaction reports from the cache
+     *
+     * @param fromDate Start date to fetch reports from (inclusive)
+     * @param toDate End date to fetch reports up to (inclusive)
+     * @param grouping Grouping that reports should be broken down into
+     * @param period Period that reports should be broken down by
+     * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
+     *
+     * @return LiveData object of Resource<List<ReportTransactionHistoryRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun historyTransactionReports(fromDate: String, toDate: String, grouping: ReportGrouping,
                                   period: ReportPeriod, budgetCategory: BudgetCategory? = null): LiveData<Resource<List<ReportTransactionHistoryRelation>>> =
             Transformations.map(db.reportsTransactionHistory().load(fromDate, toDate, grouping, period, budgetCategory)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Refresh transaction history reports from the host
+     *
+     * @param fromDate Start date to fetch reports from (inclusive)
+     * @param toDate End date to fetch reports up to (inclusive)
+     * @param grouping Grouping that reports should be broken down into
+     * @param period Period that reports should be broken down by
+     * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshTransactionHistoryReports(fromDate: String, toDate: String, grouping: ReportGrouping,
                                          period: ReportPeriod, budgetCategory: BudgetCategory? = null,
                                          completion: OnFrolloSDKCompletionListener<Result>? = null) {

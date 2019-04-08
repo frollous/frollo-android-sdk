@@ -1,5 +1,13 @@
 ## Changelog
 
+### 1.2.0
+- Reports
+
+#### Features
+- Account Balance Reports
+- Current Transaction Reports
+- History Transaction Reports
+
 ### 1.1.0
 - Surveys
 

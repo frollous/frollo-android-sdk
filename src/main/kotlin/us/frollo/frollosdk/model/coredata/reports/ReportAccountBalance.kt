@@ -30,21 +30,36 @@ import java.math.BigDecimal
         indices = [Index("report_id"),
             Index(value = ["account_id", "date", "period"], unique = true)])
 
+/** Data representation of account balance report */
 data class ReportAccountBalance(
+
+        /** Date of the report period */
         @ColumnInfo(name = "date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
+
+        /** Related account ID */
         @ColumnInfo(name = "account_id") val accountId: Long,
+
+        /** Currency of the report. ISO 4217 code */
         @ColumnInfo(name = "currency") val currency: String,
+
+        /** Balance of the report */
         @ColumnInfo(name = "value") val value: BigDecimal,
+
+        /** Period of the report */
         @ColumnInfo(name = "period") val period: ReportPeriod
 
 ): IAdapterModel {
 
+    /** Unique ID of the report */
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "report_id") var reportId: Long = 0
 
     companion object {
+        /** Date format to convert daily date from stored date string to user's current locale */
         const val DATE_FORMAT_PATTERN_DAILY = "yyyy-MM-dd"
+        /** Date format to convert monthly date from stored date string to user's current locale */
         const val DATE_FORMAT_PATTERN_MONTHLY = "yyyy-MM"
+        /** Date formatter to convert weekly date from stored date string to user's current locale */
         const val DATE_FORMAT_PATTERN_WEEKLY = "yyyy-MM-W"
     }
 }

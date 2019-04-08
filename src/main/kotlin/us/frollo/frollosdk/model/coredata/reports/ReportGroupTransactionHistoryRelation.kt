@@ -23,39 +23,57 @@ import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 
+/** History Transactions Group Report with associated data */
 data class ReportGroupTransactionHistoryRelation(
 
+        /** Group Report */
         @Embedded
         var groupReport: ReportGroupTransactionHistory? = null,
 
+        /** Associated Overall Report
+         *
+         * Even though its a list this will have only one element. It is requirement of Room database for this to be a list.
+         */
         @Relation(parentColumn = "report_id", entityColumn = "report_id", entity = ReportTransactionHistory::class)
         var overallReports: List<ReportTransactionHistory>? = null,
 
+        /** Associated Transaction Category
+         *
+         * Even though its a list this will have only one element. It is requirement of Room database for this to be a list.
+         */
         @Relation(parentColumn = "linked_id", entityColumn = "transaction_category_id", entity = TransactionCategory::class)
         var transactionCategories: List<TransactionCategory>? = null,
 
+        /** Associated Merchant
+         *
+         * Even though its a list this will have only one element. It is requirement of Room database for this to be a list.
+         */
         @Relation(parentColumn = "linked_id", entityColumn = "merchant_id", entity = Merchant::class)
         var merchants: List<Merchant>? = null
 
 ): IAdapterModel {
 
+        /** Associated Overall Report */
         val overall: ReportTransactionHistory?
                 get() {
                         val models = overallReports
                         return if (models?.isNotEmpty() == true) models[0] else null
                 }
 
+        /** Associated Budget Category if applicable. See [ReportGrouping] */
         val budgetCategory: BudgetCategory?
                 get() {
                         return groupReport?.name?.toBudgetCategory()
                 }
 
+        /** Associated Transaction Category */
         val transactionCategory: TransactionCategory?
                 get() {
                         val models = transactionCategories
                         return if (models?.isNotEmpty() == true) models[0] else null
                 }
 
+        /** Associated Merchant */
         val merchant: Merchant?
                 get() {
                         val models = merchants

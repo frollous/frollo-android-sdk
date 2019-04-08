@@ -31,25 +31,51 @@ import java.math.BigDecimal
         indices = [Index("report_group_id"),
             Index(value = ["linked_id", "date", "period", "filtered_budget_category", "report_grouping"], unique = true)])
 
+/** Data representation of history transaction group report */
 data class ReportGroupTransactionHistory(
+
+        /** Unique ID of the related object. E.g. merchant or category */
         @ColumnInfo(name = "linked_id") val linkedId: Long,
+
+        /** Name of the related object (Optional) */
         @ColumnInfo(name = "linked_name") val name: String,
+
+        /** Value of the report */
         @ColumnInfo(name = "value") val value: BigDecimal,
+
+        /** Budget value for the report (Optional) */
         @ColumnInfo(name = "budget") val budget: BigDecimal?,
+
+        /** Date of the report period */
         @ColumnInfo(name = "date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
+
+        /** Period of the report */
         @ColumnInfo(name = "period") val period: ReportPeriod,
+
+        /** Filter budget category if the report was filtered to a specific category */
         @ColumnInfo(name = "filtered_budget_category") val filteredBudgetCategory: BudgetCategory?,
+
+        /** Grouping - how the report response has been broken down */
         @ColumnInfo(name = "report_grouping") val grouping: ReportGrouping,
+
+        /** Transaction ids related to the report */
         @ColumnInfo(name = "transaction_ids") val transactionIds: List<Long>?,
+
+        /** Related overall report id */
         @ColumnInfo(name = "report_id") val reportId: Long
+
 ): IAdapterModel {
 
+    /** Unique ID of the group report */
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "report_group_id") var reportGroupId: Long = 0
 
     companion object {
+        /** Date format to convert daily date from stored date string to user's current locale */
         const val DATE_FORMAT_PATTERN_DAILY = "yyyy-MM-dd"
+        /** Date format to convert monthly date from stored date string to user's current locale */
         const val DATE_FORMAT_PATTERN_MONTHLY = "yyyy-MM"
+        /** Date formatter to convert weekly date from stored date string to user's current locale */
         const val DATE_FORMAT_PATTERN_WEEKLY = "yyyy-MM-W"
     }
 }

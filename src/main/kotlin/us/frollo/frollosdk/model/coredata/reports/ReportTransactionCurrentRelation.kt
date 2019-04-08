@@ -23,30 +23,43 @@ import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 
+/** Current Transactions Report with associated data */
 data class ReportTransactionCurrentRelation(
 
+        /** Current Transactions Report */
         @Embedded
         var report: ReportTransactionCurrent? = null,
 
+        /** Associated Transaction Category
+         *
+         * Even though its a list this will have only one element. It is requirement of Room database for this to be a list.
+         */
         @Relation(parentColumn = "linked_id", entityColumn = "transaction_category_id", entity = TransactionCategory::class)
         var transactionCategories: List<TransactionCategory>? = null,
 
+        /** Associated Merchant
+         *
+         * Even though its a list this will have only one element. It is requirement of Room database for this to be a list.
+         */
         @Relation(parentColumn = "linked_id", entityColumn = "merchant_id", entity = Merchant::class)
         var merchants: List<Merchant>? = null
 
 ): IAdapterModel {
 
+        /** Associated Budget Category if applicable. See [ReportGrouping] */
         val budgetCategory: BudgetCategory?
                 get() {
                         return report?.name?.toBudgetCategory()
                 }
 
+        /** Associated Transaction Category */
         val transactionCategory: TransactionCategory?
                 get() {
                         val models = transactionCategories
                         return if (models?.isNotEmpty() == true) models[0] else null
                 }
 
+        /** Associated Merchant */
         val merchant: Merchant?
                 get() {
                         val models = merchants

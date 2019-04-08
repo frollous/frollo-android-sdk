@@ -19,12 +19,24 @@ package us.frollo.frollosdk.model.coredata.reports
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
+/**
+ * Represents how a transaction report response should be broken down. E.g. by merchant
+ */
 enum class ReportGrouping {
+
+    /** Budget category */
     @SerializedName("by_budget_category") BUDGET_CATEGORY,
+
+    /** Merchant */
     @SerializedName("by_transaction_category") TRANSACTION_CATEGORY,
+
+    /** Transaction Category */
     @SerializedName("by_transaction_category_group") TRANSACTION_CATEGORY_GROUP,
+
+    /** Transaction Category Parent Group */
     @SerializedName("by_merchant") MERCHANT;
 
+    /** Enum to serialized string */
     //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =
     //Try to get the annotation value if available instead of using plain .toString()

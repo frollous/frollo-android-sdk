@@ -19,11 +19,14 @@ package us.frollo.frollosdk.model.coredata.reports
 import androidx.room.*
 import us.frollo.frollosdk.model.IAdapterModel
 
+/** History Transactions Report with associated data */
 data class ReportTransactionHistoryRelation(
 
+        /** Overall report */
         @Embedded
         var report: ReportTransactionHistory? = null,
 
+        /** Associated group reports */
         @Relation(parentColumn = "report_id", entityColumn = "report_id", entity = ReportGroupTransactionHistory::class)
         var groups: List<ReportGroupTransactionHistoryRelation>? = null
 

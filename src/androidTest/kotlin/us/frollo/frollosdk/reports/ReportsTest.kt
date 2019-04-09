@@ -36,6 +36,7 @@ import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
@@ -120,6 +121,25 @@ class ReportsTest {
     }
 
     @Test
+    fun testFetchingAccountBalanceReportsFailsDateFormat() {
+        initSetup()
+
+        try {
+            reports.accountBalanceReports(fromDate = "2017-06", toDate = "2018-01", period = ReportPeriod.DAY)
+        } catch (e: FrolloSDKError) {
+            assertEquals("Invalid format for from/to date", e.localizedMessage)
+        }
+
+        try {
+            reports.refreshAccountBalanceReports(fromDate = "2017-06", toDate = "2018-01", period = ReportPeriod.DAY)
+        } catch (e: FrolloSDKError) {
+            assertEquals("Invalid format for from/to date", e.localizedMessage)
+        }
+
+        tearDown()
+    }
+
+    @Test
     fun testFetchingAccountBalanceReportsByDay() {
         initSetup()
 
@@ -173,8 +193,8 @@ class ReportsTest {
     fun testFetchingAccountBalanceReportsByMonth() {
         initSetup()
 
-        val fromDate = "2018-10"
-        val toDate = "2019-01"
+        val fromDate = "2018-10-28"
+        val toDate = "2019-01-29"
         val period = ReportPeriod.MONTH
         val requestPath = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$fromDate&to_date=$toDate"
 
@@ -223,8 +243,8 @@ class ReportsTest {
     fun testFetchingAccountBalanceReportsByWeek() {
         initSetup()
 
-        val fromDate = "2018-10-4"
-        val toDate = "2019-01-5"
+        val fromDate = "2018-10-28"
+        val toDate = "2019-01-29"
         val period = ReportPeriod.WEEK
         val requestPath = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$fromDate&to_date=$toDate"
 
@@ -382,10 +402,10 @@ class ReportsTest {
     fun testFetchingAccountBalanceReportsUpdatesExisting() {
         initSetup()
 
-        val oldFromDate = "2018-10"
-        val oldToDate = "2018-11"
-        val newFromDate = "2018-10"
-        val newToDate = "2019-02"
+        val oldFromDate = "2018-10-28"
+        val oldToDate = "2018-11-29"
+        val newFromDate = "2018-10-28"
+        val newToDate = "2019-02-01"
         val period = ReportPeriod.MONTH
         val requestPath1 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$oldFromDate&to_date=$oldToDate"
         val requestPath2 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$newFromDate&to_date=$newToDate"
@@ -481,18 +501,14 @@ class ReportsTest {
     fun testFetchingAccountBalanceReportsCommingling() {
         initSetup()
 
-        val fromDate1 = "2018-10-28"
-        val toDate1 = "2019-01-29"
-        val fromDate2 = "2018-10-4"
-        val toDate2 = "2019-01-5"
-        val fromDate3 = "2018-10"
-        val toDate3 = "2019-01"
+        val fromDate = "2018-10-28"
+        val toDate = "2019-01-29"
         val period1 = ReportPeriod.DAY
         val period2 = ReportPeriod.WEEK
         val period3 = ReportPeriod.MONTH
-        val requestPath1 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period1&from_date=$fromDate1&to_date=$toDate1"
-        val requestPath2 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period2&from_date=$fromDate2&to_date=$toDate2"
-        val requestPath3 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period3&from_date=$fromDate3&to_date=$toDate3"
+        val requestPath1 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period1&from_date=$fromDate&to_date=$toDate"
+        val requestPath2 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period2&from_date=$fromDate&to_date=$toDate"
+        val requestPath3 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period3&from_date=$fromDate&to_date=$toDate"
 
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -514,17 +530,17 @@ class ReportsTest {
         })
 
         // Fetch Old reports
-        reports.refreshAccountBalanceReports(period = period1, fromDate = fromDate1, toDate = toDate1) { result ->
+        reports.refreshAccountBalanceReports(period = period1, fromDate = fromDate, toDate = toDate) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
         }
 
-        reports.refreshAccountBalanceReports(period = period2, fromDate = fromDate2, toDate = toDate2) { result ->
+        reports.refreshAccountBalanceReports(period = period2, fromDate = fromDate, toDate = toDate) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
         }
 
-        reports.refreshAccountBalanceReports(period = period3, fromDate = fromDate3, toDate = toDate3) { result ->
+        reports.refreshAccountBalanceReports(period = period3, fromDate = fromDate, toDate = toDate) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
         }
@@ -532,7 +548,7 @@ class ReportsTest {
         wait(5)
 
         // Check for day reports
-        var testObserver = reports.accountBalanceReports(period = period1, fromDate = fromDate1, toDate = toDate1).test()
+        var testObserver = reports.accountBalanceReports(period = period1, fromDate = fromDate, toDate = toDate).test()
         testObserver.awaitValue()
         var models = testObserver.value().data
 
@@ -547,7 +563,7 @@ class ReportsTest {
         assertEquals(BigDecimal("-1191.45"), report?.report?.value)
 
         // Check for week report
-        testObserver = reports.accountBalanceReports(period = period2, fromDate = fromDate2, toDate = toDate2).test()
+        testObserver = reports.accountBalanceReports(period = period2, fromDate = fromDate, toDate = toDate).test()
         testObserver.awaitValue()
         models = testObserver.value().data
 
@@ -562,7 +578,7 @@ class ReportsTest {
         assertEquals(BigDecimal("-1191.45"), report?.report?.value)
 
         // Check for month reports
-        testObserver = reports.accountBalanceReports(period = period3, fromDate = fromDate3, toDate = toDate3).test()
+        testObserver = reports.accountBalanceReports(period = period3, fromDate = fromDate, toDate = toDate).test()
         testObserver.awaitValue()
         models = testObserver.value().data
 
@@ -1213,7 +1229,7 @@ class ReportsTest {
 
         database.reportsTransactionHistory().insertAll(*list.toTypedArray())
 
-        val testObserver = reports.historyTransactionReports(fromDate = "2018-05", toDate = "2018-06", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH).test()
+        val testObserver = reports.historyTransactionReports(fromDate = "2018-05-01", toDate = "2018-06-30", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH).test()
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
         assertEquals(1, testObserver.value().data?.size)
@@ -1222,11 +1238,30 @@ class ReportsTest {
     }
 
     @Test
+    fun testFetchHistoryTransactionReportsFailsDateFormat() {
+        initSetup()
+
+        try {
+            reports.historyTransactionReports(fromDate = "2017-06", toDate = "2018-01", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.DAY)
+        } catch (e: FrolloSDKError) {
+            assertEquals("Invalid format for from/to date", e.localizedMessage)
+        }
+
+        try {
+            reports.refreshTransactionHistoryReports(fromDate = "2017-06", toDate = "2018-01", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.DAY)
+        } catch (e: FrolloSDKError) {
+            assertEquals("Invalid format for from/to date", e.localizedMessage)
+        }
+
+        tearDown()
+    }
+
+    @Test
     fun testFetchingHistoryReportsByBudgetCategory() {
         initSetup()
 
-        val fromDate = "2018-01"
-        val toDate = "2018-12"
+        val fromDate = "2018-01-01"
+        val toDate = "2018-12-31"
         val period = ReportPeriod.MONTH
         val grouping = ReportGrouping.BUDGET_CATEGORY
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
@@ -1292,8 +1327,8 @@ class ReportsTest {
     fun testFetchingHistoryReportsByMerchant() {
         initSetup()
 
-        val fromDate = "2018-01"
-        val toDate = "2018-12"
+        val fromDate = "2018-01-01"
+        val toDate = "2018-12-31"
         val period = ReportPeriod.MONTH
         val grouping = ReportGrouping.MERCHANT
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
@@ -1424,8 +1459,8 @@ class ReportsTest {
     fun testFetchingHistoryReportsByTransactionCategoryMonthly() {
         initSetup()
 
-        val fromDate = "2018-01"
-        val toDate = "2018-12"
+        val fromDate = "2018-01-01"
+        val toDate = "2018-12-31"
         val period = ReportPeriod.MONTH
         val grouping = ReportGrouping.TRANSACTION_CATEGORY
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
@@ -1490,8 +1525,8 @@ class ReportsTest {
     fun testFetchingHistoryReportsByTransactionCategoryWeekly() {
         initSetup()
 
-        val fromDate = "2018-01-1"
-        val toDate = "2018-12-5"
+        val fromDate = "2018-01-01"
+        val toDate = "2018-12-31"
         val period = ReportPeriod.WEEK
         val grouping = ReportGrouping.TRANSACTION_CATEGORY
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
@@ -1556,8 +1591,8 @@ class ReportsTest {
     fun testFetchingHistoryReportsFilteredByBudgetCategory() {
         initSetup()
 
-        val fromDate = "2018-01"
-        val toDate = "2018-12"
+        val fromDate = "2018-01-01"
+        val toDate = "2018-12-31"
         val period = ReportPeriod.MONTH
         val grouping = ReportGrouping.TRANSACTION_CATEGORY
         val budgetCategory = BudgetCategory.LIFESTYLE
@@ -1623,10 +1658,10 @@ class ReportsTest {
     fun testFetchingHistoryReportsUpdatesExisting() {
         initSetup()
 
-        val oldFromDate = "2018-01"
-        val oldToDate = "2018-12"
-        val newFromDate = "2018-03"
-        val newToDate = "2019-03"
+        val oldFromDate = "2018-01-01"
+        val oldToDate = "2018-12-31"
+        val newFromDate = "2018-03-01"
+        val newToDate = "2019-03-31"
         val period = ReportPeriod.MONTH
         val grouping = ReportGrouping.TRANSACTION_CATEGORY
         val requestPath1 = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$oldFromDate&to_date=$oldToDate"
@@ -1750,8 +1785,8 @@ class ReportsTest {
     fun testFetchingHistoryReportsCommingling() {
         initSetup()
 
-        val fromDate = "2018-01"
-        val toDate = "2018-12"
+        val fromDate = "2018-01-01"
+        val toDate = "2018-12-31"
         val period = ReportPeriod.MONTH
         val grouping = ReportGrouping.TRANSACTION_CATEGORY
         val living = BudgetCategory.LIVING
@@ -1897,8 +1932,8 @@ class ReportsTest {
     fun testFetchingHistoryReportsDuplicating() {
         initSetup()
 
-        val fromDate = "2018-01"
-        val toDate = "2018-12"
+        val fromDate = "2018-01-01"
+        val toDate = "2018-12-31"
         val period = ReportPeriod.MONTH
         val grouping = ReportGrouping.TRANSACTION_CATEGORY
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
@@ -1998,8 +2033,8 @@ class ReportsTest {
     fun testHistoryReportsLinkToMerchants() {
         initSetup()
 
-        val fromDate = "2018-01"
-        val toDate = "2018-12"
+        val fromDate = "2018-01-01"
+        val toDate = "2018-12-31"
         val period = ReportPeriod.MONTH
         val grouping = ReportGrouping.MERCHANT
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
@@ -2050,8 +2085,8 @@ class ReportsTest {
     fun testHistoryReportsLinkToTransactionCategories() {
         initSetup()
 
-        val fromDate = "2018-01"
-        val toDate = "2018-12"
+        val fromDate = "2018-01-01"
+        val toDate = "2018-12-31"
         val period = ReportPeriod.MONTH
         val grouping = ReportGrouping.TRANSACTION_CATEGORY
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"

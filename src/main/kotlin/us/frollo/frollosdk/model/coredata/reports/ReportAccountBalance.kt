@@ -33,7 +33,7 @@ import java.math.BigDecimal
 /** Data representation of account balance report */
 data class ReportAccountBalance(
 
-        /** Date of the report period */
+        /** Date of the report period. Check [ReportDateFormat] for the date formats. */
         @ColumnInfo(name = "date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
 
         /** Related account ID */
@@ -53,13 +53,4 @@ data class ReportAccountBalance(
     /** Unique ID of the report */
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "report_id") var reportId: Long = 0
-
-    companion object {
-        /** Date format to convert daily date from stored date string to user's current locale */
-        const val DATE_FORMAT_PATTERN_DAILY = "yyyy-MM-dd"
-        /** Date format to convert monthly date from stored date string to user's current locale */
-        const val DATE_FORMAT_PATTERN_MONTHLY = "yyyy-MM"
-        /** Date formatter to convert weekly date from stored date string to user's current locale */
-        const val DATE_FORMAT_PATTERN_WEEKLY = "yyyy-MM-W"
-    }
 }

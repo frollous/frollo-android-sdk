@@ -22,16 +22,18 @@ import us.frollo.frollosdk.extensions.serializedName
 /**
  * Period - the time period the report is broken down to
  */
-enum class ReportPeriod {
+enum class ReportPeriod(
+        /** Date format to convert date from stored date string to user's current locale */
+        val dateFormatPattern: String) {
 
     /** Days */
-    @SerializedName("by_day") DAY,
+    @SerializedName("by_day") DAY(ReportDateFormat.DAILY),
 
     /** Months */
-    @SerializedName("by_month") MONTH,
+    @SerializedName("by_month") MONTH(ReportDateFormat.MONTHLY),
 
     /** Weeks */
-    @SerializedName("by_week") WEEK;
+    @SerializedName("by_week") WEEK(ReportDateFormat.WEEKLY);
 
     /** Enum to serialized string */
     //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

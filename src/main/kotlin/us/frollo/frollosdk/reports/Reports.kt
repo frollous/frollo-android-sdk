@@ -26,6 +26,7 @@ import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.extensions.*
 import us.frollo.frollosdk.logging.Log
@@ -35,6 +36,9 @@ import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.reports.*
+import us.frollo.frollosdk.model.coredata.reports.ReportDateFormat.Companion.DAILY
+import us.frollo.frollosdk.model.coredata.reports.ReportDateFormat.Companion.DATE_PATTERN_FOR_REQUEST
+import us.frollo.frollosdk.model.coredata.reports.ReportDateFormat.Companion.MONTHLY
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.network.api.ReportsAPI
 import java.lang.Exception
@@ -57,8 +61,8 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
     /**
      * Fetch account balance reports from the cache
      *
-     * @param fromDate Start date to fetch reports from (inclusive)
-     * @param toDate End date to fetch reports up to (inclusive)
+     * @param fromDate Start date in the format [yyyy-MM-dd] to fetch reports from (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
+     * @param toDate End date in the format [yyyy-MM-dd] to fetch reports up to (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
      * @param period Period that reports should be broken down by
      * @param accountId Fetch reports for a specific account ID (optional)
      * @param accountType Fetch reports for a specific account type (optional)
@@ -66,16 +70,20 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      * @return LiveData object of Resource<List<ReportAccountBalanceRelation>> which can be observed using an Observer for future changes as well.
      */
     fun accountBalanceReports(fromDate: String, toDate: String, period: ReportPeriod,
-                              accountId: Long? = null, accountType: AccountType? = null): LiveData<Resource<List<ReportAccountBalanceRelation>>> =
-            Transformations.map(db.reportsAccountBalance().loadWithRelation(sqlForFetchingAccountBalanceReports(fromDate, toDate, period, accountId, accountType))) { model ->
-                Resource.success(model)
-            }
+                              accountId: Long? = null, accountType: AccountType? = null): LiveData<Resource<List<ReportAccountBalanceRelation>>> {
+        val from = fromDate.toReportDateFormat(period)
+        val to = toDate.toReportDateFormat(period)
+
+        return Transformations.map(db.reportsAccountBalance().loadWithRelation(sqlForFetchingAccountBalanceReports(from, to, period, accountId, accountType))) { model ->
+            Resource.success(model)
+        }
+    }
 
     /**
      * Refresh account balance reports from the host
      *
-     * @param fromDate Start date to fetch reports from (inclusive)
-     * @param toDate End date to fetch reports up to (inclusive)
+     * @param fromDate Start date in the format [yyyy-MM-dd] to fetch reports from (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
+     * @param toDate End date in the format [yyyy-MM-dd] to fetch reports up to (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
      * @param period Period that reports should be broken down by
      * @param accountId Fetch reports for a specific account ID (optional)
      * @param accountType Fetch reports for a specific account type (optional)
@@ -147,8 +155,8 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
     /**
      * Fetch historic transaction reports from the cache
      *
-     * @param fromDate Start date to fetch reports from (inclusive)
-     * @param toDate End date to fetch reports up to (inclusive)
+     * @param fromDate Start date in the format [yyyy-MM-dd] to fetch reports from (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
+     * @param toDate End date in the format [yyyy-MM-dd] to fetch reports up to (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
      * @param grouping Grouping that reports should be broken down into
      * @param period Period that reports should be broken down by
      * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
@@ -156,16 +164,20 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      * @return LiveData object of Resource<List<ReportTransactionHistoryRelation>> which can be observed using an Observer for future changes as well.
      */
     fun historyTransactionReports(fromDate: String, toDate: String, grouping: ReportGrouping,
-                                  period: ReportPeriod, budgetCategory: BudgetCategory? = null): LiveData<Resource<List<ReportTransactionHistoryRelation>>> =
-            Transformations.map(db.reportsTransactionHistory().load(fromDate, toDate, grouping, period, budgetCategory)) { model ->
-                Resource.success(model)
-            }
+                                  period: ReportPeriod, budgetCategory: BudgetCategory? = null): LiveData<Resource<List<ReportTransactionHistoryRelation>>> {
+        val from = fromDate.toReportDateFormat(period)
+        val to = toDate.toReportDateFormat(period)
+
+        return Transformations.map(db.reportsTransactionHistory().load(from, to, grouping, period, budgetCategory)) { model ->
+            Resource.success(model)
+        }
+    }
 
     /**
      * Refresh transaction history reports from the host
      *
-     * @param fromDate Start date to fetch reports from (inclusive)
-     * @param toDate End date to fetch reports up to (inclusive)
+     * @param fromDate Start date in the format [yyyy-MM-dd] to fetch reports from (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
+     * @param toDate End date in the format [yyyy-MM-dd] to fetch reports up to (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
      * @param grouping Grouping that reports should be broken down into
      * @param period Period that reports should be broken down by
      * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
@@ -181,10 +193,13 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                     completion?.invoke(Result.error(resource.error))
                 }
                 Resource.Status.SUCCESS -> {
+                    val from = fromDate.toReportDateFormat(period)
+                    val to = toDate.toReportDateFormat(period)
+
                     handleTransactionHistoryReportsResponse(
                             reportsResponse = resource.data?.data?.toMutableList(),
-                            fromDate = fromDate,
-                            toDate = toDate,
+                            fromDate = from,
+                            toDate = to,
                             grouping = grouping,
                             period = period,
                             budgetCategory = budgetCategory,
@@ -483,5 +498,22 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                 aggregation.refreshMerchants(missingMerchantIds.toLongArray())
             }
         }
+    }
+
+    @Throws(FrolloSDKError::class)
+    private fun String.toReportDateFormat(period: ReportPeriod): String {
+        if (!this.isValidFormat(DATE_PATTERN_FOR_REQUEST)) {
+            throw FrolloSDKError("Invalid format for from/to date")
+        }
+
+        var newDate = this
+
+        if (period == ReportPeriod.MONTH) {
+            newDate = this.changeDateFormat(from = DAILY, to = MONTHLY)
+        } else if (period == ReportPeriod.WEEK) {
+            newDate = this.dailyToWeekly()
+        }
+
+        return newDate
     }
 }

@@ -15,5 +15,8 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 81,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": "Unknown"
+	}
 }

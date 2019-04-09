@@ -16,7 +16,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 238
+	"merchant": {
+		"id": 238,
+		"name": ""
+	}
 }, {
 	"id": 194629,
 	"account_id": 939,
@@ -35,7 +38,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 238
+	"merchant": {
+		"id": 238,
+		"name": ""
+	}
 }, {
 	"id": 194500,
 	"account_id": 939,
@@ -54,7 +60,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23
+	"merchant": {
+		"id": 23,
+		"name": ""
+	}
 }, {
 	"id": 99650,
 	"account_id": 542,
@@ -73,7 +82,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 194560,
 	"account_id": 939,
@@ -92,7 +104,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44
+	"merchant": {
+		"id": 44,
+		"name": ""
+	}
 }, {
 	"id": 194072,
 	"account_id": 937,
@@ -111,7 +126,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 1251,
 	"bill_payment_id": 8007
 }, {
@@ -132,7 +150,10 @@
 	},
 	"budget_category": "income",
 	"category_id": 84,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99584,
 	"account_id": 542,
@@ -151,7 +172,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 1252,
 	"bill_payment_id": 8034
 }, {
@@ -171,7 +195,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 61,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99564,
 	"account_id": 545,
@@ -189,7 +216,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 69,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99563,
 	"account_id": 545,
@@ -207,7 +237,10 @@
 	},
 	"budget_category": "goals",
 	"category_id": 92,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 194430,
 	"account_id": 939,
@@ -226,7 +259,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2
+	"merchant": {
+		"id": 2,
+		"name": ""
+	}
 }, {
 	"id": 194291,
 	"account_id": 937,
@@ -245,7 +281,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 83,
-	"merchant_id": 65
+	"merchant": {
+		"id": 65,
+		"name": ""
+	}
 }, {
 	"id": 99690,
 	"account_id": 542,
@@ -264,7 +303,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 83,
-	"merchant_id": 65
+	"merchant": {
+		"id": 65,
+		"name": ""
+	}
 }, {
 	"id": 194197,
 	"account_id": 937,
@@ -283,7 +325,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 99651,
 	"account_id": 542,
@@ -302,7 +347,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 194908,
 	"account_id": 940,
@@ -320,7 +368,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 79,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 194907,
 	"account_id": 940,
@@ -338,7 +389,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 69,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 194906,
 	"account_id": 940,
@@ -356,7 +410,10 @@
 	},
 	"budget_category": "goals",
 	"category_id": 92,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 194375,
 	"account_id": 939,
@@ -375,7 +432,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 71,
-	"merchant_id": 31
+	"merchant": {
+		"id": 31,
+		"name": ""
+	}
 }, {
 	"id": 194789,
 	"account_id": 939,
@@ -394,7 +454,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81
+	"merchant": {
+		"id": 81,
+		"name": ""
+	}
 }, {
 	"id": 194431,
 	"account_id": 939,
@@ -413,7 +476,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2
+	"merchant": {
+		"id": 2,
+		"name": ""
+	}
 }, {
 	"id": 194339,
 	"account_id": 939,
@@ -432,7 +498,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 79,
-	"merchant_id": 148
+	"merchant": {
+		"id": 148,
+		"name": ""
+	}
 }, {
 	"id": 234868,
 	"account_id": 1157,
@@ -451,7 +520,10 @@
 	},
 	"budget_category": "income",
 	"category_id": 60,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 234869,
 	"account_id": 1157,
@@ -470,7 +542,10 @@
 	},
 	"budget_category": "income",
 	"category_id": 60,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 234870,
 	"account_id": 1157,
@@ -489,7 +564,10 @@
 	},
 	"budget_category": "income",
 	"category_id": 60,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 234871,
 	"account_id": 1157,
@@ -508,7 +586,10 @@
 	},
 	"budget_category": "income",
 	"category_id": 60,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 194790,
 	"account_id": 939,
@@ -527,7 +608,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81
+	"merchant": {
+		"id": 81,
+		"name": ""
+	}
 }, {
 	"id": 194198,
 	"account_id": 937,
@@ -546,7 +630,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 99652,
 	"account_id": 542,
@@ -565,7 +652,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 194791,
 	"account_id": 939,
@@ -584,7 +674,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81
+	"merchant": {
+		"id": 81,
+		"name": ""
+	}
 }, {
 	"id": 194631,
 	"account_id": 939,
@@ -603,7 +696,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 238
+	"merchant": {
+		"id": 238,
+		"name": ""
+	}
 }, {
 	"id": 194501,
 	"account_id": 939,
@@ -622,7 +718,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23
+	"merchant": {
+		"id": 23,
+		"name": ""
+	}
 }, {
 	"id": 194366,
 	"account_id": 939,
@@ -641,7 +740,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204
+	"merchant": {
+		"id": 204,
+		"name": ""
+	}
 }, {
 	"id": 194367,
 	"account_id": 939,
@@ -660,7 +762,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204
+	"merchant": {
+		"id": 204,
+		"name": ""
+	}
 }, {
 	"id": 194073,
 	"account_id": 937,
@@ -679,7 +784,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 1251,
 	"bill_payment_id": 8008
 }, {
@@ -700,7 +808,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 1252,
 	"bill_payment_id": 8035
 }, {
@@ -721,7 +832,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44
+	"merchant": {
+		"id": 44,
+		"name": ""
+	}
 }, {
 	"id": 194199,
 	"account_id": 937,
@@ -740,7 +854,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 194632,
 	"account_id": 939,
@@ -759,7 +876,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 249
+	"merchant": {
+		"id": 249,
+		"name": ""
+	}
 }, {
 	"id": 194792,
 	"account_id": 939,
@@ -778,7 +898,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81
+	"merchant": {
+		"id": 81,
+		"name": ""
+	}
 }, {
 	"id": 194432,
 	"account_id": 939,
@@ -797,7 +920,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2
+	"merchant": {
+		"id": 2,
+		"name": ""
+	}
 }, {
 	"id": 194376,
 	"account_id": 939,
@@ -816,7 +942,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 71,
-	"merchant_id": 31
+	"merchant": {
+		"id": 31,
+		"name": ""
+	}
 }, {
 	"id": 99653,
 	"account_id": 542,
@@ -835,7 +964,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 99617,
 	"account_id": 542,
@@ -854,7 +986,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 78,
-	"merchant_id": 41
+	"merchant": {
+		"id": 41,
+		"name": ""
+	}
 }, {
 	"id": 194793,
 	"account_id": 939,
@@ -873,7 +1008,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81
+	"merchant": {
+		"id": 81,
+		"name": ""
+	}
 }, {
 	"id": 194368,
 	"account_id": 939,
@@ -892,7 +1030,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204
+	"merchant": {
+		"id": 204,
+		"name": ""
+	}
 }, {
 	"id": 194794,
 	"account_id": 939,
@@ -911,7 +1052,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81
+	"merchant": {
+		"id": 81,
+		"name": ""
+	}
 }, {
 	"id": 194733,
 	"account_id": 939,
@@ -930,7 +1074,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 68,
-	"merchant_id": 72
+	"merchant": {
+		"id": 72,
+		"name": ""
+	}
 }, {
 	"id": 194502,
 	"account_id": 939,
@@ -949,7 +1096,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23
+	"merchant": {
+		"id": 23,
+		"name": ""
+	}
 }, {
 	"id": 194369,
 	"account_id": 939,
@@ -968,7 +1118,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204
+	"merchant": {
+		"id": 204,
+		"name": ""
+	}
 }, {
 	"id": 194634,
 	"account_id": 939,
@@ -987,7 +1140,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 248
+	"merchant": {
+		"id": 248,
+		"name": ""
+	}
 }, {
 	"id": 194633,
 	"account_id": 939,
@@ -1006,7 +1162,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 248
+	"merchant": {
+		"id": 248,
+		"name": ""
+	}
 }, {
 	"id": 194397,
 	"account_id": 939,
@@ -1025,7 +1184,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 64,
-	"merchant_id": 14
+	"merchant": {
+		"id": 14,
+		"name": ""
+	}
 }, {
 	"id": 194370,
 	"account_id": 939,
@@ -1044,7 +1206,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204
+	"merchant": {
+		"id": 204,
+		"name": ""
+	}
 }, {
 	"id": 194200,
 	"account_id": 937,
@@ -1063,7 +1228,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 194153,
 	"account_id": 937,
@@ -1082,7 +1250,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 78,
-	"merchant_id": 41
+	"merchant": {
+		"id": 41,
+		"name": ""
+	}
 }, {
 	"id": 194745,
 	"account_id": 939,
@@ -1101,7 +1272,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 66,
-	"merchant_id": 97
+	"merchant": {
+		"id": 97,
+		"name": ""
+	}
 }, {
 	"id": 194562,
 	"account_id": 939,
@@ -1120,7 +1294,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44
+	"merchant": {
+		"id": 44,
+		"name": ""
+	}
 }, {
 	"id": 194324,
 	"account_id": 939,
@@ -1138,7 +1315,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 81,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 194305,
 	"account_id": 937,
@@ -1156,7 +1336,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 81,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 194074,
 	"account_id": 937,
@@ -1175,7 +1358,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 1251,
 	"bill_payment_id": 8009
 }, {
@@ -1195,7 +1381,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 81,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99586,
 	"account_id": 542,
@@ -1214,7 +1403,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 1252,
 	"bill_payment_id": 8036
 }, {
@@ -1235,7 +1427,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 70,
-	"merchant_id": 19,
+	"merchant": {
+		"id": 19,
+		"name": ""
+	},
 	"bill_id": 1249,
 	"bill_payment_id": 7987
 }, {
@@ -1256,7 +1451,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 70,
-	"merchant_id": 19
+	"merchant": {
+		"id": 19,
+		"name": ""
+	}
 }, {
 	"id": 99654,
 	"account_id": 542,
@@ -1275,7 +1473,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 194635,
 	"account_id": 939,
@@ -1294,7 +1495,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 292
+	"merchant": {
+		"id": 292,
+		"name": ""
+	}
 }, {
 	"id": 194433,
 	"account_id": 939,
@@ -1313,7 +1517,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2
+	"merchant": {
+		"id": 2,
+		"name": ""
+	}
 }, {
 	"id": 194795,
 	"account_id": 939,
@@ -1332,7 +1539,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81
+	"merchant": {
+		"id": 81,
+		"name": ""
+	}
 }, {
 	"id": 194796,
 	"account_id": 939,
@@ -1351,7 +1561,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81
+	"merchant": {
+		"id": 81,
+		"name": ""
+	}
 }, {
 	"id": 194201,
 	"account_id": 937,
@@ -1370,7 +1583,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 194160,
 	"account_id": 937,
@@ -1389,7 +1605,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 70,
-	"merchant_id": 205,
+	"merchant": {
+		"id": 205,
+		"name": ""
+	},
 	"bill_id": 1248,
 	"bill_payment_id": 7980
 }, {
@@ -1410,7 +1629,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 99625,
 	"account_id": 542,
@@ -1429,7 +1651,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 70,
-	"merchant_id": 205
+	"merchant": {
+		"id": 205,
+		"name": ""
+	}
 }, {
 	"id": 194757,
 	"account_id": 939,
@@ -1448,7 +1673,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 94,
-	"merchant_id": 125
+	"merchant": {
+		"id": 125,
+		"name": ""
+	}
 }, {
 	"id": 194503,
 	"account_id": 939,
@@ -1467,7 +1695,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23
+	"merchant": {
+		"id": 23,
+		"name": ""
+	}
 }, {
 	"id": 194636,
 	"account_id": 939,
@@ -1486,7 +1717,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 107
+	"merchant": {
+		"id": 107,
+		"name": ""
+	}
 }, {
 	"id": 99656,
 	"account_id": 542,
@@ -1505,7 +1739,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 194202,
 	"account_id": 937,
@@ -1524,7 +1761,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 194075,
 	"account_id": 937,
@@ -1543,7 +1783,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 1251,
 	"bill_payment_id": 8010
 }, {
@@ -1564,7 +1807,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 1252,
 	"bill_payment_id": 8037
 }, {
@@ -1585,7 +1831,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44
+	"merchant": {
+		"id": 44,
+		"name": ""
+	}
 }, {
 	"id": 194409,
 	"account_id": 939,
@@ -1604,7 +1853,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 64,
-	"merchant_id": 40
+	"merchant": {
+		"id": 40,
+		"name": ""
+	}
 }, {
 	"id": 194637,
 	"account_id": 939,
@@ -1623,7 +1875,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 194203,
 	"account_id": 937,
@@ -1642,7 +1897,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 194118,
 	"account_id": 937,
@@ -1661,7 +1919,10 @@
 	},
 	"budget_category": "income",
 	"category_id": 84,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 194797,
 	"account_id": 939,
@@ -1680,7 +1941,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81
+	"merchant": {
+		"id": 81,
+		"name": ""
+	}
 }, {
 	"id": 194434,
 	"account_id": 939,
@@ -1699,7 +1963,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2
+	"merchant": {
+		"id": 2,
+		"name": ""
+	}
 }, {
 	"id": 194798,
 	"account_id": 939,
@@ -1718,7 +1985,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81
+	"merchant": {
+		"id": 81,
+		"name": ""
+	}
 }, {
 	"id": 194638,
 	"account_id": 939,
@@ -1737,7 +2007,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 292
+	"merchant": {
+		"id": 292,
+		"name": ""
+	}
 }, {
 	"id": 194504,
 	"account_id": 939,
@@ -1756,7 +2029,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23
+	"merchant": {
+		"id": 23,
+		"name": ""
+	}
 }, {
 	"id": 99657,
 	"account_id": 542,
@@ -1775,7 +2051,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 99618,
 	"account_id": 542,
@@ -1794,7 +2073,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 78,
-	"merchant_id": 41
+	"merchant": {
+		"id": 41,
+		"name": ""
+	}
 }, {
 	"id": 194799,
 	"account_id": 939,
@@ -1813,7 +2095,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81
+	"merchant": {
+		"id": 81,
+		"name": ""
+	}
 }, {
 	"id": 194564,
 	"account_id": 939,
@@ -1832,7 +2117,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44
+	"merchant": {
+		"id": 44,
+		"name": ""
+	}
 }, {
 	"id": 194172,
 	"account_id": 937,
@@ -1851,7 +2139,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 90,
-	"merchant_id": 57,
+	"merchant": {
+		"id": 57,
+		"name": ""
+	},
 	"bill_id": 1250,
 	"bill_payment_id": 7994
 }, {
@@ -1872,7 +2163,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 90,
-	"merchant_id": 57
+	"merchant": {
+		"id": 57,
+		"name": ""
+	}
 }, {
 	"id": 194435,
 	"account_id": 939,
@@ -1891,7 +2185,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2
+	"merchant": {
+		"id": 2,
+		"name": ""
+	}
 }, {
 	"id": 194204,
 	"account_id": 937,
@@ -1910,7 +2207,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 194152,
 	"account_id": 937,
@@ -1929,7 +2229,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 78,
-	"merchant_id": 41
+	"merchant": {
+		"id": 41,
+		"name": ""
+	}
 }, {
 	"id": 194076,
 	"account_id": 937,
@@ -1948,7 +2251,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 1251,
 	"bill_payment_id": 8011
 }, {
@@ -1969,7 +2275,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 1252,
 	"bill_payment_id": 8038
 }, {
@@ -1990,7 +2299,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 238
+	"merchant": {
+		"id": 238,
+		"name": ""
+	}
 }, {
 	"id": 194639,
 	"account_id": 939,
@@ -2009,7 +2321,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 238
+	"merchant": {
+		"id": 238,
+		"name": ""
+	}
 }, {
 	"id": 194505,
 	"account_id": 939,
@@ -2028,7 +2343,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23
+	"merchant": {
+		"id": 23,
+		"name": ""
+	}
 }, {
 	"id": 99658,
 	"account_id": 542,
@@ -2047,7 +2365,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24
+	"merchant": {
+		"id": 24,
+		"name": ""
+	}
 }, {
 	"id": 194565,
 	"account_id": 939,
@@ -2066,7 +2387,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44
+	"merchant": {
+		"id": 44,
+		"name": ""
+	}
 }, {
 	"id": 194377,
 	"account_id": 939,
@@ -2085,7 +2409,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 71,
-	"merchant_id": 31
+	"merchant": {
+		"id": 31,
+		"name": ""
+	}
 }, {
 	"id": 194292,
 	"account_id": 937,
@@ -2104,7 +2431,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 83,
-	"merchant_id": 65
+	"merchant": {
+		"id": 65,
+		"name": ""
+	}
 }, {
 	"id": 99605,
 	"account_id": 542,
@@ -2123,7 +2453,10 @@
 	},
 	"budget_category": "income",
 	"category_id": 84,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99569,
 	"account_id": 545,
@@ -2141,7 +2474,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 61,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99568,
 	"account_id": 545,
@@ -2159,7 +2495,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 69,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99567,
 	"account_id": 545,
@@ -2177,7 +2516,10 @@
 	},
 	"budget_category": "goals",
 	"category_id": 92,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99566,
 	"account_id": 545,
@@ -2195,5 +2537,8 @@
 	},
 	"budget_category": "goals",
 	"category_id": 92,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }]

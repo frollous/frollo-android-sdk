@@ -19,6 +19,7 @@ package us.frollo.frollosdk.model.coredata.aggregation.transactions
 import androidx.room.*
 import us.frollo.frollosdk.model.IAdapterModel
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Balance
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantDetails
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 
 // Declaring the ColumnInfo allows for the renaming of variables without
@@ -71,8 +72,8 @@ data class Transaction(
         /** Transaction Category ID related to the transaction */
         @ColumnInfo(name = "category_id") var categoryId: Long,
 
-        /** Merchant ID related to the transaction */
-        @ColumnInfo(name = "merchant_id") val merchantId: Long,
+        /** Merchant details related to the transaction */
+        @Embedded(prefix = "merchant_")  val merchant: MerchantDetails,
 
         /** Bill ID related to the transaction */
         @ColumnInfo(name = "bill_id") var billId: Long?,

@@ -20,6 +20,7 @@ import org.junit.Test
 
 import org.junit.Assert.*
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.*
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantLocation
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
@@ -498,6 +499,42 @@ class ConvertersTest {
         assertEquals("POSTED", str)
 
         assertNull(Converters.instance.stringFromTransactionStatus(null))
+    }
+
+    @Test
+    fun testStringToMerchantLocation() {
+        val json = "{\"formatted_address\":\"41 McLaren St, North Sydney, NSW 2120 Australia\",\"line_1\":\"41 McLaren St\",\"suburb\":\"North Sydney\",\"state\":\"NSW\",\"postcode\":\"2120\",\"country\":\"Australia\"}"
+        val location = Converters.instance.stringToMerchantLocation(json)
+        assertNotNull(location)
+        assertEquals("41 McLaren St, North Sydney, NSW 2120 Australia", location?.formattedAddress)
+        assertEquals("41 McLaren St", location?.line1)
+        assertNull(location?.line2)
+        assertNull(location?.line3)
+        assertEquals("North Sydney", location?.suburb)
+        assertEquals("NSW", location?.state)
+        assertEquals("2120", location?.postcode)
+        assertEquals("Australia", location?.country)
+        assertNull(location?.latitude)
+        assertNull(location?.longitude)
+
+        assertNull(Converters.instance.stringToMerchantLocation(null))
+    }
+
+    @Test
+    fun testStringFromMerchantLocation() {
+        val location = MerchantLocation(
+                formattedAddress = "41 McLaren St, North Sydney, NSW 2120 Australia",
+                line1 = "41 McLaren St",
+                line2 = null,
+                line3 = null,
+                suburb = "North Sydney",
+                state = "NSW",
+                postcode = "2120",
+                country = "Australia",
+                latitude = null,
+                longitude = null)
+        val json = Converters.instance.stringFromMerchantLocation(location)
+        assertEquals("{\"formatted_address\":\"41 McLaren St, North Sydney, NSW 2120 Australia\",\"line_1\":\"41 McLaren St\",\"suburb\":\"North Sydney\",\"state\":\"NSW\",\"postcode\":\"2120\",\"country\":\"Australia\"}", json)
     }
 
     @Test

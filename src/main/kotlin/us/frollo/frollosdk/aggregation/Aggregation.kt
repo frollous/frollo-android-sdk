@@ -763,7 +763,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     val response = resource.data
                     response?.let {
                         val updatedIds = insertTransactions(response).plus(updatedTransactionIds)
-                        val merchantIds = it.map { model -> model.merchantId }.toLongArray().plus(updatedMerchantIds)
+                        val merchantIds = it.map { model -> model.merchant.id }.toLongArray().plus(updatedMerchantIds)
 
                         if (it.size >= TRANSACTION_BATCH_SIZE) {
                             refreshNextransactions(fromDate, toDate, accountIds, transactionIncluded,
@@ -986,7 +986,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                                            completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
-                fetchMissingMerchants(response.map { it.merchantId }.toSet())
+                fetchMissingMerchants(response.map { it.merchant.id }.toSet())
 
                 val models = mapTransactionResponse(response)
                 db.transactions().insertAll(*models.toTypedArray())
@@ -999,7 +999,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     private fun handleTransactionResponse(response: TransactionResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
-                fetchMissingMerchants(setOf(response.merchantId))
+                fetchMissingMerchants(setOf(response.merchant.id))
 
                 db.transactions().insert(response.toTransaction())
 

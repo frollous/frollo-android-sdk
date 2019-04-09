@@ -19,6 +19,7 @@ package us.frollo.frollosdk.model
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Balance
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantDetails
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionDescription
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
@@ -40,7 +41,7 @@ internal fun testTransactionResponseData(transactionId: Long? = null, accountId:
             billId = randomNumber().toLong(),
             billPaymentId = randomNumber().toLong(),
             categoryId = categoryId ?: randomNumber().toLong(),
-            merchantId = merchantId ?: randomNumber().toLong(),
+            merchant = testMerchantDetails(merchantId),
             budgetCategory = BudgetCategory.values()[Random.nextInt(BudgetCategory.values().size)],
             description = TransactionDescription(original = randomUUID(), user = null, simple = null),
             included = included ?: randomBoolean(),
@@ -49,6 +50,14 @@ internal fun testTransactionResponseData(transactionId: Long? = null, accountId:
             status = TransactionStatus.values()[Random.nextInt(TransactionStatus.values().size)],
             transactionDate = transactionDate ?: "2019-01-01")
 }
+
+internal fun testMerchantDetails(merchantId: Long? = null): MerchantDetails =
+        MerchantDetails(
+                id = merchantId ?: randomNumber().toLong(),
+                name = randomUUID(),
+                phone = randomUUID(),
+                website = randomUUID(),
+                location = null)
 
 internal fun testTransactionsSummaryResponseData(count: Long? = null, sum: BigDecimal? = null) : TransactionsSummaryResponse {
     return TransactionsSummaryResponse(

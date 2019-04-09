@@ -20,6 +20,7 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.*
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantLocation
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
@@ -222,6 +223,12 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromTransactionStatus(value: TransactionStatus?): String? = value?.name
+
+    @TypeConverter
+    fun stringToMerchantLocation(value: String?): MerchantLocation? = if (value == null) null else gson.fromJson(value)
+
+    @TypeConverter
+    fun stringFromMerchantLocation(value: MerchantLocation?): String? = if (value == null) null else gson.toJson(value)
 
     // Transaction Category
 

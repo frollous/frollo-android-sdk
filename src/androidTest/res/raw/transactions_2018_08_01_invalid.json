@@ -15,7 +15,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 81,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99703,
 	"base_type": "debit",
@@ -32,7 +35,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 81,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99602,
 	"account_id": 542,
@@ -47,7 +53,10 @@
 	},
 	"budget_category": "income",
 	"category_id": 84,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99559,
 	"account_id": 545,
@@ -64,7 +73,10 @@
 		"original": "Fee Transaction"
 	},
 	"category_id": 79,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99558,
 	"account_id": 545,
@@ -82,7 +94,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 69,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99557,
 	"account_id": 545,
@@ -100,7 +115,10 @@
 	},
 	"budget_category": "goals",
 	"category_id": 77,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99556,
 	"account_id": 545,
@@ -118,7 +136,10 @@
 	},
 	"budget_category": "goals",
 	"category_id": 92,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99923,
 	"account_id": 544,
@@ -137,8 +158,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 75,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99767,
 	"account_id": 544,
@@ -157,8 +180,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 64,
-	"merchant_id": 2,
-	"merchant_name": "Woolworths"
+	"merchant": {
+		"id": 2,
+		"name": "Woolworths"
+	}
 }, {
 	"id": 99713,
 	"account_id": 544,
@@ -177,8 +202,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 79,
-	"merchant_id": 148,
-	"merchant_name": "Charge/Fee"
+	"merchant": {
+		"id": 148,
+		"name": "Charge/Fee"
+	}
 }, {
 	"id": 99924,
 	"account_id": 544,
@@ -197,8 +224,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99635,
 	"account_id": 542,
@@ -217,8 +246,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99925,
 	"account_id": 544,
@@ -237,8 +268,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99863,
 	"account_id": 544,
@@ -257,8 +290,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 238,
-	"merchant_name": "The Occidental Hotel"
+	"merchant": {
+		"id": 238,
+		"name": "The Occidental Hotel"
+	}
 }, {
 	"id": 99803,
 	"account_id": 544,
@@ -277,8 +312,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 66,
-	"merchant_id": 23,
-	"merchant_name": "IGA grocery stores"
+	"merchant": {
+		"id": 23,
+		"name": "IGA grocery stores"
+	}
 }, {
 	"id": 99719,
 	"account_id": 544,
@@ -297,8 +334,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99576,
 	"account_id": 542,
@@ -317,7 +356,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 585,
 	"bill_payment_id": 2564
 }, {
@@ -338,8 +380,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 66,
-	"merchant_id": 44,
-	"merchant_name": "Coles"
+	"merchant": {
+		"id": 44,
+		"name": "Coles"
+	}
 }, {
 	"id": 99636,
 	"account_id": 542,
@@ -358,8 +402,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99741,
 	"account_id": 544,
@@ -378,8 +424,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 71,
-	"merchant_id": 31,
-	"merchant_name": "PayPal"
+	"merchant": {
+		"id": 31,
+		"name": "PayPal"
+	}
 }, {
 	"id": 99926,
 	"account_id": 544,
@@ -398,8 +446,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99768,
 	"account_id": 544,
@@ -418,8 +468,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2,
-	"merchant_name": "Woolworths"
+	"merchant": {
+		"id": 2,
+		"name": "Woolworths"
+	}
 }, {
 	"id": 99927,
 	"account_id": 544,
@@ -438,8 +490,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99928,
 	"account_id": 544,
@@ -458,8 +512,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99905,
 	"account_id": 544,
@@ -478,8 +534,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 68,
-	"merchant_id": 72,
-	"merchant_name": "Bunnings"
+	"merchant": {
+		"id": 72,
+		"name": "Bunnings"
+	}
 }, {
 	"id": 99804,
 	"account_id": 544,
@@ -498,8 +556,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23,
-	"merchant_name": "IGA grocery stores"
+	"merchant": {
+		"id": 23,
+		"name": "IGA grocery stores"
+	}
 }, {
 	"id": 99720,
 	"account_id": 544,
@@ -518,8 +578,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99865,
 	"account_id": 544,
@@ -538,8 +600,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 248,
-	"merchant_name": "The Tree House"
+	"merchant": {
+		"id": 248,
+		"name": "The Tree House"
+	}
 }, {
 	"id": 99864,
 	"account_id": 544,
@@ -558,8 +622,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 248,
-	"merchant_name": "The Tree House"
+	"merchant": {
+		"id": 248,
+		"name": "The Tree House"
+	}
 }, {
 	"id": 99755,
 	"account_id": 544,
@@ -578,8 +644,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 64,
-	"merchant_id": 14,
-	"merchant_name": "Apple Inc"
+	"merchant": {
+		"id": 14,
+		"name": "Apple Inc"
+	}
 }, {
 	"id": 99721,
 	"account_id": 544,
@@ -598,8 +666,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99637,
 	"account_id": 542,
@@ -618,8 +688,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99621,
 	"account_id": 542,
@@ -638,8 +710,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 78,
-	"merchant_id": 41,
-	"merchant_name": "Transport for NSW"
+	"merchant": {
+		"id": 41,
+		"name": "Transport for NSW"
+	}
 }, {
 	"id": 99577,
 	"account_id": 542,
@@ -658,7 +732,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 585,
 	"bill_payment_id": 2565
 }, {
@@ -679,8 +756,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 66,
-	"merchant_id": 97,
-	"merchant_name": "Dan Murphy"
+	"merchant": {
+		"id": 97,
+		"name": "Dan Murphy"
+	}
 }, {
 	"id": 99834,
 	"account_id": 544,
@@ -699,8 +778,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44,
-	"merchant_name": "Coles"
+	"merchant": {
+		"id": 44,
+		"name": "Coles"
+	}
 }, {
 	"id": 99683,
 	"account_id": 542,
@@ -719,8 +800,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 70,
-	"merchant_id": 19,
-	"merchant_name": "Optus",
+	"merchant": {
+		"id": 19,
+		"name": "Optus"
+	},
 	"bill_id": 582,
 	"bill_payment_id": 2543
 }, {
@@ -741,8 +824,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2,
-	"merchant_name": "Woolworths"
+	"merchant": {
+		"id": 2,
+		"name": "Woolworths"
+	}
 }, {
 	"id": 99742,
 	"account_id": 544,
@@ -761,8 +846,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 71,
-	"merchant_id": 31,
-	"merchant_name": "PayPal"
+	"merchant": {
+		"id": 31,
+		"name": "PayPal"
+	}
 }, {
 	"id": 99929,
 	"account_id": 544,
@@ -781,8 +868,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99930,
 	"account_id": 544,
@@ -801,8 +890,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99638,
 	"account_id": 542,
@@ -821,8 +912,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99623,
 	"account_id": 542,
@@ -841,8 +934,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 70,
-	"merchant_id": 205,
-	"merchant_name": "Amaysim",
+	"merchant": {
+		"id": 205,
+		"name": "Amaysim"
+	},
 	"bill_id": 581,
 	"bill_payment_id": 2536
 }, {
@@ -863,8 +958,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 94,
-	"merchant_id": 125,
-	"merchant_name": "BIG W"
+	"merchant": {
+		"id": 125,
+		"name": "BIG W"
+	}
 }, {
 	"id": 99805,
 	"account_id": 544,
@@ -883,8 +980,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23,
-	"merchant_name": "IGA grocery stores"
+	"merchant": {
+		"id": 23,
+		"name": "IGA grocery stores"
+	}
 }, {
 	"id": 99722,
 	"account_id": 544,
@@ -903,8 +1002,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99866,
 	"account_id": 544,
@@ -923,8 +1024,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 107,
-	"merchant_name": "The Brew House Hotel"
+	"merchant": {
+		"id": 107,
+		"name": "The Brew House Hotel"
+	}
 }, {
 	"id": 99724,
 	"account_id": 544,
@@ -943,8 +1046,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99578,
 	"account_id": 542,
@@ -963,7 +1068,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 585,
 	"bill_payment_id": 2566
 }, {
@@ -984,8 +1092,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99835,
 	"account_id": 544,
@@ -1004,8 +1114,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44,
-	"merchant_name": "Coles"
+	"merchant": {
+		"id": 44,
+		"name": "Coles"
+	}
 }, {
 	"id": 99761,
 	"account_id": 544,
@@ -1024,8 +1136,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 64,
-	"merchant_id": 40,
-	"merchant_name": "Netflix",
+	"merchant": {
+		"id": 40,
+		"name": "Netflix"
+	},
 	"bill_id": 583,
 	"bill_payment_id": 2550
 }, {
@@ -1046,8 +1160,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99705,
 	"account_id": 544,
@@ -1065,7 +1181,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 81,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99695,
 	"account_id": 542,
@@ -1083,7 +1202,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 81,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99867,
 	"account_id": 544,
@@ -1102,8 +1224,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 1,
-	"merchant_name": "Kansai Japanese Restaurant"
+	"merchant": {
+		"id": 1,
+		"name": "Kansai Japanese Restaurant"
+	}
 }, {
 	"id": 99640,
 	"account_id": 542,
@@ -1122,8 +1246,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99931,
 	"account_id": 544,
@@ -1142,8 +1268,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99770,
 	"account_id": 544,
@@ -1162,8 +1290,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2,
-	"merchant_name": "Woolworths"
+	"merchant": {
+		"id": 2,
+		"name": "Woolworths"
+	}
 }, {
 	"id": 99932,
 	"account_id": 544,
@@ -1182,8 +1312,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99806,
 	"account_id": 544,
@@ -1202,8 +1334,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23,
-	"merchant_name": "IGA grocery stores"
+	"merchant": {
+		"id": 23,
+		"name": "IGA grocery stores"
+	}
 }, {
 	"id": 99933,
 	"account_id": 544,
@@ -1222,8 +1356,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99622,
 	"account_id": 542,
@@ -1242,8 +1378,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 78,
-	"merchant_id": 41,
-	"merchant_name": "Transport for NSW"
+	"merchant": {
+		"id": 41,
+		"name": "Transport for NSW"
+	}
 }, {
 	"id": 99836,
 	"account_id": 544,
@@ -1262,8 +1400,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44,
-	"merchant_name": "Coles"
+	"merchant": {
+		"id": 44,
+		"name": "Coles"
+	}
 }, {
 	"id": 99725,
 	"account_id": 544,
@@ -1282,8 +1422,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99629,
 	"account_id": 542,
@@ -1302,8 +1444,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 90,
-	"merchant_id": 57,
-	"merchant_name": "AGL",
+	"merchant": {
+		"id": 57,
+		"name": "AGL"
+	},
 	"bill_id": 584,
 	"bill_payment_id": 2557
 }, {
@@ -1324,7 +1468,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 585,
 	"bill_payment_id": 2567
 }, {
@@ -1345,8 +1492,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2,
-	"merchant_name": "Woolworths"
+	"merchant": {
+		"id": 2,
+		"name": "Woolworths"
+	}
 }, {
 	"id": 99726,
 	"account_id": 544,
@@ -1365,8 +1514,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99641,
 	"account_id": 542,
@@ -1385,8 +1536,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99869,
 	"account_id": 544,
@@ -1405,8 +1558,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 238,
-	"merchant_name": "The Occidental Hotel"
+	"merchant": {
+		"id": 238,
+		"name": "The Occidental Hotel"
+	}
 }, {
 	"id": 99868,
 	"account_id": 544,
@@ -1425,8 +1580,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 238,
-	"merchant_name": "The Occidental Hotel"
+	"merchant": {
+		"id": 238,
+		"name": "The Occidental Hotel"
+	}
 }, {
 	"id": 99807,
 	"account_id": 544,
@@ -1445,8 +1602,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23,
-	"merchant_name": "IGA grocery stores"
+	"merchant": {
+		"id": 23,
+		"name": "IGA grocery stores"
+	}
 }, {
 	"id": 99837,
 	"account_id": 544,
@@ -1465,8 +1624,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44,
-	"merchant_name": "Coles"
+	"merchant": {
+		"id": 44,
+		"name": "Coles"
+	}
 }, {
 	"id": 99603,
 	"account_id": 542,
@@ -1485,7 +1646,10 @@
 	},
 	"budget_category": "income",
 	"category_id": 84,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99562,
 	"account_id": 545,
@@ -1503,7 +1667,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 79,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99561,
 	"account_id": 545,
@@ -1521,7 +1688,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 69,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99560,
 	"account_id": 545,
@@ -1539,7 +1709,10 @@
 	},
 	"budget_category": "goals",
 	"category_id": 92,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99934,
 	"account_id": 544,
@@ -1558,8 +1731,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99773,
 	"account_id": 544,
@@ -1578,8 +1753,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2,
-	"merchant_name": "Woolworths"
+	"merchant": {
+		"id": 2,
+		"name": "Woolworths"
+	}
 }, {
 	"id": 99772,
 	"account_id": 544,
@@ -1598,8 +1775,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2,
-	"merchant_name": "Woolworths"
+	"merchant": {
+		"id": 2,
+		"name": "Woolworths"
+	}
 }, {
 	"id": 99714,
 	"account_id": 544,
@@ -1618,8 +1797,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 79,
-	"merchant_id": 148,
-	"merchant_name": "Charge/Fee"
+	"merchant": {
+		"id": 148,
+		"name": "Charge/Fee"
+	}
 }, {
 	"id": 99689,
 	"account_id": 542,
@@ -1638,8 +1819,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 83,
-	"merchant_id": 65,
-	"merchant_name": "Direct Credit"
+	"merchant": {
+		"id": 65,
+		"name": "Direct Credit"
+	}
 }, {
 	"id": 99935,
 	"account_id": 544,
@@ -1658,8 +1841,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99727,
 	"account_id": 544,
@@ -1678,8 +1863,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99643,
 	"account_id": 542,
@@ -1698,8 +1885,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99642,
 	"account_id": 542,
@@ -1718,8 +1907,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99936,
 	"account_id": 544,
@@ -1738,8 +1929,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99870,
 	"account_id": 544,
@@ -1758,8 +1951,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 238,
-	"merchant_name": "The Occidental Hotel"
+	"merchant": {
+		"id": 238,
+		"name": "The Occidental Hotel"
+	}
 }, {
 	"id": 99808,
 	"account_id": 544,
@@ -1778,8 +1973,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23,
-	"merchant_name": "IGA grocery stores"
+	"merchant": {
+		"id": 23,
+		"name": "IGA grocery stores"
+	}
 }, {
 	"id": 99580,
 	"account_id": 542,
@@ -1798,7 +1995,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 585,
 	"bill_payment_id": 2568
 }, {
@@ -1819,8 +2019,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44,
-	"merchant_name": "Coles"
+	"merchant": {
+		"id": 44,
+		"name": "Coles"
+	}
 }, {
 	"id": 99644,
 	"account_id": 542,
@@ -1839,8 +2041,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99743,
 	"account_id": 544,
@@ -1859,8 +2063,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 71,
-	"merchant_id": 31,
-	"merchant_name": "PayPal"
+	"merchant": {
+		"id": 31,
+		"name": "PayPal"
+	}
 }, {
 	"id": 99937,
 	"account_id": 544,
@@ -1879,8 +2085,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99774,
 	"account_id": 544,
@@ -1899,8 +2107,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2,
-	"merchant_name": "Woolworths"
+	"merchant": {
+		"id": 2,
+		"name": "Woolworths"
+	}
 }, {
 	"id": 99938,
 	"account_id": 544,
@@ -1919,8 +2129,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99728,
 	"account_id": 544,
@@ -1939,8 +2151,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99619,
 	"account_id": 542,
@@ -1959,8 +2173,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 78,
-	"merchant_id": 41,
-	"merchant_name": "Transport for NSW"
+	"merchant": {
+		"id": 41,
+		"name": "Transport for NSW"
+	}
 }, {
 	"id": 99939,
 	"account_id": 544,
@@ -1979,8 +2195,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99906,
 	"account_id": 544,
@@ -1999,8 +2217,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 68,
-	"merchant_id": 72,
-	"merchant_name": "Bunnings"
+	"merchant": {
+		"id": 72,
+		"name": "Bunnings"
+	}
 }, {
 	"id": 99809,
 	"account_id": 544,
@@ -2019,8 +2239,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23,
-	"merchant_name": "IGA grocery stores"
+	"merchant": {
+		"id": 23,
+		"name": "IGA grocery stores"
+	}
 }, {
 	"id": 99729,
 	"account_id": 544,
@@ -2039,8 +2261,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99872,
 	"account_id": 544,
@@ -2059,8 +2283,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 248,
-	"merchant_name": "The Tree House"
+	"merchant": {
+		"id": 248,
+		"name": "The Tree House"
+	}
 }, {
 	"id": 99871,
 	"account_id": 544,
@@ -2079,8 +2305,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 248,
-	"merchant_name": "The Tree House"
+	"merchant": {
+		"id": 248,
+		"name": "The Tree House"
+	}
 }, {
 	"id": 99645,
 	"account_id": 542,
@@ -2099,8 +2327,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99581,
 	"account_id": 542,
@@ -2119,7 +2349,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 585,
 	"bill_payment_id": 2569
 }, {
@@ -2140,8 +2373,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 66,
-	"merchant_id": 97,
-	"merchant_name": "Dan Murphy"
+	"merchant": {
+		"id": 97,
+		"name": "Dan Murphy"
+	}
 }, {
 	"id": 99839,
 	"account_id": 544,
@@ -2160,8 +2395,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44,
-	"merchant_name": "Coles"
+	"merchant": {
+		"id": 44,
+		"name": "Coles"
+	}
 }, {
 	"id": 99730,
 	"account_id": 544,
@@ -2180,8 +2417,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99706,
 	"account_id": 544,
@@ -2199,7 +2438,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 81,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99696,
 	"account_id": 542,
@@ -2217,7 +2459,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 81,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99775,
 	"account_id": 544,
@@ -2236,8 +2481,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2,
-	"merchant_name": "Woolworths"
+	"merchant": {
+		"id": 2,
+		"name": "Woolworths"
+	}
 }, {
 	"id": 99756,
 	"account_id": 544,
@@ -2256,8 +2503,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 64,
-	"merchant_id": 14,
-	"merchant_name": "Apple Inc"
+	"merchant": {
+		"id": 14,
+		"name": "Apple Inc"
+	}
 }, {
 	"id": 99744,
 	"account_id": 544,
@@ -2276,8 +2525,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 71,
-	"merchant_id": 31,
-	"merchant_name": "PayPal"
+	"merchant": {
+		"id": 31,
+		"name": "PayPal"
+	}
 }, {
 	"id": 99940,
 	"account_id": 544,
@@ -2296,8 +2547,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99941,
 	"account_id": 544,
@@ -2316,8 +2569,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99731,
 	"account_id": 544,
@@ -2336,8 +2591,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99684,
 	"account_id": 542,
@@ -2356,8 +2613,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 70,
-	"merchant_id": 19,
-	"merchant_name": "Optus",
+	"merchant": {
+		"id": 19,
+		"name": "Optus"
+	},
 	"bill_id": 582,
 	"bill_payment_id": 2544
 }, {
@@ -2378,8 +2637,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99918,
 	"account_id": 544,
@@ -2398,8 +2659,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 94,
-	"merchant_id": 125,
-	"merchant_name": "BIG W"
+	"merchant": {
+		"id": 125,
+		"name": "BIG W"
+	}
 }, {
 	"id": 99810,
 	"account_id": 544,
@@ -2418,8 +2681,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23,
-	"merchant_name": "IGA grocery stores"
+	"merchant": {
+		"id": 23,
+		"name": "IGA grocery stores"
+	}
 }, {
 	"id": 99733,
 	"account_id": 544,
@@ -2438,8 +2703,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99873,
 	"account_id": 544,
@@ -2458,8 +2725,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 107,
-	"merchant_name": "The Brew House Hotel"
+	"merchant": {
+		"id": 107,
+		"name": "The Brew House Hotel"
+	}
 }, {
 	"id": 99582,
 	"account_id": 542,
@@ -2478,7 +2747,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 585,
 	"bill_payment_id": 2570
 }, {
@@ -2499,8 +2771,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99647,
 	"account_id": 542,
@@ -2519,8 +2793,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99624,
 	"account_id": 542,
@@ -2539,8 +2815,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 70,
-	"merchant_id": 205,
-	"merchant_name": "Amaysim",
+	"merchant": {
+		"id": 205,
+		"name": "Amaysim"
+	},
 	"bill_id": 581,
 	"bill_payment_id": 2537
 }, {
@@ -2561,8 +2839,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44,
-	"merchant_name": "Coles"
+	"merchant": {
+		"id": 44,
+		"name": "Coles"
+	}
 }, {
 	"id": 99874,
 	"account_id": 544,
@@ -2581,8 +2861,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 1,
-	"merchant_name": "Kansai Japanese Restaurant"
+	"merchant": {
+		"id": 1,
+		"name": "Kansai Japanese Restaurant"
+	}
 }, {
 	"id": 99648,
 	"account_id": 542,
@@ -2601,8 +2883,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99942,
 	"account_id": 544,
@@ -2621,8 +2905,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99776,
 	"account_id": 544,
@@ -2641,8 +2927,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2,
-	"merchant_name": "Woolworths"
+	"merchant": {
+		"id": 2,
+		"name": "Woolworths"
+	}
 }, {
 	"id": 99943,
 	"account_id": 544,
@@ -2661,8 +2949,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99811,
 	"account_id": 544,
@@ -2681,8 +2971,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23,
-	"merchant_name": "IGA grocery stores"
+	"merchant": {
+		"id": 23,
+		"name": "IGA grocery stores"
+	}
 }, {
 	"id": 99762,
 	"account_id": 544,
@@ -2701,8 +2993,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 64,
-	"merchant_id": 40,
-	"merchant_name": "Netflix",
+	"merchant": {
+		"id": 40,
+		"name": "Netflix"
+	},
 	"bill_id": 583,
 	"bill_payment_id": 2551
 }, {
@@ -2723,8 +3017,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99944,
 	"account_id": 544,
@@ -2743,8 +3039,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99735,
 	"account_id": 544,
@@ -2763,8 +3061,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99841,
 	"account_id": 544,
@@ -2783,8 +3083,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44,
-	"merchant_name": "Coles"
+	"merchant": {
+		"id": 44,
+		"name": "Coles"
+	}
 }, {
 	"id": 99620,
 	"account_id": 542,
@@ -2803,8 +3105,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 78,
-	"merchant_id": 41,
-	"merchant_name": "Transport for NSW"
+	"merchant": {
+		"id": 41,
+		"name": "Transport for NSW"
+	}
 }, {
 	"id": 99583,
 	"account_id": 542,
@@ -2823,7 +3127,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 585,
 	"bill_payment_id": 2571
 }, {
@@ -2844,8 +3151,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2,
-	"merchant_name": "Woolworths"
+	"merchant": {
+		"id": 2,
+		"name": "Woolworths"
+	}
 }, {
 	"id": 99649,
 	"account_id": 542,
@@ -2864,8 +3173,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99876,
 	"account_id": 544,
@@ -2884,8 +3195,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 238,
-	"merchant_name": "The Occidental Hotel"
+	"merchant": {
+		"id": 238,
+		"name": "The Occidental Hotel"
+	}
 }, {
 	"id": 99875,
 	"account_id": 544,
@@ -2904,8 +3217,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 238,
-	"merchant_name": "The Occidental Hotel"
+	"merchant": {
+		"id": 238,
+		"name": "The Occidental Hotel"
+	}
 }, {
 	"id": 99812,
 	"account_id": 544,
@@ -2924,8 +3239,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23,
-	"merchant_name": "IGA grocery stores"
+	"merchant": {
+		"id": 23,
+		"name": "IGA grocery stores"
+	}
 }, {
 	"id": 99707,
 	"account_id": 544,
@@ -2943,7 +3260,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 81,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99697,
 	"account_id": 542,
@@ -2961,7 +3281,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 81,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99630,
 	"account_id": 542,
@@ -2980,8 +3303,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 90,
-	"merchant_id": 57,
-	"merchant_name": "AGL",
+	"merchant": {
+		"id": 57,
+		"name": "AGL"
+	},
 	"bill_id": 584,
 	"bill_payment_id": 2558
 }, {
@@ -3002,8 +3327,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44,
-	"merchant_name": "Coles"
+	"merchant": {
+		"id": 44,
+		"name": "Coles"
+	}
 }, {
 	"id": 99778,
 	"account_id": 544,
@@ -3022,8 +3349,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2,
-	"merchant_name": "Woolworths"
+	"merchant": {
+		"id": 2,
+		"name": "Woolworths"
+	}
 }, {
 	"id": 99650,
 	"account_id": 542,
@@ -3042,8 +3371,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99604,
 	"account_id": 542,
@@ -3062,7 +3393,10 @@
 	},
 	"budget_category": "income",
 	"category_id": 84,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99584,
 	"account_id": 542,
@@ -3081,7 +3415,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 585,
 	"bill_payment_id": 2572
 }, {
@@ -3101,7 +3438,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 79,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99564,
 	"account_id": 545,
@@ -3119,7 +3459,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 69,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99563,
 	"account_id": 545,
@@ -3137,7 +3480,10 @@
 	},
 	"budget_category": "goals",
 	"category_id": 92,
-	"merchant_id": 1
+	"merchant": {
+		"id": 1,
+		"name": ""
+	}
 }, {
 	"id": 99945,
 	"account_id": 544,
@@ -3156,8 +3502,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99779,
 	"account_id": 544,
@@ -3176,8 +3524,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2,
-	"merchant_name": "Woolworths"
+	"merchant": {
+		"id": 2,
+		"name": "Woolworths"
+	}
 }, {
 	"id": 99715,
 	"account_id": 544,
@@ -3196,8 +3546,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 79,
-	"merchant_id": 148,
-	"merchant_name": "Charge/Fee"
+	"merchant": {
+		"id": 148,
+		"name": "Charge/Fee"
+	}
 }, {
 	"id": 99690,
 	"account_id": 542,
@@ -3216,8 +3568,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 83,
-	"merchant_id": 65,
-	"merchant_name": "Direct Credit"
+	"merchant": {
+		"id": 65,
+		"name": "Direct Credit"
+	}
 }, {
 	"id": 99946,
 	"account_id": 544,
@@ -3236,8 +3590,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99651,
 	"account_id": 542,
@@ -3256,8 +3612,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99947,
 	"account_id": 544,
@@ -3276,8 +3634,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99877,
 	"account_id": 544,
@@ -3296,8 +3656,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 238,
-	"merchant_name": "The Occidental Hotel"
+	"merchant": {
+		"id": 238,
+		"name": "The Occidental Hotel"
+	}
 }, {
 	"id": 99813,
 	"account_id": 544,
@@ -3316,8 +3678,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23,
-	"merchant_name": "IGA grocery stores"
+	"merchant": {
+		"id": 23,
+		"name": "IGA grocery stores"
+	}
 }, {
 	"id": 99745,
 	"account_id": 544,
@@ -3336,8 +3700,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 71,
-	"merchant_id": 31,
-	"merchant_name": "PayPal"
+	"merchant": {
+		"id": 31,
+		"name": "PayPal"
+	}
 }, {
 	"id": 99843,
 	"account_id": 544,
@@ -3356,8 +3722,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 44,
-	"merchant_name": "Coles"
+	"merchant": {
+		"id": 44,
+		"name": "Coles"
+	}
 }, {
 	"id": 99652,
 	"account_id": 542,
@@ -3376,8 +3744,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 80,
-	"merchant_id": 24,
-	"merchant_name": "Cash Withdrawal"
+	"merchant": {
+		"id": 24,
+		"name": "Cash Withdrawal"
+	}
 }, {
 	"id": 99736,
 	"account_id": 544,
@@ -3396,8 +3766,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99948,
 	"account_id": 544,
@@ -3416,8 +3788,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99780,
 	"account_id": 544,
@@ -3436,8 +3810,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 2,
-	"merchant_name": "Woolworths"
+	"merchant": {
+		"id": 2,
+		"name": "Woolworths"
+	}
 }, {
 	"id": 99737,
 	"account_id": 544,
@@ -3456,8 +3832,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 78,
-	"merchant_id": 204,
-	"merchant_name": "Uber"
+	"merchant": {
+		"id": 204,
+		"name": "Uber"
+	}
 }, {
 	"id": 99585,
 	"account_id": 542,
@@ -3476,7 +3854,10 @@
 	},
 	"budget_category": "living",
 	"category_id": 76,
-	"merchant_id": 1,
+	"merchant": {
+		"id": 1,
+		"name": ""
+	},
 	"bill_id": 585,
 	"bill_payment_id": 2573
 }, {
@@ -3497,8 +3878,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99950,
 	"account_id": 544,
@@ -3517,8 +3900,10 @@
 	},
 	"budget_category": "lifestyle",
 	"category_id": 77,
-	"merchant_id": 81,
-	"merchant_name": "McDonald's"
+	"merchant": {
+		"id": 81,
+		"name": "McDonald's"
+	}
 }, {
 	"id": 99907,
 	"account_id": 544,
@@ -3537,8 +3922,10 @@
 	},
 	"budget_category": "one_off",
 	"category_id": 68,
-	"merchant_id": 72,
-	"merchant_name": "Bunnings"
+	"merchant": {
+		"id": 72,
+		"name": "Bunnings"
+	}
 }, {
 	"id": 99814,
 	"account_id": 544,
@@ -3557,6 +3944,8 @@
 	},
 	"budget_category": "living",
 	"category_id": 66,
-	"merchant_id": 23,
-	"merchant_name": "IGA grocery stores"
+	"merchant": {
+		"id": 23,
+		"name": "IGA grocery stores"
+	}
 }]

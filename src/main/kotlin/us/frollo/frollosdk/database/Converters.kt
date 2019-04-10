@@ -29,6 +29,10 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.*
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategoryType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
+import us.frollo.frollosdk.model.coredata.bills.BillFrequency
+import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
+import us.frollo.frollosdk.model.coredata.bills.BillStatus
+import us.frollo.frollosdk.model.coredata.bills.BillType
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
@@ -259,6 +263,32 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromReportPeriod(value: ReportPeriod?): String? = value?.name
+
+    // Bill
+
+    @TypeConverter
+    fun stringToBillType(value: String?): BillType? = if (value == null) BillType.BILL else BillType.valueOf(value)
+
+    @TypeConverter
+    fun stringFromBillType(value: BillType?): String? = value?.name ?: BillType.BILL.name
+
+    @TypeConverter
+    fun stringToBillStatus(value: String?): BillStatus? = if (value == null) BillStatus.ESTIMATED else BillStatus.valueOf(value)
+
+    @TypeConverter
+    fun stringFromBillStatus(value: BillStatus?): String? = value?.name ?: BillStatus.ESTIMATED.name
+
+    @TypeConverter
+    fun stringToBillFrequency(value: String?): BillFrequency? = if (value == null) BillFrequency.UNKNOWN else BillFrequency.valueOf(value)
+
+    @TypeConverter
+    fun stringFromBillFrequency(value: BillFrequency?): String? = value?.name ?: BillFrequency.UNKNOWN.name
+
+    @TypeConverter
+    fun stringToBillPaymentStatus(value: String?): BillPaymentStatus? = if (value == null) BillPaymentStatus.DUE else BillPaymentStatus.valueOf(value)
+
+    @TypeConverter
+    fun stringFromBillPaymentStatus(value: BillPaymentStatus?): String? = value?.name ?: BillPaymentStatus.DUE.name
 
     // Shared
 

@@ -22,9 +22,10 @@ import java.math.BigDecimal
 
 internal data class BillCreateRequest(
         @SerializedName("transaction_id") val transactionId: Long? = null,
+        @SerializedName("category_id") val categoryId: Long? = null,
         @SerializedName("name") val name: String? = null,
         @SerializedName("due_amount") val dueAmount: BigDecimal? = null,
-        @SerializedName("frequency") var frequency: BillFrequency,
+        @SerializedName("frequency") val frequency: BillFrequency,
         @SerializedName("next_payment_date") val nextPaymentDate: String, // yyyy-MM-dd
-        @SerializedName("note") var note: String? = null
+        @SerializedName("note") val notes: String? = null
 )

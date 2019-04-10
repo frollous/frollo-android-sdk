@@ -54,8 +54,6 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
 
     private val reportsAPI: ReportsAPI = network.create(ReportsAPI::class.java)
 
-    private var refreshingMerchantIDs = setOf<Long>()
-
     // Account Balance Reports
 
     /**
@@ -306,7 +304,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
 
                 // Refresh missing merchants
                 if (grouping == ReportGrouping.MERCHANT)
-                    fetchMissingMerchants(linkedIds.toSet())
+                    aggregation.fetchMissingMerchants(linkedIds.toSet())
 
                 db.reportsTransactionCurrent().insertAndDeleteInTransaction(
                         new = reportsToInsert,
@@ -482,22 +480,11 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
 
         // Refresh missing merchants
         if (report.grouping == ReportGrouping.MERCHANT)
-            fetchMissingMerchants(linkedIds.toSet())
+            aggregation.fetchMissingMerchants(linkedIds.toSet())
 
         // Fetch and delete any leftovers
         val staleIds = db.reportGroupsTransactionHistory().findStaleIds(report.reportId, categoryReportIds)
         db.reportGroupsTransactionHistory().deleteMany(staleIds)
-    }
-
-    private fun fetchMissingMerchants(merchantIds: Set<Long>) {
-        doAsync {
-            val existingMerchantIds = db.merchants().getIds().toSet()
-            val missingMerchantIds = merchantIds.compareToFindMissingItems(existingMerchantIds).minus(refreshingMerchantIDs)
-            if (missingMerchantIds.isNotEmpty()) {
-                refreshingMerchantIDs = refreshingMerchantIDs.plus(missingMerchantIds)
-                aggregation.refreshMerchants(missingMerchantIds.toLongArray())
-            }
-        }
     }
 
     @Throws(FrolloSDKError::class)

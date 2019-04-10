@@ -27,19 +27,19 @@ internal data class BillResponse(
         @SerializedName("id") val billId: Long,
         @SerializedName("name") val name: String,
         @SerializedName("description") val description: String?,
-        @SerializedName("bill_type") var billType: BillType,
-        @SerializedName("status") var status: BillStatus,
+        @SerializedName("bill_type") val billType: BillType,
+        @SerializedName("status") val status: BillStatus,
         @SerializedName("last_amount") val lastAmount: BigDecimal,
         @SerializedName("due_amount") val dueAmount: BigDecimal,
         @SerializedName("average_amount") val averageAmount: BigDecimal,
-        @SerializedName("frequency") var frequency: BillFrequency,
-        @SerializedName("payment_status") var paymentStatus: BillPaymentStatus,
+        @SerializedName("frequency") val frequency: BillFrequency,
+        @SerializedName("payment_status") val paymentStatus: BillPaymentStatus,
         @SerializedName("last_payment_date") val lastPaymentDate: String, // yyyy-MM-dd
         @SerializedName("next_payment_date") val nextPaymentDate: String, // yyyy-MM-dd
-        @SerializedName("category") var category: Category?,
-        @SerializedName("merchant") var merchant: Merchant?,
-        @SerializedName("account_id") val accountId: Long,
-        @SerializedName("note") var note: String?
+        @SerializedName("category") val category: Category?,
+        @SerializedName("merchant") val merchant: Merchant?,
+        @SerializedName("account_id") val accountId: Long?,
+        @SerializedName("note") val notes: String?
 ) {
     internal data class Category(
             @SerializedName("id") val id: Long,

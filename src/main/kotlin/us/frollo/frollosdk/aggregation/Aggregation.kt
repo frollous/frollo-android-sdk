@@ -884,6 +884,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * Update a transaction on the host
      *
      * @param transactionId ID of the transaction to be updated
+     * @param transaction Updated transaction data model
      * @param recategoriseAll Apply recategorisation to all similar transactions (Optional)
      * @param includeApplyAll Apply included flag to all similar transactions (Optional)
      * @param completion Optional completion handler with optional error if the request fails
@@ -1208,7 +1209,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
-    private fun fetchMissingMerchants(merchantIds: Set<Long>) {
+    internal fun fetchMissingMerchants(merchantIds: Set<Long>) {
         doAsync {
             val existingMerchantIds = db.merchants().getIds().toSet()
             val missingMerchantIds = merchantIds.compareToFindMissingItems(existingMerchantIds).minus(refreshingMerchantIDs)

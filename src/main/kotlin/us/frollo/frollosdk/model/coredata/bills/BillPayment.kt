@@ -36,10 +36,10 @@ data class BillPayment(
         @ColumnInfo(name = "bill_payment_id") val billPaymentId: Long,
         @ColumnInfo(name = "bill_id") val billId: Long,
         @ColumnInfo(name = "name") val name: String,
-        @ColumnInfo(name = "merchant_id") val merchantId: Long,
-        @ColumnInfo(name = "date") val date: String, // yyyy-MM-dd
+        @ColumnInfo(name = "merchant_id") val merchantId: Long?,
+        @ColumnInfo(name = "date") var date: String, // yyyy-MM-dd
         @ColumnInfo(name = "payment_status") var paymentStatus: BillPaymentStatus,
-        @ColumnInfo(name = "frequency") var frequency: BillFrequency,
+        @ColumnInfo(name = "frequency") val frequency: BillFrequency,
         @ColumnInfo(name = "amount") val amount: BigDecimal,
         @ColumnInfo(name = "unpayable") val unpayable: Boolean
 ): IAdapterModel {

@@ -23,8 +23,8 @@ import us.frollo.frollosdk.model.api.bills.*
 internal interface BillsAPI {
     companion object {
         // Bill URLs
-        const val URL_BILLS = "aggregation/bills"
-        const val URL_BILL = "aggregation/bills/{bill_id}"
+        const val URL_BILLS = "bills"
+        const val URL_BILL = "bills/{bill_id}"
 
         // Bill Payment URLs
         const val URL_BILL_PAYMENTS = "bills/payments"

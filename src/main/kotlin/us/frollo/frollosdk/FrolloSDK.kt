@@ -30,6 +30,7 @@ import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.AuthenticationStatus
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.bills.Bills
 import us.frollo.frollosdk.core.ACTION.ACTION_AUTHENTICATION_CHANGED
 import us.frollo.frollosdk.core.ARGUMENT.ARG_AUTHENTICATION_STATUS
 import us.frollo.frollosdk.core.DeviceInfo
@@ -110,6 +111,12 @@ object FrolloSDK {
     val reports: Reports
         get() =_reports ?: throw IllegalAccessException("SDK not setup")
 
+    /**
+     * Bills - All bills and bill payments. See [Bills] for details
+     */
+    val bills: Bills
+        get() =_bills ?: throw IllegalAccessException("SDK not setup")
+
     private var _setup = false
     private var _authentication: Authentication? = null
     private var _aggregation: Aggregation? = null
@@ -118,6 +125,7 @@ object FrolloSDK {
     private var _notifications: Notifications? = null
     private var _surveys: Surveys? = null
     private var _reports: Reports? = null
+    private var _bills: Bills? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
@@ -188,6 +196,8 @@ object FrolloSDK {
             _surveys = Surveys(network)
             // 14. Setup Reports
             _reports = Reports(network, database, aggregation)
+            // 15. Setup Bills
+            _bills = Bills(network, database, aggregation)
 
             if (version.migrationNeeded()) {
                 version.migrateVersion()
@@ -323,7 +333,7 @@ object FrolloSDK {
     private fun refreshSystem() {
         aggregation.refreshProviders()
         aggregation.refreshTransactionCategories()
-        //TODO: Refresh Bills
+        bills.refreshBills()
         authentication.updateDevice()
     }
 

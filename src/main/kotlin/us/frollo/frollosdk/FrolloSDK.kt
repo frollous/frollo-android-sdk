@@ -46,6 +46,7 @@ import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
+import us.frollo.frollosdk.model.coredata.bills.BillPayment
 import us.frollo.frollosdk.notifications.Notifications
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.reports.Reports
@@ -324,7 +325,12 @@ object FrolloSDK {
      * Refresh data from other important APIs that frequently change but are less time sensitive, e.g. bill payments
      */
     private fun refreshSecondary() {
-        //TODO: Refresh Bill Payments
+        val now = LocalDate.now()
+        // To end of current month
+        val toDate = now.withDayOfMonth(now.lengthOfMonth()).toString(BillPayment.DATE_FORMAT_PATTERN)
+        // From start of last month
+        val fromDate = now.minusMonths(1).withDayOfMonth(1).toString(BillPayment.DATE_FORMAT_PATTERN)
+        bills.refreshBillPayments(fromDate = fromDate, toDate = toDate)
     }
 
     /**

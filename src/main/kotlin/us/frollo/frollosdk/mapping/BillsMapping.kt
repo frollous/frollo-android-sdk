@@ -16,6 +16,7 @@
 
 package us.frollo.frollosdk.mapping
 
+import us.frollo.frollosdk.model.api.bills.BillPaymentResponse
 import us.frollo.frollosdk.model.api.bills.BillResponse
 import us.frollo.frollosdk.model.coredata.bills.*
 
@@ -37,3 +38,15 @@ internal fun BillResponse.toBill(): Bill =
                 merchantId = merchant?.id,
                 accountId = accountId,
                 notes = notes)
+
+internal fun BillPaymentResponse.toBillPayment(): BillPayment =
+        BillPayment(
+                billPaymentId = billPaymentId,
+                billId = billId,
+                name = name,
+                merchantId = merchantId,
+                date = date,
+                paymentStatus = paymentStatus,
+                frequency = frequency,
+                amount = amount,
+                unpayable = unpayable)

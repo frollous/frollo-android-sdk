@@ -29,13 +29,9 @@ import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.extensions.*
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toBill
-import us.frollo.frollosdk.model.api.bills.BillCreateRequest
-import us.frollo.frollosdk.model.api.bills.BillResponse
-import us.frollo.frollosdk.model.api.bills.BillUpdateRequest
-import us.frollo.frollosdk.model.api.bills.BillsResponse
-import us.frollo.frollosdk.model.coredata.bills.Bill
-import us.frollo.frollosdk.model.coredata.bills.BillFrequency
-import us.frollo.frollosdk.model.coredata.bills.BillRelation
+import us.frollo.frollosdk.mapping.toBillPayment
+import us.frollo.frollosdk.model.api.bills.*
+import us.frollo.frollosdk.model.coredata.bills.*
 import us.frollo.frollosdk.network.api.BillsAPI
 import java.math.BigDecimal
 
@@ -43,7 +39,6 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
 
     companion object {
         private const val TAG = "Bills"
-        private const val TRANSACTION_BATCH_SIZE = 200
     }
 
     private val billsAPI: BillsAPI = network.create(BillsAPI::class.java)
@@ -162,6 +157,84 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         }
     }
 
+    // Bill Payment
+
+    fun fetchBillPayment(billPaymentId: Long): LiveData<Resource<BillPayment>> =
+            Transformations.map(db.billPayments().load(billPaymentId)) { model ->
+                Resource.success(model)
+            }
+
+    fun fetchBillPayments(fromDate: String, toDate: String): LiveData<Resource<List<BillPayment>>> =
+            Transformations.map(db.billPayments().load(fromDate = fromDate, toDate = toDate)) { models ->
+                Resource.success(models)
+            }
+
+    fun fetchBillPaymentsByBillId(billId: Long, fromDate: String, toDate: String): LiveData<Resource<List<BillPayment>>> =
+            Transformations.map(db.billPayments().loadByBillId(billId = billId, fromDate = fromDate, toDate = toDate)) { models ->
+                Resource.success(models)
+            }
+
+    fun fetchPaymentWithRelation(billPaymentId: Long): LiveData<Resource<BillPaymentRelation>> =
+            Transformations.map(db.billPayments().loadWithRelation(billPaymentId)) { model ->
+                Resource.success(model)
+            }
+
+    fun fetchBillPaymentsWithRelation(fromDate: String, toDate: String): LiveData<Resource<List<BillPaymentRelation>>> =
+            Transformations.map(db.billPayments().loadWithRelation(fromDate = fromDate, toDate = toDate)) { models ->
+                Resource.success(models)
+            }
+
+    fun fetchBillPaymentsByBillIdWithRelation(billId: Long, fromDate: String, toDate: String): LiveData<Resource<List<BillPaymentRelation>>> =
+            Transformations.map(db.billPayments().loadByBillIdWithRelation(billId = billId, fromDate = fromDate, toDate = toDate)) { models ->
+                Resource.success(models)
+            }
+
+    fun deleteBillPayment(billPaymentId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        billsAPI.deleteBillPayment(billPaymentId).enqueue { resource ->
+            when(resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#deleteBillPayment", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    removeCachedBillPayments(longArrayOf(billPaymentId))
+                }
+            }
+        }
+    }
+
+    fun refreshBillPayments(fromDate: String, toDate: String, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        billsAPI.fetchBillPayments(fromDate = fromDate, toDate = toDate).enqueue { resource ->
+            when(resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshBillPayments", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleBillPaymentsResponse(response = resource.data, fromDate = fromDate, toDate = toDate, completion = completion)
+                }
+            }
+        }
+    }
+
+    fun updateBillPayment(billPaymentId: Long, date: String? = null, paymentStatus: BillPaymentStatus? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        val request = BillPaymentUpdateRequest(date = date, status = paymentStatus)
+
+        billsAPI.updateBillPayment(billPaymentId, request).enqueue { resource ->
+            when(resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#updateBillPayment", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleBillPaymentResponse(response = resource.data, completion = completion)
+                }
+            }
+        }
+    }
+
+    // Response Handlers
+
     private fun handleBillsResponse(response: BillsResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
@@ -197,8 +270,47 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
 
+    private fun handleBillPaymentsResponse(response: List<BillPaymentResponse>?, fromDate: String, toDate: String,
+                                           completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        response?.let {
+            doAsync {
+                val models = mapBillPaymentResponse(response)
+
+                aggregation.fetchMissingMerchants(models.mapNotNull { it.merchantId }.toSet())
+
+                db.billPayments().insertAll(*models.toTypedArray())
+
+                val apiIds = models.map { it.billPaymentId }.toList()
+                val staleIds = db.billPayments().getStaleIds(apiIds = apiIds.toLongArray(), fromDate = fromDate, toDate = toDate)
+
+                if (staleIds.isNotEmpty()) {
+                    removeCachedBillPayments(staleIds.toLongArray())
+                }
+
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    private fun handleBillPaymentResponse(response: BillPaymentResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        response?.let {
+            doAsync {
+                val model = response.toBillPayment()
+
+                model.merchantId?.let { aggregation.fetchMissingMerchants(setOf(it)) }
+
+                db.billPayments().insert(model)
+
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
     private fun mapBillResponse(models: List<BillResponse>): List<Bill> =
             models.map { it.toBill() }.toList()
+
+    private fun mapBillPaymentResponse(models: List<BillPaymentResponse>): List<BillPayment> =
+            models.map { it.toBillPayment() }.toList()
 
     // WARNING: Do not call this method on the main thread
     private fun removeCachedBills(billIds: LongArray) {

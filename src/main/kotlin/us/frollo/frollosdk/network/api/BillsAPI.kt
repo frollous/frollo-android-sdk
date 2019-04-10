@@ -54,9 +54,6 @@ internal interface BillsAPI {
     @GET(URL_BILL_PAYMENTS)
     fun fetchBillPayments(@QueryMap queryParams: Map<String, String>): Call<List<BillPaymentResponse>>
 
-    @GET(URL_BILL_PAYMENT)
-    fun fetchBillPayment(@Path("bill_payment_id") billPaymentId: Long): Call<BillPaymentResponse>
-
     @PUT(URL_BILL_PAYMENT)
     fun updateBillPayment(@Path("bill_payment_id") billPaymentId: Long, @Body request: BillPaymentUpdateRequest): Call<BillPaymentResponse>
 

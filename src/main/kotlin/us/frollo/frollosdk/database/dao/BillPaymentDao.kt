@@ -51,12 +51,6 @@ internal interface BillPaymentDao {
     @Query("DELETE FROM bill_payment WHERE bill_payment_id = :billPaymentId")
     fun delete(billPaymentId: Long)
 
-    @Query("DELETE FROM bill_payment WHERE bill_id in (:billIds)")
-    fun deleteByBillIds(billIds: LongArray)
-
-    @Query("DELETE FROM bill_payment WHERE bill_id = :billId")
-    fun deleteByBillId(billId: Long)
-
     @Query("DELETE FROM bill_payment")
     fun clear()
 

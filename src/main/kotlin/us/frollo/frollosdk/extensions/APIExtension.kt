@@ -21,13 +21,16 @@ import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
 import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
+import us.frollo.frollosdk.model.api.bills.BillPaymentResponse
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
+import us.frollo.frollosdk.model.coredata.bills.BillPayment
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.network.api.BillsAPI
 import us.frollo.frollosdk.network.api.ReportsAPI
 
 internal fun AggregationAPI.fetchTransactionsByQuery(
@@ -95,4 +98,17 @@ internal fun ReportsAPI.fetchTransactionHistoryReports(grouping: ReportGrouping,
     var queryMap = mapOf("grouping" to grouping.toString(), "period" to period.toString(), "from_date" to fromDate, "to_date" to toDate)
     budgetCategory?.let { queryMap = queryMap.plus(Pair("budget_category", it.toString())) }
     return fetchTransactionHistoryReports(queryMap)
+}
+
+internal fun BillsAPI.fetchBillPayments(
+        fromDate: String, // yyyy-MM-dd
+        toDate: String, // yyyy-MM-dd
+        skip: Int? = null,
+        count: Int? = null) : Call<List<BillPaymentResponse>> {
+
+    var queryMap = mapOf("from_date" to fromDate, "to_date" to toDate)
+    skip?.let { queryMap = queryMap.plus(Pair("skip", it.toString())) }
+    count?.let { queryMap = queryMap.plus(Pair("count", it.toString())) }
+
+    return fetchBillPayments(queryMap)
 }

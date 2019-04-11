@@ -1,5 +1,14 @@
 ## Changelog
 
+### 1.3.0
+- Bills
+- Enriched Transaction Data
+
+#### Features
+- Bills
+- Bill Payments
+- Enriched merchant details on a Transaction
+
 ### 1.2.0
 - Reports
 

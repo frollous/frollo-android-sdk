@@ -19,12 +19,22 @@ package us.frollo.frollosdk.model.coredata.bills
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
+/** Status of the latest bill payment */
 enum class BillPaymentStatus {
+
+    /** Payment is due */
     @SerializedName("due") DUE,
+
+    /** Payment is in the future */
     @SerializedName("future") FUTURE,
+
+    /** Payment is overdue */
     @SerializedName("overdue") OVERDUE,
+
+    /** Paid */
     @SerializedName("paid") PAID;
 
+    /** Enum to serialized string */
     //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =
     //Try to get the annotation value if available instead of using plain .toString()

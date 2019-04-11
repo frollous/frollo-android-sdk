@@ -19,17 +19,37 @@ package us.frollo.frollosdk.model.coredata.bills
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
+/** How often the [BillPayment]`s occur */
 enum class BillFrequency {
+
+    /** Annually */
     @SerializedName("annually") ANNUALLY,
+
+    /** Biannually - twice in a year */
     @SerializedName("biannually") BIANNUALLY,
+
+    /** Fortnightly */
     @SerializedName("fortnightly") FORTNIGHTLY,
+
+    /** Every four weeks */
     @SerializedName("four_weekly") FOUR_WEEKLY,
+
+    /** Irregularly */
     @SerializedName("irregular") IRREGULAR,
+
+    /** Monthly */
     @SerializedName("monthly") MONTHLY,
+
+    /** Quarterly */
     @SerializedName("quarterly") QUARTERLY,
+
+    /** Weekly */
     @SerializedName("weekly") WEEKLY,
+
+    /** Unknown */
     @SerializedName("unknown") UNKNOWN;
 
+    /** Enum to serialized string */
     //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =
     //Try to get the annotation value if available instead of using plain .toString()

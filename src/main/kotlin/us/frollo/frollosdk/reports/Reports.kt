@@ -59,8 +59,8 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
     /**
      * Fetch account balance reports from the cache
      *
-     * @param fromDate Start date in the format [yyyy-MM-dd] to fetch reports from (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
-     * @param toDate End date in the format [yyyy-MM-dd] to fetch reports up to (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
+     * @param fromDate Start date in the format yyyy-MM-dd to fetch reports from (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
+     * @param toDate End date in the format yyyy-MM-dd to fetch reports up to (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
      * @param period Period that reports should be broken down by
      * @param accountId Fetch reports for a specific account ID (optional)
      * @param accountType Fetch reports for a specific account type (optional)
@@ -80,8 +80,8 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
     /**
      * Refresh account balance reports from the host
      *
-     * @param fromDate Start date in the format [yyyy-MM-dd] to fetch reports from (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
-     * @param toDate End date in the format [yyyy-MM-dd] to fetch reports up to (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
+     * @param fromDate Start date in the format yyyy-MM-dd to fetch reports from (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
+     * @param toDate End date in the format yyyy-MM-dd to fetch reports up to (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
      * @param period Period that reports should be broken down by
      * @param accountId Fetch reports for a specific account ID (optional)
      * @param accountType Fetch reports for a specific account type (optional)
@@ -153,8 +153,8 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
     /**
      * Fetch historic transaction reports from the cache
      *
-     * @param fromDate Start date in the format [yyyy-MM-dd] to fetch reports from (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
-     * @param toDate End date in the format [yyyy-MM-dd] to fetch reports up to (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
+     * @param fromDate Start date in the format yyyy-MM-dd to fetch reports from (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
+     * @param toDate End date in the format yyyy-MM-dd to fetch reports up to (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
      * @param grouping Grouping that reports should be broken down into
      * @param period Period that reports should be broken down by
      * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
@@ -174,8 +174,8 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
     /**
      * Refresh transaction history reports from the host
      *
-     * @param fromDate Start date in the format [yyyy-MM-dd] to fetch reports from (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
-     * @param toDate End date in the format [yyyy-MM-dd] to fetch reports up to (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
+     * @param fromDate Start date in the format yyyy-MM-dd to fetch reports from (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
+     * @param toDate End date in the format yyyy-MM-dd to fetch reports up to (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
      * @param grouping Grouping that reports should be broken down into
      * @param period Period that reports should be broken down by
      * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)

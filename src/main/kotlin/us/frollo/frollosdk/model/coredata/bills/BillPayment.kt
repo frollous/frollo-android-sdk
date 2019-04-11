@@ -31,20 +31,42 @@ import java.math.BigDecimal
             Index("bill_id"),
             Index("merchant_id")])
 
+/** Data representation of a Bill payment */
 data class BillPayment(
+
+        /** Unique ID of the bill payment */
         @PrimaryKey
         @ColumnInfo(name = "bill_payment_id") val billPaymentId: Long,
+
+        /** Bill ID of the parent bill */
         @ColumnInfo(name = "bill_id") val billId: Long,
+
+        /** Name of the bill */
         @ColumnInfo(name = "name") val name: String,
+
+        /** Merchant ID associated with the bill payment */
         @ColumnInfo(name = "merchant_id") val merchantId: Long?,
+
+        /** Date of the bill payment. See [BillPayment.DATE_FORMAT_PATTERN] for the date format pattern */
         @ColumnInfo(name = "date") var date: String, // yyyy-MM-dd
+
+        /** Status of the bill payment */
         @ColumnInfo(name = "payment_status") var paymentStatus: BillPaymentStatus,
+
+        /** Frequency the bill payment occurs */
         @ColumnInfo(name = "frequency") val frequency: BillFrequency,
+
+        /** Amount of the payment */
         @ColumnInfo(name = "amount") val amount: BigDecimal,
+
+        /** Indicates if the bill payment can be marked as unpaid */
         @ColumnInfo(name = "unpayable") val unpayable: Boolean
+
 ): IAdapterModel {
 
     companion object {
+
+        /** Date format for dates associated with Bill Payment */
         const val DATE_FORMAT_PATTERN = "yyyy-MM-dd"
     }
 }

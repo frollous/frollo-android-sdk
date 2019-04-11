@@ -252,7 +252,7 @@ class BillsTest {
 
         val date = LocalDate.now().plusDays(1).toString(Bill.DATE_FORMAT_PATTERN)
 
-        bills.createBill(frequency = BillFrequency.MONTHLY, nextPaymentDate = date, dueAmount = BigDecimal("50.0"), name = "Stan", notes = "Cancel this") { result ->
+        bills.createBill(dueAmount = BigDecimal("50.0"), frequency = BillFrequency.MONTHLY, nextPaymentDate = date, name = "Stan", notes = "Cancel this") { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -678,7 +678,7 @@ class BillsTest {
         database.bills().insert(testBillResponseData(billId = 123, accountId = 345, merchantId = 678, transactionCategoryId = 567).toBill())
         database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 456, billId = 123, date = "2019-01-01").toBillPayment())
 
-        val testObserver = bills.fetchBillPayments(fromDate = "2019-01-01", toDate = "2019-04-30").test()
+        val testObserver = bills.fetchBillPaymentsWithRelation(fromDate = "2019-01-01", toDate = "2019-04-30").test()
 
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)

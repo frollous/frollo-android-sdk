@@ -35,6 +35,7 @@ import us.frollo.frollosdk.model.coredata.bills.*
 import us.frollo.frollosdk.network.api.BillsAPI
 import java.math.BigDecimal
 
+/** Manages bills and bill payments */
 class Bills(network: NetworkService, private val db: SDKDatabase, private val aggregation: Aggregation) {
 
     companion object {
@@ -45,37 +46,98 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
 
     // Bill
 
+    /**
+     * Fetch bill by ID from the cache
+     *
+     * @param billId Unique bill ID to fetch
+     *
+     * @return LiveData object of Resource<Bill> which can be observed using an Observer for future changes as well.
+     */
     fun fetchBill(billId: Long): LiveData<Resource<Bill>> =
             Transformations.map(db.bills().load(billId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch bills from the cache
+     *
+     * @return LiveData object of Resource<List<Bill> which can be observed using an Observer for future changes as well.
+     */
     fun fetchBills(): LiveData<Resource<List<Bill>>> =
             Transformations.map(db.bills().load()) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Fetch bill by ID from the cache along with other associated data.
+     *
+     * @param billId Unique bill ID to fetch
+     *
+     * @return LiveData object of Resource<BillRelation> which can be observed using an Observer for future changes as well.
+     */
     fun fetchBillWithRelation(billId: Long): LiveData<Resource<BillRelation>> =
             Transformations.map(db.bills().loadWithRelation(billId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch bills from the cache along with other associated data.
+     *
+     * @return LiveData object of Resource<List<BillRelation> which can be observed using an Observer for future changes as well.
+     */
     fun fetchBillsWithRelation(): LiveData<Resource<List<BillRelation>>> =
             Transformations.map(db.bills().loadWithRelation()) { models ->
                 Resource.success(models)
             }
 
-    fun createBill(frequency: BillFrequency, nextPaymentDate: String, name: String? = null,
-                   transactionId: Long? = null, dueAmount: BigDecimal? = null, notes: String? = null,
+    /**
+     * Create a new bill on the host from a transaction
+     *
+     * @param transactionId ID of the transaction representing a bill payment
+     * @param frequency How often the bill recurrs
+     * @param nextPaymentDate Date of the next payment is due
+     * @param name Custom name for the bill (Optional: defaults to the transaction name)
+     * @param notes Notes attached to the bill (Optional)
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun createBill(transactionId: Long, frequency: BillFrequency, nextPaymentDate: String,
+                   name: String? = null, notes: String? = null,
                    completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val request = BillCreateRequest(
+                transactionId = transactionId,
+                dueAmount = null,
                 name = name,
                 frequency = frequency,
                 nextPaymentDate = nextPaymentDate,
-                transactionId = transactionId,
-                dueAmount = dueAmount,
                 notes = notes)
 
+        createBill(request, completion)
+    }
+
+    /**
+     * Create a new bill on the host manually
+     *
+     * @param dueAmount Amount the bill charges, recurring
+     * @param frequency How often the bill recurrs
+     * @param nextPaymentDate Date of the next payment is due
+     * @param name Custom name for the bill
+     * @param notes Notes attached to the bill (Optional)
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun createBill(dueAmount: BigDecimal, frequency: BillFrequency, nextPaymentDate: String, name: String,
+                   notes: String? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        val request = BillCreateRequest(
+                transactionId = null,
+                dueAmount = dueAmount,
+                name = name,
+                frequency = frequency,
+                nextPaymentDate = nextPaymentDate,
+                notes = notes)
+
+        createBill(request, completion)
+    }
+
+    private fun createBill(request: BillCreateRequest, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         billsAPI.createBill(request).enqueue { resource ->
             when(resource.status) {
                 Resource.Status.ERROR -> {
@@ -89,6 +151,12 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         }
     }
 
+    /**
+     * Delete a specific bill by ID from the host
+     *
+     * @param billId ID of the bill to be deleted
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun deleteBill(billId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         billsAPI.deleteBill(billId).enqueue { resource ->
             when(resource.status) {
@@ -103,6 +171,13 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         }
     }
 
+    /**
+     * Refresh all available bills from the host.
+     *
+     * Includes both estimated and confirmed bills.
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshBills(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         billsAPI.fetchBills().enqueue { resource ->
             when(resource.status) {
@@ -117,6 +192,12 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         }
     }
 
+    /**
+     * Refresh a specific bill by ID from the host
+     *
+     * @param billId ID of the bill to fetch
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshBill(billId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         billsAPI.fetchBill(billId).enqueue { resource ->
             when(resource.status) {
@@ -131,6 +212,12 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         }
     }
 
+    /**
+     * Update a bill on the host
+     *
+     * @param bill Updated bill data model
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun updateBill(bill: Bill, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val request = BillUpdateRequest(
                 name = bill.name,
@@ -156,16 +243,40 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
 
     // Bill Payment
 
+    /**
+     * Fetch bill payment by ID from the cache
+     *
+     * @param billPaymentId Unique bill payment ID to fetch
+     *
+     * @return LiveData object of Resource<BillPayment> which can be observed using an Observer for future changes as well.
+     */
     fun fetchBillPayment(billPaymentId: Long): LiveData<Resource<BillPayment>> =
             Transformations.map(db.billPayments().load(billPaymentId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch bill payments from the cache
+     *
+     * @param fromDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
+     * @param toDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
+     *
+     * @return LiveData object of Resource<List<BillPayment>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchBillPayments(fromDate: String, toDate: String): LiveData<Resource<List<BillPayment>>> =
             Transformations.map(db.billPayments().load(fromDate = fromDate, toDate = toDate)) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Fetch bill payments by bill ID from the cache
+     *
+     * @param billId Bill ID of the bill payments to fetch
+     * @param fromDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
+     * @param toDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
+     *
+     * @return LiveData object of Resource<List<BillPayment>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchBillPaymentsByBillId(billId: Long, fromDate: String? = null, toDate: String? = null): LiveData<Resource<List<BillPayment>>> =
             if (fromDate != null && toDate != null) {
                 Transformations.map(db.billPayments().loadByBillId(billId = billId, fromDate = fromDate, toDate = toDate)) { models ->
@@ -177,16 +288,40 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
                 }
             }
 
+    /**
+     * Fetch bill payment by ID from the cache with associated data
+     *
+     * @param billPaymentId Unique bill payment ID to fetch
+     *
+     * @return LiveData object of Resource<BillPaymentRelation> which can be observed using an Observer for future changes as well.
+     */
     fun fetchBillPaymentWithRelation(billPaymentId: Long): LiveData<Resource<BillPaymentRelation>> =
             Transformations.map(db.billPayments().loadWithRelation(billPaymentId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch bill payments from the cache with associated data
+     *
+     * @param fromDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
+     * @param toDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
+     *
+     * @return LiveData object of Resource<List<BillPaymentRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchBillPaymentsWithRelation(fromDate: String, toDate: String): LiveData<Resource<List<BillPaymentRelation>>> =
             Transformations.map(db.billPayments().loadWithRelation(fromDate = fromDate, toDate = toDate)) { models ->
                 Resource.success(models)
             }
 
+    /**
+     * Fetch bill payments by bill ID from the cache with associated data
+     *
+     * @param billId Bill ID of the bill payments to fetch
+     * @param fromDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
+     * @param toDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
+     *
+     * @return LiveData object of Resource<List<BillPaymentRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchBillPaymentsByBillIdWithRelation(billId: Long, fromDate: String? = null, toDate: String? = null): LiveData<Resource<List<BillPaymentRelation>>> =
             if (fromDate != null && toDate != null) {
                 Transformations.map(db.billPayments().loadByBillIdWithRelation(billId = billId, fromDate = fromDate, toDate = toDate)) { models ->
@@ -198,6 +333,12 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
                 }
             }
 
+    /**
+     * Delete a specific bill payment by ID from the host
+     *
+     * @param billPaymentId ID of the bill payment to be deleted
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun deleteBillPayment(billPaymentId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         billsAPI.deleteBillPayment(billPaymentId).enqueue { resource ->
             when(resource.status) {
@@ -212,6 +353,13 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         }
     }
 
+    /**
+     * Refresh bill payments from a certain period from the host
+     *
+     * @param fromDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
+     * @param toDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshBillPayments(fromDate: String, toDate: String, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         billsAPI.fetchBillPayments(fromDate = fromDate, toDate = toDate).enqueue { resource ->
             when(resource.status) {
@@ -226,6 +374,14 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         }
     }
 
+    /**
+     * Update a bill payment on the host
+     *
+     * @param billPaymentId ID of the bill payment to be updated
+     * @param date Date of the bill payment
+     * @param paymentStatus Bill payment status
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun updateBillPayment(billPaymentId: Long, date: String? = null, paymentStatus: BillPaymentStatus? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val request = BillPaymentUpdateRequest(date = date, status = paymentStatus)
 

@@ -19,12 +19,22 @@ package us.frollo.frollosdk.model.coredata.bills
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
+/** Detailed type of bill */
 enum class BillType {
+
+    /** General bill */
     @SerializedName("bill") BILL,
+
+    /** Manually entered bill */
     @SerializedName("subscription") SUBSCRIPTION,
+
+    /** Repayment, e.g. of a debt */
     @SerializedName("repayment") REPAYMENT,
+
+    /** Recurring subscription */
     @SerializedName("manual") MANUAL;
 
+    /** Enum to serialized string */
     //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =
     //Try to get the annotation value if available instead of using plain .toString()

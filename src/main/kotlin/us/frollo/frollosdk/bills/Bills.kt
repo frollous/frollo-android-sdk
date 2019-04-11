@@ -65,7 +65,7 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
                 Resource.success(models)
             }
 
-    fun createBill(name: String, frequency: BillFrequency, nextPaymentDate: String,
+    fun createBill(frequency: BillFrequency, nextPaymentDate: String, name: String? = null,
                    transactionId: Long? = null, transactionCategoryId: Long? = null,
                    dueAmount: BigDecimal? = null, notes: String? = null,
                    completion: OnFrolloSDKCompletionListener<Result>? = null) {

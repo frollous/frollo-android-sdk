@@ -29,6 +29,10 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.*
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategoryType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
+import us.frollo.frollosdk.model.coredata.bills.BillFrequency
+import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
+import us.frollo.frollosdk.model.coredata.bills.BillStatus
+import us.frollo.frollosdk.model.coredata.bills.BillType
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
@@ -635,5 +639,69 @@ class ConvertersTest {
         val list = mutableListOf<Long>(1024790, 1024791, 1024792)
         val string = Converters.instance.stringFromListOfLong(list)
         assertEquals("|1024790|1024791|1024792|", string)
+    }
+
+    @Test
+    fun testStringToBillType() {
+        val status = Converters.instance.stringToBillType("MANUAL")
+        assertEquals(BillType.MANUAL, status)
+
+        assertEquals(BillType.BILL, Converters.instance.stringToBillType(null))
+    }
+
+    @Test
+    fun testStringFromBillType() {
+        val str = Converters.instance.stringFromBillType(BillType.MANUAL)
+        assertEquals("MANUAL", str)
+
+        assertEquals("BILL", Converters.instance.stringFromBillType(null))
+    }
+
+    @Test
+    fun testStringToBillStatus() {
+        val status = Converters.instance.stringToBillStatus("CONFIRMED")
+        assertEquals(BillStatus.CONFIRMED, status)
+
+        assertEquals(BillStatus.ESTIMATED, Converters.instance.stringToBillStatus(null))
+    }
+
+    @Test
+    fun testStringFromBillStatus() {
+        val str = Converters.instance.stringFromBillStatus(BillStatus.CONFIRMED)
+        assertEquals("CONFIRMED", str)
+
+        assertEquals("ESTIMATED", Converters.instance.stringFromBillStatus(null))
+    }
+
+    @Test
+    fun testStringToBillFrequency() {
+        val status = Converters.instance.stringToBillFrequency("ANNUALLY")
+        assertEquals(BillFrequency.ANNUALLY, status)
+
+        assertEquals(BillFrequency.UNKNOWN, Converters.instance.stringToBillFrequency(null))
+    }
+
+    @Test
+    fun testStringFromBillFrequency() {
+        val str = Converters.instance.stringFromBillFrequency(BillFrequency.ANNUALLY)
+        assertEquals("ANNUALLY", str)
+
+        assertEquals("UNKNOWN", Converters.instance.stringFromBillFrequency(null))
+    }
+
+    @Test
+    fun testStringToBillPaymentStatus() {
+        val status = Converters.instance.stringToBillPaymentStatus("FUTURE")
+        assertEquals(BillPaymentStatus.FUTURE, status)
+
+        assertEquals(BillPaymentStatus.DUE, Converters.instance.stringToBillPaymentStatus(null))
+    }
+
+    @Test
+    fun testStringFromBillPaymentStatus() {
+        val str = Converters.instance.stringFromBillPaymentStatus(BillPaymentStatus.FUTURE)
+        assertEquals("FUTURE", str)
+
+        assertEquals("DUE", Converters.instance.stringFromBillPaymentStatus(null))
     }
 }

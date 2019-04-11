@@ -35,16 +35,16 @@ import java.math.BigDecimal
 data class Bill(
         @PrimaryKey
         @ColumnInfo(name = "bill_id") val billId: Long,
-        @ColumnInfo(name = "name") var name: String,
+        @ColumnInfo(name = "name") var name: String?,
         @ColumnInfo(name = "description") val description: String?,
         @ColumnInfo(name = "bill_type") var billType: BillType,
         @ColumnInfo(name = "status") var status: BillStatus,
-        @ColumnInfo(name = "last_amount") val lastAmount: BigDecimal,
+        @ColumnInfo(name = "last_amount") val lastAmount: BigDecimal?,
         @ColumnInfo(name = "due_amount") var dueAmount: BigDecimal,
         @ColumnInfo(name = "average_amount") val averageAmount: BigDecimal,
         @ColumnInfo(name = "frequency") var frequency: BillFrequency,
         @ColumnInfo(name = "payment_status") val paymentStatus: BillPaymentStatus,
-        @ColumnInfo(name = "last_payment_date") val lastPaymentDate: String, // yyyy-MM-dd
+        @ColumnInfo(name = "last_payment_date") val lastPaymentDate: String?, // yyyy-MM-dd
         @ColumnInfo(name = "next_payment_date") var nextPaymentDate: String, // yyyy-MM-dd
         @ColumnInfo(name = "category_id") val categoryId: Long?,
         @ColumnInfo(name = "merchant_id") val merchantId: Long?,

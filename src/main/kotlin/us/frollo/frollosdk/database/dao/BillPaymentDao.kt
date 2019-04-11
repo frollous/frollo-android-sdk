@@ -33,6 +33,9 @@ internal interface BillPaymentDao {
     @Query("SELECT * FROM bill_payment WHERE bill_id = :billId AND (date BETWEEN Date(:fromDate) AND Date(:toDate))")
     fun loadByBillId(billId: Long, fromDate: String, toDate: String): LiveData<List<BillPayment>>
 
+    @Query("SELECT * FROM bill_payment WHERE bill_id = :billId")
+    fun loadByBillId(billId: Long): LiveData<List<BillPayment>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: BillPayment): LongArray
 
@@ -67,4 +70,8 @@ internal interface BillPaymentDao {
     @androidx.room.Transaction
     @Query("SELECT * FROM bill_payment WHERE bill_id = :billId AND (date BETWEEN Date(:fromDate) AND Date(:toDate))")
     fun loadByBillIdWithRelation(billId: Long, fromDate: String, toDate: String): LiveData<List<BillPaymentRelation>>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM bill_payment WHERE bill_id = :billId")
+    fun loadByBillIdWithRelation(billId: Long): LiveData<List<BillPaymentRelation>>
 }

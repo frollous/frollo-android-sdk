@@ -207,7 +207,7 @@ class BillDaoTest {
     }
 
     @Test
-    fun testLoadByAccountIdWithRelation() {
+    fun testLoadByBillIdWithRelation() {
         db.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
         db.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
         db.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())

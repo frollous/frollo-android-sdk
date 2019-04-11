@@ -66,15 +66,13 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
             }
 
     fun createBill(frequency: BillFrequency, nextPaymentDate: String, name: String? = null,
-                   transactionId: Long? = null, transactionCategoryId: Long? = null,
-                   dueAmount: BigDecimal? = null, notes: String? = null,
+                   transactionId: Long? = null, dueAmount: BigDecimal? = null, notes: String? = null,
                    completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val request = BillCreateRequest(
                 name = name,
                 frequency = frequency,
                 nextPaymentDate = nextPaymentDate,
                 transactionId = transactionId,
-                categoryId = transactionCategoryId,
                 dueAmount = dueAmount,
                 notes = notes)
 
@@ -136,7 +134,6 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
     fun updateBill(bill: Bill, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val request = BillUpdateRequest(
                 name = bill.name,
-                categoryId = bill.categoryId,
                 billType = bill.billType,
                 status = bill.status,
                 frequency = bill.frequency,
@@ -169,12 +166,18 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
                 Resource.success(models)
             }
 
-    fun fetchBillPaymentsByBillId(billId: Long, fromDate: String, toDate: String): LiveData<Resource<List<BillPayment>>> =
-            Transformations.map(db.billPayments().loadByBillId(billId = billId, fromDate = fromDate, toDate = toDate)) { models ->
-                Resource.success(models)
+    fun fetchBillPaymentsByBillId(billId: Long, fromDate: String? = null, toDate: String? = null): LiveData<Resource<List<BillPayment>>> =
+            if (fromDate != null && toDate != null) {
+                Transformations.map(db.billPayments().loadByBillId(billId = billId, fromDate = fromDate, toDate = toDate)) { models ->
+                    Resource.success(models)
+                }
+            } else {
+                Transformations.map(db.billPayments().loadByBillId(billId = billId)) { models ->
+                    Resource.success(models)
+                }
             }
 
-    fun fetchPaymentWithRelation(billPaymentId: Long): LiveData<Resource<BillPaymentRelation>> =
+    fun fetchBillPaymentWithRelation(billPaymentId: Long): LiveData<Resource<BillPaymentRelation>> =
             Transformations.map(db.billPayments().loadWithRelation(billPaymentId)) { model ->
                 Resource.success(model)
             }
@@ -184,9 +187,15 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
                 Resource.success(models)
             }
 
-    fun fetchBillPaymentsByBillIdWithRelation(billId: Long, fromDate: String, toDate: String): LiveData<Resource<List<BillPaymentRelation>>> =
-            Transformations.map(db.billPayments().loadByBillIdWithRelation(billId = billId, fromDate = fromDate, toDate = toDate)) { models ->
-                Resource.success(models)
+    fun fetchBillPaymentsByBillIdWithRelation(billId: Long, fromDate: String? = null, toDate: String? = null): LiveData<Resource<List<BillPaymentRelation>>> =
+            if (fromDate != null && toDate != null) {
+                Transformations.map(db.billPayments().loadByBillIdWithRelation(billId = billId, fromDate = fromDate, toDate = toDate)) { models ->
+                    Resource.success(models)
+                }
+            } else {
+                Transformations.map(db.billPayments().loadByBillIdWithRelation(billId = billId)) { models ->
+                    Resource.success(models)
+                }
             }
 
     fun deleteBillPayment(billPaymentId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {

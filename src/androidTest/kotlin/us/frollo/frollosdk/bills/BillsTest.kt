@@ -43,6 +43,7 @@ import us.frollo.frollosdk.mapping.*
 import us.frollo.frollosdk.model.*
 import us.frollo.frollosdk.model.coredata.bills.Bill
 import us.frollo.frollosdk.model.coredata.bills.BillFrequency
+import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.network.api.BillsAPI
@@ -333,7 +334,7 @@ class BillsTest {
             }
         })
 
-        bills.refreshBills  { result ->
+        bills.refreshBills { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -414,6 +415,8 @@ class BillsTest {
         })
 
         val bill = testBillResponseData(billId = 12345).toBill()
+
+        database.bills().insert(bill)
 
         bills.updateBill(bill) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
@@ -558,6 +561,406 @@ class BillsTest {
         assertNotNull(model)
         assertEquals(1249L, model?.bill?.billId)
         assertEquals(model?.bill?.categoryId, model?.transactionCategory?.transactionCategoryId)
+
+        tearDown()
+    }
+
+    // Bill Payment Tests
+
+    @Test
+    fun testFetchBillPaymentByID() {
+        initSetup()
+
+        val data1 = testBillPaymentResponseData(billPaymentId = 100, date = "2019-01-01")
+        val data2 = testBillPaymentResponseData(billPaymentId = 101, date = "2019-02-01")
+        val data3 = testBillPaymentResponseData(billPaymentId = 102, date = "2019-02-06")
+        val data4 = testBillPaymentResponseData(billPaymentId = 103, date = "2019-04-01")
+        val data5 = testBillPaymentResponseData(billPaymentId = 104, date = "2019-04-30")
+        val list = mutableListOf(data1, data2, data3, data4, data5)
+
+        database.billPayments().insertAll(*list.map { it.toBillPayment() }.toList().toTypedArray())
+
+        val testObserver = bills.fetchBillPayment(data3.billPaymentId).test()
+
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(data3.billPaymentId, testObserver.value().data?.billPaymentId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchBillPayments() {
+        initSetup()
+
+        val data1 = testBillPaymentResponseData(billPaymentId = 100, date = "2019-01-01")
+        val data2 = testBillPaymentResponseData(billPaymentId = 101, date = "2019-02-01")
+        val data3 = testBillPaymentResponseData(billPaymentId = 102, date = "2019-02-06")
+        val data4 = testBillPaymentResponseData(billPaymentId = 103, date = "2019-04-01")
+        val data5 = testBillPaymentResponseData(billPaymentId = 104, date = "2019-04-30")
+        val list = mutableListOf(data1, data2, data3, data4, data5)
+
+        database.billPayments().insertAll(*list.map { it.toBillPayment() }.toList().toTypedArray())
+
+        val testObserver = bills.fetchBillPayments(fromDate = "2019-02-06", toDate = "2019-04-30").test()
+
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(3, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchBillPaymentsByBillIdDated() {
+        initSetup()
+
+        val data1 = testBillPaymentResponseData(billPaymentId = 100, billId = 200, date = "2019-01-01")
+        val data2 = testBillPaymentResponseData(billPaymentId = 101, billId = 200, date = "2019-02-01")
+        val data3 = testBillPaymentResponseData(billPaymentId = 102, billId = 201, date = "2019-02-06")
+        val data4 = testBillPaymentResponseData(billPaymentId = 103, billId = 200, date = "2019-04-01")
+        val data5 = testBillPaymentResponseData(billPaymentId = 104, billId = 201, date = "2019-04-30")
+        val list = mutableListOf(data1, data2, data3, data4, data5)
+
+        database.billPayments().insertAll(*list.map { it.toBillPayment() }.toList().toTypedArray())
+
+        val testObserver = bills.fetchBillPaymentsByBillId(billId = 200, fromDate = "2019-02-01", toDate = "2019-04-30").test()
+
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(2, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchBillPaymentsByBillId() {
+        initSetup()
+
+        val data1 = testBillPaymentResponseData(billPaymentId = 100, billId = 200, date = "2019-01-01")
+        val data2 = testBillPaymentResponseData(billPaymentId = 101, billId = 200, date = "2019-02-01")
+        val data3 = testBillPaymentResponseData(billPaymentId = 102, billId = 201, date = "2019-02-06")
+        val data4 = testBillPaymentResponseData(billPaymentId = 103, billId = 200, date = "2019-04-01")
+        val data5 = testBillPaymentResponseData(billPaymentId = 104, billId = 201, date = "2019-04-30")
+        val list = mutableListOf(data1, data2, data3, data4, data5)
+
+        database.billPayments().insertAll(*list.map { it.toBillPayment() }.toList().toTypedArray())
+
+        val testObserver = bills.fetchBillPaymentsByBillId(billId = 200).test()
+
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(3, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchBillPaymentByIDWithRelation() {
+        initSetup()
+
+        database.bills().insert(testBillResponseData(billId = 123, accountId = 345, merchantId = 678, transactionCategoryId = 567).toBill())
+        database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 456, billId = 123, date = "2019-01-01").toBillPayment())
+
+        val testObserver = bills.fetchBillPaymentWithRelation(billPaymentId = 456).test()
+
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(456L, testObserver.value().data?.billPayment?.billPaymentId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchBillPaymentsWithRelation() {
+        initSetup()
+
+        database.bills().insert(testBillResponseData(billId = 123, accountId = 345, merchantId = 678, transactionCategoryId = 567).toBill())
+        database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 456, billId = 123, date = "2019-01-01").toBillPayment())
+
+        val testObserver = bills.fetchBillPayments(fromDate = "2019-01-01", toDate = "2019-04-30").test()
+
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(1, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchBillPaymentsByBillIdDatedWithRelation() {
+        initSetup()
+
+        database.bills().insert(testBillResponseData(billId = 123, accountId = 345, merchantId = 678, transactionCategoryId = 567).toBill())
+        database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 456, billId = 123, date = "2019-01-01").toBillPayment())
+        database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 457, billId = 123, date = "2019-02-01").toBillPayment())
+
+        val testObserver = bills.fetchBillPaymentsByBillIdWithRelation(billId = 123, fromDate = "2019-02-01", toDate = "2019-04-30").test()
+
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(1, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchBillPaymentsByBillIdWithRelation() {
+        initSetup()
+
+        database.bills().insert(testBillResponseData(billId = 123, accountId = 345, merchantId = 678, transactionCategoryId = 567).toBill())
+        database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 456, billId = 123, date = "2019-01-01").toBillPayment())
+        database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 457, billId = 123, date = "2019-02-01").toBillPayment())
+
+        val testObserver = bills.fetchBillPaymentsByBillIdWithRelation(billId = 123).test()
+
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(2, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testDeleteBillPayment() {
+        initSetup()
+
+        val billPaymentId: Long = 12345
+
+        val requestPath = "bills/payments/$billPaymentId"
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(204)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        database.billPayments().insert(testBillPaymentResponseData(billPaymentId = billPaymentId).toBillPayment())
+
+        var testObserver = bills.fetchBillPayment(billPaymentId).test()
+
+        testObserver.awaitValue()
+        val model = testObserver.value().data
+        assertNotNull(model)
+        assertEquals(billPaymentId, model?.billPaymentId)
+
+        bills.deleteBillPayment(billPaymentId) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            testObserver = bills.fetchBillPayment(billPaymentId).test()
+
+            testObserver.awaitValue()
+            assertNull(testObserver.value().data)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshBillPayments() {
+        initSetup()
+
+        val fromDate = "2018-12-01"
+        val toDate = "2021-12-02"
+        val requestPath = "${BillsAPI.URL_BILL_PAYMENTS}?from_date=$fromDate&to_date=$toDate"
+
+        val body = readStringFromJson(app, R.raw.bill_payments_2018_12_01_valid)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        bills.refreshBillPayments(fromDate = fromDate, toDate = toDate) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = bills.fetchBillPayments(fromDate = fromDate, toDate = toDate).test()
+
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
+            assertEquals(7, testObserver.value().data?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testUpdateBillPayment() {
+        initSetup()
+
+        val billPaymentId: Long = 12345
+
+        val requestPath = "bills/payments/$billPaymentId"
+
+        val body = readStringFromJson(app, R.raw.bill_payment_id_12345)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val billPayment = testBillPaymentResponseData(billPaymentId = 12345).toBillPayment()
+
+        database.billPayments().insert(billPayment)
+
+        bills.updateBillPayment(billPaymentId = billPaymentId, paymentStatus = BillPaymentStatus.PAID) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = bills.fetchBillPayment(billPaymentId = 12345).test()
+
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(12345L, models?.billPaymentId)
+            assertEquals("Optus Internet", models?.name)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testBillsLinkToBills() {
+        initSetup()
+
+        val fromDate = "2018-12-01"
+        val toDate = "2021-12-02"
+        val requestPath = "${BillsAPI.URL_BILL_PAYMENTS}?from_date=$fromDate&to_date=$toDate"
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.bill_payments_2018_12_01_valid))
+                } else if (request?.trimmedPath == BillsAPI.URL_BILLS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.bills_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        bills.refreshBills { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+        }
+
+        bills.refreshBillPayments(fromDate = fromDate, toDate = toDate) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+        }
+
+        wait(3)
+
+        val testObserver = bills.fetchBillPaymentWithRelation(billPaymentId = 7991).test()
+
+        testObserver.awaitValue()
+        val model = testObserver.value().data
+        assertNotNull(model)
+        assertEquals(7991L, model?.billPayment?.billPaymentId)
+        assertEquals(model?.billPayment?.billId, model?.bill?.bill?.billId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testLinkingRemoveCachedCascade() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.bills_valid)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == BillsAPI.URL_BILLS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        database.bills().insert(testBillResponseData(billId = 123, accountId = 345, merchantId = 678, transactionCategoryId = 567).toBill())
+        database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 456, billId = 123, date = "2019-01-01").toBillPayment())
+        database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 457, billId = 123, date = "2019-02-01").toBillPayment())
+
+        bills.fetchBill(billId = 123).test().apply {
+            awaitValue()
+
+            assertEquals(123L, value().data?.billId)
+        }
+
+        bills.fetchBillPayments(fromDate = "2019-01-01", toDate = "2019-04-01").test().apply {
+            awaitValue()
+
+            assertEquals(2, value().data?.size)
+            assertEquals(456L, value().data?.get(0)?.billPaymentId)
+            assertEquals(457L, value().data?.get(1)?.billPaymentId)
+        }
+
+        bills.refreshBills { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            bills.fetchBills().test().apply {
+                awaitValue()
+
+                assertNotNull(value().data)
+                assertEquals(7, value().data?.size)
+            }
+
+            bills.fetchBill(billId = 123).test().apply {
+                awaitValue()
+
+                assertNull(value().data)
+            }
+
+            bills.fetchBillPayment(billPaymentId = 456).test().apply {
+                awaitValue()
+
+                assertNull(value().data)
+            }
+
+            bills.fetchBillPayment(billPaymentId = 457).test().apply {
+                awaitValue()
+
+                assertNull(value().data)
+            }
+        }
+
+        wait(3)
 
         tearDown()
     }

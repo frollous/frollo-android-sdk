@@ -22,7 +22,6 @@ import java.math.BigDecimal
 
 internal data class BillCreateRequest(
         @SerializedName("transaction_id") val transactionId: Long? = null,
-        @SerializedName("category_id") val categoryId: Long? = null,
         @SerializedName("name") val name: String? = null,
         @SerializedName("due_amount") val dueAmount: BigDecimal? = null,
         @SerializedName("frequency") val frequency: BillFrequency,

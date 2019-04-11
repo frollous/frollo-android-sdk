@@ -56,7 +56,7 @@ internal fun testBillResponseData(billId: Long? = null, merchantId: Long? = null
             notes = randomString(200))
 }
 
-internal fun testBillPaymentResponseData(billPaymentId: Long? = null, billId: Long? = null) : BillPaymentResponse {
+internal fun testBillPaymentResponseData(billPaymentId: Long? = null, billId: Long? = null, date: String? = null) : BillPaymentResponse {
     return BillPaymentResponse(
             billPaymentId = billPaymentId ?: randomNumber().toLong(),
             billId = billId ?: randomNumber().toLong(),
@@ -64,7 +64,7 @@ internal fun testBillPaymentResponseData(billPaymentId: Long? = null, billId: Lo
             amount = BigDecimal("70.05"),
             frequency = BillFrequency.values()[Random.nextInt(BillFrequency.values().size)],
             paymentStatus = BillPaymentStatus.values()[Random.nextInt(BillPaymentStatus.values().size)],
-            date = "2018-12-01",
+            date = date ?: "2018-12-01",
             merchantId = randomNumber().toLong(),
             unpayable = randomBoolean())
 }

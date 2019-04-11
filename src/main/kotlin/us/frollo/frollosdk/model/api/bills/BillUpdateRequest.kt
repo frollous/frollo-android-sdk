@@ -24,7 +24,6 @@ import java.math.BigDecimal
 
 internal data class BillUpdateRequest(
         @SerializedName("name") val name: String? = null,
-        @SerializedName("category_id") val categoryId: Long? = null,
         @SerializedName("bill_type") val billType: BillType? = null,
         @SerializedName("status") val status: BillStatus? = null,
         @SerializedName("frequency") val frequency: BillFrequency? = null,

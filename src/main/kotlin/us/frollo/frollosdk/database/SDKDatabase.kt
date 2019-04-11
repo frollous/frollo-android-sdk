@@ -54,7 +54,7 @@ import us.frollo.frollosdk.model.coredata.user.User
     ReportAccountBalance::class,
     Bill::class,
     BillPayment::class
-], version = 2, exportSchema = true)
+], version = 3, exportSchema = true)
 
 @TypeConverters(Converters::class)
 abstract class SDKDatabase : RoomDatabase() {
@@ -89,11 +89,12 @@ abstract class SDKDatabase : RoomDatabase() {
                 Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
                         .allowMainThreadQueries() // Needed for some tests
                         //.fallbackToDestructiveMigration()
-                        .addMigrations(MIGRATION_1_2)
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                         .build()
 
         // Copy-paste of auto-generated SQLs from room schema json file
         // located in sandbox code after building under frollo-android-sdk/schemas/$version.json
+
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // New changes in this migration:
@@ -117,6 +118,31 @@ abstract class SDKDatabase : RoomDatabase() {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `report_account_balance` (`report_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` TEXT NOT NULL, `account_id` INTEGER NOT NULL, `currency` TEXT NOT NULL, `value` TEXT NOT NULL, `period` TEXT NOT NULL)")
                 database.execSQL("CREATE INDEX `index_report_account_balance_report_id` ON `report_account_balance` (`report_id`)")
                 database.execSQL("CREATE UNIQUE INDEX `index_report_account_balance_account_id_date_period` ON `report_account_balance` (`account_id`, `date`, `period`)")
+            }
+        }
+
+        private val MIGRATION_2_3: Migration = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // New changes in this migration:
+                // 1) Alter table/entity transaction_model - add columns: "merchant_name", "merchant_phone", "merchant_website", "merchant_location"
+                // 2) Add new table/entity bill and create indexes
+                // 3) Add new table/entity bill_payment and create indexes
+
+                database.execSQL("ALTER TABLE `transaction_model` ADD COLUMN `merchant_name` TEXT NOT NULL DEFAULT ''")
+                database.execSQL("ALTER TABLE `transaction_model` ADD COLUMN `merchant_phone` TEXT")
+                database.execSQL("ALTER TABLE `transaction_model` ADD COLUMN `merchant_website` TEXT")
+                database.execSQL("ALTER TABLE `transaction_model` ADD COLUMN `merchant_location` TEXT")
+
+                database.execSQL("CREATE TABLE IF NOT EXISTS `bill` (`bill_id` INTEGER NOT NULL, `name` TEXT, `description` TEXT, `bill_type` TEXT NOT NULL, `status` TEXT NOT NULL, `last_amount` TEXT, `due_amount` TEXT NOT NULL, `average_amount` TEXT NOT NULL, `frequency` TEXT NOT NULL, `payment_status` TEXT NOT NULL, `last_payment_date` TEXT, `next_payment_date` TEXT NOT NULL, `category_id` INTEGER, `merchant_id` INTEGER, `account_id` INTEGER, `note` TEXT, PRIMARY KEY(`bill_id`))")
+                database.execSQL("CREATE INDEX `index_bill_bill_id` ON `bill` (`bill_id`)")
+                database.execSQL("CREATE INDEX `index_bill_merchant_id` ON `bill` (`merchant_id`)")
+                database.execSQL("CREATE INDEX `index_bill_category_id` ON `bill` (`category_id`)")
+                database.execSQL("CREATE INDEX `index_bill_account_id` ON `bill` (`account_id`)")
+
+                database.execSQL("CREATE TABLE IF NOT EXISTS `bill_payment` (`bill_payment_id` INTEGER NOT NULL, `bill_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `merchant_id` INTEGER, `date` TEXT NOT NULL, `payment_status` TEXT NOT NULL, `frequency` TEXT NOT NULL, `amount` TEXT NOT NULL, `unpayable` INTEGER NOT NULL, PRIMARY KEY(`bill_payment_id`))")
+                database.execSQL("CREATE INDEX `index_bill_payment_bill_payment_id` ON `bill_payment` (`bill_payment_id`)")
+                database.execSQL("CREATE INDEX `index_bill_payment_bill_id` ON `bill_payment` (`bill_id`)")
+                database.execSQL("CREATE INDEX `index_bill_payment_merchant_id` ON `bill_payment` (`merchant_id`)")
             }
         }
     }

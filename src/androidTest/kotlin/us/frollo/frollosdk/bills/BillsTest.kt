@@ -829,7 +829,7 @@ class BillsTest {
 
         database.billPayments().insert(billPayment)
 
-        bills.updateBillPayment(billPaymentId = billPaymentId, paymentStatus = BillPaymentStatus.PAID) { result ->
+        bills.updateBillPayment(billPaymentId = billPaymentId, paid = true) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 

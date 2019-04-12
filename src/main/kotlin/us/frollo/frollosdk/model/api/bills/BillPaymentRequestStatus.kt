@@ -17,8 +17,15 @@
 package us.frollo.frollosdk.model.api.bills
 
 import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.extensions.serializedName
 
-internal data class BillPaymentUpdateRequest(
-        @SerializedName("status") val status: BillPaymentRequestStatus? = null,
-        @SerializedName("date") val date: String? = null // yyyy-MM-dd
-)
+internal enum class BillPaymentRequestStatus {
+    @SerializedName("paid") PAID,
+    @SerializedName("unpaid") UNPAID;
+
+    //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
+    override fun toString(): String =
+    //Try to get the annotation value if available instead of using plain .toString()
+    //Fallback to super.toString() in case annotation is not present/available
+            serializedName() ?: super.toString()
+}

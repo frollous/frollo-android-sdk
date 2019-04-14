@@ -40,5 +40,6 @@ internal data class MessageResponse(
         @ColumnInfo(name = "title") @SerializedName("title") val title: String?,
         @ColumnInfo(name = "content_type") @SerializedName("content_type") val contentType: ContentType,
         @Embedded(prefix = "content_") @SerializedName("content") val content: MessageContent?,
-        @Embedded(prefix = "action_") @SerializedName("action") val action: Action?
+        @Embedded(prefix = "action_") @SerializedName("action") val action: Action?,
+        @ColumnInfo(name = "auto_dismiss") @SerializedName("auto_dismiss") val autoDismiss: Boolean
 )

@@ -31,6 +31,9 @@ data class MessageImage(
         /** Placement order of the message - higher is more important */
         override val placement: Long,
 
+        /** Indicates if the message can be auto dismissed after user has interacted */
+        override val autoDismiss: Boolean,
+
         /** Indicates if the message can be marked read or not */
         override val persists: Boolean,
 
@@ -61,4 +64,4 @@ data class MessageImage(
         /** Raw value for the image URL */
         val url: String
 
-) : Message(messageId, event, userEventId, placement, persists, read, interacted, messageTypes, title, contentType, action)
+) : Message(messageId, event, userEventId, placement, autoDismiss, persists, read, interacted, messageTypes, title, contentType, action)

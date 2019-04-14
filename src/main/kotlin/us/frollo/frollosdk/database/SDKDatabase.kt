@@ -127,6 +127,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 // 1) Alter table/entity transaction_model - add columns: "merchant_name", "merchant_phone", "merchant_website", "merchant_location"
                 // 2) Add new table/entity bill and create indexes
                 // 3) Add new table/entity bill_payment and create indexes
+                // 4) Alter table/entity message - add column: "auto_dismiss"
 
                 database.execSQL("ALTER TABLE `transaction_model` ADD COLUMN `merchant_name` TEXT NOT NULL DEFAULT ''")
                 database.execSQL("ALTER TABLE `transaction_model` ADD COLUMN `merchant_phone` TEXT")
@@ -143,6 +144,8 @@ abstract class SDKDatabase : RoomDatabase() {
                 database.execSQL("CREATE INDEX `index_bill_payment_bill_payment_id` ON `bill_payment` (`bill_payment_id`)")
                 database.execSQL("CREATE INDEX `index_bill_payment_bill_id` ON `bill_payment` (`bill_id`)")
                 database.execSQL("CREATE INDEX `index_bill_payment_merchant_id` ON `bill_payment` (`merchant_id`)")
+
+                database.execSQL("ALTER TABLE `message` ADD COLUMN `auto_dismiss` INTEGER NOT NULL DEFAULT 0")
             }
         }
     }

@@ -33,6 +33,9 @@ abstract class Message(
         /** Placement order of the message - higher is more important */
         open val placement: Long,
 
+        /** Indicates if the message can be auto dismissed after user has interacted */
+        open val autoDismiss: Boolean,
+
         /** Indicates if the message can be marked read or not */
         open val persists: Boolean,
 

@@ -184,7 +184,7 @@ class ReportsTest {
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        wait(5)
 
         tearDown()
     }

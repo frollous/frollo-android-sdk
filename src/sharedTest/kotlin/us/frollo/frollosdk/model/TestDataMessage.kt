@@ -65,6 +65,7 @@ internal fun testMessageResponseData(type: ContentType? = null, types: List<Stri
             messageTypes = if (types == null) mutableListOf("home_nudge") else types,
             persists = randomBoolean(),
             placement = randomNumber(1..1000).toLong(),
+            autoDismiss = randomBoolean(),
             read = if (read == null) randomBoolean() else read,
             title = randomString(100),
             userEventId = randomNumber(1..100000).toLong())
@@ -81,6 +82,7 @@ internal fun MessageResponse.testModifyUserResponseData(newTitle: String? = null
             messageTypes = if (types == null) messageTypes else types,
             persists = persists,
             placement = placement,
+            autoDismiss = randomBoolean(),
             read = read,
             title = if (newTitle == null) title else newTitle,
             userEventId = userEventId)

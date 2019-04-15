@@ -2,7 +2,9 @@
 
 ### 1.3.0
 - Bills
-- Enriched Transaction Data
+- Enhanced Transaction - with Merchant location & phone
+- Support for fetching latest published survey
+- Auto dismiss flag for Messages
 
 #### Features
 - Bills

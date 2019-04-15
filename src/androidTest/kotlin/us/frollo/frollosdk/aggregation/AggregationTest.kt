@@ -779,7 +779,7 @@ class AggregationTest {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            assertEquals(4, models?.size)
+            assertEquals(8, models?.size)
         }
 
         val request = mockServer.takeRequest()
@@ -1191,7 +1191,7 @@ class AggregationTest {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            assertEquals(179, models?.size)
+            assertEquals(111, models?.size)
         }
 
         val request = mockServer.takeRequest()
@@ -1229,7 +1229,7 @@ class AggregationTest {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            assertEquals(315, models?.size)
+            assertEquals(311, models?.size)
         }
 
         wait(3)
@@ -1241,10 +1241,10 @@ class AggregationTest {
     fun testRefreshTransactionByID() {
         initSetup()
 
-        val body = readStringFromJson(app, R.raw.transaction_id_99703)
+        val body = readStringFromJson(app, R.raw.transaction_id_194630)
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == "aggregation/transactions/99703") {
+                if (request?.trimmedPath == "aggregation/transactions/194630") {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -1253,19 +1253,19 @@ class AggregationTest {
             }
         })
 
-        aggregation.refreshTransaction(99703L) { result ->
+        aggregation.refreshTransaction(194630L) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            val testObserver = aggregation.fetchTransaction(99703L).test()
+            val testObserver = aggregation.fetchTransaction(194630L).test()
             testObserver.awaitValue()
             val model = testObserver.value().data
             assertNotNull(model)
-            assertEquals(99703L, model?.transactionId)
+            assertEquals(194630L, model?.transactionId)
         }
 
         val request = mockServer.takeRequest()
-        assertEquals("aggregation/transactions/99703", request.trimmedPath)
+        assertEquals("aggregation/transactions/194630", request.trimmedPath)
 
         wait(3)
 
@@ -1296,7 +1296,7 @@ class AggregationTest {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            assertEquals(179, models?.size)
+            assertEquals(111, models?.size)
         }
 
         val request = mockServer.takeRequest()
@@ -1311,10 +1311,10 @@ class AggregationTest {
     fun testExcludeTransaction() {
         initSetup()
 
-        val body = readStringFromJson(app, R.raw.transaction_id_99703_excluded)
+        val body = readStringFromJson(app, R.raw.transaction_id_194630_excluded)
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == "aggregation/transactions/99703") {
+                if (request?.trimmedPath == "aggregation/transactions/194630") {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -1323,10 +1323,10 @@ class AggregationTest {
             }
         })
 
-        val transaction = testTransactionResponseData(transactionId = 99703, included = true).toTransaction()
+        val transaction = testTransactionResponseData(transactionId = 194630, included = true).toTransaction()
         database.transactions().insert(transaction)
 
-        aggregation.excludeTransaction(transactionId = 99703, excluded = true, applyToAll = true) { result ->
+        aggregation.excludeTransaction(transactionId = 194630, excluded = true, applyToAll = true) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -1335,12 +1335,12 @@ class AggregationTest {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(1, models?.size)
-            assertEquals(99703L, models?.get(0)?.transactionId)
+            assertEquals(194630L, models?.get(0)?.transactionId)
             assertTrue(models?.get(0)?.included == false)
         }
 
         val request = mockServer.takeRequest()
-        assertEquals("aggregation/transactions/99703", request.trimmedPath)
+        assertEquals("aggregation/transactions/194630", request.trimmedPath)
 
         wait(3)
 
@@ -1351,10 +1351,10 @@ class AggregationTest {
     fun testRecategoriseTransaction() {
         initSetup()
 
-        val body = readStringFromJson(app, R.raw.transaction_id_99703)
+        val body = readStringFromJson(app, R.raw.transaction_id_194630)
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == "aggregation/transactions/99703") {
+                if (request?.trimmedPath == "aggregation/transactions/194630") {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -1363,10 +1363,10 @@ class AggregationTest {
             }
         })
 
-        val transaction = testTransactionResponseData(transactionId = 99703, categoryId = 123).toTransaction()
+        val transaction = testTransactionResponseData(transactionId = 194630, categoryId = 123).toTransaction()
         database.transactions().insert(transaction)
 
-        aggregation.recategoriseTransaction(transactionId = 99703, transactionCategoryId = 81, applyToAll = true) { result ->
+        aggregation.recategoriseTransaction(transactionId = 194630, transactionCategoryId = 77, applyToAll = true) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -1375,12 +1375,12 @@ class AggregationTest {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(1, models?.size)
-            assertEquals(99703L, models?.get(0)?.transactionId)
-            assertEquals(81L, models?.get(0)?.categoryId)
+            assertEquals(194630L, models?.get(0)?.transactionId)
+            assertEquals(77L, models?.get(0)?.categoryId)
         }
 
         val request = mockServer.takeRequest()
-        assertEquals("aggregation/transactions/99703", request.trimmedPath)
+        assertEquals("aggregation/transactions/194630", request.trimmedPath)
 
         wait(3)
 
@@ -1391,10 +1391,10 @@ class AggregationTest {
     fun testUpdateTransaction() {
         initSetup()
 
-        val body = readStringFromJson(app, R.raw.transaction_id_99703)
+        val body = readStringFromJson(app, R.raw.transaction_id_194630)
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == "aggregation/transactions/99703") {
+                if (request?.trimmedPath == "aggregation/transactions/194630") {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -1405,7 +1405,7 @@ class AggregationTest {
 
         val transaction = testTransactionResponseData().toTransaction()
 
-        aggregation.updateTransaction(99703, transaction) { result ->
+        aggregation.updateTransaction(194630, transaction) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -1414,12 +1414,12 @@ class AggregationTest {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(1, models?.size)
-            assertEquals(99703L, models?.get(0)?.transactionId)
-            assertEquals(543L, models?.get(0)?.accountId)
+            assertEquals(194630L, models?.get(0)?.transactionId)
+            assertEquals(939L, models?.get(0)?.accountId)
         }
 
         val request = mockServer.takeRequest()
-        assertEquals("aggregation/transactions/99703", request.trimmedPath)
+        assertEquals("aggregation/transactions/194630", request.trimmedPath)
 
         wait(3)
 
@@ -1453,7 +1453,7 @@ class AggregationTest {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            assertEquals(179, models?.size)
+            assertEquals(111, models?.size)
         }
 
         wait(3)
@@ -1462,8 +1462,8 @@ class AggregationTest {
         testObserver2.awaitValue()
         val models2 = testObserver2.value().data
         assertNotNull(models2)
-        assertEquals(5, models2?.size)
-        assertEquals(1L, models2?.get(0)?.merchantId)
+        assertEquals(2, models2?.size)
+        assertEquals(238L, models2?.get(0)?.merchantId)
 
         tearDown()
     }
@@ -1598,7 +1598,7 @@ class AggregationTest {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            assertEquals(43, models?.size)
+            assertEquals(63, models?.size)
         }
 
         val request = mockServer.takeRequest()
@@ -1741,7 +1741,7 @@ class AggregationTest {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            assertEquals(5, models?.size)
+            assertEquals(2, models?.size)
         }
 
         val request = mockServer.takeRequest()

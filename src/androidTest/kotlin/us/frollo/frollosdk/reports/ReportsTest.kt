@@ -383,14 +383,14 @@ class ReportsTest {
 
             // Check for overall reports
             val fetchedReports = models?.sortedBy { it.report?.accountId }
-            assertEquals(188, fetchedReports?.size)
+            assertEquals(376, fetchedReports?.size)
 
             val report = fetchedReports?.last()
             assertEquals("2019-01-29", report?.report?.date)
-            assertEquals(543L, report?.report?.accountId)
+            assertEquals(938L, report?.report?.accountId)
             assertEquals("AUD", report?.report?.currency)
             assertEquals(period, report?.report?.period)
-            assertEquals(BigDecimal("2309.12"), report?.report?.value)
+            assertEquals(BigDecimal("42000.00"), report?.report?.value)
         }
 
         wait(3)

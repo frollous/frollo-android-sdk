@@ -30,8 +30,10 @@ import us.frollo.frollosdk.model.coredata.bills.BillPayment
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.model.coredata.surveys.Survey
 import us.frollo.frollosdk.network.api.BillsAPI
 import us.frollo.frollosdk.network.api.ReportsAPI
+import us.frollo.frollosdk.network.api.SurveysAPI
 
 internal fun AggregationAPI.fetchTransactionsByQuery(
         fromDate: String, // yyyy-MM-dd
@@ -111,4 +113,10 @@ internal fun BillsAPI.fetchBillPayments(
     count?.let { queryMap = queryMap.plus(Pair("count", it.toString())) }
 
     return fetchBillPayments(queryMap)
+}
+
+internal fun SurveysAPI.fetchSurvey(surveyKey: String, latest: Boolean? = null) : Call<Survey> {
+    var queryMap = mapOf<String, String>()
+    latest?.let { queryMap = mapOf(Pair("latest", latest.toString())) }
+    return fetchSurvey(surveyKey, queryMap)
 }

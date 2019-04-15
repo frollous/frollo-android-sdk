@@ -27,7 +27,7 @@ internal interface SurveysAPI {
     }
 
     @GET(URL_SURVEY)
-    fun fetchSurvey(@Path("survey_key") surveyKey: String): Call<Survey>
+    fun fetchSurvey(@Path("survey_key") surveyKey: String, @QueryMap queryParams: Map<String, String>): Call<Survey>
 
     @POST(URL_SURVEYS)
     fun submitSurvey(@Body request: Survey): Call<Survey>

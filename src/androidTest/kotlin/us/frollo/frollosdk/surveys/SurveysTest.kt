@@ -120,6 +120,46 @@ class SurveysTest {
     }
 
     @Test
+    fun testFetchLatestSurvey() {
+        initSetup()
+
+        val surveyKey = "FINANCIAL_WELLBEING"
+        val latest = true
+
+        val body = readStringFromJson(app, R.raw.survey_valid)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == "user/surveys/$surveyKey?latest=$latest") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        surveys.fetchSurvey(surveyKey = surveyKey, latest = latest) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val model = resource.data
+            assertNotNull(model)
+            assertEquals(surveyKey, model?.key)
+            assertEquals(1, model?.questions?.size)
+            assertEquals(SurveyQuestionType.SLIDER, model?.questions?.get(0)?.type)
+            assertEquals(1L, model?.questions?.get(0)?.id)
+            assertEquals(1, model?.questions?.get(0)?.answers?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("user/surveys/$surveyKey?latest=$latest", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testSubmitSurvey() {
         initSetup()
 

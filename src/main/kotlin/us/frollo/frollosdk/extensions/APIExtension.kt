@@ -35,6 +35,8 @@ import us.frollo.frollosdk.network.api.BillsAPI
 import us.frollo.frollosdk.network.api.ReportsAPI
 import us.frollo.frollosdk.network.api.SurveysAPI
 
+// Aggregation
+
 internal fun AggregationAPI.fetchTransactionsByQuery(
         fromDate: String, // yyyy-MM-dd
         toDate: String, // yyyy-MM-dd
@@ -45,12 +47,12 @@ internal fun AggregationAPI.fetchTransactionsByQuery(
         count: Int? = null
 ) : Call<List<TransactionResponse>> {
 
-    var queryMap = mapOf("from_date" to fromDate, "to_date" to toDate)
-    skip?.let { queryMap = queryMap.plus(Pair("skip", it.toString())) }
-    count?.let { queryMap = queryMap.plus(Pair("count", it.toString())) }
-    accountIncluded?.let { queryMap = queryMap.plus(Pair("account_included", it.toString())) }
-    transactionIncluded?.let { queryMap = queryMap.plus(Pair("transaction_included", it.toString())) }
-    accountIds?.let { queryMap = queryMap.plus(Pair("account_ids", it.joinToString(","))) }
+    val queryMap = mutableMapOf("from_date" to fromDate, "to_date" to toDate)
+    skip?.let { queryMap.put("skip", it.toString()) }
+    count?.let { queryMap.put("count", it.toString()) }
+    accountIncluded?.let { queryMap.put("account_included", it.toString()) }
+    transactionIncluded?.let { queryMap.put("transaction_included", it.toString()) }
+    accountIds?.let { queryMap.put("account_ids", it.joinToString(",")) }
 
     return fetchTransactions(queryMap)
 }
@@ -66,10 +68,10 @@ internal fun AggregationAPI.fetchTransactionsSummaryByQuery(
         transactionIncluded: Boolean? = null
 ) : Call<TransactionsSummaryResponse> {
 
-    var queryMap = mapOf("from_date" to fromDate, "to_date" to toDate)
-    accountIncluded?.let { queryMap = queryMap.plus(Pair("account_included", it.toString())) }
-    transactionIncluded?.let { queryMap = queryMap.plus(Pair("transaction_included", it.toString())) }
-    accountIds?.let { queryMap = queryMap.plus(Pair("account_ids", it.joinToString(","))) }
+    val queryMap = mutableMapOf("from_date" to fromDate, "to_date" to toDate)
+    accountIncluded?.let { queryMap.put("account_included", it.toString()) }
+    transactionIncluded?.let { queryMap.put("transaction_included", it.toString()) }
+    accountIds?.let { queryMap.put("account_ids", it.joinToString(",")) }
 
     return fetchTransactionsSummary(queryMap)
 }
@@ -80,27 +82,54 @@ internal fun AggregationAPI.fetchTransactionsSummaryByIDs(transactionIds: LongAr
 internal fun AggregationAPI.fetchMerchantsByIDs(merchantIds: LongArray) : Call<List<MerchantResponse>> =
         fetchMerchantsByIds(mapOf("merchant_ids" to merchantIds.joinToString(",")))
 
+internal fun AggregationAPI.searchTransactions(
+        searchTerm: String,
+        fromDate: String? = null, // yyyy-MM-dd
+        toDate: String? = null, // yyyy-MM-dd
+        accountIds: LongArray? = null,
+        accountIncluded: Boolean? = null,
+        transactionIncluded: Boolean? = null,
+        skip: Int? = null,
+        count: Int? = null
+) : Call<List<TransactionResponse>> {
+
+    val queryMap = mutableMapOf("search_term" to searchTerm)
+    fromDate?.let { queryMap.put("from_date", it) }
+    toDate?.let { queryMap.put("to_date", it) }
+    skip?.let { queryMap.put("skip", it.toString()) }
+    count?.let { queryMap.put("count", it.toString()) }
+    accountIncluded?.let { queryMap.put("account_included", it.toString()) }
+    transactionIncluded?.let { queryMap.put("transaction_included", it.toString()) }
+    accountIds?.let { queryMap.put("account_ids", it.joinToString(",")) }
+
+    return searchTransactions(queryMap)
+}
+
+// Reports
+
 internal fun ReportsAPI.fetchAccountBalanceReports(period: ReportPeriod, fromDate: String, toDate: String,
                                                    accountId: Long? = null, accountType: AccountType? = null) : Call<AccountBalanceReportResponse> {
-    var queryMap = mapOf("period" to period.toString(), "from_date" to fromDate, "to_date" to toDate)
-    accountType?.let { queryMap = queryMap.plus(Pair("container", it.toString())) }
-    accountId?.let { queryMap = queryMap.plus(Pair("account_id", it.toString())) }
+    val queryMap = mutableMapOf("period" to period.toString(), "from_date" to fromDate, "to_date" to toDate)
+    accountType?.let { queryMap.put("container", it.toString()) }
+    accountId?.let { queryMap.put("account_id", it.toString()) }
     return fetchAccountBalanceReports(queryMap)
 }
 
 internal fun ReportsAPI.fetchTransactionCurrentReports(grouping: ReportGrouping, budgetCategory: BudgetCategory? = null) : Call<TransactionCurrentReportResponse> {
-    var queryMap = mapOf("grouping" to grouping.toString())
-    budgetCategory?.let { queryMap = queryMap.plus(Pair("budget_category", it.toString())) }
+    val queryMap = mutableMapOf("grouping" to grouping.toString())
+    budgetCategory?.let { queryMap.put("budget_category", it.toString()) }
     return fetchTransactionCurrentReports(queryMap)
 }
 
 internal fun ReportsAPI.fetchTransactionHistoryReports(grouping: ReportGrouping, period: ReportPeriod,
                                                        fromDate: String, toDate: String,
                                                        budgetCategory: BudgetCategory? = null) : Call<TransactionHistoryReportResponse> {
-    var queryMap = mapOf("grouping" to grouping.toString(), "period" to period.toString(), "from_date" to fromDate, "to_date" to toDate)
-    budgetCategory?.let { queryMap = queryMap.plus(Pair("budget_category", it.toString())) }
+    val queryMap = mutableMapOf("grouping" to grouping.toString(), "period" to period.toString(), "from_date" to fromDate, "to_date" to toDate)
+    budgetCategory?.let { queryMap.put("budget_category", it.toString()) }
     return fetchTransactionHistoryReports(queryMap)
 }
+
+// Bills
 
 internal fun BillsAPI.fetchBillPayments(
         fromDate: String, // yyyy-MM-dd
@@ -108,15 +137,17 @@ internal fun BillsAPI.fetchBillPayments(
         skip: Int? = null,
         count: Int? = null) : Call<List<BillPaymentResponse>> {
 
-    var queryMap = mapOf("from_date" to fromDate, "to_date" to toDate)
-    skip?.let { queryMap = queryMap.plus(Pair("skip", it.toString())) }
-    count?.let { queryMap = queryMap.plus(Pair("count", it.toString())) }
+    val queryMap = mutableMapOf("from_date" to fromDate, "to_date" to toDate)
+    skip?.let { queryMap.put("skip", it.toString()) }
+    count?.let { queryMap.put("count", it.toString()) }
 
     return fetchBillPayments(queryMap)
 }
 
+// Surveys
+
 internal fun SurveysAPI.fetchSurvey(surveyKey: String, latest: Boolean? = null) : Call<Survey> {
-    var queryMap = mapOf<String, String>()
-    latest?.let { queryMap = mapOf(Pair("latest", latest.toString())) }
+    val queryMap = mutableMapOf<String, String>()
+    latest?.let { queryMap.put("latest", latest.toString()) }
     return fetchSurvey(surveyKey, queryMap)
 }

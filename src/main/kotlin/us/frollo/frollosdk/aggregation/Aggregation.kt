@@ -745,11 +745,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     fun refreshTransactions(fromDate: String, toDate: String, accountIds: LongArray? = null,
                             transactionIncluded: Boolean? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         doAsync {
-            refreshNextransactions(fromDate, toDate, accountIds, transactionIncluded, 0, longArrayOf(), longArrayOf(), completion)
+            refreshNextTransactions(fromDate, toDate, accountIds, transactionIncluded, 0, longArrayOf(), longArrayOf(), completion)
         }
     }
 
-    private fun refreshNextransactions(fromDate: String, toDate: String, accountIds: LongArray? = null,
+    private fun refreshNextTransactions(fromDate: String, toDate: String, accountIds: LongArray? = null,
                                        transactionIncluded: Boolean? = null, skip: Int,
                                        updatedTransactionIds: LongArray, updatedMerchantIds: LongArray,
                                        completion: OnFrolloSDKCompletionListener<Result>? = null) {
@@ -766,7 +766,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                         val merchantIds = it.map { model -> model.merchant.id }.toLongArray().plus(updatedMerchantIds)
 
                         if (it.size >= TRANSACTION_BATCH_SIZE) {
-                            refreshNextransactions(fromDate, toDate, accountIds, transactionIncluded,
+                            refreshNextTransactions(fromDate, toDate, accountIds, transactionIncluded,
                                     skip + TRANSACTION_BATCH_SIZE, updatedIds, merchantIds, completion)
                         } else {
                             fetchMissingMerchants(merchantIds.toSet())
@@ -775,7 +775,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshNextransactions", resource.error?.localizedDescription)
+                    Log.e("$TAG#refreshNextTransactions", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
                 }
             }
@@ -910,6 +910,66 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#updateTransaction", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
+                }
+            }
+        }
+    }
+
+    /**
+     * Search transactions - This will return a list of transaction ids based on the given [searchTerm].
+     *
+     * There are some special cases that exist, depending on the search term provided, that perform a specific search.
+     *
+     * a) excluded - Only excluded transactions will be returned.
+     *
+     * b) pending - Only pending transactions will be returned.
+     *
+     * c) income or lifestyle or living or goals - Only transactions belonging to the given budget_category will be returned.
+     *
+     * d) anything else - The [searchTerm] will be used to do a like comparison in the following: Description, Amount, Merchant name, Category name.
+     *
+     * @param searchTerm The term to search on.
+     * @param page Page number of results (Pagination starts from 0). Each page contains maximum of 200 transaction ids.
+     * @param fromDate Start date (inclusive) to fetch transactions from (optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param toDate End date (inclusive) to fetch transactions up to (optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param accountIds Specific account IDs of the transactions to fetch (optional)
+     * @param transactionIncluded Boolean flag to indicate to fetch only those transactions that are excluded/included in budget (optional)
+     * @param accountIncluded Boolean flag to indicate to fetch only those transactions whose associated account is excluded/included in budget (optional)
+     * @param completion Completion handler with optional error if the request fails and array of transaction ids if succeeds
+     */
+    fun searchTransactions(searchTerm: String, page: Int = 0, fromDate: String? = null, toDate: String? = null,
+                           accountIds: LongArray? = null, transactionIncluded: Boolean? = null,
+                           accountIncluded: Boolean? = null, completion: OnFrolloSDKCompletionListener<Resource<LongArray>>) {
+
+        val skip = page * TRANSACTION_BATCH_SIZE
+
+        aggregationAPI.searchTransactions(
+                searchTerm = searchTerm, fromDate = fromDate, toDate = toDate, accountIds = accountIds,
+                transactionIncluded = transactionIncluded, accountIncluded = accountIncluded,
+                count = TRANSACTION_BATCH_SIZE, skip = skip).enqueue { resource ->
+
+            when(resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#searchTransactions", resource.error?.localizedDescription)
+                    completion.invoke(Resource.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    doAsync {
+                        val response = resource.data
+                        val transactionIds = mutableListOf<Long>()
+
+                        response?.let { list ->
+                            transactionIds.addAll(list.map { it.transactionId }.toList())
+                            val merchantIds = list.map { it.merchant.id }.toSet()
+
+                            insertTransactions(response)
+                            fetchMissingMerchants(merchantIds)
+                        }
+
+                        uiThread {
+                            completion.invoke(Resource.success(data = transactionIds.toLongArray()))
+                        }
+                    }
                 }
             }
         }

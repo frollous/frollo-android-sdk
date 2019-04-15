@@ -38,6 +38,7 @@ import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.user.*
+import java.math.BigDecimal
 
 class ConvertersTest {
 
@@ -507,7 +508,7 @@ class ConvertersTest {
 
     @Test
     fun testStringToMerchantLocation() {
-        val json = "{\"formatted_address\":\"41 McLaren St, North Sydney, NSW 2120 Australia\",\"line_1\":\"41 McLaren St\",\"suburb\":\"North Sydney\",\"state\":\"NSW\",\"postcode\":\"2120\",\"country\":\"Australia\"}"
+        val json = "{\"formatted_address\":\"41 McLaren St, North Sydney, NSW 2120 Australia\",\"line_1\":\"41 McLaren St\",\"suburb\":\"North Sydney\",\"state\":\"NSW\",\"postcode\":\"2120\",\"country\":\"Australia\",\"latitude\":-33.83517030000001,\"longitude\":151.2086038}"
         val location = Converters.instance.stringToMerchantLocation(json)
         assertNotNull(location)
         assertEquals("41 McLaren St, North Sydney, NSW 2120 Australia", location?.formattedAddress)
@@ -518,8 +519,8 @@ class ConvertersTest {
         assertEquals("NSW", location?.state)
         assertEquals("2120", location?.postcode)
         assertEquals("Australia", location?.country)
-        assertNull(location?.latitude)
-        assertNull(location?.longitude)
+        assertEquals(BigDecimal("-33.83517030000001"), location?.latitude)
+        assertEquals(BigDecimal("151.2086038"), location?.longitude)
 
         assertNull(Converters.instance.stringToMerchantLocation(null))
     }
@@ -535,10 +536,10 @@ class ConvertersTest {
                 state = "NSW",
                 postcode = "2120",
                 country = "Australia",
-                latitude = null,
-                longitude = null)
+                latitude = BigDecimal("-33.83517030000001"),
+                longitude = BigDecimal("151.2086038"))
         val json = Converters.instance.stringFromMerchantLocation(location)
-        assertEquals("{\"formatted_address\":\"41 McLaren St, North Sydney, NSW 2120 Australia\",\"line_1\":\"41 McLaren St\",\"suburb\":\"North Sydney\",\"state\":\"NSW\",\"postcode\":\"2120\",\"country\":\"Australia\"}", json)
+        assertEquals("{\"formatted_address\":\"41 McLaren St, North Sydney, NSW 2120 Australia\",\"line_1\":\"41 McLaren St\",\"suburb\":\"North Sydney\",\"state\":\"NSW\",\"postcode\":\"2120\",\"country\":\"Australia\",\"latitude\":-33.83517030000001,\"longitude\":151.2086038}", json)
     }
 
     @Test

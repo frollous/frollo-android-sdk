@@ -1426,6 +1426,108 @@ class AggregationTest {
         tearDown()
     }
 
+
+    @Test
+    fun testSearchTransactions() {
+        initSetup()
+
+        val searchTerm = "Travel"
+        val requestPath = "${AggregationAPI.URL_TRANSACTIONS_SEARCH}?search_term=$searchTerm&skip=0&count=200"
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.transactions_2018_08_01_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.searchTransactions(searchTerm = searchTerm) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val transactionIds = resource.data
+            assertNotNull(transactionIds)
+            assertEquals(111, transactionIds?.size)
+
+            val testObserver = aggregation.fetchTransactions(transactionIds).test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(111, models?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testSearchPaginatedTransactions() {
+        initSetup()
+
+        val searchTerm = "Travel"
+        val requestPath1 = "${AggregationAPI.URL_TRANSACTIONS_SEARCH}?search_term=$searchTerm&from_date=2018-08-01&to_date=2018-08-31&skip=0&count=200"
+        val requestPath2 = "${AggregationAPI.URL_TRANSACTIONS_SEARCH}?search_term=$searchTerm&from_date=2018-08-01&to_date=2018-08-31&skip=200&count=200"
+
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath1) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.transactions_2018_12_04_count_200_skip_0))
+                } else if (request?.trimmedPath == requestPath2) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.transactions_2018_12_04_count_200_skip_200))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.searchTransactions(searchTerm = searchTerm, page = 0, fromDate = "2018-08-01", toDate = "2018-08-31") { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val transactionIds = resource.data
+            assertNotNull(transactionIds)
+            assertEquals(200, transactionIds?.size)
+
+            val testObserver = aggregation.fetchTransactions(transactionIds).test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(200, models?.size)
+        }
+
+        wait(3)
+
+        aggregation.searchTransactions(searchTerm = searchTerm, page = 1, fromDate = "2018-08-01", toDate = "2018-08-31") { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val transactionIds = resource.data
+            assertNotNull(transactionIds)
+            assertEquals(111, transactionIds?.size)
+
+            val testObserver = aggregation.fetchTransactions(transactionIds).test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(111, models?.size)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
     @Test
     fun testTransactionsFetchMissingMerchants() {
         initSetup()

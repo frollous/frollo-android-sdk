@@ -17,6 +17,7 @@
 package us.frollo.frollosdk.model.coredata.aggregation.merchants
 
 import com.google.gson.annotations.SerializedName
+import java.math.BigDecimal
 
 /** Merchant location */
 data class MerchantLocation(
@@ -46,8 +47,8 @@ data class MerchantLocation(
         @SerializedName("country") val country: String?,
 
         /** Latitude */
-        @SerializedName("latitude") val latitude: String?,
+        @SerializedName("latitude") val latitude: BigDecimal?,
 
         /** Longitude */
-        @SerializedName("longitude") val longitude: String?
+        @SerializedName("longitude") val longitude: BigDecimal?
 )

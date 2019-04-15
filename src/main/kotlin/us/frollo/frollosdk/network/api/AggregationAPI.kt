@@ -47,6 +47,7 @@ internal interface AggregationAPI {
         // Transaction URLs
         const val URL_TRANSACTIONS = "aggregation/transactions"
         const val URL_TRANSACTION = "aggregation/transactions/{transaction_id}"
+        const val URL_TRANSACTIONS_SEARCH = "aggregation/transactions/search"
         const val URL_TRANSACTIONS_SUMMARY = "aggregation/transactions/summary"
 
         // Transaction Category URLs
@@ -104,6 +105,10 @@ internal interface AggregationAPI {
 
     @PUT(URL_TRANSACTION)
     fun updateTransaction(@Path("transaction_id") transactionId: Long, @Body request: TransactionUpdateRequest): Call<TransactionResponse>
+
+    // Query parameters: {search_term, from_date, to_date, transaction_ids, account_ids, account_included, transaction_included, skip, count}
+    @GET(URL_TRANSACTIONS_SEARCH)
+    fun searchTransactions(@QueryMap queryParams: Map<String, String>): Call<List<TransactionResponse>>
 
     // Query parameters: {transaction_ids, account_ids, from_date, to_date, account_included, transaction_included}
     @GET(URL_TRANSACTIONS_SUMMARY)

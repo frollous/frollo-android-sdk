@@ -62,6 +62,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginFor
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderRelation
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionDescription
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionRelation
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionsSummary
 import kotlin.collections.ArrayList
@@ -916,41 +917,61 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     /**
-     * Search transactions - This will return a list of transaction ids based on the given [searchTerm].
+     * Search transactions
      *
-     * There are some special cases that exist, depending on the search term provided, that perform a specific search.
+     * Search for transactions from the server. Transactions will be cached and a list of matching transaction IDs returned.
+     * Search results are paginated and retrieving the full list of more than 200 will require incrementing the [page] parameter.
      *
-     * a) excluded - Only excluded transactions will be returned.
+     * Example: Fetch results 201-400
      *
-     * b) pending - Only pending transactions will be returned.
+     * `transactionSearch(searchTerm: "supermarket", page: 1)`
      *
-     * c) income or lifestyle or living or goals - Only transactions belonging to the given budget_category will be returned.
+     * The search term will match the following fields on a transaction:
      *
-     * d) anything else - The [searchTerm] will be used to do a like comparison in the following: Description, Amount, Merchant name, Category name.
+     * - [TransactionDescription.original]
+     * - [TransactionDescription.simple]
+     * - [TransactionDescription.user]
+     * - [Transaction.amount]
+     * - [Merchant.name]
+     * - [TransactionCategory.name]
      *
-     * @param searchTerm The term to search on.
-     * @param page Page number of results (Pagination starts from 0). Each page contains maximum of 200 transaction ids.
+     * Magic search terms can also be used where the following will match specific types or properties rather than the fields above.
+     *
+     * - excluded - Only transactions where [Transaction.included] is false.
+     * - pending - Only transactions where [Transaction.status] is pending.
+     * - income - Budget category is income.
+     * - lifestyle - Budget category is living.
+     * - living - Budget category is lifestyle.
+     * - goals - Budget category is goals.
+     *
+     * @param searchTerm Search term to match, either text, amount or magic term
+     * @param page Page to start search from. Defaults to 0
      * @param fromDate Start date (inclusive) to fetch transactions from (optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
      * @param toDate End date (inclusive) to fetch transactions up to (optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
-     * @param accountIds Specific account IDs of the transactions to fetch (optional)
-     * @param transactionIncluded Boolean flag to indicate to fetch only those transactions that are excluded/included in budget (optional)
-     * @param accountIncluded Boolean flag to indicate to fetch only those transactions whose associated account is excluded/included in budget (optional)
+     * @param accountIds A list of account IDs to restrict search to (optional)
+     * @param accountIncluded Only return results from accounts included in the budget (optional)
      * @param completion Completion handler with optional error if the request fails and array of transaction ids if succeeds
      */
-    fun searchTransactions(searchTerm: String, page: Int = 0, fromDate: String? = null, toDate: String? = null,
-                           accountIds: LongArray? = null, transactionIncluded: Boolean? = null,
-                           accountIncluded: Boolean? = null, completion: OnFrolloSDKCompletionListener<Resource<LongArray>>) {
+    fun transactionSearch(searchTerm: String, page: Int = 0, fromDate: String? = null, toDate: String? = null,
+                          accountIds: LongArray? = null, accountIncluded: Boolean? = null,
+                          completion: OnFrolloSDKCompletionListener<Resource<LongArray>>) {
+
+        if (searchTerm.isBlank()) {
+            Log.d("$TAG#transactionSearch", "Search term is empty")
+            val error = DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)
+            completion.invoke(Resource.error(error))
+            return
+        }
 
         val skip = page * TRANSACTION_BATCH_SIZE
 
-        aggregationAPI.searchTransactions(
+        aggregationAPI.transactionSearch(
                 searchTerm = searchTerm, fromDate = fromDate, toDate = toDate, accountIds = accountIds,
-                transactionIncluded = transactionIncluded, accountIncluded = accountIncluded,
-                count = TRANSACTION_BATCH_SIZE, skip = skip).enqueue { resource ->
+                accountIncluded = accountIncluded, count = TRANSACTION_BATCH_SIZE, skip = skip).enqueue { resource ->
 
             when(resource.status) {
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#searchTransactions", resource.error?.localizedDescription)
+                    Log.e("$TAG#transactionSearch", resource.error?.localizedDescription)
                     completion.invoke(Resource.error(resource.error))
                 }
                 Resource.Status.SUCCESS -> {

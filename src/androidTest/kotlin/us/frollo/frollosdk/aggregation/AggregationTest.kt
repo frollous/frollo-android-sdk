@@ -1428,7 +1428,7 @@ class AggregationTest {
 
 
     @Test
-    fun testSearchTransactions() {
+    fun testTransactionSearch() {
         initSetup()
 
         val searchTerm = "Travel"
@@ -1445,7 +1445,7 @@ class AggregationTest {
             }
         })
 
-        aggregation.searchTransactions(searchTerm = searchTerm) { resource ->
+        aggregation.transactionSearch(searchTerm = searchTerm) { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
 
@@ -1491,7 +1491,7 @@ class AggregationTest {
             }
         })
 
-        aggregation.searchTransactions(searchTerm = searchTerm, page = 0, fromDate = "2018-08-01", toDate = "2018-08-31") { resource ->
+        aggregation.transactionSearch(searchTerm = searchTerm, page = 0, fromDate = "2018-08-01", toDate = "2018-08-31") { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
 
@@ -1508,7 +1508,7 @@ class AggregationTest {
 
         wait(3)
 
-        aggregation.searchTransactions(searchTerm = searchTerm, page = 1, fromDate = "2018-08-01", toDate = "2018-08-31") { resource ->
+        aggregation.transactionSearch(searchTerm = searchTerm, page = 1, fromDate = "2018-08-01", toDate = "2018-08-31") { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
 

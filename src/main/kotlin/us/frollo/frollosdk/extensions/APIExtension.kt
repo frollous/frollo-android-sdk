@@ -82,7 +82,7 @@ internal fun AggregationAPI.fetchTransactionsSummaryByIDs(transactionIds: LongAr
 internal fun AggregationAPI.fetchMerchantsByIDs(merchantIds: LongArray) : Call<List<MerchantResponse>> =
         fetchMerchantsByIds(mapOf("merchant_ids" to merchantIds.joinToString(",")))
 
-internal fun AggregationAPI.searchTransactions(
+internal fun AggregationAPI.transactionSearch(
         searchTerm: String,
         fromDate: String? = null, // yyyy-MM-dd
         toDate: String? = null, // yyyy-MM-dd
@@ -102,7 +102,7 @@ internal fun AggregationAPI.searchTransactions(
     transactionIncluded?.let { queryMap.put("transaction_included", it.toString()) }
     accountIds?.let { queryMap.put("account_ids", it.joinToString(",")) }
 
-    return searchTransactions(queryMap)
+    return transactionSearch(queryMap)
 }
 
 // Reports

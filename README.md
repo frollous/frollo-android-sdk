@@ -2,15 +2,20 @@
 
 ### Requirements
 
-- Android Studio 3.3.2+
+- Android Studio 3.4+
 - Kotlin version 1.3.30+
-- Gradle plugin version 3.3.2+ - In your project level **build.gradle**    
+- Gradle tools plugin version 3.4.0+ - In your project level **build.gradle**    
     ```    
         dependencies {    
-            classpath "com.android.tools.build:gradle:3.3.2"    
+            classpath "com.android.tools.build:gradle:3.4.0"    
             //..    
         }    
     ```
+- Gradle version must be 5.1.1+
+
+    Modify Gradle version in your **gradle_wrapper.properties** as below
+
+        `distributionUrl=https\://services.gradle.org/distributions/gradle-5.1.1-all.zip`
 - You need to define a **appAuthRedirectScheme** in your module level **build.gradle**. This should be unique redirect uri for your app.    
 
     Example:

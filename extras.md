@@ -56,25 +56,6 @@ If the user is not authenticated the [loginUser](us.frollo.frollosdk.auth/-authe
 
 ##### Integration Requirements
 
-If you are going to authenticate using Authorization Code, some extra setup steps are required for your app.
-
-- Gradle version must be 5.1.1+
-
-    Modify Gradle version in your **gradle_wrapper.properties** as below
-
-        `distributionUrl=https\://services.gradle.org/distributions/gradle-5.1.1-all.zip`
-
-- Jetifier version must be 1.0.0-beta04+
-
-    Add below line in your project level **build.gradle** dependencies section
-    ```
-        dependencies {
-            //..
-            classpath "com.android.tools.build.jetifier:jetifier-processor:1.0.0-beta04"
-            //..
-        }
-    ```
-
 - You need to define a **appAuthRedirectScheme** in your module level **build.gradle**. This should be unique redirect uri for your app.
 
     Example:

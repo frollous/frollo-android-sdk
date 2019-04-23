@@ -15,7 +15,9 @@
 
     Modify Gradle version in your **gradle_wrapper.properties** as below
 
-        `distributionUrl=https\://services.gradle.org/distributions/gradle-5.1.1-all.zip`
+    ```
+        distributionUrl=https\://services.gradle.org/distributions/gradle-5.1.1-all.zip
+    ```
 - You need to define a **appAuthRedirectScheme** in your module level **build.gradle**. This should be unique redirect uri for your app.    
 
     Example:

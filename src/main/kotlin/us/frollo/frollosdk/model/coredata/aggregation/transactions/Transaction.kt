@@ -79,7 +79,10 @@ data class Transaction(
         @ColumnInfo(name = "bill_id") var billId: Long?,
 
         /** Bill Payment ID related to the transaction */
-        @ColumnInfo(name = "bill_payment_id") var billPaymentId: Long?
+        @ColumnInfo(name = "bill_payment_id") var billPaymentId: Long?,
+
+        /** All tags applied to this transaction */
+        @ColumnInfo(name = "user_tags") var userTags: List<String>?
 
 ): IAdapterModel {
 

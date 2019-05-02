@@ -38,6 +38,7 @@ import us.frollo.frollosdk.model.coredata.reports.ReportGroupTransactionHistory
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
 import us.frollo.frollosdk.model.coredata.user.User
+import us.frollo.frollosdk.model.coredata.user.UserTags
 
 @Database(entities = [
     User::class,
@@ -53,8 +54,9 @@ import us.frollo.frollosdk.model.coredata.user.User
     ReportGroupTransactionHistory::class,
     ReportAccountBalance::class,
     Bill::class,
-    BillPayment::class
-], version = 3, exportSchema = true)
+    BillPayment::class,
+    UserTags::class
+], version = 4, exportSchema = true)
 
 @TypeConverters(Converters::class)
 abstract class SDKDatabase : RoomDatabase() {
@@ -73,11 +75,13 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun reportsAccountBalance(): ReportAccountBalanceDao
     internal abstract fun bills(): BillDao
     internal abstract fun billPayments(): BillPaymentDao
+    internal abstract fun userTagsDAO(): UserTagsDAO
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"
 
-        @Volatile private var instance: SDKDatabase? = null // Singleton instantiation
+        @Volatile
+        private var instance: SDKDatabase? = null // Singleton instantiation
 
         internal fun getInstance(app: Application): SDKDatabase {
             return instance ?: synchronized(this) {
@@ -89,7 +93,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
                         .allowMainThreadQueries() // Needed for some tests
                         //.fallbackToDestructiveMigration()
-                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                         .build()
 
         // Copy-paste of auto-generated SQLs from room schema json file
@@ -146,6 +150,13 @@ abstract class SDKDatabase : RoomDatabase() {
                 database.execSQL("CREATE INDEX `index_bill_payment_merchant_id` ON `bill_payment` (`merchant_id`)")
 
                 database.execSQL("ALTER TABLE `message` ADD COLUMN `auto_dismiss` INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
+        private val MIGRATION_3_4: Migration = object : Migration(3, 4) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS user_tags (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, tag TEXT)")
+                database.execSQL("ALTER TABLE transaction_model ADD COLUMN `user_tags` TEXT")
             }
         }
     }

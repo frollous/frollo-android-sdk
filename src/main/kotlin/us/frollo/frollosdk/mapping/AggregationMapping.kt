@@ -113,7 +113,8 @@ internal fun TransactionResponse.toTransaction(): Transaction =
                 memo = memo,
                 postDate = postDate,
                 status = status,
-                transactionDate = transactionDate)
+                transactionDate = transactionDate,
+                userTags = userTags)
 
 internal fun TransactionsSummaryResponse.toTransactionsSummary(): TransactionsSummary =
         TransactionsSummary(

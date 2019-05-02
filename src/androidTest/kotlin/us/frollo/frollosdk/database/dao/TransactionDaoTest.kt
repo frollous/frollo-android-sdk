@@ -29,13 +29,15 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.extensions.getTransactionByTags
 import us.frollo.frollosdk.extensions.sqlForTransactionStaleIds
 import us.frollo.frollosdk.mapping.*
 import us.frollo.frollosdk.model.*
 
 class TransactionDaoTest {
 
-    @get:Rule val testRule = InstantTaskExecutorRule()
+    @get:Rule
+    val testRule = InstantTaskExecutorRule()
 
     private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
     private val db = SDKDatabase.getInstance(app)
@@ -92,6 +94,27 @@ class TransactionDaoTest {
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(2, testObserver.value().size)
+    }
+
+    @Test
+    fun testFetchTransactionsByTags() {
+        val data1 = testTransactionResponseData(transactionId = 100, userTags = listOf("abc", "def"))
+        val data2 = testTransactionResponseData(transactionId = 101, userTags = listOf("abc2", "def2"))
+        val data3 = testTransactionResponseData(transactionId = 102, userTags = listOf("hello", "how"))
+        val data4 = testTransactionResponseData(transactionId = 103, userTags = listOf("why", "are"))
+        val data5 = testTransactionResponseData(transactionId = 104, userTags = listOf("why", "are"))
+        val data6 = testTransactionResponseData(transactionId = 105, userTags = listOf("why", "are"))
+        val data7 = testTransactionResponseData(transactionId = 106, userTags = listOf("whyas", "areas"))
+
+        val list = mutableListOf(data1, data2, data3, data4, data5, data6, data7)
+
+        db.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+
+        val tags = mutableListOf("why", "are")
+        val testObserver = db.transactions().loadByQuery(getTransactionByTags(tags)).test()
+        testObserver.awaitValue()
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(3, testObserver.value().size)
     }
 
     @Test

@@ -7,3 +7,4 @@
 /captures
 .externalNativeBuild
 fastlane/report.xml
+schemas/

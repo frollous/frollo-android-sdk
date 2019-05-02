@@ -24,6 +24,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBa
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionDescription
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.model.coredata.user.UserTags
 import us.frollo.frollosdk.testutils.randomBoolean
 import us.frollo.frollosdk.testutils.randomNumber
 import us.frollo.frollosdk.testutils.randomUUID
@@ -32,7 +33,7 @@ import kotlin.random.Random
 
 internal fun testTransactionResponseData(transactionId: Long? = null, accountId: Long? = null,
                                          categoryId: Long? = null, merchantId: Long? = null,
-                                         transactionDate: String? = null, included: Boolean? = null) : TransactionResponse {
+                                         transactionDate: String? = null, included: Boolean? = null, userTags: List<String>? = null) : TransactionResponse {
     return TransactionResponse(
             transactionId = transactionId ?: randomNumber().toLong(),
             accountId = accountId ?: randomNumber().toLong(),
@@ -48,7 +49,8 @@ internal fun testTransactionResponseData(transactionId: Long? = null, accountId:
             memo = randomUUID(),
             postDate = "2019-01-01",
             status = TransactionStatus.values()[Random.nextInt(TransactionStatus.values().size)],
-            transactionDate = transactionDate ?: "2019-01-01")
+            transactionDate = transactionDate ?: "2019-01-01",
+            userTags = userTags)
 }
 
 internal fun testMerchantDetails(merchantId: Long? = null): MerchantDetails =

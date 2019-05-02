@@ -42,6 +42,7 @@ import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
+import us.frollo.frollosdk.extensions.getTransactionByTags
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.mapping.*
 import us.frollo.frollosdk.model.*
@@ -1002,6 +1003,29 @@ class AggregationTest {
         assertNotNull(testObserver.value().data)
         assertEquals(3, testObserver.value().data?.size)
         assertTrue(testObserver.value().data?.map { it.transactionId }?.toList()?.containsAll(listOf(101L,102L,103L)) == true)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionsByTags() {
+        initSetup()
+
+        val data1 = testTransactionResponseData(transactionId = 100,userTags = listOf("abc", "def"))
+        val data2 = testTransactionResponseData(transactionId = 101,userTags = listOf("abc2", "def2"))
+        val data3 = testTransactionResponseData(transactionId = 102,userTags = listOf("hello", "how"))
+        val data4 = testTransactionResponseData(transactionId = 103,userTags = listOf("why", "are"))
+        val data5 = testTransactionResponseData(transactionId = 104,userTags = listOf("why", "are"))
+        val data6 = testTransactionResponseData(transactionId = 105,userTags = listOf("why", "are"))
+        val list = mutableListOf(data1, data2, data3, data4, data5, data6)
+
+        database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+
+        val query = getTransactionByTags(listOf("why","are"))
+        val testObserver = aggregation.fetchTransactions(query).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(3, testObserver.value().data?.size)
 
         tearDown()
     }

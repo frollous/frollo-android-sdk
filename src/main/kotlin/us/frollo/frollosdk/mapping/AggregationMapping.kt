@@ -23,6 +23,7 @@ import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
+import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagsResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
@@ -31,6 +32,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContaine
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionsSummary
+import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTags
 
 internal fun ProviderResponse.toProvider(): Provider =
         Provider(
@@ -137,3 +139,6 @@ internal fun MerchantResponse.toMerchant(): Merchant =
                 name = name,
                 merchantType = merchantType,
                 smallLogoUrl = smallLogoUrl)
+
+internal fun TransactionTagsResponse.toUserTags(): TransactionTags =
+        TransactionTags(name = name, count = count, lastUsedAt = lastUsedAt, createdAt = createdAt)

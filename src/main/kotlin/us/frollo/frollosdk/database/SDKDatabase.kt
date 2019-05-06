@@ -38,7 +38,7 @@ import us.frollo.frollosdk.model.coredata.reports.ReportGroupTransactionHistory
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
 import us.frollo.frollosdk.model.coredata.user.User
-import us.frollo.frollosdk.model.coredata.user.UserTags
+import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTags
 
 @Database(entities = [
     User::class,
@@ -55,7 +55,7 @@ import us.frollo.frollosdk.model.coredata.user.UserTags
     ReportAccountBalance::class,
     Bill::class,
     BillPayment::class,
-    UserTags::class
+    TransactionTags::class
 ], version = 4, exportSchema = true)
 
 @TypeConverters(Converters::class)
@@ -155,7 +155,7 @@ abstract class SDKDatabase : RoomDatabase() {
 
         private val MIGRATION_3_4: Migration = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("CREATE TABLE IF NOT EXISTS user_tags (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, tag TEXT)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS transaction_tags (name text PRIMARY KEY NOT NULL, count integer, lastUsedAt text, createdAt text)")
                 database.execSQL("ALTER TABLE transaction_model ADD COLUMN `user_tags` TEXT")
             }
         }

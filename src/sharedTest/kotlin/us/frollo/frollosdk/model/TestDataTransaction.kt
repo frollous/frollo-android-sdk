@@ -24,7 +24,6 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBa
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionDescription
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
-import us.frollo.frollosdk.model.coredata.user.UserTags
 import us.frollo.frollosdk.testutils.randomBoolean
 import us.frollo.frollosdk.testutils.randomNumber
 import us.frollo.frollosdk.testutils.randomUUID

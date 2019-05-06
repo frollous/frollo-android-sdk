@@ -22,8 +22,11 @@ import us.frollo.frollosdk.extensions.serializedName
 /** Status of the transaction's lifecycle */
 enum class SortByEnum {
 
-    /** Pending. Transaction is authorised but not posted */
-    @SerializedName("search_term") SEARCH_TERM;
+    @SerializedName("name") NAME,
+    @SerializedName("created_at") CREATED_AT,
+    @SerializedName("last_used_at") LAST_USED,
+    @SerializedName("count") COUNT,
+    @SerializedName("relevance") RELEVANCE;
 
     /** Enum to serialized string */
     //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

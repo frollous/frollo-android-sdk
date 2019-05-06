@@ -20,11 +20,11 @@ import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
 /** Status of the transaction's lifecycle */
-enum class TagEnums {
+enum class SearchTermEnum {
 
     /** Pending. Transaction is authorised but not posted */
-    @SerializedName("search_term") SEARCH_TERM
-    
+    @SerializedName("search_term") SEARCH_TERM;
+
     /** Enum to serialized string */
     //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =

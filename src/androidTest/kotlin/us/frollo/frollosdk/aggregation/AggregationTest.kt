@@ -827,6 +827,41 @@ class AggregationTest {
     }
 
     @Test
+    fun testRefreshTags() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.user_tags)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == AggregationAPI.URL_USER_TAGS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshUserTags(null,null,null) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchTransactionsTags().test()
+            testObserver.awaitValue()
+            val model = testObserver.value().data
+            assertNotNull(model)
+            assertEquals("pub_lunch", model?.get(0)?.name)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${AggregationAPI.URL_USER_TAGS}", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testUpdateAccountValid() {
         initSetup()
 

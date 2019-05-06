@@ -23,7 +23,8 @@ import us.frollo.frollosdk.extensions.serializedName
 enum class OrderByEnum {
 
     /** Pending. Transaction is authorised but not posted */
-    @SerializedName("search_term") SEARCH_TERM;
+    @SerializedName("asc") ASC,
+    @SerializedName("desc") DESC;
 
     /** Enum to serialized string */
     //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

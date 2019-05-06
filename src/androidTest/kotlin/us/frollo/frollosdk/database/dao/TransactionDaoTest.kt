@@ -29,7 +29,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.extensions.getTransactionByTags
+import us.frollo.frollosdk.extensions.sqlForTransactionByUserTags
 import us.frollo.frollosdk.extensions.sqlForTransactionStaleIds
 import us.frollo.frollosdk.mapping.*
 import us.frollo.frollosdk.model.*
@@ -111,7 +111,7 @@ class TransactionDaoTest {
         db.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
 
         val tags = mutableListOf("why", "are")
-        val testObserver = db.transactions().loadByQuery(getTransactionByTags(tags)).test()
+        val testObserver = db.transactions().loadByQuery(sqlForTransactionByUserTags(tags)).test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(3, testObserver.value().size)

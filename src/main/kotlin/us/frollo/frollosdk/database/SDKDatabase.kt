@@ -75,7 +75,7 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun reportsAccountBalance(): ReportAccountBalanceDao
     internal abstract fun bills(): BillDao
     internal abstract fun billPayments(): BillPaymentDao
-    internal abstract fun userTagsDAO(): UserTagsDAO
+    internal abstract fun userTags(): UserTagsDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"
@@ -155,6 +155,10 @@ abstract class SDKDatabase : RoomDatabase() {
 
         private val MIGRATION_3_4: Migration = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
+
+                // New changes in this migration:
+                // 1) Create table user tags
+                // 2) Alter transaction table to add a user tag
                 database.execSQL("CREATE TABLE IF NOT EXISTS user_tags (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, tag TEXT)")
                 database.execSQL("ALTER TABLE transaction_model ADD COLUMN `user_tags` TEXT")
             }

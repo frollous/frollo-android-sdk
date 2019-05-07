@@ -61,14 +61,13 @@ internal fun generateSQLQueryMessages(searchParams: List<String>, read: Boolean?
     return SimpleSQLiteQuery("SELECT * FROM message WHERE $sb")
 }
 
-internal fun getTransactionByTags(tags: List<String>): SimpleSQLiteQuery {
+internal fun sqlForTransactionByUserTags(tags: List<String>): SimpleSQLiteQuery {
     val sb = StringBuilder()
 
     tags.forEachIndexed { index, str ->
+        sb.append("user_tags LIKE '%|$str|%'")
         if(index < tags.size -1 )
-            sb.append("user_tags LIKE '%|$str|%' and ")
-        else
-            sb.append("user_tags LIKE '%|$str|%'")
+            sb.append(" AND ")
     }
 
     val query = "SELECT * FROM transaction_model WHERE $sb"

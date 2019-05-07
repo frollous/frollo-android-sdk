@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.coredata.user
+package us.frollo.frollosdk.database.dao
 
-import androidx.annotation.NonNull
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
-import us.frollo.frollosdk.model.IAdapterModel
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import us.frollo.frollosdk.model.coredata.user.UserTags
 
-@Entity(tableName = "user_tags")
-data class UserTags(
+@Dao
+internal interface UserTagsDao {
 
-        @NonNull
-        @ColumnInfo(name = "tag") var tag: String
-) : IAdapterModel {
-
-    /** Unique ID of the user tag */
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") var tagId: Long = 0
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(vararg models: UserTags): LongArray
 }

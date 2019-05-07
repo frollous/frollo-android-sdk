@@ -627,30 +627,24 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      *
      * @param userTags list of tags that are linked to a transaction
      *
-     * @return LiveData object of LiveData<List<Transaction>> which can be observed using an Observer for future changes as well.
+     * @return LiveData object of LiveData<Resource<List<Transaction>>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchTransactionsByTags(userTags: List<String>): LiveData<Resource<List<Transaction>>> {
-        val sql = sqlForTransactionByUserTags(userTags)
-        var result =  db.transactions().loadByQuery(sql)
-        return Transformations.map(result) { models ->
-            Resource.success(models)
-        }
-    }
+    fun fetchTransactionsByTags(userTags: List<String>): LiveData<Resource<List<Transaction>>> =
+            Transformations.map(db.transactions().loadByQuery(sqlForTransactionByUserTags(userTags))) { models ->
+                Resource.success(models)
+            }
 
     /**
      * Fetch transactions by user's tags
      *
      * @param userTags list of tags that are linked to a transaction
      *
-     * @return LiveData object of LiveData<List<Transaction>> which can be observed using an Observer for future changes as well.
+     * @return LiveData object of LiveData<Resource<List<TransactionRelation>>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchTransactionsByTagsWithRelation(userTags: List<String>): LiveData<Resource<List<TransactionRelation>>> {
-        val sql = sqlForTransactionByUserTags(userTags)
-        var result =  db.transactions().loadByQueryWithRelation(sql)
-        return Transformations.map(result) { models ->
-            Resource.success(models)
-        }
-    }
+    fun fetchTransactionsByTagsWithRelation(userTags: List<String>): LiveData<Resource<List<TransactionRelation>>> =
+            Transformations.map(db.transactions().loadByQueryWithRelation(sqlForTransactionByUserTags(userTags))) { models ->
+                Resource.success(models)
+            }
 
     /**
      * Fetch transactions from the cache

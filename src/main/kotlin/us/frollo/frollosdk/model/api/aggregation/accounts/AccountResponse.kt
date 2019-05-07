@@ -52,20 +52,8 @@ internal data class AccountResponse(
         @SerializedName("amount_due") val amountDue: Balance?,
         @SerializedName("minimum_amount_due") val minimumAmountDue: Balance?,
         @SerializedName("last_payment_amount") val lastPaymentAmount: Balance?,
-        /*
-        * @lastPaymentDate Date format for this field is ISO8601
-        * exmaple 2011-12-03T10:15:30+01:00
-        * */
         @SerializedName("last_payment_date") val lastPaymentDate: String?, // ISO8601 format Eg: 2011-12-03T10:15:30+01:00
-        /*
-        * @lastPaymentDate Date format for this field is ISO8601
-        * exmaple 2011-12-03T10:15:30+01:00
-        * */
         @SerializedName("due_date") val dueDate: String?, // ISO8601 format Eg: 2011-12-03T10:15:30+01:00
-        /*
-        * @lastPaymentDate Date format for this field is  yyyy-MM-dd
-        * exmaple 2011-12-03
-        * */
         @SerializedName("end_date") val endDate: String?, // yyyy-MM-dd
         @SerializedName("balance_details") val balanceDetails: BalanceDetails?
 )

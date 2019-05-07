@@ -1028,8 +1028,8 @@ class AggregationTest {
         val liveDataObj = aggregation.fetchTransactionsByTags(tagList).test()
         val transactionList = liveDataObj.value()
         assertNotNull(transactionList.data)
-        assert(transactionList.data!!.isNotEmpty())
-        assertEquals(3, transactionList.data!!.size)
+        assert(transactionList.data?.isNotEmpty()!!)
+        assertEquals(3, transactionList.data?.size!!)
 
         tearDown()
     }
@@ -1053,10 +1053,10 @@ class AggregationTest {
         val testObserver = aggregation.fetchTransactionsByTagsWithRelation(tagList).test()
         testObserver.awaitValue()
 
-        val list = testObserver.value().data!!
+        val list = testObserver.value().data
 
-        assertTrue(list.isNotEmpty())
-        assertEquals(3, list.size)
+        assertTrue(list?.isNotEmpty()!!)
+        assertEquals(3, list?.size)
 
         val model1 =list[0]
 

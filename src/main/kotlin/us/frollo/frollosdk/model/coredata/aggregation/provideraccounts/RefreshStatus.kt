@@ -34,14 +34,14 @@ data class RefreshStatus(
         /** Date the aggregator last refreshed the provider account
          *
          * Date format for this field is ISO8601
-         * exmaple 2011-12-03T10:15:30+01:00
+         * example 2011-12-03T10:15:30+01:00
          * */
         @ColumnInfo(name = "last_refreshed") @SerializedName("last_refreshed") val lastRefreshed: String?,
 
         /** Next refresh date by the aggregator
          *
          * Date format for this field is ISO8601
-         * exmaple 2011-12-03T10:15:30+01:00
+         * example 2011-12-03T10:15:30+01:00
          * */
         @ColumnInfo(name = "next_refresh") @SerializedName("next_refresh") val nextRefresh: String?
 )

@@ -31,9 +31,17 @@ data class RefreshStatus(
         /** Account refresh additional status */
         @ColumnInfo(name = "additional_status") @SerializedName("additional_status") val additionalStatus: AccountRefreshAdditionalStatus?,
 
-        /** Date the aggregator last refreshed the provider account */
-        @ColumnInfo(name = "last_refreshed") @SerializedName("last_refreshed") val lastRefreshed: String?, // ISO8601 format Eg: 2011-12-03T10:15:30+01:00
+        /** Date the aggregator last refreshed the provider account
+         *
+         * Date format for this field is ISO8601
+         * example 2011-12-03T10:15:30+01:00
+         * */
+        @ColumnInfo(name = "last_refreshed") @SerializedName("last_refreshed") val lastRefreshed: String?,
 
-        /** Next refresh date by the aggregator */
-        @ColumnInfo(name = "next_refresh") @SerializedName("next_refresh") val nextRefresh: String? // ISO8601 format Eg: 2011-12-03T10:15:30+01:00
+        /** Next refresh date by the aggregator
+         *
+         * Date format for this field is ISO8601
+         * example 2011-12-03T10:15:30+01:00
+         * */
+        @ColumnInfo(name = "next_refresh") @SerializedName("next_refresh") val nextRefresh: String?
 )

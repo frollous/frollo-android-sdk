@@ -42,14 +42,17 @@ import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
-import us.frollo.frollosdk.extensions.getTransactionByTags
+import us.frollo.frollosdk.extensions.sqlForTransactionByUserTags
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.mapping.*
 import us.frollo.frollosdk.model.*
-import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.*
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.*
+import java.math.BigDecimal
 
 class AggregationTest {
 
@@ -1056,11 +1059,53 @@ class AggregationTest {
 
         database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
 
-        val query = getTransactionByTags(listOf("why","are"))
-        val testObserver = aggregation.fetchTransactions(query).test()
+        val tagList = listOf("why","are")
+        val liveDataObj = aggregation.fetchTransactionsByTags(tagList).test()
+        val transactionList = liveDataObj.value()
+        assertNotNull(transactionList.data)
+        assert(transactionList.data?.isNotEmpty()!!)
+        assertEquals(3, transactionList.data?.size!!)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionsByUserTagsWithRelation() {
+        initSetup()
+
+        database.transactions().insert(testTransactionResponseData(transactionId = 122, accountId = 234, categoryId = 567, merchantId = 678,userTags = listOf("why", "are")).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678,userTags = listOf("why", "are")).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 124, accountId = 235, categoryId = 567, merchantId = 678,userTags = listOf("why", "are")).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 125, accountId = 235, categoryId = 567, merchantId = 678,userTags = listOf("whyasdas", "areasdasd")).toTransaction())
+        database.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())
+        database.accounts().insert(testAccountResponseData(accountId = 235, providerAccountId = 345).toAccount())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 345, providerId = 456).toProviderAccount())
+        database.providers().insert(testProviderResponseData(providerId = 456).toProvider())
+        database.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
+        database.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
+
+        val tagList = listOf("why","are")
+        val testObserver = aggregation.fetchTransactionsByTagsWithRelation(tagList).test()
         testObserver.awaitValue()
-        assertNotNull(testObserver.value().data)
-        assertEquals(3, testObserver.value().data?.size)
+
+        val list = testObserver.value().data
+
+        assertTrue(list?.isNotEmpty()!!)
+        assertEquals(3, list?.size)
+
+        val model1 =list[0]
+
+        assertEquals(122L, model1.transaction?.transactionId)
+        assertEquals(678L, model1.merchant?.merchantId)
+        assertEquals(567L, model1.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model1.account?.account?.accountId)
+
+        val model2 = list[1]
+
+        assertEquals(123L, model2.transaction?.transactionId)
+        assertEquals(678L, model2.merchant?.merchantId)
+        assertEquals(567L, model2.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model2.account?.account?.accountId)
 
         tearDown()
     }

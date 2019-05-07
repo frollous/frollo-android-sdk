@@ -39,6 +39,7 @@ import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
 import us.frollo.frollosdk.model.coredata.user.User
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTags
+import us.frollo.frollosdk.model.coredata.user.UserTags
 
 @Database(entities = [
     User::class,
@@ -75,7 +76,7 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun reportsAccountBalance(): ReportAccountBalanceDao
     internal abstract fun bills(): BillDao
     internal abstract fun billPayments(): BillPaymentDao
-    internal abstract fun userTagsDAO(): UserTagsDAO
+    internal abstract fun userTags(): UserTagsDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"
@@ -155,6 +156,10 @@ abstract class SDKDatabase : RoomDatabase() {
 
         private val MIGRATION_3_4: Migration = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
+
+                // New changes in this migration:
+                // 1) Create table user tags
+                // 2) Alter transaction table to add a user tag
                 database.execSQL("CREATE TABLE IF NOT EXISTS transaction_tags (name text PRIMARY KEY NOT NULL, count integer, lastUsedAt text, createdAt text)")
                 database.execSQL("ALTER TABLE transaction_model ADD COLUMN `user_tags` TEXT")
             }

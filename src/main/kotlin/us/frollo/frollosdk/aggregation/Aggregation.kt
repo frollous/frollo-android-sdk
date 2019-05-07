@@ -195,8 +195,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 val userTagList = it.map { it.toUserTags() }.toList()
                 val userTagNames = it.map { it.name }.toList()
                 //val query = "delete from transaction_tags where name not in ($userTagNames)"
-                db.userTagsDAO().deleteByNames(userTagNames)
-                db.userTagsDAO().insertAll(userTagList)
+                db.userTags().deleteByNames(userTagNames)
+                db.userTags().insertAll(userTagList)
                 uiThread { completion?.invoke(Result.success()) }
             }
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
@@ -210,8 +210,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<Transaction>> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactionsTags(): LiveData<Resource<List<TransactionTags>>> {
-        val result = db.userTagsDAO().load()
-        return Transformations.map(result) { models ->
+        return Transformations.map(db.userTags().load()) { models ->
             Resource.success(models)
         }
     }
@@ -678,6 +677,30 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
             }
 
     /**
+     * Fetch transactions by user's tags
+     *
+     * @param userTags list of tags that are linked to a transaction
+     *
+     * @return LiveData object of LiveData<Resource<List<Transaction>>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchTransactionsByTags(userTags: List<String>): LiveData<Resource<List<Transaction>>> =
+            Transformations.map(db.transactions().loadByQuery(sqlForTransactionByUserTags(userTags))) { models ->
+                Resource.success(models)
+            }
+
+    /**
+     * Fetch transactions by user's tags
+     *
+     * @param userTags list of tags that are linked to a transaction
+     *
+     * @return LiveData object of LiveData<Resource<List<TransactionRelation>>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchTransactionsByTagsWithRelation(userTags: List<String>): LiveData<Resource<List<TransactionRelation>>> =
+            Transformations.map(db.transactions().loadByQueryWithRelation(sqlForTransactionByUserTags(userTags))) { models ->
+                Resource.success(models)
+            }
+
+    /**
      * Fetch transactions from the cache
      *
      * @param transactionIds Unique list of IDs of the transactions to fetch (optional). If not specified this method returns all transactions from cache.
@@ -806,15 +829,15 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     private fun refreshNextTransactions(fromDate: String, toDate: String, accountIds: LongArray? = null,
-                                       transactionIncluded: Boolean? = null, skip: Int,
-                                       updatedTransactionIds: LongArray, updatedMerchantIds: LongArray,
-                                       completion: OnFrolloSDKCompletionListener<Result>? = null) {
+                                        transactionIncluded: Boolean? = null, skip: Int,
+                                        updatedTransactionIds: LongArray, updatedMerchantIds: LongArray,
+                                        completion: OnFrolloSDKCompletionListener<Result>? = null) {
 
         aggregationAPI.fetchTransactionsByQuery(fromDate = fromDate, toDate = toDate,
                 accountIds = accountIds, transactionIncluded = transactionIncluded,
                 count = TRANSACTION_BATCH_SIZE, skip = skip).enqueue { resource ->
 
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     val response = resource.data
                     response?.let {
@@ -943,10 +966,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param transaction Updated transaction data model
      * @param recategoriseAll Apply recategorisation to all similar transactions (Optional)
      * @param includeApplyAll Apply included flag to all similar transactions (Optional)
+     * @param userTags userTags Updated list of tags to be applied for the transaction. These tags will replace the existing ones. (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun updateTransaction(transactionId: Long, transaction: Transaction,
                           recategoriseAll: Boolean? = null, includeApplyAll: Boolean? = null,
+                          userTags: List<String>? = null,
                           completion: OnFrolloSDKCompletionListener<Result>? = null) {
 
         val request = TransactionUpdateRequest(
@@ -956,10 +981,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 memo = transaction.memo,
                 userDescription = transaction.description?.user,
                 recategoriseAll = recategoriseAll,
-                includeApplyAll = includeApplyAll)
+                includeApplyAll = includeApplyAll,
+                userTags = userTags)
 
         aggregationAPI.updateTransaction(transactionId, request).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleTransactionResponse(response = resource.data, completion = completion)
                 }
@@ -1120,7 +1146,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     private fun handleTransactionsByIDsResponse(response: List<TransactionResponse>?,
-                                           completion: OnFrolloSDKCompletionListener<Result>? = null) {
+                                                completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
                 fetchMissingMerchants(response.map { it.merchant.id }.toSet())

@@ -29,7 +29,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.extensions.getTransactionByTags
+import us.frollo.frollosdk.extensions.sqlForTransactionByUserTags
 import us.frollo.frollosdk.extensions.sqlForTransactionStaleIds
 import us.frollo.frollosdk.mapping.*
 import us.frollo.frollosdk.model.*
@@ -111,7 +111,7 @@ class TransactionDaoTest {
         db.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
 
         val tags = mutableListOf("why", "are")
-        val testObserver = db.transactions().loadByQuery(getTransactionByTags(tags)).test()
+        val testObserver = db.transactions().loadByQuery(sqlForTransactionByUserTags(tags)).test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(3, testObserver.value().size)
@@ -471,5 +471,41 @@ class TransactionDaoTest {
         assertEquals(678L, model2.merchant?.merchantId)
         assertEquals(567L, model2.transactionCategory?.transactionCategoryId)
         assertEquals(235L, model2.account?.account?.accountId)
+    }
+
+    @Test
+    fun testFetchTransactionsByTagsWithRelation(){
+        db.transactions().insert(testTransactionResponseData(transactionId = 122, accountId = 234, categoryId = 567, merchantId = 678,userTags = listOf("why", "are")).toTransaction())
+        db.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678,userTags = listOf("why", "are")).toTransaction())
+        db.transactions().insert(testTransactionResponseData(transactionId = 124, accountId = 235, categoryId = 567, merchantId = 678,userTags = listOf("why", "are")).toTransaction())
+        db.transactions().insert(testTransactionResponseData(transactionId = 125, accountId = 235, categoryId = 567, merchantId = 678,userTags = listOf("whyasdas", "areasdasd")).toTransaction())
+        db.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())
+        db.accounts().insert(testAccountResponseData(accountId = 235, providerAccountId = 345).toAccount())
+        db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 345, providerId = 456).toProviderAccount())
+        db.providers().insert(testProviderResponseData(providerId = 456).toProvider())
+        db.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
+        db.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
+
+        val tagList = listOf("why","are")
+        val sql = sqlForTransactionByUserTags(tagList)
+        var testObserver =  db.transactions().loadByQueryWithRelation(sql).test()
+        testObserver.awaitValue()
+
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(3, testObserver.value().size)
+
+        val model1 = testObserver.value()[0]
+
+        assertEquals(122L, model1.transaction?.transactionId)
+        assertEquals(678L, model1.merchant?.merchantId)
+        assertEquals(567L, model1.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model1.account?.account?.accountId)
+
+        val model2 = testObserver.value()[1]
+
+        assertEquals(123L, model2.transaction?.transactionId)
+        assertEquals(678L, model2.merchant?.merchantId)
+        assertEquals(567L, model2.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model2.account?.account?.accountId)
     }
 }

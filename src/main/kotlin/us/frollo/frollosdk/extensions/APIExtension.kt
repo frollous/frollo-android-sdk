@@ -27,9 +27,6 @@ import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
-import us.frollo.frollosdk.model.coredata.aggregation.tags.OrderByEnum
-import us.frollo.frollosdk.model.coredata.aggregation.tags.SortByEnum
-import us.frollo.frollosdk.model.coredata.bills.BillPayment
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
@@ -109,7 +106,7 @@ internal fun AggregationAPI.transactionSearch(
 }
 
 internal fun AggregationAPI.userTagsSearch(
-        searchTerm: String?,
+        searchTerm: String? = null,
         sort: String? = null,
         order: String? = null
 ) : Call<List<TransactionTagsResponse>> {

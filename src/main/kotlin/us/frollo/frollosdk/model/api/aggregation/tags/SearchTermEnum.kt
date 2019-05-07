@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.coredata.aggregation.tags
+package us.frollo.frollosdk.model.api.aggregation.tags
 
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
 /** Status of the transaction's lifecycle */
-enum class TagsEnums(var value:String) {
+enum class SearchTermEnum {
 
     /** Pending. Transaction is authorised but not posted */
-    @SerializedName ("search_term")SEARCH_TERM("search_term"),
-    @SerializedName("name") NAME("name"),
-    @SerializedName("created_at") CREATED_AT("created_at"),
-    @SerializedName("last_used_at") LAST_USED("last_used_at"),
-    @SerializedName("count") COUNT("count"),
-    @SerializedName("relevance") RELEVANCE("relevance"),
-    @SerializedName("asc") ASC("asc"),
-    @SerializedName("desc") DESC("desc");
-
+    @SerializedName("search_term") SEARCH_TERM;
 
     /** Enum to serialized string */
     //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

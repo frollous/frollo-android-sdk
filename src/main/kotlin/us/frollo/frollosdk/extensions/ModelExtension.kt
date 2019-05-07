@@ -18,6 +18,9 @@ package us.frollo.frollosdk.extensions
 
 import android.os.Bundle
 import androidx.sqlite.db.SimpleSQLiteQuery
+import us.frollo.frollosdk.model.api.aggregation.tags.OrderByEnum
+import us.frollo.frollosdk.model.api.aggregation.tags.SearchTermEnum
+import us.frollo.frollosdk.model.api.aggregation.tags.SortByEnum
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
@@ -85,6 +88,19 @@ internal fun sqlForTransactionStaleIds(fromDate: String, toDate: String, account
                 "WHERE ((transaction_date BETWEEN Date('$fromDate') AND Date('$toDate')) $sb)"
 
     return SimpleSQLiteQuery(query)
+}
+
+internal fun sqlForUserTags(searchTerm: String? = null, sortBy: SortByEnum? = null, orderBy: OrderByEnum? = null): SimpleSQLiteQuery {
+    var sort = SortByEnum.NAME.name
+    var order = OrderByEnum.ASC.name
+
+    var where:String = ""
+    searchTerm?.let { where = " where name like '%$searchTerm%'" }
+    sortBy?.let { sort = it.toString() }
+    orderBy?.let { order = it.toString() }
+
+    val sql= "SELECT * FROM transaction_tags $where ORDER BY $sort $order"
+    return SimpleSQLiteQuery(sql)
 }
 
 internal fun sqlForExistingAccountBalanceReports(date: String, period: ReportPeriod, reportAccountIds: LongArray, accountId: Long? = null, accountType: AccountType? = null): SimpleSQLiteQuery {

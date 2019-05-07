@@ -12,6 +12,6 @@ import us.frollo.frollosdk.model.IAdapterModel
 data class TransactionTags(
         @NonNull @PrimaryKey @ColumnInfo(name = "name") val name: String,
         @ColumnInfo(name = "count") val count: Long,
-        @ColumnInfo(name = "lastUsedAt") @Nullable var lastUsedAt: String? = null,
-        @ColumnInfo(name = "createdAt") @Nullable var createdAt: String? = null
+        @ColumnInfo(name = "last_used_at") @Nullable var lastUsedAt: String? = null,
+        @ColumnInfo(name = "created_at") @Nullable var createdAt: String? = null
 ) : IAdapterModel

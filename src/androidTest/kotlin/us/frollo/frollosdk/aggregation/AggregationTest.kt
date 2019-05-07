@@ -1038,33 +1038,39 @@ class AggregationTest {
     fun testFetchTransactionsByUserTagsWithRelation() {
         initSetup()
 
-        val data1 = testTransactionResponseData(transactionId = 100,userTags = listOf("abc", "def"),accountId = 1,merchantId = 1)
-        val data2 = testTransactionResponseData(transactionId = 101,userTags = listOf("abc2", "def2"),accountId = 1,merchantId = 1)
-        val data3 = testTransactionResponseData(transactionId = 102,userTags = listOf("hello", "how"),accountId = 1,merchantId = 1)
-        val data4 = testTransactionResponseData(transactionId = 103,userTags = listOf("why", "are"),accountId = 2,merchantId = 1)
-        val data5 = testTransactionResponseData(transactionId = 104,userTags = listOf("why", "are"),accountId = 2,merchantId = 1)
-        val data6 = testTransactionResponseData(transactionId = 105,userTags = listOf("why", "are"),accountId = 1,merchantId = 1)
-        val list = mutableListOf(data1, data2, data3, data4, data5, data6)
-
-        database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
-        database.accounts().insert(Account(1,"Kartiks acc","123","bsb","kar",
-                1,"provider",null,1,null,AccountStatus.ACTIVE, AccountAttributes(AccountType.BILL,AccountSubType.BANK_ACCOUNT,AccountGroup.BANK,null),
-                true,true, true, null, Balance(BigDecimal(100), "AUD"),null,null,null,null,null,null,
-                null,null,null,null,null,null,null,null,null ))
-        database.accounts().insert(Account(2,"Kartiks acc2","1234","bsb","kar12",
-                2,"provider",null,1,null,AccountStatus.ACTIVE, AccountAttributes(AccountType.BILL,AccountSubType.BANK_ACCOUNT,AccountGroup.BANK,null),
-                true,true, true, null, Balance(BigDecimal(100), "AUD"),null,null,null,null,null,null,
-                null,null,null,null,null,null,null,null,null ))
-
-        database.merchants().insert(Merchant(1,"kartik",MerchantType.RETAILER,"asdasdad"))
+        database.transactions().insert(testTransactionResponseData(transactionId = 122, accountId = 234, categoryId = 567, merchantId = 678,userTags = listOf("why", "are")).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678,userTags = listOf("why", "are")).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 124, accountId = 235, categoryId = 567, merchantId = 678,userTags = listOf("why", "are")).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 125, accountId = 235, categoryId = 567, merchantId = 678,userTags = listOf("whyasdas", "areasdasd")).toTransaction())
+        database.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())
+        database.accounts().insert(testAccountResponseData(accountId = 235, providerAccountId = 345).toAccount())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 345, providerId = 456).toProviderAccount())
+        database.providers().insert(testProviderResponseData(providerId = 456).toProvider())
+        database.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
+        database.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
 
         val tagList = listOf("why","are")
-        val liveDataObj = aggregation.fetchTransactionsByTagsWithRelation(tagList).test()
-        val transactionList = liveDataObj.value()
-        assert(transactionList.data!!.isNotEmpty())
-        assertEquals(3, transactionList.data!!.size)
-        assertEquals(transactionList.data!!.get(0)!!.accounts?.get(0)!!.account!!.accountId,transactionList.data!!.get(0).accounts?.get(0)?.transactions?.get(0)?.accountId)
-        assertEquals(transactionList.data!!.get(0)!!.merchants!!.get(0).merchantId,1)
+        val testObserver = aggregation.fetchTransactionsByTagsWithRelation(tagList).test()
+        testObserver.awaitValue()
+
+        val list = testObserver.value().data!!
+
+        assertTrue(list.isNotEmpty())
+        assertEquals(3, list.size)
+
+        val model1 =list[0]
+
+        assertEquals(122L, model1.transaction?.transactionId)
+        assertEquals(678L, model1.merchant?.merchantId)
+        assertEquals(567L, model1.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model1.account?.account?.accountId)
+
+        val model2 = list[1]
+
+        assertEquals(123L, model2.transaction?.transactionId)
+        assertEquals(678L, model2.merchant?.merchantId)
+        assertEquals(567L, model2.transactionCategory?.transactionCategoryId)
+        assertEquals(234L, model2.account?.account?.accountId)
 
         tearDown()
     }

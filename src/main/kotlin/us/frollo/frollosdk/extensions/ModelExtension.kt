@@ -67,7 +67,7 @@ internal fun sqlForTransactionByUserTags(tags: List<String>): SimpleSQLiteQuery 
     tags.forEachIndexed { index, str ->
         sb.append("user_tags LIKE '%|$str|%'")
         if(index < tags.size -1 )
-            sb.append(" and ")
+            sb.append(" AND ")
     }
 
     val query = "SELECT * FROM transaction_model WHERE $sb"

@@ -629,9 +629,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      *
      * @return LiveData object of LiveData<List<Transaction>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchTransactionsByTags(userTags: List<String>): LiveData<List<Transaction>> {
+    fun fetchTransactionsByTags(userTags: List<String>): LiveData<Resource<List<Transaction>>> {
         val sql = sqlForTransactionByUserTags(userTags)
-        return db.transactions().loadByQuery(sql)
+        var result =  db.transactions().loadByQuery(sql)
+        return Transformations.map(result) { models ->
+            Resource.success(models)
+        }
     }
 
     /**
@@ -641,9 +644,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      *
      * @return LiveData object of LiveData<List<Transaction>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchTransactionsByTagsWithRelation(userTags: List<String>): LiveData<List<TransactionRelation>> {
+    fun fetchTransactionsByTagsWithRelation(userTags: List<String>): LiveData<Resource<List<TransactionRelation>>> {
         val sql = sqlForTransactionByUserTags(userTags)
-        return db.transactions().loadByQueryWithRelation(sql)
+        var result =  db.transactions().loadByQueryWithRelation(sql)
+        return Transformations.map(result) { models ->
+            Resource.success(models)
+        }
     }
 
     /**
@@ -912,7 +918,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param transaction Updated transaction data model
      * @param recategoriseAll Apply recategorisation to all similar transactions (Optional)
      * @param includeApplyAll Apply included flag to all similar transactions (Optional)
-     * @param userTags tags to be added oe removed from transaction (Optional)
+     * @param userTags userTags Updated list of tags to be applied for the transaction. These tags will replace the existing ones. (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun updateTransaction(transactionId: Long, transaction: Transaction,

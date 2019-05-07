@@ -118,14 +118,26 @@ data class Account(
         /** Last payment amount (optional) */
         @Embedded(prefix = "l_payment_") val lastPaymentAmount: Balance?,
 
-        /** Last payment date (optional) */
-        @ColumnInfo(name = "last_payment_date") val lastPaymentDate: String?, // ISO8601 format Eg: 2011-12-03T10:15:30+01:00
+        /** Last payment date (optional)
+         *
+         * Date format for this field is ISO8601
+         * example 2011-12-03T10:15:30+01:00
+         * */
+        @ColumnInfo(name = "last_payment_date") val lastPaymentDate: String?,
 
-        /** Due date (optional) */
-        @ColumnInfo(name = "due_date") val dueDate: String?, // ISO8601 format Eg: 2011-12-03T10:15:30+01:00
+        /** Due date (optional)
+         *
+         * Date format for this field is ISO8601
+         * example 2011-12-03T10:15:30+01:00
+         **/
+        @ColumnInfo(name = "due_date") val dueDate: String?,
 
-        /** End date (optional) */
-        @ColumnInfo(name = "end_date") val endDate: String?, // yyyy-MM-dd
+        /** End date (optional)
+         *
+         * Date format for this field is yyyy-MM-dd
+         * example 2011-12-03
+         * */
+        @ColumnInfo(name = "end_date") val endDate: String?, //
 
         /** Balance details (optional) */
         @Embedded(prefix = "b_details_") val balanceDetails: BalanceDetails?

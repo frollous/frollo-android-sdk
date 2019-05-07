@@ -46,10 +46,13 @@ import us.frollo.frollosdk.extensions.sqlForTransactionByUserTags
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.mapping.*
 import us.frollo.frollosdk.model.*
-import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.*
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.*
+import java.math.BigDecimal
 
 class AggregationTest {
 
@@ -1021,36 +1024,12 @@ class AggregationTest {
 
         database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
 
-        val query = sqlForTransactionByUserTags(listOf("why","are"))
-        val testObserver = aggregation.fetchTransactions(query).test()
-        testObserver.awaitValue()
-        assertNotNull(testObserver.value().data)
-        assertEquals(3, testObserver.value().data?.size)
-
-        tearDown()
-    }
-
-    @Test
-    fun testFetchTransactionsByTags2() {
-        initSetup()
-
-        val data1 = testTransactionResponseData(transactionId = 100,userTags = listOf("abc", "def"))
-        val data2 = testTransactionResponseData(transactionId = 101,userTags = listOf("abc2", "def2"))
-        val data3 = testTransactionResponseData(transactionId = 102,userTags = listOf("hello", "how"))
-        val data4 = testTransactionResponseData(transactionId = 103,userTags = listOf("why", "are"))
-        val data5 = testTransactionResponseData(transactionId = 104,userTags = listOf("why", "are"))
-        val data6 = testTransactionResponseData(transactionId = 105,userTags = listOf("why", "are"))
-        val list = mutableListOf(data1, data2, data3, data4, data5, data6)
-
-        database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
-
         val tagList = listOf("why","are")
         val liveDataObj = aggregation.fetchTransactionsByTags(tagList).test()
-        //testObserver.awaitValue()
         val transactionList = liveDataObj.value()
-        assertNotNull(transactionList)
-        assert(transactionList.isNotEmpty())
-        assertEquals(3, transactionList.size)
+        assertNotNull(transactionList.data)
+        assert(transactionList.data!!.isNotEmpty())
+        assertEquals(3, transactionList.data!!.size)
 
         tearDown()
     }
@@ -1059,23 +1038,33 @@ class AggregationTest {
     fun testFetchTransactionsByUserTagsWithRelation() {
         initSetup()
 
-        val data1 = testTransactionResponseData(transactionId = 100,userTags = listOf("abc", "def"))
-        val data2 = testTransactionResponseData(transactionId = 101,userTags = listOf("abc2", "def2"))
-        val data3 = testTransactionResponseData(transactionId = 102,userTags = listOf("hello", "how"))
-        val data4 = testTransactionResponseData(transactionId = 103,userTags = listOf("why", "are"))
-        val data5 = testTransactionResponseData(transactionId = 104,userTags = listOf("why", "are"))
-        val data6 = testTransactionResponseData(transactionId = 105,userTags = listOf("why", "are"))
+        val data1 = testTransactionResponseData(transactionId = 100,userTags = listOf("abc", "def"),accountId = 1,merchantId = 1)
+        val data2 = testTransactionResponseData(transactionId = 101,userTags = listOf("abc2", "def2"),accountId = 1,merchantId = 1)
+        val data3 = testTransactionResponseData(transactionId = 102,userTags = listOf("hello", "how"),accountId = 1,merchantId = 1)
+        val data4 = testTransactionResponseData(transactionId = 103,userTags = listOf("why", "are"),accountId = 2,merchantId = 1)
+        val data5 = testTransactionResponseData(transactionId = 104,userTags = listOf("why", "are"),accountId = 2,merchantId = 1)
+        val data6 = testTransactionResponseData(transactionId = 105,userTags = listOf("why", "are"),accountId = 1,merchantId = 1)
         val list = mutableListOf(data1, data2, data3, data4, data5, data6)
 
         database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+        database.accounts().insert(Account(1,"Kartiks acc","123","bsb","kar",
+                1,"provider",null,1,null,AccountStatus.ACTIVE, AccountAttributes(AccountType.BILL,AccountSubType.BANK_ACCOUNT,AccountGroup.BANK,null),
+                true,true, true, null, Balance(BigDecimal(100), "AUD"),null,null,null,null,null,null,
+                null,null,null,null,null,null,null,null,null ))
+        database.accounts().insert(Account(2,"Kartiks acc2","1234","bsb","kar12",
+                2,"provider",null,1,null,AccountStatus.ACTIVE, AccountAttributes(AccountType.BILL,AccountSubType.BANK_ACCOUNT,AccountGroup.BANK,null),
+                true,true, true, null, Balance(BigDecimal(100), "AUD"),null,null,null,null,null,null,
+                null,null,null,null,null,null,null,null,null ))
+
+        database.merchants().insert(Merchant(1,"kartik",MerchantType.RETAILER,"asdasdad"))
 
         val tagList = listOf("why","are")
         val liveDataObj = aggregation.fetchTransactionsByTagsWithRelation(tagList).test()
-        //testObserver.awaitValue()
         val transactionList = liveDataObj.value()
-        assertNotNull(transactionList)
-        assert(transactionList.isNotEmpty())
-        assertEquals(3, transactionList.size)
+        assert(transactionList.data!!.isNotEmpty())
+        assertEquals(3, transactionList.data!!.size)
+        assertEquals(transactionList.data!!.get(0)!!.accounts?.get(0)!!.account!!.accountId,transactionList.data!!.get(0).accounts?.get(0)?.transactions?.get(0)?.accountId)
+        assertEquals(transactionList.data!!.get(0)!!.merchants!!.get(0).merchantId,1)
 
         tearDown()
     }

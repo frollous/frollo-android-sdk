@@ -17,10 +17,9 @@
 package us.frollo.frollosdk.database.dao
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
+import us.frollo.frollosdk.model.api.messages.MessageResponse
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
 
 @Dao
@@ -34,4 +33,7 @@ internal interface TransactionUserTagsDao {
 
     @Query("SELECT * FROM transaction_user_tags")
     fun load(): LiveData<List<TransactionTag>>
+
+    @RawQuery(observedEntities = [TransactionTag::class])
+    fun custom(queryStr: SupportSQLiteQuery): LiveData<List<TransactionTag>>
 }

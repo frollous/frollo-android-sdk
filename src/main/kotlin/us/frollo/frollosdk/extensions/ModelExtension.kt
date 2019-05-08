@@ -98,7 +98,7 @@ internal fun sqlForUserTags(searchTerm: String? = null, sortBy: TagsSortType? = 
     sortBy?.let { sort = it.toString() }
     orderBy?.let { order = it.toString() }
 
-    val sql= "SELECT * FROM transaction_tags $where ORDER BY $sort $order"
+    val sql= "SELECT * FROM transaction_user_tags $where ORDER BY $sort $order"
     return SimpleSQLiteQuery(sql)
 }
 

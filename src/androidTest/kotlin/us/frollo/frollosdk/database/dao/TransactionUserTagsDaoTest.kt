@@ -28,7 +28,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.extensions.sqlForUserTags
+import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
+import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.model.testTransactionTagData
 
 class TransactionUserTagsDaoTest {
@@ -77,6 +80,24 @@ class TransactionUserTagsDaoTest {
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(2, testObserver.value().size)
+    }
+
+    @Test
+    fun testSearchUserTags() {
+        val data1 = testTransactionTagData("tag1" )
+        val data2 = testTransactionTagData("tag2")
+        val data3 = testTransactionTagData("tag3")
+        val data4 = testTransactionTagData("hello")
+        val list = mutableListOf(data1, data2, data3, data4)
+        db.userTags().insertAll(list)
+
+
+        val testObserver =  db.userTags().custom(sqlForUserTags("tag",TagsSortType.COUNT,OrderType.DESC)).test()
+        testObserver.awaitValue()
+        val data = testObserver.value()
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(3, testObserver.value().size)
+        assertTrue(data.get(0).count!!-data.get(1).count!!>0)
     }
 
 }

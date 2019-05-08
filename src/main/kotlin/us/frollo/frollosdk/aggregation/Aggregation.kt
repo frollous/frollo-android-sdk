@@ -1125,14 +1125,17 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
             models.map { it.toTransaction() }.toList()
 
     //Transaction user tags
-
     /**
-     * Fetch transaction user tags from the cache
+     * Fetch transactions from the cache
      *
-     * @return LiveData object of Resource<List<TransactionTag>>> which can be observed using an Observer for future changes as well.
+     * @param searchTerm tag name you want to search
+     * @param sortBy sort results by SortByEnum.NAME, SortByEnum.CREATED_AT,SortByEnum.LAST_USED,SortByEnum.COUNT,SortByEnum.RELEVANCE
+     * @param orderBy order results by OrderByEnum.ASC, OrderByEnum.DESC
+     *
+     * @return LiveData object of LiveData<Resource<List<TransactionTags>>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchTransactionUserTags(): LiveData<Resource<List<TransactionTag>>> {
-        return Transformations.map(db.userTags().load()) { models ->
+    fun fetchTransactionUserTags(searchTerm: String? = null, sortBy: TagsSortType? = null, orderBy: OrderType? = null): LiveData<Resource<List<TransactionTag>>> {
+        return Transformations.map(db.userTags().custom(sqlForUserTags(searchTerm,sortBy,orderBy))) { models ->
             Resource.success(models)
         }
     }
@@ -1140,14 +1143,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     /**
      * Get all existing transaction tags tagged by the user.
      *
-     * @param searchTerm tag name you want to search
-     * @param tagsSortType sort results by TagsSortType.NAME, TagsSortType.CREATED_AT,TagsSortType.LAST_USED,TagsSortType.COUNT,TagsSortType.RELEVANCE
-     * @param orderBy order results by OrderType.ASC, OrderType.DESC
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun refreshTransactionUserTags(searchTerm: String? = null, tagsSortType:TagsSortType? = null, orderBy: OrderType? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun refreshTransactionUserTags(completion: OnFrolloSDKCompletionListener<Result>? = null) {
 
-        aggregationAPI.userTagsSearch(searchTerm,sort = tagsSortType?.name, order = orderBy?.name).enqueue { resource ->
+        aggregationAPI.userTagsSearch().enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleTransactionUserTagsResponse(resource.data, completion)

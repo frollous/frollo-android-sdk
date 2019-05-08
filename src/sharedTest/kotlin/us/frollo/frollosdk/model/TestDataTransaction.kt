@@ -27,8 +27,10 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionSt
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.testutils.randomBoolean
 import us.frollo.frollosdk.testutils.randomNumber
+import us.frollo.frollosdk.testutils.randomString
 import us.frollo.frollosdk.testutils.randomUUID
 import java.math.BigDecimal
+import java.util.*
 import kotlin.random.Random
 
 internal fun testTransactionResponseData(transactionId: Long? = null, accountId: Long? = null,
@@ -67,9 +69,9 @@ internal fun testTransactionsSummaryResponseData(count: Long? = null, sum: BigDe
             sum = sum ?: randomNumber().toBigDecimal())
 
 
-internal fun testTransactionTagData(name: String? = randomUUID(),createdAt:String?="2011-12-03T10:15:30+01:00",lastUsedAt:String?="2011-12-03T10:15:30+01:00"): TransactionTag =
+internal fun testTransactionTagData(name: String? = null, createdAt: String? = null, lastUsedAt: String? = null): TransactionTag =
         TransactionTag(
-                name = name!!,
-                createdAt = createdAt,
-                lastUsedAt = lastUsedAt,
+                name = name ?: randomString(8),
+                createdAt = createdAt ?: Date().toString(),
+                lastUsedAt = lastUsedAt ?: Date().toString(),
                 count = randomNumber().toLong())

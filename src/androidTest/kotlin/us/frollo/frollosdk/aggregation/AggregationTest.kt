@@ -846,10 +846,10 @@ class AggregationTest {
             assertNull(result.error)
 
             val testObserver = aggregation.fetchTransactionUserTags().test()
-            testObserver.awaitValue()
             val model = testObserver.value().data
             assertNotNull(model)
             assertEquals("pub_lunch", model?.get(0)?.name)
+            assertEquals(model?.size, 5)
         }
 
         val request = mockServer.takeRequest()

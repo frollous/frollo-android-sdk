@@ -140,5 +140,5 @@ internal fun MerchantResponse.toMerchant(): Merchant =
                 merchantType = merchantType,
                 smallLogoUrl = smallLogoUrl)
 
-internal fun TransactionTagResponse.toTransactionTags(): TransactionTag =
+internal fun TransactionTagResponse.toTransactionTag(): TransactionTag =
         TransactionTag(name = name, count = count, lastUsedAt = lastUsedAt, createdAt = createdAt)

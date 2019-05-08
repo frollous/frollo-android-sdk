@@ -61,9 +61,9 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderA
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderRelation
-import us.frollo.frollosdk.model.coredata.shared.OrderByEnum
+import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.model.coredata.aggregation.tags.SearchTermEnum
-import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortBy
+import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
@@ -1142,13 +1142,13 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * Get all existing transaction tags tagged by the user.
      *
      * @param searchTerm tag name you want to search
-     * @param tagsSortBy sort results by TagsSortBy.NAME, TagsSortBy.CREATED_AT,TagsSortBy.LAST_USED,TagsSortBy.COUNT,TagsSortBy.RELEVANCE
-     * @param orderBy order results by OrderByEnum.ASC, OrderByEnum.DESC
+     * @param tagsSortType sort results by TagsSortType.NAME, TagsSortType.CREATED_AT,TagsSortType.LAST_USED,TagsSortType.COUNT,TagsSortType.RELEVANCE
+     * @param orderBy order results by OrderType.ASC, OrderType.DESC
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun refreshTransactionUserTags(searchTerm: SearchTermEnum? = null, tagsSortBy:TagsSortBy? = null, orderBy: OrderByEnum? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun refreshTransactionUserTags(searchTerm: SearchTermEnum? = null, tagsSortType:TagsSortType? = null, orderBy: OrderType? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
 
-        aggregationAPI.userTagsSearch(searchTerm?.name,sort = tagsSortBy?.name, order = orderBy?.name).enqueue { resource ->
+        aggregationAPI.userTagsSearch(searchTerm?.name,sort = tagsSortType?.name, order = orderBy?.name).enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleTransactionUserTagsResponse(resource.data, completion)
@@ -1164,7 +1164,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     private fun handleTransactionUserTagsResponse(response: List<TransactionTagResponse>?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
-                val userTagList = it.map { it.toTransactionTags() }.toList()
+                val userTagList = it.map { it.toTransactionTag() }.toList()
                 val userTagNames = it.map { it.name }.toList()
                 db.userTags().deleteByNamesInverse(userTagNames)
                 db.userTags().insertAll(userTagList)

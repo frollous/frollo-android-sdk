@@ -159,7 +159,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 // New changes in this migration:
                 // 1) Create table user tags
                 // 2) Alter transaction table to add a user tag
-                database.execSQL("CREATE TABLE IF NOT EXISTS transaction_user_tags (name text PRIMARY KEY NOT NULL, count INTEGER, lastUsedAt TEXT, createdAt TEXT)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS transaction_user_tags (name TEXT PRIMARY KEY NOT NULL, count INTEGER DEFAULT 0, lastUsedAt TEXT, createdAt TEXT)")
                 database.execSQL("ALTER TABLE transaction_model ADD COLUMN `user_tags` TEXT")
             }
         }

@@ -20,6 +20,7 @@ import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionRespons
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Balance
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantDetails
+import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionDescription
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
@@ -60,8 +61,15 @@ internal fun testMerchantDetails(merchantId: Long? = null): MerchantDetails =
                 website = randomUUID(),
                 location = null)
 
-internal fun testTransactionsSummaryResponseData(count: Long? = null, sum: BigDecimal? = null) : TransactionsSummaryResponse {
-    return TransactionsSummaryResponse(
+internal fun testTransactionsSummaryResponseData(count: Long? = null, sum: BigDecimal? = null) : TransactionsSummaryResponse =
+     TransactionsSummaryResponse(
             count = count ?: randomNumber().toLong(),
             sum = sum ?: randomNumber().toBigDecimal())
-}
+
+
+internal fun testTransactionTagData(name: String? = randomUUID(),createdAt:String?="2011-12-03T10:15:30+01:00",lastUsedAt:String?="2011-12-03T10:15:30+01:00"): TransactionTag =
+        TransactionTag(
+                name = name!!,
+                createdAt = createdAt,
+                lastUsedAt = lastUsedAt,
+                count = randomNumber().toLong())

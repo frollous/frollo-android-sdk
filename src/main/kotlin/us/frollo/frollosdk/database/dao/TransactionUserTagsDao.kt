@@ -29,8 +29,8 @@ internal interface TransactionUserTagsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(tagsList: List<TransactionTag>): LongArray
 
-    @Query("DELETE FROM transaction_user_tags WHERE name NOT IN (:ids)")
-    fun deleteByNamesInverse(ids: List<String>)
+    @Query("DELETE FROM transaction_user_tags WHERE name NOT IN (:tagNames)")
+    fun deleteByNamesInverse(tagNames: List<String>)
 
     @Query("SELECT * FROM transaction_user_tags")
     fun load(): LiveData<List<TransactionTag>>

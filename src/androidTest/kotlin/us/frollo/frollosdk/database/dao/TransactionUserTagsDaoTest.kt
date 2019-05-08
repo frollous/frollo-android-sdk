@@ -29,8 +29,9 @@ import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
+import us.frollo.frollosdk.model.testTransactionTagData
 
-class TransactionTransactionUserTagsDaoTest {
+class TransactionUserTagsDaoTest {
 
     @get:Rule
     val testRule = InstantTaskExecutorRule()
@@ -50,10 +51,10 @@ class TransactionTransactionUserTagsDaoTest {
 
     @Test
     fun testLoadAllAndInsert() {
-        val data1 = TransactionTag("tag1", 1,"2011-12-03T10:15:30+01:00","2011-12-03T10:15:30+01:00")
-        val data2 = TransactionTag("tag2", 5,"2011-12-03T10:15:30+01:00","2011-12-03T10:15:30+01:00")
-        val data3 = TransactionTag("tag3", 9,"2011-12-03T10:15:30+01:00","2011-12-03T10:15:30+01:00")
-        val data4 = TransactionTag("tag4", 10,"2011-12-03T10:15:30+01:00","2011-12-03T10:15:30+01:00")
+        val data1 = testTransactionTagData("tag1")
+        val data2 = testTransactionTagData("tag2")
+        val data3 = testTransactionTagData("tag4")
+        val data4 = testTransactionTagData("tag3")
         val list = mutableListOf(data1, data2, data3, data4)
         db.userTags().insertAll(list)
         val testObserver =  db.userTags().load().test()
@@ -64,10 +65,10 @@ class TransactionTransactionUserTagsDaoTest {
 
     @Test
     fun testDeleteByNames() {
-        val data1 = TransactionTag("tag1", 1,"2011-12-03T10:15:30+01:00","2011-12-03T10:15:30+01:00")
-        val data2 = TransactionTag("tag2", 5,"2011-12-03T10:15:30+01:00","2011-12-03T10:15:30+01:00")
-        val data3 = TransactionTag("tag3", 9,"2011-12-03T10:15:30+01:00","2011-12-03T10:15:30+01:00")
-        val data4 = TransactionTag("tag4", 10,"2011-12-03T10:15:30+01:00","2011-12-03T10:15:30+01:00")
+        val data1 = testTransactionTagData("tag1" )
+        val data2 = testTransactionTagData("tag2")
+        val data3 = testTransactionTagData("tag3")
+        val data4 = testTransactionTagData("tag4")
         val list = mutableListOf(data1, data2, data3, data4)
         db.userTags().insertAll(list)
         db.userTags().deleteByNamesInverse(mutableListOf("tag1","tag2"))

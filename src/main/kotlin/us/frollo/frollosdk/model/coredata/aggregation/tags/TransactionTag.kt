@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.coredata.user
+package us.frollo.frollosdk.model.coredata.aggregation.tags
 
-import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import us.frollo.frollosdk.model.IAdapterModel
 
-@Entity(tableName = "user_tags")
-data class UserTags(
-
-        @NonNull
-        @ColumnInfo(name = "tag") var tag: String
-) : IAdapterModel {
-
-    /** Unique ID of the user tag */
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") var tagId: Long = 0
-}
+@Entity(tableName = "transaction_user_tags")
+data class TransactionTag(
+        @PrimaryKey @ColumnInfo(name = "name") val name: String,
+        @ColumnInfo(name = "count") val count: Long,
+        @ColumnInfo(name = "lastUsedAt") val lastUsedAt: String?,
+        @ColumnInfo(name = "createdAt")  val createdAt: String?
+) : IAdapterModel

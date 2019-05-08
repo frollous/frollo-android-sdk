@@ -19,14 +19,12 @@ package us.frollo.frollosdk.model.coredata.aggregation.tags
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
-/** Status of the transaction's lifecycle */
-enum class SortByEnum {
+enum class TagsSortBy {
 
     @SerializedName("name") NAME,
     @SerializedName("created_at") CREATED_AT,
     @SerializedName("last_used_at") LAST_USED,
-    @SerializedName("count") COUNT,
-    @SerializedName("relevance") RELEVANCE;
+    @SerializedName("count") COUNT;
 
     /** Enum to serialized string */
     //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

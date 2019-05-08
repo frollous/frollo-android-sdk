@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.coredata.aggregation.tags
+package us.frollo.frollosdk.model.coredata.shared
 
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
@@ -22,7 +22,6 @@ import us.frollo.frollosdk.extensions.serializedName
 /** Status of the transaction's lifecycle */
 enum class OrderByEnum {
 
-    /** Pending. Transaction is authorised but not posted */
     @SerializedName("asc") ASC,
     @SerializedName("desc") DESC;
 

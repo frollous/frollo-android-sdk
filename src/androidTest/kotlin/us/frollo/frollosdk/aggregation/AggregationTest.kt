@@ -42,17 +42,13 @@ import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
-import us.frollo.frollosdk.extensions.sqlForTransactionByUserTags
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.mapping.*
 import us.frollo.frollosdk.model.*
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.*
-import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
-import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.*
-import java.math.BigDecimal
 
 class AggregationTest {
 
@@ -823,6 +819,41 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/accounts/542", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshTransactionUserTags() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.transactions_user_tags)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == AggregationAPI.URL_USER_TAGS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshTransactionUserTags(null,null,null) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchTransactionUserTags().test()
+            val model = testObserver.value().data
+            assertNotNull(model)
+            assertEquals("pub_lunch", model?.get(0)?.name)
+            assertEquals(model?.size, 5)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${AggregationAPI.URL_USER_TAGS}", request.trimmedPath)
 
         wait(3)
 

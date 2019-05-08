@@ -18,6 +18,7 @@ package us.frollo.frollosdk.extensions
 
 import retrofit2.Call
 import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
+import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
@@ -26,7 +27,6 @@ import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
-import us.frollo.frollosdk.model.coredata.bills.BillPayment
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
@@ -105,8 +105,20 @@ internal fun AggregationAPI.transactionSearch(
     return transactionSearch(queryMap)
 }
 
-// Reports
+internal fun AggregationAPI.userTagsSearch(
+        searchTerm: String?,
+        sort: String? = null,
+        order: String? = null
+) : Call<List<TransactionTagResponse>> {
 
+    val queryMap = mutableMapOf<String, String>()
+    searchTerm?.let { queryMap.put("search_term",it) }
+    sort?.let { queryMap.put("from_date", it) }
+    order?.let { queryMap.put("to_date", it) }
+    return fetchUserTags(queryMap)
+}
+
+// Reports
 internal fun ReportsAPI.fetchAccountBalanceReports(period: ReportPeriod, fromDate: String, toDate: String,
                                                    accountId: Long? = null, accountType: AccountType? = null) : Call<AccountBalanceReportResponse> {
     val queryMap = mutableMapOf("period" to period.toString(), "from_date" to fromDate, "to_date" to toDate)

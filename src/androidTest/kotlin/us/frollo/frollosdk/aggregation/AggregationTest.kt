@@ -45,10 +45,7 @@ import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.mapping.*
 import us.frollo.frollosdk.model.*
-import us.frollo.frollosdk.model.api.aggregation.tags.OrderByEnum
-import us.frollo.frollosdk.model.api.aggregation.tags.SortByEnum
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.*
-import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTags
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.*
@@ -829,10 +826,10 @@ class AggregationTest {
     }
 
     @Test
-    fun testRefreshTags() {
+    fun testRefreshTransactionUserTags() {
         initSetup()
 
-        val body = readStringFromJson(app, R.raw.user_tags)
+        val body = readStringFromJson(app, R.raw.transactions_user_tags)
         mockServer.setDispatcher(object: Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_USER_TAGS) {
@@ -844,15 +841,15 @@ class AggregationTest {
             }
         })
 
-        aggregation.refreshUserTags() { result ->
+        aggregation.refreshTransactionUserTags(null,null,null) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            val testObserver = aggregation.fetchAllUserTransactionsTags().test()
-            testObserver.awaitValue()
+            val testObserver = aggregation.fetchTransactionUserTags().test()
             val model = testObserver.value().data
             assertNotNull(model)
             assertEquals("pub_lunch", model?.get(0)?.name)
+            assertEquals(model?.size, 5)
         }
 
         val request = mockServer.takeRequest()
@@ -997,26 +994,6 @@ class AggregationTest {
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
         assertEquals(2, testObserver.value().data?.size)
-
-        tearDown()
-    }
-
-    @Test
-    fun testFetchUserTags() {
-        initSetup()
-
-        val data1 = TransactionTags("TAG1",8,"2011-12-03T10:15:30+01:00","2011-12-03T10:15:30+01:00")
-        val data2 =  TransactionTags("TvG2",4,"2011-12-03T10:15:30+01:00","2011-12-03T10:15:30+01:00")
-        val data3 = TransactionTags("TAG11",7,"2011-12-03T10:15:30+01:00","2011-12-03T10:15:30+01:00")
-        val data4 = TransactionTags("TAG14",10,"2011-12-03T10:15:30+01:00","2011-12-03T10:15:30+01:00")
-        val list = arrayListOf<TransactionTags>(data1, data2, data3, data4)
-
-        database.userTags().insertAll(list)
-
-        val testObserver = aggregation.fetchAllUserTransactionsTags("ta",SortByEnum.COUNT,OrderByEnum.DESC).test()
-        testObserver.awaitValue()
-        assertNotNull(testObserver.value().data)
-        assertEquals(3, testObserver.value().data?.size)
 
         tearDown()
     }

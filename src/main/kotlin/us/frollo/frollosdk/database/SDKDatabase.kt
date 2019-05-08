@@ -38,8 +38,7 @@ import us.frollo.frollosdk.model.coredata.reports.ReportGroupTransactionHistory
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
 import us.frollo.frollosdk.model.coredata.user.User
-import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTags
-import us.frollo.frollosdk.model.coredata.user.UserTags
+import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
 
 @Database(entities = [
     User::class,
@@ -56,7 +55,7 @@ import us.frollo.frollosdk.model.coredata.user.UserTags
     ReportAccountBalance::class,
     Bill::class,
     BillPayment::class,
-    TransactionTags::class
+    TransactionTag::class
 ], version = 4, exportSchema = true)
 
 @TypeConverters(Converters::class)
@@ -76,7 +75,7 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun reportsAccountBalance(): ReportAccountBalanceDao
     internal abstract fun bills(): BillDao
     internal abstract fun billPayments(): BillPaymentDao
-    internal abstract fun userTags(): UserTagsDao
+    internal abstract fun userTags(): TransactionUserTagsDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"
@@ -160,7 +159,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 // New changes in this migration:
                 // 1) Create table user tags
                 // 2) Alter transaction table to add a user tag
-                database.execSQL("CREATE TABLE IF NOT EXISTS transaction_tags (name text PRIMARY KEY NOT NULL, count integer, last_used_at text, created_at text)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS transaction_user_tags (name TEXT PRIMARY KEY NOT NULL, count INTEGER DEFAULT 0, lastUsedAt TEXT, createdAt TEXT)")
                 database.execSQL("ALTER TABLE transaction_model ADD COLUMN `user_tags` TEXT")
             }
         }

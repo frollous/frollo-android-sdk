@@ -20,14 +20,17 @@ import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionRespons
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Balance
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantDetails
+import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionDescription
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.testutils.randomBoolean
 import us.frollo.frollosdk.testutils.randomNumber
+import us.frollo.frollosdk.testutils.randomString
 import us.frollo.frollosdk.testutils.randomUUID
 import java.math.BigDecimal
+import java.util.*
 import kotlin.random.Random
 
 internal fun testTransactionResponseData(transactionId: Long? = null, accountId: Long? = null,
@@ -60,8 +63,15 @@ internal fun testMerchantDetails(merchantId: Long? = null): MerchantDetails =
                 website = randomUUID(),
                 location = null)
 
-internal fun testTransactionsSummaryResponseData(count: Long? = null, sum: BigDecimal? = null) : TransactionsSummaryResponse {
-    return TransactionsSummaryResponse(
+internal fun testTransactionsSummaryResponseData(count: Long? = null, sum: BigDecimal? = null) : TransactionsSummaryResponse =
+     TransactionsSummaryResponse(
             count = count ?: randomNumber().toLong(),
             sum = sum ?: randomNumber().toBigDecimal())
-}
+
+
+internal fun testTransactionTagData(name: String? = null, createdAt: String? = null, lastUsedAt: String? = null): TransactionTag =
+        TransactionTag(
+                name = name ?: randomString(8),
+                createdAt = createdAt ?: Date().toString(),
+                lastUsedAt = lastUsedAt ?: Date().toString(),
+                count = randomNumber().toLong())

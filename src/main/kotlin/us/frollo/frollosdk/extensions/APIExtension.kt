@@ -18,7 +18,7 @@ package us.frollo.frollosdk.extensions
 
 import retrofit2.Call
 import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
-import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagsResponse
+import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
@@ -109,7 +109,7 @@ internal fun AggregationAPI.userTagsSearch(
         searchTerm: String? = null,
         sort: String? = null,
         order: String? = null
-) : Call<List<TransactionTagsResponse>> {
+) : Call<List<TransactionTagResponse>> {
 
     val queryMap = mutableMapOf<String, String>()
     searchTerm?.let { queryMap.put("search_term",it) }

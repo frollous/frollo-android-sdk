@@ -18,14 +18,13 @@ package us.frollo.frollosdk.extensions
 
 import android.os.Bundle
 import androidx.sqlite.db.SimpleSQLiteQuery
-import us.frollo.frollosdk.model.api.aggregation.tags.OrderByEnum
-import us.frollo.frollosdk.model.api.aggregation.tags.SearchTermEnum
-import us.frollo.frollosdk.model.api.aggregation.tags.SortByEnum
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
+import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
 import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.model.coredata.user.User
 import us.frollo.frollosdk.notifications.NotificationPayloadNames
 import java.lang.StringBuilder
@@ -90,9 +89,9 @@ internal fun sqlForTransactionStaleIds(fromDate: String, toDate: String, account
     return SimpleSQLiteQuery(query)
 }
 
-internal fun sqlForUserTags(searchTerm: String? = null, sortBy: SortByEnum? = null, orderBy: OrderByEnum? = null): SimpleSQLiteQuery {
-    var sort = SortByEnum.NAME.name
-    var order = OrderByEnum.ASC.name
+internal fun sqlForUserTags(searchTerm: String? = null, sortBy: TagsSortType? = null, orderBy: OrderType? = null): SimpleSQLiteQuery {
+    var sort = TagsSortType.NAME.name
+    var order = OrderType.ASC.name
 
     var where:String = ""
     searchTerm?.let { where = " where name like '%$searchTerm%'" }

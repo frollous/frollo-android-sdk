@@ -48,8 +48,7 @@ import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccoun
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
-import us.frollo.frollosdk.model.api.aggregation.tags.OrderByEnum
-import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagsResponse
+import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
@@ -62,9 +61,9 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderA
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderRelation
-import us.frollo.frollosdk.model.api.aggregation.tags.SearchTermEnum
-import us.frollo.frollosdk.model.api.aggregation.tags.SortByEnum
-import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTags
+import us.frollo.frollosdk.model.coredata.shared.OrderType
+import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
+import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionDescription
@@ -163,55 +162,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     completion?.invoke(Result.error(resource.error))
                 }
             }
-        }
-    }
-
-    /**
-     * Get all existing user transaction tags
-     *
-     *
-     * @param completion Optional completion handler with optional error if the request fails
-     */
-    fun refreshUserTags(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-
-        aggregationAPI.userTagsSearch().enqueue { resource ->
-            when(resource.status) {
-                Resource.Status.SUCCESS -> {
-                    handleUserTagsResponse(resource.data, completion)
-                }
-                Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshProvider", resource.error?.localizedDescription)
-                    completion?.invoke(Result.error(resource.error))
-                }
-            }
-        }
-    }
-
-    private fun handleUserTagsResponse(response: List<TransactionTagsResponse>?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        response?.let {
-            doAsync {
-
-                val userTagList = it.map { it.toUserTags() }.toList()
-                val userTagNames = it.map { it.name }.toList()
-                db.userTags().deleteByNames(userTagNames)
-                db.userTags().insertAll(userTagList)
-                uiThread { completion?.invoke(Result.success()) }
-            }
-        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
-    }
-
-    /**
-     * Fetch transactions from the cache
-     *
-     * @param searchTerm tag name you want to search
-     * @param sortBy sort results by SortByEnum.NAME, SortByEnum.CREATED_AT,SortByEnum.LAST_USED,SortByEnum.COUNT,SortByEnum.RELEVANCE
-     * @param orderBy order results by OrderByEnum.ASC, OrderByEnum.DESC
-     *
-     * @return LiveData object of LiveData<Resource<List<TransactionTags>>> which can be observed using an Observer for future changes as well.
-     */
-    fun fetchAllUserTransactionsTags(searchTerm: String? = null, sortBy: SortByEnum? = null, orderBy: OrderByEnum? = null): LiveData<Resource<List<TransactionTags>>> {
-        return Transformations.map(db.userTags().custom(sqlForUserTags(searchTerm,sortBy,orderBy))) { models ->
-            Resource.success(models)
         }
     }
 
@@ -1173,6 +1123,54 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
     private fun mapTransactionResponse(models: List<TransactionResponse>): List<Transaction> =
             models.map { it.toTransaction() }.toList()
+
+    //Transaction user tags
+
+    /**
+     * Fetch transaction user tags from the cache
+     *
+     * @return LiveData object of Resource<List<TransactionTag>>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchTransactionUserTags(): LiveData<Resource<List<TransactionTag>>> {
+        return Transformations.map(db.userTags().load()) { models ->
+            Resource.success(models)
+        }
+    }
+
+    /**
+     * Get all existing transaction tags tagged by the user.
+     *
+     * @param searchTerm tag name you want to search
+     * @param tagsSortType sort results by TagsSortType.NAME, TagsSortType.CREATED_AT,TagsSortType.LAST_USED,TagsSortType.COUNT,TagsSortType.RELEVANCE
+     * @param orderBy order results by OrderType.ASC, OrderType.DESC
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun refreshTransactionUserTags(searchTerm: String? = null, tagsSortType:TagsSortType? = null, orderBy: OrderType? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+
+        aggregationAPI.userTagsSearch(searchTerm,sort = tagsSortType?.name, order = orderBy?.name).enqueue { resource ->
+            when(resource.status) {
+                Resource.Status.SUCCESS -> {
+                    handleTransactionUserTagsResponse(resource.data, completion)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshTransactionUserTags", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+            }
+        }
+    }
+
+    private fun handleTransactionUserTagsResponse(response: List<TransactionTagResponse>?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        response?.let {
+            doAsync {
+                val userTagList = it.map { it.toTransactionTag() }.toList()
+                val userTagNames = it.map { it.name }.toList()
+                db.userTags().deleteByNamesInverse(userTagNames)
+                db.userTags().insertAll(userTagList)
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
 
     // Transaction Category
 

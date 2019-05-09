@@ -917,7 +917,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param recategoriseAll Apply recategorisation to all similar transactions (Optional)
      * @param includeApplyAll Apply included flag to all similar transactions (Optional)
      * @param userTags userTags Updated list of tags to be applied for the transaction. These tags will replace the existing ones. (Optional)
-     * @param userTagsApplyAll a flag to apply the userTags to all transactions similar to current one. Default is false. (Optional)
+     * @param userTagsApplyAll a flag to apply the userTags to all transactions similar to current one. (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun updateTransaction(transactionId: Long, transaction: Transaction,

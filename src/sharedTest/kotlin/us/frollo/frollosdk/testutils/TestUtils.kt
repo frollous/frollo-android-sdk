@@ -17,6 +17,7 @@
 package us.frollo.frollosdk.testutils
 
 import android.content.Context
+import android.util.Log
 import androidx.annotation.RawRes
 import us.frollo.frollosdk.extensions.toString
 import java.io.InputStream
@@ -25,6 +26,11 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.format.DateTimeParseException
+import java.sql.Timestamp
 
 internal fun randomNumber(range: IntRange? = null)
         = if (range == null) Random().nextInt() else range.random()
@@ -76,3 +82,23 @@ fun wait(seconds: Int) {
 
 val RecordedRequest.trimmedPath: String
     get() = path.replace(Regex("^/+"), "")
+
+fun String.getDateTIme(): LocalDateTime? {
+    try {
+        return OffsetDateTime.parse(this).toLocalDateTime()
+    }catch (e: DateTimeParseException){
+        e.printStackTrace()
+        Log.d("","error parsing date")
+    }
+    return null
+}
+
+fun String.getDateTimeStamp(): Long {
+    try {
+        return  Timestamp(OffsetDateTime.parse(this).toLocalDateTime().toEpochSecond(ZoneOffset.UTC)).time
+    }catch (e: DateTimeParseException){
+        e.printStackTrace()
+        Log.d("","error parsing date")
+    }
+    return 0
+}

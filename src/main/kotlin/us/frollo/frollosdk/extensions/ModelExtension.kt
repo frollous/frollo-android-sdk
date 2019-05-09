@@ -20,9 +20,11 @@ import android.os.Bundle
 import androidx.sqlite.db.SimpleSQLiteQuery
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
+import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
 import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.model.coredata.user.User
 import us.frollo.frollosdk.notifications.NotificationPayloadNames
 import java.lang.StringBuilder
@@ -85,6 +87,18 @@ internal fun sqlForTransactionStaleIds(fromDate: String, toDate: String, account
                 "WHERE ((transaction_date BETWEEN Date('$fromDate') AND Date('$toDate')) $sb)"
 
     return SimpleSQLiteQuery(query)
+}
+
+internal fun sqlForUserTags(searchTerm: String? = null, sortBy: TagsSortType? = null, orderBy: OrderType? = null): SimpleSQLiteQuery {
+    var sort = TagsSortType.NAME.toString()
+    var order = OrderType.ASC.toString()
+    var where = ""
+    searchTerm?.let { where = " WHERE name LIKE '%$searchTerm%'" }
+    sortBy?.let { sort = it.toString() }
+    orderBy?.let { order = it.toString() }
+
+    val sql= "SELECT * FROM transaction_user_tags $where ORDER BY $sort $order"
+    return SimpleSQLiteQuery(sql)
 }
 
 internal fun sqlForExistingAccountBalanceReports(date: String, period: ReportPeriod, reportAccountIds: LongArray, accountId: Long? = null, accountType: AccountType? = null): SimpleSQLiteQuery {

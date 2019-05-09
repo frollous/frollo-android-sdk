@@ -105,8 +105,8 @@ internal fun AggregationAPI.transactionSearch(
     return transactionSearch(queryMap)
 }
 
-internal fun AggregationAPI.userTagsSearch(
-        searchTerm: String?,
+internal fun AggregationAPI.fetchUserTags(
+        searchTerm: String? = null,
         sort: String? = null,
         order: String? = null
 ) : Call<List<TransactionTagResponse>> {

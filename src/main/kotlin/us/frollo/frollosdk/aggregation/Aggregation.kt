@@ -48,6 +48,8 @@ import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccoun
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
+import us.frollo.frollosdk.model.api.aggregation.tags.SuggestedTagsResponse
+import us.frollo.frollosdk.model.api.aggregation.tags.SuggestedTagsSortType
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
@@ -1140,6 +1142,29 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     fun fetchTransactionUserTags(searchTerm: String? = null, sortBy: TagsSortType? = null, orderBy: OrderType? = null): LiveData<Resource<List<TransactionTag>>> {
         return Transformations.map(db.userTags().custom(sqlForUserTags(searchTerm,sortBy,orderBy))) { models ->
             Resource.success(models)
+        }
+    }
+
+    /**
+     * @param searchTerm tag name you want to search
+     * @param sortBy Sort type for sorting the results. See [SuggestedTagsSortType] for more details.
+     * @param orderBy Order type for ordering the results. See [OrderType] for more details.
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun fetchSuggestedTransactionUserTags(searchTerm: String? = null, sortBy: SuggestedTagsSortType? = SuggestedTagsSortType.NAME,
+                                            orderBy: OrderType? = OrderType.ASC, completion: OnFrolloSDKCompletionListener<Resource< List<SuggestedTagsResponse>> >? = null) {
+
+        aggregationAPI.fetchSuggestedUserTags(searchTerm,sortBy.toString(),orderBy.toString()).enqueue { resource ->
+            when(resource.status) {
+                Resource.Status.SUCCESS -> {
+                    completion?.invoke(Resource.success(resource.data!!))
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshTransactionUserTags", resource.error?.localizedDescription)
+                    completion?.invoke(Resource.error(resource.error))
+                }
+            }
         }
     }
 

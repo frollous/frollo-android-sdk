@@ -18,6 +18,7 @@ package us.frollo.frollosdk.extensions
 
 import retrofit2.Call
 import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
+import us.frollo.frollosdk.model.api.aggregation.tags.SuggestedTagsResponse
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
@@ -113,9 +114,22 @@ internal fun AggregationAPI.fetchUserTags(
 
     val queryMap = mutableMapOf<String, String>()
     searchTerm?.let { queryMap.put("search_term",it) }
-    sort?.let { queryMap.put("from_date", it) }
-    order?.let { queryMap.put("to_date", it) }
+    sort?.let { queryMap.put("sort", it) }
+    order?.let { queryMap.put("order", it) }
     return fetchUserTags(queryMap)
+}
+
+internal fun AggregationAPI.fetchSuggestedUserTags(
+        searchTerm: String? = null,
+        sort: String? = null,
+        order: String? = null
+) : Call<List<SuggestedTagsResponse>> {
+
+    val queryMap = mutableMapOf<String, String>()
+    searchTerm?.let { queryMap.put("search_term",it) }
+    sort?.let { queryMap.put("sort", it) }
+    order?.let { queryMap.put("order", it) }
+    return fetchSuggestedUserTags(queryMap)
 }
 
 // Reports

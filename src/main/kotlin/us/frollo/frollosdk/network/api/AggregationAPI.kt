@@ -25,7 +25,6 @@ import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccoun
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
-import us.frollo.frollosdk.model.api.aggregation.tags.SuggestedTagsResponse
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
@@ -54,7 +53,7 @@ internal interface AggregationAPI {
 
         // Tags URLs
         const val URL_USER_TAGS = "$URL_TRANSACTIONS/tags/user"
-        const val URL_SUGGESTED_USER_TAGS = "$URL_TRANSACTIONS/tags/suggested"
+        const val URL_SUGGESTED_TAGS = "$URL_TRANSACTIONS/tags/suggested"
 
         // Transaction Category URLs
         const val URL_TRANSACTION_CATEGORIES = "aggregation/transactions/categories"
@@ -140,6 +139,6 @@ internal interface AggregationAPI {
     @GET(URL_USER_TAGS)
     fun fetchUserTags(@QueryMap queryParams: Map<String, String>): Call<List<TransactionTagResponse>>
 
-    @GET(URL_SUGGESTED_USER_TAGS)
-    fun fetchSuggestedUserTags(@QueryMap queryParams: Map<String, String>): Call<List<SuggestedTagsResponse>>
+    @GET(URL_SUGGESTED_TAGS)
+    fun fetchSuggestedTags(@QueryMap queryParams: Map<String, String>): Call<List<TransactionTagResponse>>
 }

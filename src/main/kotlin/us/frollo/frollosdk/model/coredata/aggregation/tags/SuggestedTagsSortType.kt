@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.aggregation.tags
+package us.frollo.frollosdk.model.coredata.aggregation.tags
 
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName

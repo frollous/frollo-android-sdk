@@ -27,5 +27,7 @@ internal data class TransactionUpdateRequest(
         @SerializedName("user_description") val userDescription: String? = null,
         @SerializedName("recategorise_all") val recategoriseAll: Boolean? = null,
         @SerializedName("include_apply_all") val includeApplyAll: Boolean? = null,
+        @SerializedName("user_tags_apply_all") val userTagsApplyAll: Boolean? = null,
         @SerializedName("user_tags") val userTags: List<String>? = null
+
 )

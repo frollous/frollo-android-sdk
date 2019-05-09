@@ -18,6 +18,7 @@ package us.frollo.frollosdk.database.dao
 
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
@@ -124,5 +125,27 @@ class TransactionUserTagsDaoTest {
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(3, testObserver.value().size)
         assertTrue(data.get(0).lastUsedAt?.getDateTimeStamp()!!-data.get(2).lastUsedAt?.getDateTimeStamp()!!>0)
+    }
+
+    @Test
+    fun testfetchTransactionUserTags() {
+
+        val data1 = testTransactionTagData("tag1",createdAt = "2019-03-03")
+        val data2 = testTransactionTagData("tag2",createdAt = "2019-03-09")
+        val data3 = testTransactionTagData("tag4",createdAt = "2019-03-02")
+        val data4 = testTransactionTagData("tag3",createdAt = "2019-03-01")
+        var list = mutableListOf(data1, data2, data3, data4)
+        db.userTags().insertAll(list)
+
+        val fromDate = "2019-03-03"
+        val endDate = "2019-03-07"
+
+        val sql = "SELECT * FROM transaction_user_tags where created_at between Date('$fromDate') and Date('$endDate')"
+        val query = SimpleSQLiteQuery(sql)
+        val testObserver =  db.userTags().custom(query).test()
+        testObserver.awaitValue()
+        val list2 = testObserver.value()
+        assertEquals(1,list2.size)
+        tearDown()
     }
 }

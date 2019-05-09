@@ -861,6 +861,33 @@ class AggregationTest {
     }
 
     @Test
+    fun testfetchTransactionUserTags() {
+        initSetup()
+
+        val data1 = testTransactionTagData("tag1",createdAt = "2019-03-03")
+        val data2 = testTransactionTagData("tag2",createdAt = "2019-03-09")
+        val data3 = testTransactionTagData("tag4",createdAt = "2019-03-02")
+        val data4 = testTransactionTagData("tag3",createdAt = "2019-03-01")
+        var list = mutableListOf(data1, data2, data3, data4)
+        database.userTags().insertAll(list)
+
+        val fromDate = "2019-03-03"
+        val endDate = "2019-03-07"
+
+        val sql = "SELECT * FROM transaction_user_tags where created_at between Date('$fromDate') and Date('$endDate')"
+        val query = SimpleSQLiteQuery(sql)
+        val testObserver =  aggregation.fetchTransactionUserTags(query).test()
+        testObserver.awaitValue()
+        val list2 = testObserver.value().data!!
+        assertEquals(1,list2.size)
+        tearDown()
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testUpdateAccountValid() {
         initSetup()
 

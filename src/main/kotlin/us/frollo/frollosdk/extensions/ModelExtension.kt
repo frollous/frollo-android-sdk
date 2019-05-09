@@ -90,11 +90,10 @@ internal fun sqlForTransactionStaleIds(fromDate: String, toDate: String, account
 }
 
 internal fun sqlForUserTags(searchTerm: String? = null, sortBy: TagsSortType? = null, orderBy: OrderType? = null): SimpleSQLiteQuery {
-    var sort = TagsSortType.NAME.name
-    var order = OrderType.ASC.name
-
-    var where:String = ""
-    searchTerm?.let { where = " where name like '%$searchTerm%'" }
+    var sort = TagsSortType.NAME.toString()
+    var order = OrderType.ASC.toString()
+    var where = ""
+    searchTerm?.let { where = " WHERE name LIKE '%$searchTerm%'" }
     sortBy?.let { sort = it.toString() }
     orderBy?.let { order = it.toString() }
 

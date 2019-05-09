@@ -917,11 +917,13 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param recategoriseAll Apply recategorisation to all similar transactions (Optional)
      * @param includeApplyAll Apply included flag to all similar transactions (Optional)
      * @param userTags userTags Updated list of tags to be applied for the transaction. These tags will replace the existing ones. (Optional)
+     * @param userTagsApplyAll a flag to apply the userTags to all transactions similar to current one. Default is false. (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun updateTransaction(transactionId: Long, transaction: Transaction,
                           recategoriseAll: Boolean? = null, includeApplyAll: Boolean? = null,
                           userTags: List<String>? = null,
+                          userTagsApplyAll:Boolean = false,
                           completion: OnFrolloSDKCompletionListener<Result>? = null) {
 
         val request = TransactionUpdateRequest(
@@ -932,6 +934,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 userDescription = transaction.description?.user,
                 recategoriseAll = recategoriseAll,
                 includeApplyAll = includeApplyAll,
+                userTagsApplyAll = userTagsApplyAll,
                 userTags = userTags)
 
         aggregationAPI.updateTransaction(transactionId, request).enqueue { resource ->
@@ -1126,13 +1129,13 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
     //Transaction user tags
     /**
-     * Fetch transactions from the cache
+     * Fetch transaction user tags from the cache
      *
      * @param searchTerm tag name you want to search
-     * @param sortBy sort results by SortByEnum.NAME, SortByEnum.CREATED_AT,SortByEnum.LAST_USED,SortByEnum.COUNT,SortByEnum.RELEVANCE
-     * @param orderBy order results by OrderByEnum.ASC, OrderByEnum.DESC
+     * @param sortBy Sort type for sorting the results. See [TagSortType] for more details.
+     * @param @param sortBy Order type for ordering the results. See [OrderType] for more details.
      *
-     * @return LiveData object of LiveData<Resource<List<TransactionTags>>> which can be observed using an Observer for future changes as well.
+     * @return LiveData object of LiveData<Resource<List<TransactionTag>>> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactionUserTags(searchTerm: String? = null, sortBy: TagsSortType? = null, orderBy: OrderType? = null): LiveData<Resource<List<TransactionTag>>> {
         return Transformations.map(db.userTags().custom(sqlForUserTags(searchTerm,sortBy,orderBy))) { models ->
@@ -1141,13 +1144,13 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     /**
-     * Get all existing transaction tags tagged by the user.
      *
+     * Get all existing transaction tags tagged byRefresh all transaction user tags from the host the user.
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshTransactionUserTags(completion: OnFrolloSDKCompletionListener<Result>? = null) {
 
-        aggregationAPI.userTagsSearch().enqueue { resource ->
+        aggregationAPI.fetchUserTags().enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleTransactionUserTagsResponse(resource.data, completion)
@@ -1170,6 +1173,18 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 uiThread { completion?.invoke(Result.success()) }
             }
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    /**
+     * Get all existing transaction tags tagged by the user based on your criteria.
+     *
+     * @param query SimpleSQLiteQuery to fetch tags based on your criteria.
+     * @return LiveData object of LiveData<Resource<List<TransactionTag>>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchTransactionUserTags(query: SimpleSQLiteQuery): LiveData<Resource<List<TransactionTag>>> {
+        return Transformations.map(db.userTags().custom(query)) { models ->
+            Resource.success(models)
+        }
     }
 
     // Transaction Category

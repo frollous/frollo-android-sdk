@@ -113,9 +113,22 @@ internal fun AggregationAPI.fetchUserTags(
 
     val queryMap = mutableMapOf<String, String>()
     searchTerm?.let { queryMap.put("search_term",it) }
-    sort?.let { queryMap.put("from_date", it) }
-    order?.let { queryMap.put("to_date", it) }
+    sort?.let { queryMap.put("sort", it) }
+    order?.let { queryMap.put("order", it) }
     return fetchUserTags(queryMap)
+}
+
+internal fun AggregationAPI.fetchSuggestedTags(
+        searchTerm: String? = null,
+        sort: String? = null,
+        order: String? = null
+) : Call<List<TransactionTagResponse>> {
+
+    val queryMap = mutableMapOf<String, String>()
+    searchTerm?.let { queryMap.put("search_term",it) }
+    sort?.let { queryMap.put("sort", it) }
+    order?.let { queryMap.put("order", it) }
+    return fetchSuggestedTags(queryMap)
 }
 
 // Reports

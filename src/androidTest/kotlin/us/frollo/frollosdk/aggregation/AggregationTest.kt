@@ -861,7 +861,34 @@ class AggregationTest {
     }
 
     @Test
-    fun testfetchTransactionUserTags() {
+    fun testFetchSuggestedTransactionTags() {
+        initSetup()
+        val body = readStringFromJson(app, R.raw.transactions_user_tags)
+        mockServer.setDispatcher(object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath!!.contains(AggregationAPI.URL_SUGGESTED_TAGS)) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.fetchTransactionSuggestedTags("ca") {
+            assertEquals(Resource.Status.SUCCESS, it.status)
+            assertNull(it.error)
+            val model = it.data!!
+            assertNotNull(model)
+            assertEquals("pub_lunch", model.get(0).name)
+            assertEquals(model?.size, 5)
+        }
+        wait(3)
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionUserTags() {
         initSetup()
 
         val data1 = testTransactionTagData("tag1",createdAt = "2019-03-03")

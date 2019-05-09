@@ -53,6 +53,7 @@ internal interface AggregationAPI {
 
         // Tags URLs
         const val URL_USER_TAGS = "$URL_TRANSACTIONS/tags/user"
+        const val URL_SUGGESTED_TAGS = "$URL_TRANSACTIONS/tags/suggested"
 
         // Transaction Category URLs
         const val URL_TRANSACTION_CATEGORIES = "aggregation/transactions/categories"
@@ -137,4 +138,7 @@ internal interface AggregationAPI {
 
     @GET(URL_USER_TAGS)
     fun fetchUserTags(@QueryMap queryParams: Map<String, String>): Call<List<TransactionTagResponse>>
+
+    @GET(URL_SUGGESTED_TAGS)
+    fun fetchSuggestedTags(@QueryMap queryParams: Map<String, String>): Call<List<TransactionTagResponse>>
 }

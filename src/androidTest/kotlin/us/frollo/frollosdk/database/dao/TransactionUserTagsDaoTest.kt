@@ -22,17 +22,17 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
-
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.extensions.sqlForUserTags
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
-import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
 import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.model.testTransactionTagData
+import us.frollo.frollosdk.testutils.getDateTimeStamp
 
 class TransactionUserTagsDaoTest {
 
@@ -100,4 +100,29 @@ class TransactionUserTagsDaoTest {
         assertTrue(data.get(0).count!!-data.get(1).count!!>0)
     }
 
+    @Test
+    fun testSearchUserTagsByCreationAndUpdationTime() {
+        val data1 = testTransactionTagData("tag1","2019-05-03T10:15:30+01:00","2019-05-03T10:15:30+01:00" )
+        val data2 = testTransactionTagData("tag2","2019-06-03T10:15:30+01:00","2019-06-03T10:15:30+01:00" )
+        val data3 = testTransactionTagData("tag3","2019-07-03T10:15:30+01:00","2019-07-03T10:15:30+01:00" )
+        val data4 = testTransactionTagData("hello","2019-07-03T10:15:30+01:00","2019-08-03T10:15:30+01:00" )
+        val list = mutableListOf(data1, data2, data3, data4)
+        db.userTags().insertAll(list)
+
+        var testObserver =  db.userTags().custom(sqlForUserTags("tag",TagsSortType.CREATED_AT,OrderType.DESC)).test()
+        testObserver.awaitValue()
+
+        var data = testObserver.value()
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(3, testObserver.value().size)
+        assertTrue(data.get(0).createdAt?.getDateTimeStamp()!!-data.get(2).createdAt?.getDateTimeStamp()!!>0)
+
+        testObserver =  db.userTags().custom(sqlForUserTags("tag",TagsSortType.LAST_USED,OrderType.DESC)).test()
+        testObserver.awaitValue()
+
+        data = testObserver.value()
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(3, testObserver.value().size)
+        assertTrue(data.get(0).lastUsedAt?.getDateTimeStamp()!!-data.get(2).lastUsedAt?.getDateTimeStamp()!!>0)
+    }
 }

@@ -48,8 +48,7 @@ import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccoun
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
-import us.frollo.frollosdk.model.api.aggregation.tags.SuggestedTagsResponse
-import us.frollo.frollosdk.model.api.aggregation.tags.SuggestedTagsSortType
+import us.frollo.frollosdk.model.coredata.aggregation.tags.SuggestedTagsSortType
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
@@ -1131,12 +1130,10 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
     //Transaction user tags
     /**
-     * Fetch transaction user tags from the cache
-     *
-     * @param searchTerm tag name you want to search
-     * @param sortBy Sort type for sorting the results. See [TagSortType] for more details.
-     * @param orderBy Order type for ordering the results. See [OrderType] for more details.
-     *
+     * Fetch all suggested tags for transactions. Tags can be filtered, sorted and ordered based on the parameters provided.
+     * @param searchTerm the search term to filter the tags on. (Optional)
+     * @param sortBy Sort type for sorting the results. See [TagSortType] for more details.(Optional)
+     * @param orderBy Order type for ordering the results. See [OrderType] for more details.(Optional)
      * @return LiveData object of LiveData<Resource<List<TransactionTag>>> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactionUserTags(searchTerm: String? = null, sortBy: TagsSortType? = null, orderBy: OrderType? = null): LiveData<Resource<List<TransactionTag>>> {
@@ -1158,29 +1155,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     /**
-     * @param searchTerm tag name you want to search
-     * @param sortBy Sort type for sorting the results. See [SuggestedTagsSortType] for more details.
-     * @param orderBy Order type for ordering the results. See [OrderType] for more details.
-     *
-     * @param completion Optional completion handler with optional error if the request fails
-     */
-    fun fetchSuggestedTransactionUserTags(searchTerm: String? = null, sortBy: SuggestedTagsSortType? = SuggestedTagsSortType.NAME,
-                                            orderBy: OrderType? = OrderType.ASC, completion: OnFrolloSDKCompletionListener<Resource< List<SuggestedTagsResponse>> >? = null) {
-
-        aggregationAPI.fetchSuggestedUserTags(searchTerm,sortBy.toString(),orderBy.toString()).enqueue { resource ->
-            when(resource.status) {
-                Resource.Status.SUCCESS -> {
-                    completion?.invoke(Resource.success(resource.data!!))
-                }
-                Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshTransactionUserTags", resource.error?.localizedDescription)
-                    completion?.invoke(Resource.error(resource.error))
-                }
-            }
-        }
-    }
-
-    /**
      *
      * Refresh all transaction user tags from the host
      * @param completion Optional completion handler with optional error if the request fails
@@ -1195,6 +1169,29 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshTransactionUserTags", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
+                }
+            }
+        }
+    }
+
+    /**
+     * @param searchTerm the search term to filter the tags on. (Optional)
+     * @param sortBy Sort type for sorting the results. See [SuggestedTagsSortType] for more details.(Optional)
+     * @param orderBy Order type for ordering the results. See [OrderType] for more details.(Optional)
+     * @param completion Completion handler with optional error if the request fails and list of transaction tags if succeeds
+     */
+    fun fetchTransactionSuggestedTags(searchTerm: String? = null, sortBy: SuggestedTagsSortType? = SuggestedTagsSortType.NAME,
+                                      orderBy: OrderType? = OrderType.ASC, completion:OnFrolloSDKCompletionListener <Resource<List<TransactionTag>>>) {
+
+        aggregationAPI.fetchSuggestedTags(searchTerm,sortBy.toString(),orderBy.toString()).enqueue { resource ->
+            when(resource.status) {
+                Resource.Status.SUCCESS -> {
+                    val tagsResource = resource.map { data -> data?.map { it.toTransactionTag() }?.toList() }
+                    completion.invoke(tagsResource)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#fetchTransactionSuggestedTags", resource.error?.localizedDescription)
+                    completion?.invoke(Resource.error(resource.error))
                 }
             }
         }

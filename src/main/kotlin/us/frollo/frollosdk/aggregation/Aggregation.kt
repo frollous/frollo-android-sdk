@@ -1135,7 +1135,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      *
      * @param searchTerm tag name you want to search
      * @param sortBy Sort type for sorting the results. See [TagSortType] for more details.
-     * @param @param sortBy Order type for ordering the results. See [OrderType] for more details.
+     * @param orderBy Order type for ordering the results. See [OrderType] for more details.
      *
      * @return LiveData object of LiveData<Resource<List<TransactionTag>>> which can be observed using an Observer for future changes as well.
      */

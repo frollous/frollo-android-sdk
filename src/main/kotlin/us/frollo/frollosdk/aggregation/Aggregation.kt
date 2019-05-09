@@ -923,7 +923,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     fun updateTransaction(transactionId: Long, transaction: Transaction,
                           recategoriseAll: Boolean? = null, includeApplyAll: Boolean? = null,
                           userTags: List<String>? = null,
-                          userTagsApplyAll:Boolean = false,
+                          userTagsApplyAll:Boolean? = null,
                           completion: OnFrolloSDKCompletionListener<Result>? = null) {
 
         val request = TransactionUpdateRequest(
@@ -1133,7 +1133,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      *
      * @param searchTerm tag name you want to search
      * @param sortBy Sort type for sorting the results. See [TagSortType] for more details.
-     * @param @param sortBy Order type for ordering the results. See [OrderType] for more details.
+     * @param orderBy Order type for ordering the results. See [OrderType] for more details.
      *
      * @return LiveData object of LiveData<Resource<List<TransactionTag>>> which can be observed using an Observer for future changes as well.
      */
@@ -1144,8 +1144,20 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     /**
+     * Advanced method to fetch transaction user tags by custom SQL query from the cache.
      *
-     * Get all existing transaction tags tagged byRefresh all transaction user tags from the host the user.
+     * @param query Custom query which fetches transaction user tags from the cache.
+     * @return LiveData object of LiveData<Resource<List<TransactionTag>>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchTransactionUserTags(query: SimpleSQLiteQuery): LiveData<Resource<List<TransactionTag>>> {
+        return Transformations.map(db.userTags().custom(query)) { models ->
+            Resource.success(models)
+        }
+    }
+
+    /**
+     *
+     * Refresh all transaction user tags from the host
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshTransactionUserTags(completion: OnFrolloSDKCompletionListener<Result>? = null) {
@@ -1173,18 +1185,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 uiThread { completion?.invoke(Result.success()) }
             }
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
-    }
-
-    /**
-     * Get all existing transaction tags tagged by the user based on your criteria.
-     *
-     * @param query SimpleSQLiteQuery to fetch tags based on your criteria.
-     * @return LiveData object of LiveData<Resource<List<TransactionTag>>> which can be observed using an Observer for future changes as well.
-     */
-    fun fetchTransactionUserTags(query: SimpleSQLiteQuery): LiveData<Resource<List<TransactionTag>>> {
-        return Transformations.map(db.userTags().custom(query)) { models ->
-            Resource.success(models)
-        }
     }
 
     // Transaction Category

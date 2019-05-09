@@ -128,7 +128,7 @@ class TransactionUserTagsDaoTest {
     }
 
     @Test
-    fun testfetchTransactionUserTags() {
+    fun testFetchTransactionUserTagsBetweenDates() {
 
         val data1 = testTransactionTagData("tag1",createdAt = "2019-03-03")
         val data2 = testTransactionTagData("tag2",createdAt = "2019-03-09")

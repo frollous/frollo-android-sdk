@@ -5,6 +5,7 @@
 - Enhanced Transaction - with Merchant location & phone
 - Support for fetching latest published survey
 - Auto dismiss flag for Messages
+- Transaction tags
 
 #### Features
 - Bills

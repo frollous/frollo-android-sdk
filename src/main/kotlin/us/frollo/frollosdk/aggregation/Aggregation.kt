@@ -1132,7 +1132,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     /**
      * Fetch all user tags for transactions from cache. Tags can be filtered, sorted and ordered based on the parameters provided.
      * @param searchTerm the search term to filter the tags on. (Optional)
-     * @param sortBy Sort type for sorting the results. See [TagSortType] for more details.(Optional)
+     * @param sortBy Sort type for sorting the results. See [TagsSortType] for more details.(Optional)
      * @param orderBy Order type for ordering the results. See [OrderType] for more details.(Optional)
      * @return LiveData object of LiveData<Resource<List<TransactionTag>>> which can be observed using an Observer for future changes as well.
      */
@@ -1175,6 +1175,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     /**
+     * Fetch all suggested tags for transactions from server. Tags can be filtered, sorted and ordered based on the parameters provided.
+     *
      * @param searchTerm the search term to filter the tags on. (Optional)
      * @param sortBy Sort type for sorting the results. See [SuggestedTagsSortType] for more details.(Optional)
      * @param orderBy Order type for ordering the results. See [OrderType] for more details.(Optional)

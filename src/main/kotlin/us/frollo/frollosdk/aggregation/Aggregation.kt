@@ -1128,9 +1128,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     private fun mapTransactionResponse(models: List<TransactionResponse>): List<Transaction> =
             models.map { it.toTransaction() }.toList()
 
-    //Transaction user tags
+    // Transaction User Tags
+
     /**
      * Fetch all user tags for transactions from cache. Tags can be filtered, sorted and ordered based on the parameters provided.
+     *
      * @param searchTerm the search term to filter the tags on. (Optional)
      * @param sortBy Sort type for sorting the results. See [TagsSortType] for more details.(Optional)
      * @param orderBy Order type for ordering the results. See [OrderType] for more details.(Optional)
@@ -1155,12 +1157,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     /**
-     *
      * Refresh all transaction user tags from the host
+     *
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshTransactionUserTags(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-
         aggregationAPI.fetchUserTags().enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -1174,6 +1175,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    // Transaction Suggested Tags
+
     /**
      * Fetch all suggested tags for transactions from server. Tags can be filtered, sorted and ordered based on the parameters provided.
      *
@@ -1184,7 +1187,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      */
     fun fetchTransactionSuggestedTags(searchTerm: String? = null, sortBy: SuggestedTagsSortType? = SuggestedTagsSortType.NAME,
                                       orderBy: OrderType? = OrderType.ASC, completion:OnFrolloSDKCompletionListener <Resource<List<TransactionTag>>>) {
-
         aggregationAPI.fetchSuggestedTags(searchTerm,sortBy.toString(),orderBy.toString()).enqueue { resource ->
             when(resource.status) {
                 Resource.Status.SUCCESS -> {

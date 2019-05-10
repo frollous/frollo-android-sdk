@@ -155,11 +155,12 @@ abstract class SDKDatabase : RoomDatabase() {
 
         private val MIGRATION_3_4: Migration = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
-
                 // New changes in this migration:
-                // 1) Create table user tags
-                // 2) Alter transaction table to add a user tag
-                database.execSQL("CREATE TABLE IF NOT EXISTS transaction_user_tags (name TEXT PRIMARY KEY NOT NULL, count INTEGER DEFAULT 0, last_used_at TEXT, created_at TEXT)")
+                // 1) Create table transaction_user_tags
+                // 2) Alter transaction_model table - add column user_tags
+
+                database.execSQL("CREATE TABLE IF NOT EXISTS transaction_user_tags (name TEXT NOT NULL, count INTEGER DEFAULT 0, last_used_at TEXT, created_at TEXT, PRIMARY KEY(name))")
+                database.execSQL("CREATE  INDEX index_transaction_user_tags_name ON transaction_user_tags (name)")
                 database.execSQL("ALTER TABLE transaction_model ADD COLUMN `user_tags` TEXT")
             }
         }

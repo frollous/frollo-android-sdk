@@ -19,9 +19,13 @@ package us.frollo.frollosdk.model.coredata.shared
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
+/** OrderType - can be used with many fetch queries to order results in Ascending or Descending order */
 enum class OrderType {
 
+    /** Ascending */
     @SerializedName("asc") ASC,
+
+    /** Descending */
     @SerializedName("desc") DESC;
 
     /** Enum to serialized string */

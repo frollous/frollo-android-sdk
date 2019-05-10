@@ -26,16 +26,17 @@ import us.frollo.frollosdk.model.IAdapterModel
 data class TransactionTag(
         /** Unique ID of the TransactionTag & name of the tag */
         @PrimaryKey @ColumnInfo(name = "name") val name: String,
-        /** no. of times tag has been used */
+        /** Number of times the tag has been used */
         @ColumnInfo(name = "count") val count: Long?,
         /**
-         * earliest date the tag was last used on
-         * ISO8601 format example 2011-12-03T10:15:30+01:00
+         * Date format for this field is ISO8601
+         * example 2011-12-03T10:15:30+01:00
          * */
         @ColumnInfo(name = "last_used_at") val lastUsedAt: String?,
         /**
-         * the date the tag was created for first time
-         * ISO8601 format example 2011-12-03T10:15:30+01:00
+         * Earliest date the tag was last used on
+                        Date format for this field is ISO8601
+                        example 2011-12-03T10:15:30+01:00
          * */
         @ColumnInfo(name = "created_at")  val createdAt: String?
 ) : IAdapterModel

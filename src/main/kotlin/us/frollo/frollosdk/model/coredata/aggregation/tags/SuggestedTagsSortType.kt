@@ -18,10 +18,12 @@ package us.frollo.frollosdk.model.coredata.aggregation.tags
 
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
-
+/** Sort type to be used when fetching Suggested tags from the API */
 enum class SuggestedTagsSortType {
 
+    /** NAME */
     @SerializedName("name") NAME,
+    /** RELEVANCE */
     @SerializedName("relevance") RELEVANCE;
 
     /** Enum to serialized string */

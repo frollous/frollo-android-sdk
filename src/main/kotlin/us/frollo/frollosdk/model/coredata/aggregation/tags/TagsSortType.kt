@@ -19,14 +19,18 @@ package us.frollo.frollosdk.model.coredata.aggregation.tags
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
-/** Sort type to be used when fetching tags from the databse */
+/** Sort type to be used when fetching tags from the database */
 enum class TagsSortType {
+
     /** NAME */
     @SerializedName("name") NAME,
+
     /** CREATED AT */
     @SerializedName("created_at") CREATED_AT,
+
     /** LAST USED AT */
     @SerializedName("last_used_at") LAST_USED,
+
     /** Number of times the tag has been used */
     @SerializedName("count") COUNT;
 

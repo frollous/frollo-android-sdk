@@ -848,7 +848,7 @@ class AggregationTest {
             val testObserver = aggregation.fetchTransactionUserTags().test()
             val model = testObserver.value().data
             assertNotNull(model)
-            assertEquals("dinner1", model?.get(0)?.name)
+            assertEquals("cafe", model?.get(0)?.name)
             assertEquals(model?.size, 5)
         }
 

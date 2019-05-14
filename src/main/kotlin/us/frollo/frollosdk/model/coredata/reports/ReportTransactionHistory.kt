@@ -34,25 +34,25 @@ import java.math.BigDecimal
 /** Data representation of history transaction overall report */
 data class ReportTransactionHistory(
 
-        /** Date of the report period. Check [ReportDateFormat] for the date formats. */
-        @ColumnInfo(name = "date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
+    /** Date of the report period. Check [ReportDateFormat] for the date formats. */
+    @ColumnInfo(name = "date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
 
-        /** Value of the report */
-        @ColumnInfo(name = "value") val value: BigDecimal,
+    /** Value of the report */
+    @ColumnInfo(name = "value") val value: BigDecimal,
 
-        /** Budget value for the report (Optional) */
-        @ColumnInfo(name = "budget") val budget: BigDecimal?,
+    /** Budget value for the report (Optional) */
+    @ColumnInfo(name = "budget") val budget: BigDecimal?,
 
-        /** Period of the report */
-        @ColumnInfo(name = "period") val period: ReportPeriod,
+    /** Period of the report */
+    @ColumnInfo(name = "period") val period: ReportPeriod,
 
-        /** Filter budget category if the report was filtered to a specific category */
-        @ColumnInfo(name = "filtered_budget_category") val filteredBudgetCategory: BudgetCategory?,
+    /** Filter budget category if the report was filtered to a specific category */
+    @ColumnInfo(name = "filtered_budget_category") val filteredBudgetCategory: BudgetCategory?,
 
-        /** Grouping - how the report response has been broken down */
-        @ColumnInfo(name = "report_grouping") val grouping: ReportGrouping
+    /** Grouping - how the report response has been broken down */
+    @ColumnInfo(name = "report_grouping") val grouping: ReportGrouping
 
-): IAdapterModel {
+) : IAdapterModel {
 
     /** Unique ID of the overall report */
     @PrimaryKey(autoGenerate = true)

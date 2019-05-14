@@ -17,7 +17,8 @@
 package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.POST
 import us.frollo.frollosdk.model.api.events.EventCreateRequest
 
 internal interface EventsAPI {

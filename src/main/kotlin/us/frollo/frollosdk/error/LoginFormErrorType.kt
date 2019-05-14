@@ -22,8 +22,9 @@ import us.frollo.frollosdk.R
 
 /** Indicates the issue of the error */
 enum class LoginFormErrorType(
-        /** Localized string resource id */
-        @StringRes val textResource: Int) {
+    /** Localized string resource id */
+    @StringRes val textResource: Int
+) {
 
     /** A required multiple choice field has not been selected */
     FIELD_CHOICE_NOT_SELECTED(R.string.FrolloSDK_Error_LoginForm_FieldChoiceNotSelectedFormat),
@@ -32,7 +33,7 @@ enum class LoginFormErrorType(
     /** A required field is missing a value */
     MAX_LENGTH_EXCEEDED(R.string.FrolloSDK_Error_LoginForm_MaxLengthExceededFormat),
     /** Regex validation has failed for a field */
-    VALIDATION_FAILED( R.string.FrolloSDK_Error_LoginForm_ValidationFailedFormat),
+    VALIDATION_FAILED(R.string.FrolloSDK_Error_LoginForm_ValidationFailedFormat),
     /** Unknown error */
     UNKNOWN(R.string.FrolloSDK_Error_LoginForm_UnknownError);
 

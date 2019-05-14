@@ -27,18 +27,37 @@ import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.error.FrolloSDKError
+import us.frollo.frollosdk.extensions.changeDateFormat
+import us.frollo.frollosdk.extensions.dailyToWeekly
+import us.frollo.frollosdk.extensions.enqueue
+import us.frollo.frollosdk.extensions.fetchAccountBalanceReports
+import us.frollo.frollosdk.extensions.fetchTransactionCurrentReports
+import us.frollo.frollosdk.extensions.fetchTransactionHistoryReports
+import us.frollo.frollosdk.extensions.isValidFormat
+import us.frollo.frollosdk.extensions.sqlForExistingAccountBalanceReports
+import us.frollo.frollosdk.extensions.sqlForFetchingAccountBalanceReports
+import us.frollo.frollosdk.extensions.sqlForStaleIdsAccountBalanceReports
 import us.frollo.frollosdk.network.NetworkService
-import us.frollo.frollosdk.extensions.*
 import us.frollo.frollosdk.logging.Log
-import us.frollo.frollosdk.mapping.*
+import us.frollo.frollosdk.mapping.toReportAccountBalance
+import us.frollo.frollosdk.mapping.toReportGroupTransactionHistory
+import us.frollo.frollosdk.mapping.toReportTransactionCurrent
+import us.frollo.frollosdk.mapping.toReportTransactionHistory
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
-import us.frollo.frollosdk.model.coredata.reports.*
+import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalanceRelation
+import us.frollo.frollosdk.model.coredata.reports.ReportDateFormat
 import us.frollo.frollosdk.model.coredata.reports.ReportDateFormat.Companion.DAILY
 import us.frollo.frollosdk.model.coredata.reports.ReportDateFormat.Companion.DATE_PATTERN_FOR_REQUEST
 import us.frollo.frollosdk.model.coredata.reports.ReportDateFormat.Companion.MONTHLY
+import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
+import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
+import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
+import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrentRelation
+import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
+import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistoryRelation
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.network.api.ReportsAPI
 import java.lang.Exception
@@ -67,8 +86,13 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      *
      * @return LiveData object of Resource<List<ReportAccountBalanceRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun accountBalanceReports(fromDate: String, toDate: String, period: ReportPeriod,
-                              accountId: Long? = null, accountType: AccountType? = null): LiveData<Resource<List<ReportAccountBalanceRelation>>> {
+    fun accountBalanceReports(
+        fromDate: String,
+        toDate: String,
+        period: ReportPeriod,
+        accountId: Long? = null,
+        accountType: AccountType? = null
+    ): LiveData<Resource<List<ReportAccountBalanceRelation>>> {
         val from = fromDate.toReportDateFormat(period)
         val to = toDate.toReportDateFormat(period)
 
@@ -87,11 +111,16 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      * @param accountType Fetch reports for a specific account type (optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun refreshAccountBalanceReports(fromDate: String, toDate: String, period: ReportPeriod,
-                                     accountId: Long? = null, accountType: AccountType? = null,
-                                     completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun refreshAccountBalanceReports(
+        fromDate: String,
+        toDate: String,
+        period: ReportPeriod,
+        accountId: Long? = null,
+        accountType: AccountType? = null,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         reportsAPI.fetchAccountBalanceReports(period, fromDate, toDate, accountId, accountType).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshAccountBalanceReports", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
@@ -132,7 +161,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      */
     fun refreshTransactionCurrentReports(grouping: ReportGrouping, budgetCategory: BudgetCategory? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         reportsAPI.fetchTransactionCurrentReports(grouping, budgetCategory).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshTransactionCurrentReports", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
@@ -161,8 +190,13 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      *
      * @return LiveData object of Resource<List<ReportTransactionHistoryRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun historyTransactionReports(fromDate: String, toDate: String, grouping: ReportGrouping,
-                                  period: ReportPeriod, budgetCategory: BudgetCategory? = null): LiveData<Resource<List<ReportTransactionHistoryRelation>>> {
+    fun historyTransactionReports(
+        fromDate: String,
+        toDate: String,
+        grouping: ReportGrouping,
+        period: ReportPeriod,
+        budgetCategory: BudgetCategory? = null
+    ): LiveData<Resource<List<ReportTransactionHistoryRelation>>> {
         val from = fromDate.toReportDateFormat(period)
         val to = toDate.toReportDateFormat(period)
 
@@ -181,11 +215,16 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun refreshTransactionHistoryReports(fromDate: String, toDate: String, grouping: ReportGrouping,
-                                         period: ReportPeriod, budgetCategory: BudgetCategory? = null,
-                                         completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun refreshTransactionHistoryReports(
+        fromDate: String,
+        toDate: String,
+        grouping: ReportGrouping,
+        period: ReportPeriod,
+        budgetCategory: BudgetCategory? = null,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         reportsAPI.fetchTransactionHistoryReports(grouping, period, fromDate, toDate, budgetCategory).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshTransactionHistoryReports", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
@@ -210,9 +249,13 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
     // Response Handlers
 
     @Transaction
-    private fun handleAccountBalanceReportsResponse(response: MutableList<AccountBalanceReportResponse.Report>?,
-                                                    period: ReportPeriod, accountId: Long?, accountType: AccountType?,
-                                                    completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    private fun handleAccountBalanceReportsResponse(
+        response: MutableList<AccountBalanceReportResponse.Report>?,
+        period: ReportPeriod,
+        accountId: Long?,
+        accountType: AccountType?,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         response?.let {
             doAsync {
                 // Sort by date
@@ -229,8 +272,13 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
 
     // WARNING: Do not call this method on the main thread
     @Transaction
-    private fun handleAccountBalanceReportsForDate(reportsResponse: MutableList<AccountBalanceReportResponse.Report.BalanceReport>,
-                                                   date: String, period: ReportPeriod, accountId: Long?, accountType: AccountType?) {
+    private fun handleAccountBalanceReportsForDate(
+        reportsResponse: MutableList<AccountBalanceReportResponse.Report.BalanceReport>,
+        date: String,
+        period: ReportPeriod,
+        accountId: Long?,
+        accountType: AccountType?
+    ) {
         try {
             // Sort by id
             reportsResponse.sortBy { it.id }
@@ -270,9 +318,12 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         }
     }
 
-    private fun handleTransactionCurrentReportsResponse(response: TransactionCurrentReportResponse?,
-                                                        grouping: ReportGrouping, budgetCategory: BudgetCategory?,
-                                                        completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    private fun handleTransactionCurrentReportsResponse(
+        response: TransactionCurrentReportResponse?,
+        grouping: ReportGrouping,
+        budgetCategory: BudgetCategory?,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         response?.let {
             doAsync {
                 val reportsToInsert = mutableListOf<ReportTransactionCurrent>()
@@ -317,12 +368,16 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
     }
 
     // WARNING: Do not call this method on the main thread
-    private fun handleTransactionCurrentDayReportsResponse(reportsResponse: MutableList<TransactionCurrentReportResponse.Report>,
-                                                           grouping: ReportGrouping, budgetCategory: BudgetCategory? = null,
-                                                           linkedId: Long? = null, linkedName: String? = null,
-                                                           reportsToInsert: MutableList<ReportTransactionCurrent>,
-                                                           reportsToUpdate: MutableList<ReportTransactionCurrent>,
-                                                           idsToDelete: MutableList<Long>) {
+    private fun handleTransactionCurrentDayReportsResponse(
+        reportsResponse: MutableList<TransactionCurrentReportResponse.Report>,
+        grouping: ReportGrouping,
+        budgetCategory: BudgetCategory? = null,
+        linkedId: Long? = null,
+        linkedName: String? = null,
+        reportsToInsert: MutableList<ReportTransactionCurrent>,
+        reportsToUpdate: MutableList<ReportTransactionCurrent>,
+        idsToDelete: MutableList<Long>
+    ) {
         try {
             // Sort by day
             reportsResponse.sortBy { it.day }
@@ -375,10 +430,15 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
     }
 
     @Transaction
-    private fun handleTransactionHistoryReportsResponse(reportsResponse: MutableList<TransactionHistoryReportResponse.Report>?,
-                                                        fromDate: String, toDate: String, grouping: ReportGrouping,
-                                                        period: ReportPeriod, budgetCategory: BudgetCategory?,
-                                                        completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    private fun handleTransactionHistoryReportsResponse(
+        reportsResponse: MutableList<TransactionHistoryReportResponse.Report>?,
+        fromDate: String,
+        toDate: String,
+        grouping: ReportGrouping,
+        period: ReportPeriod,
+        budgetCategory: BudgetCategory?,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         reportsResponse?.let {
             doAsync {
                 try {

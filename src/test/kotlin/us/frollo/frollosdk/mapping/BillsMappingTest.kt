@@ -16,9 +16,10 @@
 
 package us.frollo.frollosdk.mapping
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import us.frollo.frollosdk.model.*
+import us.frollo.frollosdk.model.testBillPaymentResponseData
+import us.frollo.frollosdk.model.testBillResponseData
 
 class BillsMappingTest {
 

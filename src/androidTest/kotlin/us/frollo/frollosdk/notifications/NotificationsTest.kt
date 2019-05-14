@@ -26,7 +26,8 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Test
 
-import org.junit.Assert.*
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
@@ -101,7 +102,7 @@ class NotificationsTest {
     fun testRegisterPushNotificationToken() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == DeviceAPI.URL_DEVICE) {
                     return MockResponse()
@@ -137,7 +138,7 @@ class NotificationsTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.message_id_12345)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "messages/12345") {
                     return MockResponse()

@@ -17,8 +17,16 @@
 package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
-import retrofit2.http.*
-import us.frollo.frollosdk.model.api.user.*
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import us.frollo.frollosdk.model.api.user.UserChangePasswordRequest
+import us.frollo.frollosdk.model.api.user.UserRegisterRequest
+import us.frollo.frollosdk.model.api.user.UserResetPasswordRequest
+import us.frollo.frollosdk.model.api.user.UserResponse
+import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 
 internal interface UserAPI {
     companion object {

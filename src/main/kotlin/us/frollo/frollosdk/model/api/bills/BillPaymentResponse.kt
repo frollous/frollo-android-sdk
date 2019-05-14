@@ -22,13 +22,13 @@ import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import java.math.BigDecimal
 
 internal data class BillPaymentResponse(
-        @SerializedName("id") val billPaymentId: Long,
-        @SerializedName("bill_id") val billId: Long,
-        @SerializedName("name") val name: String,
-        @SerializedName("merchant_id") val merchantId: Long?,
-        @SerializedName("date") val date: String, // yyyy-MM-dd
-        @SerializedName("payment_status") val paymentStatus: BillPaymentStatus,
-        @SerializedName("frequency") val frequency: BillFrequency,
-        @SerializedName("amount") val amount: BigDecimal,
-        @SerializedName("unpayable") val unpayable: Boolean
+    @SerializedName("id") val billPaymentId: Long,
+    @SerializedName("bill_id") val billId: Long,
+    @SerializedName("name") val name: String,
+    @SerializedName("merchant_id") val merchantId: Long?,
+    @SerializedName("date") val date: String, // yyyy-MM-dd
+    @SerializedName("payment_status") val paymentStatus: BillPaymentStatus,
+    @SerializedName("frequency") val frequency: BillFrequency,
+    @SerializedName("amount") val amount: BigDecimal,
+    @SerializedName("unpayable") val unpayable: Boolean
 )

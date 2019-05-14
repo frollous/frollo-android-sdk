@@ -19,10 +19,20 @@ package us.frollo.frollosdk.model
 import us.frollo.frollosdk.model.api.user.UserRegisterRequest
 import us.frollo.frollosdk.model.api.user.UserResetPasswordRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
-import us.frollo.frollosdk.model.coredata.user.*
-import us.frollo.frollosdk.testutils.*
+import us.frollo.frollosdk.model.coredata.user.Address
+import us.frollo.frollosdk.model.coredata.user.Attribution
+import us.frollo.frollosdk.model.coredata.user.FeatureFlag
+import us.frollo.frollosdk.model.coredata.user.Gender
+import us.frollo.frollosdk.model.coredata.user.HouseholdType
+import us.frollo.frollosdk.model.coredata.user.Industry
+import us.frollo.frollosdk.model.coredata.user.Occupation
+import us.frollo.frollosdk.model.coredata.user.UserStatus
+import us.frollo.frollosdk.testutils.randomNumber
+import us.frollo.frollosdk.testutils.randomString
+import us.frollo.frollosdk.testutils.randomUUID
+import us.frollo.frollosdk.testutils.today
 
-internal fun testUserResponseData(userId: Long? = null) : UserResponse {
+internal fun testUserResponseData(userId: Long? = null): UserResponse {
     val name = randomUUID()
 
     return UserResponse(
@@ -51,7 +61,7 @@ internal fun testUserResponseData(userId: Long? = null) : UserResponse {
                 features = listOf(FeatureFlag(feature = "aggregation", enabled = true)))
 }
 
-internal fun UserResponse.testModifyUserResponseData(firstName: String) : UserResponse {
+internal fun UserResponse.testModifyUserResponseData(firstName: String): UserResponse {
     return UserResponse(
             userId = userId,
             firstName = firstName,
@@ -78,7 +88,7 @@ internal fun UserResponse.testModifyUserResponseData(firstName: String) : UserRe
             features = features)
 }
 
-internal fun testValidRegisterData() : UserRegisterRequest {
+internal fun testValidRegisterData(): UserRegisterRequest {
     val name = randomUUID()
     return UserRegisterRequest(
             firstName = name,

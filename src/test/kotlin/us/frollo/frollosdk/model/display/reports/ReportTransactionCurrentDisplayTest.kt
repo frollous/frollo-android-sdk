@@ -16,7 +16,7 @@
 
 package us.frollo.frollosdk.model.display.reports
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrentRelation

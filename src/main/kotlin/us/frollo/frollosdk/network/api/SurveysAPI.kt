@@ -17,7 +17,11 @@
 package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
+import retrofit2.http.QueryMap
 import us.frollo.frollosdk.model.coredata.surveys.Survey
 
 internal interface SurveysAPI {

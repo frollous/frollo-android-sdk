@@ -22,33 +22,33 @@ import java.math.BigDecimal
 /** Merchant location */
 data class MerchantLocation(
 
-        /** Formatted address */
-        @SerializedName("formatted_address") val formattedAddress: String?,
+    /** Formatted address */
+    @SerializedName("formatted_address") val formattedAddress: String?,
 
-        /** Address line 1 */
-        @SerializedName("line_1") var line1: String?,
+    /** Address line 1 */
+    @SerializedName("line_1") var line1: String?,
 
-        /** Address line 2 */
-        @SerializedName("line_2") val line2: String?,
+    /** Address line 2 */
+    @SerializedName("line_2") val line2: String?,
 
-        /** Address line 3 */
-        @SerializedName("line_3") val line3: String?,
+    /** Address line 3 */
+    @SerializedName("line_3") val line3: String?,
 
-        /** Suburb */
-        @SerializedName("suburb") val suburb: String?,
+    /** Suburb */
+    @SerializedName("suburb") val suburb: String?,
 
-        /** State */
-        @SerializedName("state") val state: String?,
+    /** State */
+    @SerializedName("state") val state: String?,
 
-        /** Postcode */
-        @SerializedName("postcode") val postcode: String?,
+    /** Postcode */
+    @SerializedName("postcode") val postcode: String?,
 
-        /** Country */
-        @SerializedName("country") val country: String?,
+    /** Country */
+    @SerializedName("country") val country: String?,
 
-        /** Latitude */
-        @SerializedName("latitude") val latitude: BigDecimal?,
+    /** Latitude */
+    @SerializedName("latitude") val latitude: BigDecimal?,
 
-        /** Longitude */
-        @SerializedName("longitude") val longitude: BigDecimal?
+    /** Longitude */
+    @SerializedName("longitude") val longitude: BigDecimal?
 )

@@ -16,7 +16,10 @@
 
 package us.frollo.frollosdk.model.coredata.aggregation.merchants
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import us.frollo.frollosdk.model.IAdapterModel
 
 // Declaring the ColumnInfo allows for the renaming of variables without
@@ -28,17 +31,16 @@ import us.frollo.frollosdk.model.IAdapterModel
 /** Data representation of a Merchant */
 data class Merchant(
 
-        /** Unique ID for the merchant */
-        @PrimaryKey
-        @ColumnInfo(name = "merchant_id") val merchantId: Long,
+    /** Unique ID for the merchant */
+    @PrimaryKey @ColumnInfo(name = "merchant_id") val merchantId: Long,
 
-        /** Name of the merchant */
-        @ColumnInfo(name = "name") val name: String,
+    /** Name of the merchant */
+    @ColumnInfo(name = "name") val name: String,
 
-        /** Type of merchant */
-        @ColumnInfo(name = "merchant_type") val merchantType: MerchantType,
+    /** Type of merchant */
+    @ColumnInfo(name = "merchant_type") val merchantType: MerchantType,
 
-        /** URL of the merchant's small logo image */
-        @ColumnInfo(name = "small_logo_url") val smallLogoUrl: String
+    /** URL of the merchant's small logo image */
+    @ColumnInfo(name = "small_logo_url") val smallLogoUrl: String
 
-): IAdapterModel
+) : IAdapterModel

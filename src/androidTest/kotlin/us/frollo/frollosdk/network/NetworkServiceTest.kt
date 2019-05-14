@@ -27,7 +27,12 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
@@ -110,7 +115,7 @@ class NetworkServiceTest {
 
     @Test
     fun testForceRefreshingAccessTokens() {
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "token/") {
                     return MockResponse()
@@ -135,7 +140,7 @@ class NetworkServiceTest {
 
     @Test
     fun testForceRefreshingInvalidAccessTokens() {
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "token/") {
                     return MockResponse()
@@ -195,5 +200,5 @@ class NetworkServiceTest {
         assertEquals(-1, preferences.accessTokenExpiry)
     }
 
-    //TODO: SSL Pinning Tests
+    // TODO: SSL Pinning Tests
 }

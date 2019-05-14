@@ -26,11 +26,12 @@ import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrentRelati
  */
 data class ReportTransactionCurrentDisplay(
 
-        /** Overall reports */
-        val overallReports: List<ReportTransactionCurrent>,
+    /** Overall reports */
+    val overallReports: List<ReportTransactionCurrent>,
 
-        /** Group reports */
-        val groupReports: List<ReportTransactionCurrentRelation>)
+    /** Group reports */
+    val groupReports: List<ReportTransactionCurrentRelation>
+)
 
 /**
  * Transforms the combined list of current transactions reports into [ReportTransactionCurrentDisplay]

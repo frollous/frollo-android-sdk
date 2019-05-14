@@ -19,13 +19,23 @@ package us.frollo.frollosdk.database
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import us.frollo.frollosdk.extensions.fromJson
-import us.frollo.frollosdk.model.coredata.aggregation.accounts.*
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountGroup
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.BalanceTier
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantLocation
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
-import us.frollo.frollosdk.model.coredata.aggregation.providers.*
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderAuthType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderEncryptionType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderMFAType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategoryType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
@@ -37,7 +47,13 @@ import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
-import us.frollo.frollosdk.model.coredata.user.*
+import us.frollo.frollosdk.model.coredata.user.Attribution
+import us.frollo.frollosdk.model.coredata.user.FeatureFlag
+import us.frollo.frollosdk.model.coredata.user.Gender
+import us.frollo.frollosdk.model.coredata.user.HouseholdType
+import us.frollo.frollosdk.model.coredata.user.Industry
+import us.frollo.frollosdk.model.coredata.user.Occupation
+import us.frollo.frollosdk.model.coredata.user.UserStatus
 import java.math.BigDecimal
 
 /**
@@ -50,18 +66,18 @@ internal class Converters {
         private val gson = Gson()
     }
 
-    //Generic
+    // Generic
     @TypeConverter
     fun stringToListOfString(value: String?): List<String>? = if (value == null) null else value.split("|").filter { it.isNotBlank() }
 
     @TypeConverter
-    fun stringFromListOfString(value: List<String>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|" , postfix = "|")
+    fun stringFromListOfString(value: List<String>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|", postfix = "|")
 
     @TypeConverter
     fun stringToListOfLong(value: String?): List<Long>? = if (value == null) null else value.split("|").filter { it.isNotBlank() }.map { it.toLong() }
 
     @TypeConverter
-    fun stringFromListOfLong(value: List<Long>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|" , postfix = "|")
+    fun stringFromListOfLong(value: List<Long>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|", postfix = "|")
 
     @TypeConverter
     fun stringToBigDecimal(value: String?): BigDecimal? = if (value == null) null else BigDecimal(value)
@@ -69,7 +85,7 @@ internal class Converters {
     @TypeConverter
     fun stringFromBigDecimal(value: BigDecimal?): String? = value?.toString()
 
-    //User
+    // User
     @TypeConverter
     fun stringToListOfFeatureFlag(value: String?): List<FeatureFlag>? = if (value == null) null else gson.fromJson<List<FeatureFlag>>(value)
 
@@ -112,16 +128,16 @@ internal class Converters {
     @TypeConverter
     fun stringFromAttribution(value: Attribution?): String? = if (value == null) null else gson.toJson(value)
 
-    //Message
+    // Message
     @TypeConverter
     fun stringToContentType(value: String?): ContentType? = if (value == null) ContentType.TEXT else ContentType.valueOf(value)
 
     @TypeConverter
     fun stringFromContentType(value: ContentType?): String? = value?.name ?: run { ContentType.TEXT.name }
 
-    //Aggregation
+    // Aggregation
 
-    ///Provider
+    // Provider
     @TypeConverter
     fun stringToProviderStatus(value: String?): ProviderStatus? = if (value == null) null else ProviderStatus.valueOf(value)
 
@@ -156,9 +172,9 @@ internal class Converters {
     fun stringToListOfProviderContainerName(value: String?): List<ProviderContainerName>? = if (value == null) null else value.split("|").filter { it.isNotBlank() }.map { ProviderContainerName.valueOf(it.toUpperCase()) }.toList()
 
     @TypeConverter
-    fun stringFromListOfProviderContainerName(value: List<ProviderContainerName>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|" , postfix = "|")
+    fun stringFromListOfProviderContainerName(value: List<ProviderContainerName>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|", postfix = "|")
 
-    ///ProviderAccount
+    // ProviderAccount
     @TypeConverter
     fun stringToAccountRefreshStatus(value: String?): AccountRefreshStatus? = if (value == null) AccountRefreshStatus.UPDATING else AccountRefreshStatus.valueOf(value)
 
@@ -177,7 +193,7 @@ internal class Converters {
     @TypeConverter
     fun stringFromAccountRefreshAdditionalStatus(value: AccountRefreshAdditionalStatus?): String? = value?.name
 
-    ///Account
+    // Account
     @TypeConverter
     fun stringToAccountStatus(value: String?): AccountStatus? = if (value == null) null else AccountStatus.valueOf(value)
 

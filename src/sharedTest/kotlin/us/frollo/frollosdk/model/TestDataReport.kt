@@ -19,13 +19,18 @@ package us.frollo.frollosdk.model
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
-import us.frollo.frollosdk.model.coredata.reports.*
+import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalance
+import us.frollo.frollosdk.model.coredata.reports.ReportGroupTransactionHistory
+import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
+import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
+import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
+import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.testutils.randomNumber
 import java.math.BigDecimal
 import kotlin.random.Random
 
-internal fun testAccountBalanceReportResponseData() : AccountBalanceReportResponse {
+internal fun testAccountBalanceReportResponseData(): AccountBalanceReportResponse {
     val accounts = listOf(
             AccountBalanceReportResponse.Report.BalanceReport(
                     id = 1,
@@ -40,7 +45,7 @@ internal fun testAccountBalanceReportResponseData() : AccountBalanceReportRespon
     return AccountBalanceReportResponse(data = data)
 }
 
-internal fun testTransactionCurrentReportResponseData() : TransactionCurrentReportResponse {
+internal fun testTransactionCurrentReportResponseData(): TransactionCurrentReportResponse {
     val days = listOf(
             TransactionCurrentReportResponse.Report(
                     day = 1,
@@ -62,7 +67,7 @@ internal fun testTransactionCurrentReportResponseData() : TransactionCurrentRepo
     return TransactionCurrentReportResponse(days = days, groups = groups)
 }
 
-internal fun testTransactionHistoryReportResponseData() : TransactionHistoryReportResponse {
+internal fun testTransactionHistoryReportResponseData(): TransactionHistoryReportResponse {
     val groups = listOf(
             TransactionHistoryReportResponse.Report.GroupReport(
                     id = 1,
@@ -81,8 +86,12 @@ internal fun testTransactionHistoryReportResponseData() : TransactionHistoryRepo
 }
 
 internal fun testReportAccountBalanceData(
-        date: String, accountId: Long? = null, period: ReportPeriod,
-        id: Long? = null, value: BigDecimal? = null): ReportAccountBalance {
+    date: String,
+    accountId: Long? = null,
+    period: ReportPeriod,
+    id: Long? = null,
+    value: BigDecimal? = null
+): ReportAccountBalance {
     val report = ReportAccountBalance(
             date = date,
             accountId = accountId ?: randomNumber().toLong(),
@@ -96,9 +105,14 @@ internal fun testReportAccountBalanceData(
 }
 
 internal fun testReportTransactionCurrentData(
-        day: Int, linkedId: Long? = null, linkedName: String? = null,
-        grouping: ReportGrouping? = null, budgetCategory: BudgetCategory? = null,
-        id: Long? = null, amount: BigDecimal? = null): ReportTransactionCurrent {
+    day: Int,
+    linkedId: Long? = null,
+    linkedName: String? = null,
+    grouping: ReportGrouping? = null,
+    budgetCategory: BudgetCategory? = null,
+    id: Long? = null,
+    amount: BigDecimal? = null
+): ReportTransactionCurrent {
     val report = ReportTransactionCurrent(
             day = day,
             linkedId = linkedId,
@@ -116,8 +130,13 @@ internal fun testReportTransactionCurrentData(
 }
 
 internal fun testReportTransactionHistoryData(
-        date: String, period: ReportPeriod, grouping: ReportGrouping? = null, budgetCategory: BudgetCategory? = null,
-        id: Long? = null, value: BigDecimal? = null): ReportTransactionHistory {
+    date: String,
+    period: ReportPeriod,
+    grouping: ReportGrouping? = null,
+    budgetCategory: BudgetCategory? = null,
+    id: Long? = null,
+    value: BigDecimal? = null
+): ReportTransactionHistory {
     val report = ReportTransactionHistory(
             date = date,
             value = value ?: BigDecimal(34.67),
@@ -132,9 +151,16 @@ internal fun testReportTransactionHistoryData(
 }
 
 internal fun testReportGroupTransactionHistoryData(
-        date: String, linkedId: Long, linkedName: String, period: ReportPeriod,
-        grouping: ReportGrouping? = null, budgetCategory: BudgetCategory? = null,
-        id: Long? = null, value: BigDecimal? = null, reportId: Long): ReportGroupTransactionHistory {
+    date: String,
+    linkedId: Long,
+    linkedName: String,
+    period: ReportPeriod,
+    grouping: ReportGrouping? = null,
+    budgetCategory: BudgetCategory? = null,
+    id: Long? = null,
+    value: BigDecimal? = null,
+    reportId: Long
+): ReportGroupTransactionHistory {
     val report = ReportGroupTransactionHistory(
             date = date,
             linkedId = linkedId,

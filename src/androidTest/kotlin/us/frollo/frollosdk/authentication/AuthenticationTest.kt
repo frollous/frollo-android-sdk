@@ -31,7 +31,11 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Test
 
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
@@ -40,10 +44,16 @@ import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.error.APIError
+import us.frollo.frollosdk.error.APIErrorType
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
+import us.frollo.frollosdk.error.OAuth2Error
+import us.frollo.frollosdk.error.OAuth2ErrorType
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.network.api.UserAPI
-import us.frollo.frollosdk.error.*
 import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.mapping.toUser
@@ -52,8 +62,12 @@ import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.testUserResponseData
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
-import us.frollo.frollosdk.testutils.*
-import java.util.*
+import us.frollo.frollosdk.testutils.randomString
+import us.frollo.frollosdk.testutils.randomUUID
+import us.frollo.frollosdk.testutils.readStringFromJson
+import us.frollo.frollosdk.testutils.trimmedPath
+import us.frollo.frollosdk.testutils.wait
+import java.util.Date
 
 class AuthenticationTest {
 
@@ -139,7 +153,7 @@ class AuthenticationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -150,7 +164,7 @@ class AuthenticationTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -193,7 +207,7 @@ class AuthenticationTest {
     fun testInvalidLoginUser() {
         initSetup()
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -232,7 +246,7 @@ class AuthenticationTest {
     fun testInvalidLoginUserSecondaryFailure() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -243,7 +257,7 @@ class AuthenticationTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -286,7 +300,7 @@ class AuthenticationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -297,7 +311,7 @@ class AuthenticationTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -343,7 +357,7 @@ class AuthenticationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -354,7 +368,7 @@ class AuthenticationTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -426,7 +440,7 @@ class AuthenticationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_REGISTER) {
                     return MockResponse()
@@ -437,7 +451,7 @@ class AuthenticationTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -488,7 +502,7 @@ class AuthenticationTest {
     fun testRegisterUserInvalid() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_REGISTER) {
                     return MockResponse()
@@ -499,7 +513,7 @@ class AuthenticationTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -544,7 +558,7 @@ class AuthenticationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_REGISTER) {
                     return MockResponse()
@@ -555,7 +569,7 @@ class AuthenticationTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -606,7 +620,7 @@ class AuthenticationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_REGISTER) {
                     return MockResponse()
@@ -617,7 +631,7 @@ class AuthenticationTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -666,7 +680,7 @@ class AuthenticationTest {
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -707,7 +721,7 @@ class AuthenticationTest {
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -744,7 +758,7 @@ class AuthenticationTest {
 
         preferences.loggedIn = false
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -782,7 +796,7 @@ class AuthenticationTest {
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -839,7 +853,7 @@ class AuthenticationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.error_suspended_device)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -882,7 +896,7 @@ class AuthenticationTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_CHANGE_PASSWORD) {
                     return MockResponse()
@@ -914,7 +928,7 @@ class AuthenticationTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_CHANGE_PASSWORD) {
                     return MockResponse()
@@ -943,7 +957,7 @@ class AuthenticationTest {
     fun testDeleteUser() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_DELETE_USER) {
                     return MockResponse()
@@ -982,7 +996,7 @@ class AuthenticationTest {
 
         preferences.loggedIn = false
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_DELETE_USER) {
                     return MockResponse()
@@ -1009,14 +1023,13 @@ class AuthenticationTest {
         tearDown()
     }
 
-
     @Test
     fun testResetPassword() {
         initSetup()
 
         preferences.loggedIn = true
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_PASSWORD_RESET) {
                     return MockResponse()
@@ -1044,7 +1057,7 @@ class AuthenticationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -1082,7 +1095,7 @@ class AuthenticationTest {
     fun testUpdateDevice() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == DeviceAPI.URL_DEVICE) {
                     return MockResponse()
@@ -1114,7 +1127,7 @@ class AuthenticationTest {
     fun testUpdateDeviceCompliance() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == DeviceAPI.URL_DEVICE) {
                     return MockResponse()
@@ -1147,7 +1160,7 @@ class AuthenticationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -1158,7 +1171,7 @@ class AuthenticationTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -1201,7 +1214,7 @@ class AuthenticationTest {
     fun testExchangeAuthorizationCodeInvalid() {
         initSetup()
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -1240,7 +1253,7 @@ class AuthenticationTest {
     fun testExchangeAuthorizationCodeInvalidSecondaryFailure() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -1251,7 +1264,7 @@ class AuthenticationTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -1294,7 +1307,7 @@ class AuthenticationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -1305,7 +1318,7 @@ class AuthenticationTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -1350,7 +1363,7 @@ class AuthenticationTest {
     fun testExchangeLegacyRefreshTokenSecondaryFailure() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -1361,7 +1374,7 @@ class AuthenticationTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()

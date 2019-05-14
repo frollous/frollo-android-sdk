@@ -93,7 +93,6 @@ class Keystore {
             val inputBuff = inputStr?.toByteArray(charset("UTF-8"))
             val encryptedData = cipher.doFinal(inputBuff)
             encryptedStr = Base64.encodeToString(encryptedData, Base64.DEFAULT)
-
         } catch (e: Exception) {
             Log.e("FrolloSDKLogger", "$TAG.aesEncrypt : Error - Data encryption failed")
         }
@@ -111,7 +110,6 @@ class Keystore {
             val encryptedBuff = Base64.decode(encryptedStr, Base64.DEFAULT)
             val decryptedData = cipher.doFinal(encryptedBuff)
             decryptedStr = String(decryptedData, 0, decryptedData.size, charset("UTF-8"))
-
         } catch (e: Exception) {
             Log.e("FrolloSDKLogger", "$TAG.aesDecrypt : Error - Data decryption failed")
         }

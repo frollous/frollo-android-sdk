@@ -22,7 +22,9 @@ import net.openid.appauth.AuthorizationRequest.Scope.OFFLINE_ACCESS
 import net.openid.appauth.AuthorizationRequest.Scope.EMAIL
 import net.openid.appauth.AuthorizationRequest.Scope.OPENID
 import net.openid.appauth.AuthorizationService
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.testutils.randomString

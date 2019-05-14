@@ -22,14 +22,24 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Before
 
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.mapping.*
-import us.frollo.frollosdk.model.*
+import us.frollo.frollosdk.mapping.toAccount
+import us.frollo.frollosdk.mapping.toBill
+import us.frollo.frollosdk.mapping.toBillPayment
+import us.frollo.frollosdk.mapping.toMerchant
+import us.frollo.frollosdk.mapping.toTransactionCategory
+import us.frollo.frollosdk.model.testAccountResponseData
+import us.frollo.frollosdk.model.testBillPaymentResponseData
+import us.frollo.frollosdk.model.testBillResponseData
+import us.frollo.frollosdk.model.testMerchantResponseData
+import us.frollo.frollosdk.model.testTransactionCategoryResponseData
 
 class BillDaoTest {
 

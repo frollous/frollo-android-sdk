@@ -18,7 +18,8 @@ package us.frollo.frollosdk.mapping
 
 import us.frollo.frollosdk.model.api.bills.BillPaymentResponse
 import us.frollo.frollosdk.model.api.bills.BillResponse
-import us.frollo.frollosdk.model.coredata.bills.*
+import us.frollo.frollosdk.model.coredata.bills.Bill
+import us.frollo.frollosdk.model.coredata.bills.BillPayment
 
 internal fun BillResponse.toBill(): Bill =
         Bill(

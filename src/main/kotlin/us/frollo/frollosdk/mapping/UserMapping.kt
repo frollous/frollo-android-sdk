@@ -17,7 +17,7 @@
 package us.frollo.frollosdk.mapping
 
 import us.frollo.frollosdk.model.api.user.UserResponse
-import us.frollo.frollosdk.model.coredata.user.*
+import us.frollo.frollosdk.model.coredata.user.User
 
 internal fun UserResponse.toUser() =
         User(

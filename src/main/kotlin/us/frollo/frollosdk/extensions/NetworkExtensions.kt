@@ -21,14 +21,19 @@ import retrofit2.Callback
 import retrofit2.Response
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Resource
+import us.frollo.frollosdk.error.APIError
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.FrolloSDKError
+import us.frollo.frollosdk.error.NetworkError
+import us.frollo.frollosdk.error.OAuth2Error
+import us.frollo.frollosdk.error.OAuth2ErrorType
 import us.frollo.frollosdk.network.ApiResponse
-import us.frollo.frollosdk.error.*
 import us.frollo.frollosdk.mapping.toDataError
 import us.frollo.frollosdk.mapping.toOAuth2ErrorResponse
 import us.frollo.frollosdk.network.ErrorResponseType
 
 internal fun <T> Call<T>.enqueue(errorResponseType: ErrorResponseType = ErrorResponseType.NORMAL, completion: (Resource<T>) -> Unit) {
-    this.enqueue(object: Callback<T> {
+    this.enqueue(object : Callback<T> {
         override fun onResponse(call: Call<T>?, response: Response<T>?) {
             val apiResponse = ApiResponse(response)
             if (apiResponse.isSuccessful) {
@@ -45,7 +50,7 @@ internal fun <T> Call<T>.enqueue(errorResponseType: ErrorResponseType = ErrorRes
     })
 }
 
-internal fun <T> handleFailure(errorResponseType: ErrorResponseType, errorResponse: ApiResponse<T>,  t: Throwable? = null, completion: (Resource<T>) -> Unit) {
+internal fun <T> handleFailure(errorResponseType: ErrorResponseType, errorResponse: ApiResponse<T>, t: Throwable? = null, completion: (Resource<T>) -> Unit) {
     val code = errorResponse.code
     val errorMsg = errorResponse.errorMessage
 

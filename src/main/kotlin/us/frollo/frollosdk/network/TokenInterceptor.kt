@@ -38,7 +38,7 @@ internal class TokenInterceptor(private val helper: NetworkHelper) : Interceptor
 
         var response = chain.proceed(request)
 
-        //TODO: Review 429 Rate Limiting
+        // TODO: Review 429 Rate Limiting
         if (!response.isSuccessful && response.code() == 429) {
             Log.e("$TAG#intercept", "Error Response 429: Too many requests. Backoff!")
 

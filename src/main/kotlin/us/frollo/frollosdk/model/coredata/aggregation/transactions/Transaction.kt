@@ -16,7 +16,11 @@
 
 package us.frollo.frollosdk.model.coredata.aggregation.transactions
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import us.frollo.frollosdk.model.IAdapterModel
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Balance
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantDetails
@@ -28,63 +32,63 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 // Since `transaction` is a reserved keyword for SQLite, use `transaction_model` instead
 @Entity(tableName = "transaction_model",
         indices = [Index("transaction_id"),
-                   Index("account_id"),
-                   Index("category_id"),
-                   Index("merchant_id")])
+            Index("account_id"),
+            Index("category_id"),
+            Index("merchant_id")])
 
 /** Data representation of a Transaction */
 data class Transaction(
 
-        /** Unique ID of the transaction */
-        @PrimaryKey
-        @ColumnInfo(name = "transaction_id") val transactionId: Long,
+    /** Unique ID of the transaction */
+    @PrimaryKey
+    @ColumnInfo(name = "transaction_id") val transactionId: Long,
 
-        /** Transaction Base Type */
-        @ColumnInfo(name = "base_type") val baseType: TransactionBaseType,
+    /** Transaction Base Type */
+    @ColumnInfo(name = "base_type") val baseType: TransactionBaseType,
 
-        /** Status of the transaction */
-        @ColumnInfo(name = "status") val status: TransactionStatus,
+    /** Status of the transaction */
+    @ColumnInfo(name = "status") val status: TransactionStatus,
 
-        /** Date the transaction occurred, localized */
-        @ColumnInfo(name = "transaction_date") val transactionDate: String, // yyyy-MM-dd
+    /** Date the transaction occurred, localized */
+    @ColumnInfo(name = "transaction_date") val transactionDate: String, // yyyy-MM-dd
 
-        /** Date the transaction was posted, localized (optional) */
-        @ColumnInfo(name = "post_date") val postDate: String?, // yyyy-MM-dd
+    /** Date the transaction was posted, localized (optional) */
+    @ColumnInfo(name = "post_date") val postDate: String?, // yyyy-MM-dd
 
-        /** Amount the transaction is for */
-        @Embedded(prefix = "amount_") val amount: Balance,
+    /** Amount the transaction is for */
+    @Embedded(prefix = "amount_") val amount: Balance,
 
-        /** Description */
-        @Embedded(prefix = "description_") var description: TransactionDescription?,
+    /** Description */
+    @Embedded(prefix = "description_") var description: TransactionDescription?,
 
-        /** Transaction's associated budget category. See [BudgetCategory] */
-        @ColumnInfo(name = "budget_category") var budgetCategory: BudgetCategory,
+    /** Transaction's associated budget category. See [BudgetCategory] */
+    @ColumnInfo(name = "budget_category") var budgetCategory: BudgetCategory,
 
-        /** Included in budget */
-        @ColumnInfo(name = "included") var included: Boolean,
+    /** Included in budget */
+    @ColumnInfo(name = "included") var included: Boolean,
 
-        /** Memo or notes added to the transaction (optional) */
-        @ColumnInfo(name = "memo") var memo: String?,
+    /** Memo or notes added to the transaction (optional) */
+    @ColumnInfo(name = "memo") var memo: String?,
 
-        /** Parent account ID */
-        @ColumnInfo(name = "account_id") val accountId: Long,
+    /** Parent account ID */
+    @ColumnInfo(name = "account_id") val accountId: Long,
 
-        /** Transaction Category ID related to the transaction */
-        @ColumnInfo(name = "category_id") var categoryId: Long,
+    /** Transaction Category ID related to the transaction */
+    @ColumnInfo(name = "category_id") var categoryId: Long,
 
-        /** Merchant details related to the transaction */
-        @Embedded(prefix = "merchant_")  val merchant: MerchantDetails,
+    /** Merchant details related to the transaction */
+    @Embedded(prefix = "merchant_") val merchant: MerchantDetails,
 
-        /** Bill ID related to the transaction */
-        @ColumnInfo(name = "bill_id") var billId: Long?,
+    /** Bill ID related to the transaction */
+    @ColumnInfo(name = "bill_id") var billId: Long?,
 
-        /** Bill Payment ID related to the transaction */
-        @ColumnInfo(name = "bill_payment_id") var billPaymentId: Long?,
+    /** Bill Payment ID related to the transaction */
+    @ColumnInfo(name = "bill_payment_id") var billPaymentId: Long?,
 
-        /** All tags applied to this transaction */
-        @ColumnInfo(name = "user_tags") var userTags: List<String>?
+    /** All tags applied to this transaction */
+    @ColumnInfo(name = "user_tags") var userTags: List<String>?
 
-): IAdapterModel {
+) : IAdapterModel {
 
     companion object {
         /** Date format for dates associated with Transaction */

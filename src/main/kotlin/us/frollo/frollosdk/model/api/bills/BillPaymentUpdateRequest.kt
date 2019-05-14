@@ -19,6 +19,6 @@ package us.frollo.frollosdk.model.api.bills
 import com.google.gson.annotations.SerializedName
 
 internal data class BillPaymentUpdateRequest(
-        @SerializedName("status") val status: BillPaymentRequestStatus? = null,
-        @SerializedName("date") val date: String? = null // yyyy-MM-dd
+    @SerializedName("status") val status: BillPaymentRequestStatus? = null,
+    @SerializedName("date") val date: String? = null // yyyy-MM-dd
 )

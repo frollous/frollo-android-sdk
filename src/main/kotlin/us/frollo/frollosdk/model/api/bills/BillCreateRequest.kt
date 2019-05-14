@@ -21,10 +21,10 @@ import us.frollo.frollosdk.model.coredata.bills.BillFrequency
 import java.math.BigDecimal
 
 internal data class BillCreateRequest(
-        @SerializedName("transaction_id") val transactionId: Long? = null,
-        @SerializedName("name") val name: String? = null,
-        @SerializedName("due_amount") val dueAmount: BigDecimal? = null,
-        @SerializedName("frequency") val frequency: BillFrequency,
-        @SerializedName("next_payment_date") val nextPaymentDate: String, // yyyy-MM-dd
-        @SerializedName("note") val notes: String? = null
+    @SerializedName("transaction_id") val transactionId: Long? = null,
+    @SerializedName("name") val name: String? = null,
+    @SerializedName("due_amount") val dueAmount: BigDecimal? = null,
+    @SerializedName("frequency") val frequency: BillFrequency,
+    @SerializedName("next_payment_date") val nextPaymentDate: String, // yyyy-MM-dd
+    @SerializedName("note") val notes: String? = null
 )

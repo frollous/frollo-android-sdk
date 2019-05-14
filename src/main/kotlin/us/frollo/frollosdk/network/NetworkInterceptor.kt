@@ -38,7 +38,7 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
         private const val TAG = "NetworkInterceptor"
 
         private const val MAX_RATE_LIMIT_COUNT = 10
-        private const val TIME_INTERVAL_5_MINUTES = 300L //seconds
+        private const val TIME_INTERVAL_5_MINUTES = 300L // seconds
     }
 
     private var rateLimitCount = 0
@@ -49,7 +49,7 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
 
         var response = chain.proceed(request)
 
-        //TODO: Review 429 Rate Limiting
+        // TODO: Review 429 Rate Limiting
         if (!response.isSuccessful && response.code() == 429) {
             Log.e("$TAG#intercept", "Error Response 429: Too many requests. Backoff!")
 
@@ -90,9 +90,9 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
 
     private fun addAuthorizationHeader(request: Request, builder: Request.Builder) {
         val url = request.url().toString()
-        if (request.headers().get(HEADER_AUTHORIZATION) == null
-                && !url.contains(URL_REGISTER)
-                && !url.contains(URL_PASSWORD_RESET)) {
+        if (request.headers().get(HEADER_AUTHORIZATION) == null &&
+                !url.contains(URL_REGISTER) &&
+                !url.contains(URL_PASSWORD_RESET)) {
 
             validateAndAppendAccessToken(builder)
         }

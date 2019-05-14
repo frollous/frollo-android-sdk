@@ -16,12 +16,15 @@
 
 package us.frollo.frollosdk.mapping
 
-import org.junit.Assert.*
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import us.frollo.frollosdk.model.*
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.model.testAccountBalanceReportResponseData
+import us.frollo.frollosdk.model.testTransactionCurrentReportResponseData
+import us.frollo.frollosdk.model.testTransactionHistoryReportResponseData
 
 class ReportsMappingTest {
 

@@ -26,35 +26,36 @@ import us.frollo.frollosdk.logging.LogLevel
  * Optional preferences can be set before running FrolloSDK.setup()
  */
 data class FrolloSDKConfiguration(
-        /**
-         * OAuth2 Client identifier. The unique identifier of the application implementing the SDK
-         */
-        val clientId: String,
-        /**
-         * OAuth2 Redirection URL. URL to redirect to after the authorization flow is complete. This should be a deep or universal link to the host app
-         */
-        val redirectUrl: String,
-        /**
-         * URL of the OAuth2 authorization endpoint for web based login
-         */
-        val authorizationUrl: String,
-        /**
-         * URL of the OAuth2 token endpoint for getting tokens and native login
-         */
-        val tokenUrl: String,
-        /**
-         * Base URL of the Frollo API this SDK should point to
-         */
-        val serverUrl: String,
-        /**
-         * Level of logging for debug and error messages. Default is [LogLevel.ERROR]
-         */
-        val logLevel: LogLevel = LogLevel.ERROR) {
+    /**
+     * OAuth2 Client identifier. The unique identifier of the application implementing the SDK
+     */
+    val clientId: String,
+    /**
+     * OAuth2 Redirection URL. URL to redirect to after the authorization flow is complete. This should be a deep or universal link to the host app
+     */
+    val redirectUrl: String,
+    /**
+     * URL of the OAuth2 authorization endpoint for web based login
+     */
+    val authorizationUrl: String,
+    /**
+     * URL of the OAuth2 token endpoint for getting tokens and native login
+     */
+    val tokenUrl: String,
+    /**
+     * Base URL of the Frollo API this SDK should point to
+     */
+    val serverUrl: String,
+    /**
+     * Level of logging for debug and error messages. Default is [LogLevel.ERROR]
+     */
+    val logLevel: LogLevel = LogLevel.ERROR
+) {
 
     internal fun validForROPC() = clientId.isNotBlank() && tokenUrl.isNotBlank() && serverUrl.isNotBlank()
 
-    internal fun validForAuthorizationCodeFlow() = clientId.isNotBlank() && tokenUrl.isNotBlank()
-            && redirectUrl.isNotBlank() && authorizationUrl.isNotBlank() && serverUrl.isNotBlank()
+    internal fun validForAuthorizationCodeFlow() = clientId.isNotBlank() && tokenUrl.isNotBlank() &&
+            redirectUrl.isNotBlank() && authorizationUrl.isNotBlank() && serverUrl.isNotBlank()
 
     /**
      * OAuth2 Redirection URL. URL to redirect to after the authorization flow is complete. This should be a deep or universal link to the host app

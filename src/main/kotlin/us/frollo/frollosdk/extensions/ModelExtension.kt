@@ -68,7 +68,7 @@ internal fun sqlForTransactionByUserTags(tags: List<String>): SimpleSQLiteQuery 
 
     tags.forEachIndexed { index, str ->
         sb.append("user_tags LIKE '%|$str|%'")
-        if(index < tags.size -1 )
+        if (index < tags.size - 1)
             sb.append(" AND ")
     }
 
@@ -97,7 +97,7 @@ internal fun sqlForUserTags(searchTerm: String? = null, sortBy: TagsSortType? = 
     sortBy?.let { sort = it.toString() }
     orderBy?.let { order = it.toString() }
 
-    val sql= "SELECT * FROM transaction_user_tags $where ORDER BY $sort $order"
+    val sql = "SELECT * FROM transaction_user_tags $where ORDER BY $sort $order"
     return SimpleSQLiteQuery(sql)
 }
 
@@ -179,7 +179,7 @@ internal fun createNotificationPayload(event: String? = null, link: String? = nu
                 userMessageID = userMessageID?.trim()?.toLong())
 
 internal fun String.toBudgetCategory(): BudgetCategory? {
-    return when(this) {
+    return when (this) {
         BudgetCategory.INCOME.toString() -> BudgetCategory.INCOME
         BudgetCategory.LIVING.toString() -> BudgetCategory.LIVING
         BudgetCategory.LIFESTYLE.toString() -> BudgetCategory.LIFESTYLE

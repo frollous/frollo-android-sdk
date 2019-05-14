@@ -24,7 +24,9 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Test
 
-import org.junit.Assert.*
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
@@ -87,7 +89,7 @@ class SurveysTest {
         val surveyKey = "FINANCIAL_WELLBEING"
 
         val body = readStringFromJson(app, R.raw.survey_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "user/surveys/$surveyKey") {
                     return MockResponse()
@@ -127,7 +129,7 @@ class SurveysTest {
         val latest = true
 
         val body = readStringFromJson(app, R.raw.survey_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "user/surveys/$surveyKey?latest=$latest") {
                     return MockResponse()
@@ -166,7 +168,7 @@ class SurveysTest {
         val testSurvey = testSurveyData()
 
         val body = readStringFromJson(app, R.raw.survey_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == SurveysAPI.URL_SURVEYS) {
                     return MockResponse()

@@ -16,12 +16,16 @@
 
 package us.frollo.frollosdk.model
 
-import us.frollo.frollosdk.model.coredata.surveys.*
+import us.frollo.frollosdk.model.coredata.surveys.Survey
+import us.frollo.frollosdk.model.coredata.surveys.SurveyAnswer
+import us.frollo.frollosdk.model.coredata.surveys.SurveyAnswerType
+import us.frollo.frollosdk.model.coredata.surveys.SurveyQuestion
+import us.frollo.frollosdk.model.coredata.surveys.SurveyQuestionType
 import us.frollo.frollosdk.testutils.randomBoolean
 import us.frollo.frollosdk.testutils.randomString
 import us.frollo.frollosdk.testutils.randomUUID
 
-internal fun testSurveyData() : Survey {
+internal fun testSurveyData(): Survey {
 
     val answers = listOf(
             SurveyAnswer(

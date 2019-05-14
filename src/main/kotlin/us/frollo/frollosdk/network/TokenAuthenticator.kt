@@ -16,7 +16,10 @@
 
 package us.frollo.frollosdk.network
 
-import okhttp3.*
+import okhttp3.Authenticator
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.Route
 
 /**
  * Responds to an authentication challenge from the web server.

@@ -26,8 +26,9 @@ import us.frollo.frollosdk.extensions.serializedName
  * Type of error that has occurred during authorization
  */
 enum class OAuth2ErrorType(
-        /** Localized string resource id */
-        @StringRes val textResource: Int) {
+    /** Localized string resource id */
+    @StringRes val textResource: Int
+) {
 
     /** Access denied */
     @SerializedName("access_denied") ACCESS_DENIED(R.string.FrolloSDK_Error_OAuth_AccessDenied),
@@ -85,9 +86,9 @@ enum class OAuth2ErrorType(
             context?.resources?.getString(textResource, arg1)
 
     /** Enum to serialized string */
-    //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
+    // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =
-    //Try to get the annotation value if available instead of using plain .toString()
-    //Fallback to super.toString() in case annotation is not present/available
+    // Try to get the annotation value if available instead of using plain .toString()
+    // Fallback to super.toString() in case annotation is not present/available
             serializedName() ?: super.toString()
 }

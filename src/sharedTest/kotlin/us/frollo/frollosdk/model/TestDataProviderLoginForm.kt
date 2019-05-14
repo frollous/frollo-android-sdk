@@ -16,7 +16,12 @@
 
 package us.frollo.frollosdk.model
 
-import us.frollo.frollosdk.model.coredata.aggregation.providers.*
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderFieldType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderFieldValidation
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderFormField
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderFormRow
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderFormType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
 
 internal fun loginFormUsernameRow(): ProviderFormRow {
     val field = ProviderFormField(
@@ -150,7 +155,7 @@ internal fun loginFormRegexValidation(): ProviderFieldValidation {
     return ProviderFieldValidation(errorMsg = "Please enter a valid Access Code", regExp = "^[0-9]{0,6}$")
 }
 
-internal fun loginFormFilledData(formType: ProviderFormType? = null) : ProviderLoginForm {
+internal fun loginFormFilledData(formType: ProviderFormType? = null): ProviderLoginForm {
     val usernameRow = loginFormUsernameRow()
     usernameRow.fields[0].value = "abc123"
 
@@ -168,7 +173,7 @@ internal fun loginFormFilledData(formType: ProviderFormType? = null) : ProviderL
             rows = listOf(usernameRow, passwordRow))
 }
 
-internal fun loginFormFilledMissingRequiredField() : ProviderLoginForm {
+internal fun loginFormFilledMissingRequiredField(): ProviderLoginForm {
     val usernameRow = loginFormUsernameRow()
     usernameRow.fields[0].value = ""
 
@@ -185,7 +190,7 @@ internal fun loginFormFilledMissingRequiredField() : ProviderLoginForm {
             rows = listOf(usernameRow, passwordRow))
 }
 
-internal fun loginFormFilledInvalidMultipleChoiceField() : ProviderLoginForm {
+internal fun loginFormFilledInvalidMultipleChoiceField(): ProviderLoginForm {
     val usernameRow = loginFormUsernameRow()
     usernameRow.fields[0].value = "abc123"
 
@@ -202,7 +207,7 @@ internal fun loginFormFilledInvalidMultipleChoiceField() : ProviderLoginForm {
             rows = listOf(usernameRow).plus(multipleChoiceRows))
 }
 
-internal fun loginFormMultipleChoiceFields() : ProviderLoginForm {
+internal fun loginFormMultipleChoiceFields(): ProviderLoginForm {
     val usernameRow = loginFormUsernameRow()
 
     val multipleChoiceRows = loginFormMultipleChoiceRows()
@@ -218,7 +223,7 @@ internal fun loginFormMultipleChoiceFields() : ProviderLoginForm {
             rows = listOf(usernameRow).plus(multipleChoiceRows))
 }
 
-internal fun loginFormFilledMaxLengthExceededField() : ProviderLoginForm {
+internal fun loginFormFilledMaxLengthExceededField(): ProviderLoginForm {
     val usernameRow = loginFormUsernameRow()
     usernameRow.fields[0].value = "abc123"
 
@@ -236,7 +241,7 @@ internal fun loginFormFilledMaxLengthExceededField() : ProviderLoginForm {
             rows = listOf(usernameRow, maxLengthRow))
 }
 
-internal fun loginFormFilledRegexInvalidField() : ProviderLoginForm {
+internal fun loginFormFilledRegexInvalidField(): ProviderLoginForm {
     val regexField = loginFormValidationField()
     regexField.fields[0].value = "Not an access code"
 

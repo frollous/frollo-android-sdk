@@ -24,12 +24,16 @@ import com.jraska.livedata.test
 import org.junit.After
 import org.junit.Before
 
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.mapping.*
-import us.frollo.frollosdk.model.*
+import us.frollo.frollosdk.mapping.toProvider
+import us.frollo.frollosdk.mapping.toProviderAccount
+import us.frollo.frollosdk.model.testProviderAccountResponseData
+import us.frollo.frollosdk.model.testProviderResponseData
 
 class ProviderDaoTest {
 

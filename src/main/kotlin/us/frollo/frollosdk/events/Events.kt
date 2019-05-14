@@ -51,7 +51,7 @@ class Events(network: NetworkService) {
      */
     fun triggerEvent(eventName: String, delayMinutes: Long? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         eventsAPI.createEvent(EventCreateRequest(event = eventName, delayMinutes = delayMinutes ?: 0)).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     completion?.invoke(Result.success())
                 }

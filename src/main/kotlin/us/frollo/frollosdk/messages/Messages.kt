@@ -92,7 +92,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      */
     fun refreshMessage(messageId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         messagesAPI.fetchMessage(messageId).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleMessageResponse(response = resource.data, completion = completion)
                 }
@@ -111,7 +111,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      */
     fun refreshMessages(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         messagesAPI.fetchMessages().enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleMessagesResponse(response = resource.data, completion = completion)
                 }
@@ -130,9 +130,9 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      */
     fun refreshUnreadMessages(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         messagesAPI.fetchUnreadMessages().enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleMessagesResponse(response = resource.data,  unread = true, completion = completion)
+                    handleMessagesResponse(response = resource.data, unread = true, completion = completion)
                 }
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshUnreadMessages", resource.error?.localizedDescription)
@@ -153,7 +153,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      */
     fun updateMessage(messageId: Long, read: Boolean, interacted: Boolean, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         messagesAPI.updateMessage(messageId, MessageUpdateRequest(read, interacted)).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleMessageResponse(response = resource.data, completion = completion)
                 }

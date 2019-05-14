@@ -18,7 +18,16 @@ package us.frollo.frollosdk.model
 
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountUpdateRequest
-import us.frollo.frollosdk.model.coredata.aggregation.accounts.*
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountAttributes
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountGroup
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.Balance
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.BalanceDetails
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.BalanceTier
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.HolderProfile
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
@@ -28,7 +37,7 @@ import us.frollo.frollosdk.testutils.randomUUID
 import java.math.BigDecimal
 import kotlin.random.Random
 
-internal fun testAccountResponseData(accountId: Long? = null, providerAccountId: Long? = null, accountType: AccountType? = null) : AccountResponse {
+internal fun testAccountResponseData(accountId: Long? = null, providerAccountId: Long? = null, accountType: AccountType? = null): AccountResponse {
 
     val balanceDetails = BalanceDetails(
             currentDescription = randomUUID(),

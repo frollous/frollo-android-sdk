@@ -61,7 +61,7 @@ class TransactionUserTagsDaoTest {
         val data4 = testTransactionTagData("tag3")
         val list = mutableListOf(data1, data2, data3, data4)
         db.userTags().insertAll(list)
-        val testObserver =  db.userTags().load().test()
+        val testObserver = db.userTags().load().test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(4, testObserver.value().size)
@@ -69,15 +69,15 @@ class TransactionUserTagsDaoTest {
 
     @Test
     fun testDeleteByNames() {
-        val data1 = testTransactionTagData("tag1" )
+        val data1 = testTransactionTagData("tag1")
         val data2 = testTransactionTagData("tag2")
         val data3 = testTransactionTagData("tag3")
         val data4 = testTransactionTagData("tag4")
         val list = mutableListOf(data1, data2, data3, data4)
         db.userTags().insertAll(list)
-        db.userTags().deleteByNamesInverse(mutableListOf("tag1","tag2"))
+        db.userTags().deleteByNamesInverse(mutableListOf("tag1", "tag2"))
 
-        val testObserver =  db.userTags().load().test()
+        val testObserver = db.userTags().load().test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(2, testObserver.value().size)
@@ -85,55 +85,54 @@ class TransactionUserTagsDaoTest {
 
     @Test
     fun testSearchUserTags() {
-        val data1 = testTransactionTagData("tag1" )
+        val data1 = testTransactionTagData("tag1")
         val data2 = testTransactionTagData("tag2")
         val data3 = testTransactionTagData("tag3")
         val data4 = testTransactionTagData("hello")
         val list = mutableListOf(data1, data2, data3, data4)
         db.userTags().insertAll(list)
 
-
-        val testObserver =  db.userTags().custom(sqlForUserTags("tag",TagsSortType.COUNT,OrderType.DESC)).test()
+        val testObserver = db.userTags().custom(sqlForUserTags("tag", TagsSortType.COUNT, OrderType.DESC)).test()
         testObserver.awaitValue()
         val data = testObserver.value()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(3, testObserver.value().size)
-        assertTrue(data.get(0).count!!-data.get(1).count!!>0)
+        assertTrue(data.get(0).count!! - data.get(1).count!!> 0)
     }
 
     @Test
     fun testSearchUserTagsByCreationAndUpdationTime() {
-        val data1 = testTransactionTagData("tag1","2019-05-03T10:15:30+01:00","2019-05-03T10:15:30+01:00" )
-        val data2 = testTransactionTagData("tag2","2019-06-03T10:15:30+01:00","2019-06-03T10:15:30+01:00" )
-        val data3 = testTransactionTagData("tag3","2019-07-03T10:15:30+01:00","2019-07-03T10:15:30+01:00" )
-        val data4 = testTransactionTagData("hello","2019-07-03T10:15:30+01:00","2019-08-03T10:15:30+01:00" )
+        val data1 = testTransactionTagData("tag1", "2019-05-03T10:15:30+01:00", "2019-05-03T10:15:30+01:00")
+        val data2 = testTransactionTagData("tag2", "2019-06-03T10:15:30+01:00", "2019-06-03T10:15:30+01:00")
+        val data3 = testTransactionTagData("tag3", "2019-07-03T10:15:30+01:00", "2019-07-03T10:15:30+01:00")
+        val data4 = testTransactionTagData("hello", "2019-07-03T10:15:30+01:00", "2019-08-03T10:15:30+01:00")
         val list = mutableListOf(data1, data2, data3, data4)
         db.userTags().insertAll(list)
 
-        var testObserver =  db.userTags().custom(sqlForUserTags("tag",TagsSortType.CREATED_AT,OrderType.DESC)).test()
+        var testObserver = db.userTags().custom(sqlForUserTags("tag", TagsSortType.CREATED_AT, OrderType.DESC)).test()
         testObserver.awaitValue()
 
         var data = testObserver.value()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(3, testObserver.value().size)
-        assertTrue(data.get(0).createdAt?.getDateTimeStamp()!!-data.get(2).createdAt?.getDateTimeStamp()!!>0)
+        assertTrue(data.get(0).createdAt?.getDateTimeStamp()!! - data.get(2).createdAt?.getDateTimeStamp()!!> 0)
 
-        testObserver =  db.userTags().custom(sqlForUserTags("tag",TagsSortType.LAST_USED,OrderType.DESC)).test()
+        testObserver = db.userTags().custom(sqlForUserTags("tag", TagsSortType.LAST_USED, OrderType.DESC)).test()
         testObserver.awaitValue()
 
         data = testObserver.value()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(3, testObserver.value().size)
-        assertTrue(data.get(0).lastUsedAt?.getDateTimeStamp()!!-data.get(2).lastUsedAt?.getDateTimeStamp()!!>0)
+        assertTrue(data.get(0).lastUsedAt?.getDateTimeStamp()!! - data.get(2).lastUsedAt?.getDateTimeStamp()!!> 0)
     }
 
     @Test
     fun testFetchTransactionUserTagsBetweenDates() {
 
-        val data1 = testTransactionTagData("tag1",createdAt = "2019-03-03")
-        val data2 = testTransactionTagData("tag2",createdAt = "2019-03-09")
-        val data3 = testTransactionTagData("tag4",createdAt = "2019-03-02")
-        val data4 = testTransactionTagData("tag3",createdAt = "2019-03-01")
+        val data1 = testTransactionTagData("tag1", createdAt = "2019-03-03")
+        val data2 = testTransactionTagData("tag2", createdAt = "2019-03-09")
+        val data3 = testTransactionTagData("tag4", createdAt = "2019-03-02")
+        val data4 = testTransactionTagData("tag3", createdAt = "2019-03-01")
         var list = mutableListOf(data1, data2, data3, data4)
         db.userTags().insertAll(list)
 
@@ -142,10 +141,10 @@ class TransactionUserTagsDaoTest {
 
         val sql = "SELECT * FROM transaction_user_tags where created_at between Date('$fromDate') and Date('$endDate')"
         val query = SimpleSQLiteQuery(sql)
-        val testObserver =  db.userTags().custom(query).test()
+        val testObserver = db.userTags().custom(query).test()
         testObserver.awaitValue()
         val list2 = testObserver.value()
-        assertEquals(1,list2.size)
+        assertEquals(1, list2.size)
         tearDown()
     }
 }

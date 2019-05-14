@@ -37,11 +37,10 @@ enum class AccountRefreshStatus {
     /** Failed. The last update failed, the user may need to take an action or wait for the problem to be solved. See [AccountRefreshAdditionalStatus] */
     @SerializedName("failed") FAILED;
 
-
     /** Enum to serialized string */
-    //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
+    // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =
-    //Try to get the annotation value if available instead of using plain .toString()
-    //Fallback to super.toString() in case annotation is not present/available
+    // Try to get the annotation value if available instead of using plain .toString()
+    // Fallback to super.toString() in case annotation is not present/available
             serializedName() ?: super.toString()
 }

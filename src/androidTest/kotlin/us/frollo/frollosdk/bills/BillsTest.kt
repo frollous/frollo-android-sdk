@@ -25,7 +25,9 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
-import org.junit.Assert.*
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.threeten.bp.LocalDate
@@ -39,11 +41,18 @@ import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.extensions.toString
 import us.frollo.frollosdk.keystore.Keystore
-import us.frollo.frollosdk.mapping.*
-import us.frollo.frollosdk.model.*
+import us.frollo.frollosdk.mapping.toAccount
+import us.frollo.frollosdk.mapping.toBill
+import us.frollo.frollosdk.mapping.toBillPayment
+import us.frollo.frollosdk.mapping.toMerchant
+import us.frollo.frollosdk.mapping.toTransactionCategory
 import us.frollo.frollosdk.model.coredata.bills.Bill
 import us.frollo.frollosdk.model.coredata.bills.BillFrequency
-import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
+import us.frollo.frollosdk.model.testAccountResponseData
+import us.frollo.frollosdk.model.testBillPaymentResponseData
+import us.frollo.frollosdk.model.testBillResponseData
+import us.frollo.frollosdk.model.testMerchantResponseData
+import us.frollo.frollosdk.model.testTransactionCategoryResponseData
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.network.api.BillsAPI
@@ -200,7 +209,7 @@ class BillsTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.bill_id_12345)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BillsAPI.URL_BILLS) {
                     return MockResponse()
@@ -239,7 +248,7 @@ class BillsTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.bill_id_12345)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BillsAPI.URL_BILLS) {
                     return MockResponse()
@@ -281,7 +290,7 @@ class BillsTest {
 
         val requestPath = "bills/$billId"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -323,7 +332,7 @@ class BillsTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.bills_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BillsAPI.URL_BILLS) {
                     return MockResponse()
@@ -362,7 +371,7 @@ class BillsTest {
         val requestPath = "bills/$billId"
 
         val body = readStringFromJson(app, R.raw.bill_id_12345)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -403,7 +412,7 @@ class BillsTest {
         val requestPath = "bills/$billId"
 
         val body = readStringFromJson(app, R.raw.bill_id_12345)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -443,7 +452,7 @@ class BillsTest {
     fun testBillsLinkToAccounts() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BillsAPI.URL_BILLS) {
                     return MockResponse()
@@ -485,7 +494,7 @@ class BillsTest {
     fun testBillsLinkToMerchants() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BillsAPI.URL_BILLS) {
                     return MockResponse()
@@ -527,7 +536,7 @@ class BillsTest {
     fun testBillsLinkToTransactionCategories() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BillsAPI.URL_BILLS) {
                     return MockResponse()
@@ -729,7 +738,7 @@ class BillsTest {
 
         val requestPath = "bills/payments/$billPaymentId"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -775,7 +784,7 @@ class BillsTest {
         val requestPath = "${BillsAPI.URL_BILL_PAYMENTS}?from_date=$fromDate&to_date=$toDate"
 
         val body = readStringFromJson(app, R.raw.bill_payments_2018_12_01_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -814,7 +823,7 @@ class BillsTest {
         val requestPath = "bills/payments/$billPaymentId"
 
         val body = readStringFromJson(app, R.raw.bill_payment_id_12345)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -858,7 +867,7 @@ class BillsTest {
         val toDate = "2021-12-02"
         val requestPath = "${BillsAPI.URL_BILL_PAYMENTS}?from_date=$fromDate&to_date=$toDate"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -901,7 +910,7 @@ class BillsTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.bills_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BillsAPI.URL_BILLS) {
                     return MockResponse()

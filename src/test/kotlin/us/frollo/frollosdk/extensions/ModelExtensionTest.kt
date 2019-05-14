@@ -42,37 +42,37 @@ class ModelExtensionTest {
 
     @Test
     fun testSQLForTransactionStaleIds() {
-        val query = sqlForTransactionStaleIds(fromDate = "2019-01-03", toDate = "2019-02-03", accountIds = longArrayOf(123,456), transactionIncluded = false)
+        val query = sqlForTransactionStaleIds(fromDate = "2019-01-03", toDate = "2019-02-03", accountIds = longArrayOf(123, 456), transactionIncluded = false)
         Assert.assertEquals("SELECT transaction_id FROM transaction_model WHERE ((transaction_date BETWEEN Date('2019-01-03') AND Date('2019-02-03'))  AND account_id IN (123,456)  AND included = 0 )", query.sql)
     }
 
     @Test
     fun testSQLForExistingAccountBalanceReports() {
-        var query = sqlForExistingAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123,456), accountId = 123, accountType = AccountType.BANK)
+        var query = sqlForExistingAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123, 456), accountId = 123, accountType = AccountType.BANK)
         Assert.assertEquals("SELECT rab.* FROM report_account_balance AS rab  LEFT JOIN account AS a ON rab.account_id = a.account_id  WHERE rab.period = 'MONTH' AND rab.date = '2019-01' AND rab.account_id IN (123,456)  AND rab.account_id = 123  AND a.attr_account_type = 'BANK' ", query.sql)
 
-        query = sqlForExistingAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123,456), accountId = 123, accountType = null)
+        query = sqlForExistingAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123, 456), accountId = 123, accountType = null)
         Assert.assertEquals("SELECT rab.* FROM report_account_balance AS rab  WHERE rab.period = 'MONTH' AND rab.date = '2019-01' AND rab.account_id IN (123,456)  AND rab.account_id = 123 ", query.sql)
 
-        query = sqlForExistingAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123,456), accountId = null, accountType = AccountType.BANK)
+        query = sqlForExistingAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123, 456), accountId = null, accountType = AccountType.BANK)
         Assert.assertEquals("SELECT rab.* FROM report_account_balance AS rab  LEFT JOIN account AS a ON rab.account_id = a.account_id  WHERE rab.period = 'MONTH' AND rab.date = '2019-01' AND rab.account_id IN (123,456)  AND a.attr_account_type = 'BANK' ", query.sql)
 
-        query = sqlForExistingAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123,456), accountId = null, accountType = null)
+        query = sqlForExistingAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123, 456), accountId = null, accountType = null)
         Assert.assertEquals("SELECT rab.* FROM report_account_balance AS rab  WHERE rab.period = 'MONTH' AND rab.date = '2019-01' AND rab.account_id IN (123,456) ", query.sql)
     }
 
     @Test
     fun testSQLForStaleIdsAccountBalanceReports() {
-        var query = sqlForStaleIdsAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123,456), accountId = 123, accountType = AccountType.BANK)
+        var query = sqlForStaleIdsAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123, 456), accountId = 123, accountType = AccountType.BANK)
         Assert.assertEquals("SELECT rab.* FROM report_account_balance AS rab  LEFT JOIN account AS a ON rab.account_id = a.account_id  WHERE rab.period = 'MONTH' AND rab.date = '2019-01' AND rab.account_id NOT IN (123,456)  AND rab.account_id = 123  AND a.attr_account_type = 'BANK' ", query.sql)
 
-        query = sqlForStaleIdsAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123,456), accountId = 123, accountType = null)
+        query = sqlForStaleIdsAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123, 456), accountId = 123, accountType = null)
         Assert.assertEquals("SELECT rab.* FROM report_account_balance AS rab  WHERE rab.period = 'MONTH' AND rab.date = '2019-01' AND rab.account_id NOT IN (123,456)  AND rab.account_id = 123 ", query.sql)
 
-        query = sqlForStaleIdsAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123,456), accountId = null, accountType = AccountType.BANK)
+        query = sqlForStaleIdsAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123, 456), accountId = null, accountType = AccountType.BANK)
         Assert.assertEquals("SELECT rab.* FROM report_account_balance AS rab  LEFT JOIN account AS a ON rab.account_id = a.account_id  WHERE rab.period = 'MONTH' AND rab.date = '2019-01' AND rab.account_id NOT IN (123,456)  AND a.attr_account_type = 'BANK' ", query.sql)
 
-        query = sqlForStaleIdsAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123,456), accountId = null, accountType = null)
+        query = sqlForStaleIdsAccountBalanceReports(date = "2019-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(123, 456), accountId = null, accountType = null)
         Assert.assertEquals("SELECT rab.* FROM report_account_balance AS rab  WHERE rab.period = 'MONTH' AND rab.date = '2019-01' AND rab.account_id NOT IN (123,456) ", query.sql)
     }
 

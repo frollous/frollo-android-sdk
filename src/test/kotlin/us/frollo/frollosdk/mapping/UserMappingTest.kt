@@ -16,7 +16,7 @@
 
 package us.frollo.frollosdk.mapping
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import us.frollo.frollosdk.model.testUserResponseData
 

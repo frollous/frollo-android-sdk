@@ -22,18 +22,19 @@ import us.frollo.frollosdk.error.FrolloSDKError
  * A value that represents either a success or a failure, including an associated data on success or error on failure.
  */
 class Resource<out T> private constructor(
-        /**
-         * Status of the fetch result
-         */
-        val status: Status,
-        /**
-         * Fetched data. null if state is [Status.ERROR]
-         */
-        val data: T? = null,
-        /**
-         * Error details if state is [Status.ERROR]
-         */
-        val error: FrolloSDKError? = null) {
+    /**
+     * Status of the fetch result
+     */
+    val status: Status,
+    /**
+     * Fetched data. null if state is [Status.ERROR]
+     */
+    val data: T? = null,
+    /**
+     * Error details if state is [Status.ERROR]
+     */
+    val error: FrolloSDKError? = null
+) {
 
     /**
      * Enum of fetch result states

@@ -18,7 +18,9 @@ package us.frollo.frollosdk.model.display.aggregation.providers
 
 import android.app.Application
 import androidx.test.platform.app.InstrumentationRegistry
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import us.frollo.frollosdk.FrolloSDK

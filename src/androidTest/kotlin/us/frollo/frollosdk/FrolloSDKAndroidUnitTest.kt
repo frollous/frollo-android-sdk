@@ -22,8 +22,12 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.jraska.livedata.test
 import okhttp3.HttpUrl
 import okhttp3.mockwebserver.MockWebServer
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

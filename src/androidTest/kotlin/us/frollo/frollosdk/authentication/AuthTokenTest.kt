@@ -21,7 +21,9 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-import org.junit.Assert.*
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
 import us.frollo.frollosdk.preferences.Preferences

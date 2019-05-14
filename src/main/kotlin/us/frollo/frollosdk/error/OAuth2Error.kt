@@ -33,7 +33,7 @@ class OAuth2Error(private val exception: AuthorizationException? = null, respons
     }
 
     /** Type of OAuth2 Error */
-    val type : OAuth2ErrorType
+    val type: OAuth2ErrorType
         get() = oAuth2ErrorResponse?.errorType ?: exception?.toOAuth2ErrorType() ?: OAuth2ErrorType.UNKNOWN
 
     /** Optional error uri returned from authentication server */

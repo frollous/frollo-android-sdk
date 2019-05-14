@@ -16,10 +16,16 @@
 
 package us.frollo.frollosdk.mapping
 
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
 import org.junit.Test
 import us.frollo.frollosdk.model.api.messages.MessageContent
-import us.frollo.frollosdk.model.coredata.messages.*
+import us.frollo.frollosdk.model.coredata.messages.ContentType
+import us.frollo.frollosdk.model.coredata.messages.MessageHTML
+import us.frollo.frollosdk.model.coredata.messages.MessageImage
+import us.frollo.frollosdk.model.coredata.messages.MessageText
+import us.frollo.frollosdk.model.coredata.messages.MessageVideo
 import us.frollo.frollosdk.model.testMessageResponseData
 import us.frollo.frollosdk.model.testModifyUserResponseData
 

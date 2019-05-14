@@ -21,9 +21,12 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
-import org.junit.*
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.extensions.sqlForExistingAccountBalanceReports
@@ -38,7 +41,8 @@ import java.math.BigDecimal
 
 class ReportAccountBalanceDaoTest {
 
-    @get:Rule val testRule = InstantTaskExecutorRule()
+    @get:Rule
+    val testRule = InstantTaskExecutorRule()
 
     private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
     private val db = SDKDatabase.getInstance(app)
@@ -127,19 +131,19 @@ class ReportAccountBalanceDaoTest {
 
         db.reportsAccountBalance().insert(*list.toTypedArray())
 
-        var sql = sqlForExistingAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234,235))
+        var sql = sqlForExistingAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234, 235))
         var models = db.reportsAccountBalance().find(sql)
         assertEquals(2, models.size)
 
-        sql = sqlForExistingAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234,235,236), accountType = AccountType.CREDIT_CARD)
+        sql = sqlForExistingAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234, 235, 236), accountType = AccountType.CREDIT_CARD)
         models = db.reportsAccountBalance().find(sql)
         assertEquals(1, models.size)
 
-        sql = sqlForExistingAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234,235,236), accountType = AccountType.BANK)
+        sql = sqlForExistingAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234, 235, 236), accountType = AccountType.BANK)
         models = db.reportsAccountBalance().find(sql)
         assertEquals(2, models.size)
 
-        sql = sqlForExistingAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234,235), accountId = 234)
+        sql = sqlForExistingAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234, 235), accountId = 234)
         models = db.reportsAccountBalance().find(sql)
         assertEquals(1, models.size)
 
@@ -147,7 +151,7 @@ class ReportAccountBalanceDaoTest {
         models = db.reportsAccountBalance().find(sql)
         assertEquals(0, models.size)
 
-        sql = sqlForExistingAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234,235,236), accountType = AccountType.BILL)
+        sql = sqlForExistingAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234, 235, 236), accountType = AccountType.BILL)
         models = db.reportsAccountBalance().find(sql)
         assertEquals(0, models.size)
     }
@@ -171,7 +175,7 @@ class ReportAccountBalanceDaoTest {
 
         db.reportsAccountBalance().insert(*list.toTypedArray())
 
-        var sql = sqlForStaleIdsAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234,235))
+        var sql = sqlForStaleIdsAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234, 235))
         var models = db.reportsAccountBalance().find(sql)
         assertEquals(2, models.size)
         assertEquals(236L, models[0].accountId)
@@ -182,7 +186,7 @@ class ReportAccountBalanceDaoTest {
         assertEquals(1, models.size)
         assertEquals(237L, models[0].accountId)
 
-        sql = sqlForStaleIdsAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234,236), accountType = AccountType.BANK)
+        sql = sqlForStaleIdsAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234, 236), accountType = AccountType.BANK)
         models = db.reportsAccountBalance().find(sql)
         assertEquals(0, models.size)
 
@@ -202,7 +206,7 @@ class ReportAccountBalanceDaoTest {
         models = db.reportsAccountBalance().find(sql)
         assertEquals(0, models.size)
 
-        sql = sqlForStaleIdsAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234,235,236), accountType = AccountType.BILL)
+        sql = sqlForStaleIdsAccountBalanceReports(date = "2018-01", period = ReportPeriod.MONTH, reportAccountIds = longArrayOf(234, 235, 236), accountType = AccountType.BILL)
         models = db.reportsAccountBalance().find(sql)
         assertEquals(0, models.size)
     }
@@ -257,7 +261,7 @@ class ReportAccountBalanceDaoTest {
         testObserver.awaitValue()
         assertEquals(3, testObserver.value().size)
 
-        db.reportsAccountBalance().deleteMany(longArrayOf(100,101))
+        db.reportsAccountBalance().deleteMany(longArrayOf(100, 101))
 
         testObserver = db.reportsAccountBalance().loadWithRelation(sql).test()
         testObserver.awaitValue()

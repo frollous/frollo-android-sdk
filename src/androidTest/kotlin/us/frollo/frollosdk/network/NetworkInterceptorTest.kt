@@ -27,7 +27,9 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 
-import org.junit.Assert.*
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
@@ -88,7 +90,7 @@ class NetworkInterceptorTest {
     fun testRequestHeaders() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -121,7 +123,7 @@ class NetworkInterceptorTest {
     fun testNoHeaderAppendedToRegistrationRequest() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_REGISTER) {
                     return MockResponse()
@@ -146,7 +148,7 @@ class NetworkInterceptorTest {
     fun testNoHeaderAppendedToResetPasswordRequest() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_PASSWORD_RESET) {
                     return MockResponse()
@@ -170,7 +172,7 @@ class NetworkInterceptorTest {
     fun testAccessTokenHeaderAppendedToHostRequests() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -213,7 +215,7 @@ class NetworkInterceptorTest {
 
     @Test
     fun testRateLimitRetries() {
-        //TODO: Failing due to timeout. Need to Debug.
+        // TODO: Failing due to timeout. Need to Debug.
         /*initSetup()
 
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")

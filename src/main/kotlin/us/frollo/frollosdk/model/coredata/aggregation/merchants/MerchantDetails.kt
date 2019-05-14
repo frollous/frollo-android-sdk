@@ -22,18 +22,18 @@ import com.google.gson.annotations.SerializedName
 /** Merchant details */
 data class MerchantDetails(
 
-        /** Unique ID of the merchant */
-        @ColumnInfo(name = "id") @SerializedName("id") val id: Long,
+    /** Unique ID of the merchant */
+    @ColumnInfo(name = "id") @SerializedName("id") val id: Long,
 
-        /** Merchant name */
-        @ColumnInfo(name = "name") @SerializedName("name") var name: String,
+    /** Merchant name */
+    @ColumnInfo(name = "name") @SerializedName("name") var name: String,
 
-        /** Merchant phone number (optional) */
-        @ColumnInfo(name = "phone") @SerializedName("phone") val phone: String?,
+    /** Merchant phone number (optional) */
+    @ColumnInfo(name = "phone") @SerializedName("phone") val phone: String?,
 
-        /** Merchant website (optional) */
-        @ColumnInfo(name = "website") @SerializedName("website") val website: String?,
+    /** Merchant website (optional) */
+    @ColumnInfo(name = "website") @SerializedName("website") val website: String?,
 
-        /** Merchant location (optional) */
-        @ColumnInfo(name = "location") @SerializedName("location") val location: MerchantLocation?
+    /** Merchant location (optional) */
+    @ColumnInfo(name = "location") @SerializedName("location") val location: MerchantLocation?
 )

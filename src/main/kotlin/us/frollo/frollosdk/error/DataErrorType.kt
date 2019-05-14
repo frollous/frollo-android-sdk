@@ -24,8 +24,9 @@ import us.frollo.frollosdk.R
  * High level type of the error
  */
 enum class DataErrorType(
-        /** Localized string resource id */
-        @StringRes val textResource: Int) {
+    /** Localized string resource id */
+    @StringRes val textResource: Int
+) {
 
     /** API data error - intercepts potential issues before being sent to API */
     API(R.string.FrolloSDK_Error_Data_API_Unknown),

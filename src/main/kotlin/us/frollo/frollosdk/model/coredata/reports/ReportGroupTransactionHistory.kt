@@ -34,37 +34,37 @@ import java.math.BigDecimal
 /** Data representation of history transaction group report */
 data class ReportGroupTransactionHistory(
 
-        /** Unique ID of the related object. E.g. merchant or category */
-        @ColumnInfo(name = "linked_id") val linkedId: Long,
+    /** Unique ID of the related object. E.g. merchant or category */
+    @ColumnInfo(name = "linked_id") val linkedId: Long,
 
-        /** Name of the related object (Optional) */
-        @ColumnInfo(name = "linked_name") val name: String,
+    /** Name of the related object (Optional) */
+    @ColumnInfo(name = "linked_name") val name: String,
 
-        /** Value of the report */
-        @ColumnInfo(name = "value") val value: BigDecimal,
+    /** Value of the report */
+    @ColumnInfo(name = "value") val value: BigDecimal,
 
-        /** Budget value for the report (Optional) */
-        @ColumnInfo(name = "budget") val budget: BigDecimal?,
+    /** Budget value for the report (Optional) */
+    @ColumnInfo(name = "budget") val budget: BigDecimal?,
 
-        /** Date of the report period. Check [ReportDateFormat] for the date formats. */
-        @ColumnInfo(name = "date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
+    /** Date of the report period. Check [ReportDateFormat] for the date formats. */
+    @ColumnInfo(name = "date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
 
-        /** Period of the report */
-        @ColumnInfo(name = "period") val period: ReportPeriod,
+    /** Period of the report */
+    @ColumnInfo(name = "period") val period: ReportPeriod,
 
-        /** Filter budget category if the report was filtered to a specific category */
-        @ColumnInfo(name = "filtered_budget_category") val filteredBudgetCategory: BudgetCategory?,
+    /** Filter budget category if the report was filtered to a specific category */
+    @ColumnInfo(name = "filtered_budget_category") val filteredBudgetCategory: BudgetCategory?,
 
-        /** Grouping - how the report response has been broken down */
-        @ColumnInfo(name = "report_grouping") val grouping: ReportGrouping,
+    /** Grouping - how the report response has been broken down */
+    @ColumnInfo(name = "report_grouping") val grouping: ReportGrouping,
 
-        /** Transaction ids related to the report */
-        @ColumnInfo(name = "transaction_ids") val transactionIds: List<Long>?,
+    /** Transaction ids related to the report */
+    @ColumnInfo(name = "transaction_ids") val transactionIds: List<Long>?,
 
-        /** Related overall report id */
-        @ColumnInfo(name = "report_id") val reportId: Long
+    /** Related overall report id */
+    @ColumnInfo(name = "report_id") val reportId: Long
 
-): IAdapterModel {
+) : IAdapterModel {
 
     /** Unique ID of the group report */
     @PrimaryKey(autoGenerate = true)

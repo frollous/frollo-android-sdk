@@ -18,7 +18,9 @@ package us.frollo.frollosdk.error
 
 import android.app.Application
 import androidx.test.platform.app.InstrumentationRegistry
-import org.junit.Assert.*
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import us.frollo.frollosdk.FrolloSDK
@@ -74,12 +76,12 @@ class APIErrorTest {
     @Test
     fun testDebugDescription() {
         var apiError = APIError(401, "{\"error\":{\"error_code\":\"F0101\",\"error_message\":\"Invalid access token\"}}")
-        var localizedDescription =  app.resources.getString(APIErrorType.INVALID_ACCESS_TOKEN.textResource)
+        var localizedDescription = app.resources.getString(APIErrorType.INVALID_ACCESS_TOKEN.textResource)
         var str = "APIError: Type [INVALID_ACCESS_TOKEN] HTTP Status Code: 401 F0101: Invalid access token | $localizedDescription"
         assertEquals(str, apiError.debugDescription)
 
         apiError = APIError(401, "")
-        localizedDescription =  app.resources.getString(APIErrorType.OTHER_AUTHORISATION.textResource)
+        localizedDescription = app.resources.getString(APIErrorType.OTHER_AUTHORISATION.textResource)
         str = "APIError: Type [OTHER_AUTHORISATION] HTTP Status Code: 401  | $localizedDescription"
         assertEquals(str, apiError.debugDescription)
     }

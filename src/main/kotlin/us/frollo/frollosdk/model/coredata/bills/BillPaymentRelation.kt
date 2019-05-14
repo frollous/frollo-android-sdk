@@ -23,18 +23,18 @@ import us.frollo.frollosdk.model.IAdapterModel
 /** Bill Payment with associated data */
 data class BillPaymentRelation(
 
-        /** Bill Payment */
-        @Embedded
-        var billPayment: BillPayment? = null,
+    /** Bill Payment */
+    @Embedded
+    var billPayment: BillPayment? = null,
 
-        /** Associated Bill
-         *
-         * Even though its a list this will have only one element. It is requirement of Room database for this to be a list.
-         */
-        @Relation(parentColumn = "bill_id", entityColumn = "bill_id", entity = Bill::class)
-        var bills: List<BillRelation>? = null
+    /** Associated Bill
+     *
+     * Even though its a list this will have only one element. It is requirement of Room database for this to be a list.
+     */
+    @Relation(parentColumn = "bill_id", entityColumn = "bill_id", entity = Bill::class)
+    var bills: List<BillRelation>? = null
 
-): IAdapterModel {
+) : IAdapterModel {
 
     /** Associated Bill */
     val bill: BillRelation?

@@ -20,26 +20,25 @@ import com.google.gson.annotations.SerializedName
 import java.math.BigDecimal
 
 internal data class TransactionCurrentReportResponse(
-        @SerializedName("days") val days: List<Report>,
-        @SerializedName("groups") val groups: List<GroupReport>
+    @SerializedName("days") val days: List<Report>,
+    @SerializedName("groups") val groups: List<GroupReport>
 ) {
 
     internal data class Report(
-            @SerializedName("day") val day: Int,
-            @SerializedName("spend_value") val spendValue: BigDecimal?,
-            @SerializedName("previous_period_value") val previousPeriodValue: BigDecimal?,
-            @SerializedName("average_value") val averageValue: BigDecimal?,
-            @SerializedName("budget_value") val budgetValue: BigDecimal?
+        @SerializedName("day") val day: Int,
+        @SerializedName("spend_value") val spendValue: BigDecimal?,
+        @SerializedName("previous_period_value") val previousPeriodValue: BigDecimal?,
+        @SerializedName("average_value") val averageValue: BigDecimal?,
+        @SerializedName("budget_value") val budgetValue: BigDecimal?
     )
 
     internal data class GroupReport(
-            @SerializedName("id") val id: Long,
-            @SerializedName("name") val name: String,
-            @SerializedName("spend_value") val spendValue: BigDecimal?,
-            @SerializedName("previous_period_value") val previousPeriodValue: BigDecimal?,
-            @SerializedName("average_value") val averageValue: BigDecimal?,
-            @SerializedName("budget_value") val budgetValue: BigDecimal?,
-            @SerializedName("days") val days: List<Report>
+        @SerializedName("id") val id: Long,
+        @SerializedName("name") val name: String,
+        @SerializedName("spend_value") val spendValue: BigDecimal?,
+        @SerializedName("previous_period_value") val previousPeriodValue: BigDecimal?,
+        @SerializedName("average_value") val averageValue: BigDecimal?,
+        @SerializedName("budget_value") val budgetValue: BigDecimal?,
+        @SerializedName("days") val days: List<Report>
     )
-
 }

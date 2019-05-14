@@ -30,12 +30,18 @@ import us.frollo.frollosdk.testutils.randomNumber
 import us.frollo.frollosdk.testutils.randomString
 import us.frollo.frollosdk.testutils.randomUUID
 import java.math.BigDecimal
-import java.util.*
+import java.util.Date
 import kotlin.random.Random
 
-internal fun testTransactionResponseData(transactionId: Long? = null, accountId: Long? = null,
-                                         categoryId: Long? = null, merchantId: Long? = null,
-                                         transactionDate: String? = null, included: Boolean? = null, userTags: List<String>? = null) : TransactionResponse {
+internal fun testTransactionResponseData(
+    transactionId: Long? = null,
+    accountId: Long? = null,
+    categoryId: Long? = null,
+    merchantId: Long? = null,
+    transactionDate: String? = null,
+    included: Boolean? = null,
+    userTags: List<String>? = null
+): TransactionResponse {
     return TransactionResponse(
             transactionId = transactionId ?: randomNumber().toLong(),
             accountId = accountId ?: randomNumber().toLong(),
@@ -63,11 +69,10 @@ internal fun testMerchantDetails(merchantId: Long? = null): MerchantDetails =
                 website = randomUUID(),
                 location = null)
 
-internal fun testTransactionsSummaryResponseData(count: Long? = null, sum: BigDecimal? = null) : TransactionsSummaryResponse =
-     TransactionsSummaryResponse(
-            count = count ?: randomNumber().toLong(),
-            sum = sum ?: randomNumber().toBigDecimal())
-
+internal fun testTransactionsSummaryResponseData(count: Long? = null, sum: BigDecimal? = null): TransactionsSummaryResponse =
+        TransactionsSummaryResponse(
+                count = count ?: randomNumber().toLong(),
+                sum = sum ?: randomNumber().toBigDecimal())
 
 internal fun testTransactionTagData(name: String? = null, createdAt: String? = null, lastUsedAt: String? = null): TransactionTag =
         TransactionTag(

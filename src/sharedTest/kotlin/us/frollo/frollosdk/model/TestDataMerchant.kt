@@ -22,7 +22,7 @@ import us.frollo.frollosdk.testutils.randomNumber
 import us.frollo.frollosdk.testutils.randomUUID
 import kotlin.random.Random
 
-internal fun testMerchantResponseData(merchantId: Long? = null) : MerchantResponse {
+internal fun testMerchantResponseData(merchantId: Long? = null): MerchantResponse {
     return MerchantResponse(
             merchantId = merchantId ?: randomNumber().toLong(),
             name = randomUUID(),

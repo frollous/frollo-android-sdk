@@ -21,16 +21,17 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Before
 
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.model.*
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.model.testReportGroupTransactionHistoryData
 import java.math.BigDecimal
 
 class ReportGroupTransactionHistoryDaoTest {
@@ -81,7 +82,7 @@ class ReportGroupTransactionHistoryDaoTest {
 
         db.reportGroupsTransactionHistory().insertAll(*list.toTypedArray())
 
-        val models = db.reportGroupsTransactionHistory().find(reportId = 201, linkedIds = longArrayOf(1,12))
+        val models = db.reportGroupsTransactionHistory().find(reportId = 201, linkedIds = longArrayOf(1, 12))
         assertTrue(models.isNotEmpty())
         assertEquals(2, models.size)
         assertTrue(models.map { it.reportGroupId }.toList().containsAll(mutableListOf<Long>(101, 104)))
@@ -100,7 +101,7 @@ class ReportGroupTransactionHistoryDaoTest {
 
         db.reportGroupsTransactionHistory().insertAll(*list.toTypedArray())
 
-        val models = db.reportGroupsTransactionHistory().findStaleIds(reportId = 201, linkedIds = longArrayOf(1,12))
+        val models = db.reportGroupsTransactionHistory().findStaleIds(reportId = 201, linkedIds = longArrayOf(1, 12))
         assertTrue(models.isNotEmpty())
         assertEquals(1, models.size)
         assertEquals(105L, models[0])
@@ -170,7 +171,7 @@ class ReportGroupTransactionHistoryDaoTest {
         assertTrue(models.isNotEmpty())
         assertEquals(3, models.size)
 
-        db.reportGroupsTransactionHistory().deleteMany(longArrayOf(100,102))
+        db.reportGroupsTransactionHistory().deleteMany(longArrayOf(100, 102))
 
         models = db.reportGroupsTransactionHistory().load()
 
@@ -193,7 +194,7 @@ class ReportGroupTransactionHistoryDaoTest {
         assertTrue(models.isNotEmpty())
         assertEquals(3, models.size)
 
-        db.reportGroupsTransactionHistory().deleteByReportIds(longArrayOf(200,202))
+        db.reportGroupsTransactionHistory().deleteByReportIds(longArrayOf(200, 202))
 
         models = db.reportGroupsTransactionHistory().load()
 

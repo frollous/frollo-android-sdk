@@ -17,7 +17,7 @@
 package us.frollo.frollosdk.testutils
 
 import retrofit2.Call
-import retrofit2.http.*
+import retrofit2.http.PUT
 
 internal interface TestAPI {
     companion object {

@@ -17,7 +17,10 @@
 package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.PUT
+import retrofit2.http.Path
 import us.frollo.frollosdk.model.api.messages.MessageResponse
 import us.frollo.frollosdk.model.api.messages.MessageUpdateRequest
 

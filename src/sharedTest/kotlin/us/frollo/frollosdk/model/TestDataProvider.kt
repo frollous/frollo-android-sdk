@@ -17,11 +17,20 @@
 package us.frollo.frollosdk.model
 
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
-import us.frollo.frollosdk.model.coredata.aggregation.providers.*
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderAuthType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderEncryption
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderEncryptionType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderFieldType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderFormField
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderFormRow
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderFormType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderMFAType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 import us.frollo.frollosdk.testutils.randomNumber
 import us.frollo.frollosdk.testutils.randomUUID
 
-internal fun testProviderResponseData(providerId: Long? = null) : ProviderResponse {
+internal fun testProviderResponseData(providerId: Long? = null): ProviderResponse {
     val encryption = ProviderEncryption(
             encryptionType = ProviderEncryptionType.ENCRYPT_VALUES,
             alias = "09282016_1",

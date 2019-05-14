@@ -26,7 +26,10 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
@@ -43,12 +46,28 @@ import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.keystore.Keystore
-import us.frollo.frollosdk.mapping.*
-import us.frollo.frollosdk.model.*
-import us.frollo.frollosdk.model.coredata.aggregation.accounts.*
+import us.frollo.frollosdk.mapping.toAccount
+import us.frollo.frollosdk.mapping.toMerchant
+import us.frollo.frollosdk.mapping.toProvider
+import us.frollo.frollosdk.mapping.toProviderAccount
+import us.frollo.frollosdk.mapping.toTransaction
+import us.frollo.frollosdk.mapping.toTransactionCategory
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
+import us.frollo.frollosdk.model.loginFormFilledData
+import us.frollo.frollosdk.model.testAccountResponseData
+import us.frollo.frollosdk.model.testMerchantResponseData
+import us.frollo.frollosdk.model.testProviderAccountResponseData
+import us.frollo.frollosdk.model.testProviderResponseData
+import us.frollo.frollosdk.model.testTransactionCategoryResponseData
+import us.frollo.frollosdk.model.testTransactionResponseData
+import us.frollo.frollosdk.model.testTransactionTagData
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
-import us.frollo.frollosdk.testutils.*
+import us.frollo.frollosdk.testutils.randomBoolean
+import us.frollo.frollosdk.testutils.randomUUID
+import us.frollo.frollosdk.testutils.readStringFromJson
+import us.frollo.frollosdk.testutils.trimmedPath
+import us.frollo.frollosdk.testutils.wait
 
 class AggregationTest {
 
@@ -182,7 +201,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.providers_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_PROVIDERS) {
                     return MockResponse()
@@ -217,7 +236,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.provider_id_12345)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/providers/12345") {
                     return MockResponse()
@@ -394,7 +413,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.provider_accounts_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_PROVIDER_ACCOUNTS) {
                     return MockResponse()
@@ -429,7 +448,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.provider_account_id_123)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/provideraccounts/123") {
                     return MockResponse()
@@ -464,7 +483,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.provider_account_id_123)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_PROVIDER_ACCOUNTS) {
                     return MockResponse()
@@ -499,7 +518,7 @@ class AggregationTest {
     fun testDeleteProviderAccount() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/provideraccounts/12345") {
                     return MockResponse()
@@ -537,7 +556,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.provider_account_id_123)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/provideraccounts/123") {
                     return MockResponse()
@@ -572,7 +591,7 @@ class AggregationTest {
     fun testProviderAccountsFetchMissingProviders() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_PROVIDER_ACCOUNTS) {
                     return MockResponse()
@@ -760,7 +779,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.accounts_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_ACCOUNTS) {
                     return MockResponse()
@@ -795,7 +814,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.account_id_542)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/accounts/542") {
                     return MockResponse()
@@ -830,7 +849,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.transactions_user_tags)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_USER_TAGS) {
                     return MockResponse()
@@ -853,7 +872,7 @@ class AggregationTest {
         }
 
         val request = mockServer.takeRequest()
-        assertEquals("${AggregationAPI.URL_USER_TAGS}", request.trimmedPath)
+        assertEquals(AggregationAPI.URL_USER_TAGS, request.trimmedPath)
 
         wait(3)
 
@@ -864,7 +883,7 @@ class AggregationTest {
     fun testFetchSuggestedTransactionTags() {
         initSetup()
         val body = readStringFromJson(app, R.raw.transactions_user_tags)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath!!.contains(AggregationAPI.URL_SUGGESTED_TAGS)) {
                     return MockResponse()
@@ -891,10 +910,10 @@ class AggregationTest {
     fun testFetchTransactionUserTags() {
         initSetup()
 
-        val data1 = testTransactionTagData("tag1",createdAt = "2019-03-03")
-        val data2 = testTransactionTagData("tag2",createdAt = "2019-03-09")
-        val data3 = testTransactionTagData("tag4",createdAt = "2019-03-02")
-        val data4 = testTransactionTagData("tag3",createdAt = "2019-03-01")
+        val data1 = testTransactionTagData("tag1", createdAt = "2019-03-03")
+        val data2 = testTransactionTagData("tag2", createdAt = "2019-03-09")
+        val data3 = testTransactionTagData("tag4", createdAt = "2019-03-02")
+        val data4 = testTransactionTagData("tag3", createdAt = "2019-03-01")
         var list = mutableListOf(data1, data2, data3, data4)
         database.userTags().insertAll(list)
 
@@ -903,10 +922,10 @@ class AggregationTest {
 
         val sql = "SELECT * FROM transaction_user_tags where created_at between Date('$fromDate') and Date('$endDate')"
         val query = SimpleSQLiteQuery(sql)
-        val testObserver =  aggregation.fetchTransactionUserTags(query).test()
+        val testObserver = aggregation.fetchTransactionUserTags(query).test()
         testObserver.awaitValue()
         val list2 = testObserver.value().data!!
-        assertEquals(1,list2.size)
+        assertEquals(1, list2.size)
         tearDown()
 
         wait(3)
@@ -919,7 +938,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.account_id_542)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/accounts/542") {
                     return MockResponse()
@@ -963,7 +982,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.account_id_542)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/accounts/542") {
                     return MockResponse()
@@ -1044,7 +1063,7 @@ class AggregationTest {
 
         database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
 
-        val testObserver = aggregation.fetchTransactions(longArrayOf(101,103)).test()
+        val testObserver = aggregation.fetchTransactions(longArrayOf(101, 103)).test()
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
         assertEquals(2, testObserver.value().data?.size)
@@ -1090,7 +1109,7 @@ class AggregationTest {
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
         assertEquals(3, testObserver.value().data?.size)
-        assertTrue(testObserver.value().data?.map { it.transactionId }?.toList()?.containsAll(listOf(101L,102L,103L)) == true)
+        assertTrue(testObserver.value().data?.map { it.transactionId }?.toList()?.containsAll(listOf(101L, 102L, 103L)) == true)
 
         tearDown()
     }
@@ -1099,17 +1118,17 @@ class AggregationTest {
     fun testFetchTransactionsByTags() {
         initSetup()
 
-        val data1 = testTransactionResponseData(transactionId = 100,userTags = listOf("abc", "def"))
-        val data2 = testTransactionResponseData(transactionId = 101,userTags = listOf("abc2", "def2"))
-        val data3 = testTransactionResponseData(transactionId = 102,userTags = listOf("hello", "how"))
-        val data4 = testTransactionResponseData(transactionId = 103,userTags = listOf("why", "are"))
-        val data5 = testTransactionResponseData(transactionId = 104,userTags = listOf("why", "are"))
-        val data6 = testTransactionResponseData(transactionId = 105,userTags = listOf("why", "are"))
+        val data1 = testTransactionResponseData(transactionId = 100, userTags = listOf("abc", "def"))
+        val data2 = testTransactionResponseData(transactionId = 101, userTags = listOf("abc2", "def2"))
+        val data3 = testTransactionResponseData(transactionId = 102, userTags = listOf("hello", "how"))
+        val data4 = testTransactionResponseData(transactionId = 103, userTags = listOf("why", "are"))
+        val data5 = testTransactionResponseData(transactionId = 104, userTags = listOf("why", "are"))
+        val data6 = testTransactionResponseData(transactionId = 105, userTags = listOf("why", "are"))
         val list = mutableListOf(data1, data2, data3, data4, data5, data6)
 
         database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
 
-        val tagList = listOf("why","are")
+        val tagList = listOf("why", "are")
         val liveDataObj = aggregation.fetchTransactionsByTags(tagList).test()
         val transactionList = liveDataObj.value()
         assertNotNull(transactionList.data)
@@ -1123,10 +1142,10 @@ class AggregationTest {
     fun testFetchTransactionsByUserTagsWithRelation() {
         initSetup()
 
-        database.transactions().insert(testTransactionResponseData(transactionId = 122, accountId = 234, categoryId = 567, merchantId = 678,userTags = listOf("why", "are")).toTransaction())
-        database.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678,userTags = listOf("why", "are")).toTransaction())
-        database.transactions().insert(testTransactionResponseData(transactionId = 124, accountId = 235, categoryId = 567, merchantId = 678,userTags = listOf("why", "are")).toTransaction())
-        database.transactions().insert(testTransactionResponseData(transactionId = 125, accountId = 235, categoryId = 567, merchantId = 678,userTags = listOf("whyasdas", "areasdasd")).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 122, accountId = 234, categoryId = 567, merchantId = 678, userTags = listOf("why", "are")).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678, userTags = listOf("why", "are")).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 124, accountId = 235, categoryId = 567, merchantId = 678, userTags = listOf("why", "are")).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 125, accountId = 235, categoryId = 567, merchantId = 678, userTags = listOf("whyasdas", "areasdasd")).toTransaction())
         database.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())
         database.accounts().insert(testAccountResponseData(accountId = 235, providerAccountId = 345).toAccount())
         database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 345, providerId = 456).toProviderAccount())
@@ -1134,7 +1153,7 @@ class AggregationTest {
         database.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
         database.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
 
-        val tagList = listOf("why","are")
+        val tagList = listOf("why", "are")
         val testObserver = aggregation.fetchTransactionsByTagsWithRelation(tagList).test()
         testObserver.awaitValue()
 
@@ -1143,7 +1162,7 @@ class AggregationTest {
         assertTrue(list?.isNotEmpty()!!)
         assertEquals(3, list?.size)
 
-        val model1 =list[0]
+        val model1 = list[0]
 
         assertEquals(122L, model1.transaction?.transactionId)
         assertEquals(678L, model1.merchant?.merchantId)
@@ -1326,7 +1345,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.transactions_2018_08_01_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?from_date=2018-06-01&to_date=2018-08-08&skip=0&count=200") {
                     return MockResponse()
@@ -1360,7 +1379,7 @@ class AggregationTest {
     fun testRefreshPaginatedTransactions() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?from_date=2018-08-01&to_date=2018-08-31&skip=0&count=200") {
                     return MockResponse()
@@ -1396,7 +1415,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.transaction_id_194630)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/transactions/194630") {
                     return MockResponse()
@@ -1431,7 +1450,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.transactions_2018_08_01_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?transaction_ids=1,2,3,4,5") {
                     return MockResponse()
@@ -1466,7 +1485,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.transaction_id_194630_excluded)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/transactions/194630") {
                     return MockResponse()
@@ -1506,7 +1525,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.transaction_id_194630)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/transactions/194630") {
                     return MockResponse()
@@ -1546,7 +1565,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.transaction_id_194630)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/transactions/194630") {
                     return MockResponse()
@@ -1580,7 +1599,6 @@ class AggregationTest {
         tearDown()
     }
 
-
     @Test
     fun testTransactionSearch() {
         initSetup()
@@ -1588,7 +1606,7 @@ class AggregationTest {
         val searchTerm = "Travel"
         val requestPath = "${AggregationAPI.URL_TRANSACTIONS_SEARCH}?search_term=$searchTerm&skip=0&count=200"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -1630,7 +1648,7 @@ class AggregationTest {
         val requestPath1 = "${AggregationAPI.URL_TRANSACTIONS_SEARCH}?search_term=$searchTerm&from_date=2018-08-01&to_date=2018-08-31&skip=0&count=200"
         val requestPath2 = "${AggregationAPI.URL_TRANSACTIONS_SEARCH}?search_term=$searchTerm&from_date=2018-08-01&to_date=2018-08-31&skip=200&count=200"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath1) {
                     return MockResponse()
@@ -1686,7 +1704,7 @@ class AggregationTest {
     fun testTransactionsFetchMissingMerchants() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?from_date=2018-06-01&to_date=2018-08-08&skip=0&count=200") {
                     return MockResponse()
@@ -1731,7 +1749,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.transactions_summary_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?from_date=2018-06-01&to_date=2018-08-08") {
                     return MockResponse()
@@ -1764,7 +1782,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.transactions_summary_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?transaction_ids=1,2,3,4,5") {
                     return MockResponse()
@@ -1835,7 +1853,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.transaction_categories_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_TRANSACTION_CATEGORIES) {
                     return MockResponse()
@@ -1908,7 +1926,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.merchants_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_MERCHANTS) {
                     return MockResponse()
@@ -1943,7 +1961,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.merchant_id_197)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/merchants/197") {
                     return MockResponse()
@@ -1978,7 +1996,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.merchants_by_id)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?merchant_ids=22,30,31,106,691") {
                     return MockResponse()
@@ -2013,7 +2031,7 @@ class AggregationTest {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.providers_valid)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_PROVIDERS) {
                     return MockResponse()

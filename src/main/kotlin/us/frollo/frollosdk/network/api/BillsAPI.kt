@@ -17,8 +17,19 @@
 package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
-import retrofit2.http.*
-import us.frollo.frollosdk.model.api.bills.*
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
+import retrofit2.http.QueryMap
+import us.frollo.frollosdk.model.api.bills.BillCreateRequest
+import us.frollo.frollosdk.model.api.bills.BillPaymentResponse
+import us.frollo.frollosdk.model.api.bills.BillPaymentUpdateRequest
+import us.frollo.frollosdk.model.api.bills.BillResponse
+import us.frollo.frollosdk.model.api.bills.BillUpdateRequest
+import us.frollo.frollosdk.model.api.bills.BillsResponse
 
 internal interface BillsAPI {
     companion object {

@@ -74,49 +74,49 @@ object FrolloSDK {
      * Authentication - All authentication and user related data see [Authentication] for details
      */
     val authentication: Authentication
-        get() =_authentication ?: throw IllegalAccessException("SDK not setup")
+        get() = _authentication ?: throw IllegalAccessException("SDK not setup")
 
     /**
      * Aggregation - All account and transaction related data see [Aggregation] for details
      */
     val aggregation: Aggregation
-        get() =_aggregation ?: throw IllegalAccessException("SDK not setup")
+        get() = _aggregation ?: throw IllegalAccessException("SDK not setup")
 
     /**
      * Messages - All messages management. See [Messages] for details
      */
     val messages: Messages
-        get() =_messages ?: throw IllegalAccessException("SDK not setup")
+        get() = _messages ?: throw IllegalAccessException("SDK not setup")
 
     /**
      * Events - Triggering and handling of events. See [Events] for details
      */
     val events: Events
-        get() =_events ?: throw IllegalAccessException("SDK not setup")
+        get() = _events ?: throw IllegalAccessException("SDK not setup")
 
     /**
      * Notifications - Registering and handling of push notifications. See [Notifications] for details
      */
     val notifications: Notifications
-        get() =_notifications ?: throw IllegalAccessException("SDK not setup")
+        get() = _notifications ?: throw IllegalAccessException("SDK not setup")
 
     /**
      * Surveys - Handling surveys. See [Surveys] for details
      */
     val surveys: Surveys
-        get() =_surveys ?: throw IllegalAccessException("SDK not setup")
+        get() = _surveys ?: throw IllegalAccessException("SDK not setup")
 
     /**
      * Reports - Aggregation data reports. See [Reports] for details
      */
     val reports: Reports
-        get() =_reports ?: throw IllegalAccessException("SDK not setup")
+        get() = _reports ?: throw IllegalAccessException("SDK not setup")
 
     /**
      * Bills - All bills and bill payments. See [Bills] for details
      */
     val bills: Bills
-        get() =_bills ?: throw IllegalAccessException("SDK not setup")
+        get() = _bills ?: throw IllegalAccessException("SDK not setup")
 
     private var _setup = false
     private var _authentication: Authentication? = null

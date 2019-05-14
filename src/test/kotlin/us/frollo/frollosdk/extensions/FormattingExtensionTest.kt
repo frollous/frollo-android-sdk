@@ -16,11 +16,13 @@
 
 package us.frollo.frollosdk.extensions
 
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.threeten.bp.LocalDate
 import org.threeten.bp.Month
-import java.util.*
+import java.util.Calendar
 
 class FormattingExtensionTest {
 
@@ -82,19 +84,19 @@ class FormattingExtensionTest {
 
     @Test
     fun testGetWeekInMonth() {
-        for(i in 1..7) {
+        for (i in 1..7) {
             assertEquals(1, getWeekInMonth(i))
         }
-        for(i in 8..14) {
+        for (i in 8..14) {
             assertEquals(2, getWeekInMonth(i))
         }
-        for(i in 15..21) {
+        for (i in 15..21) {
             assertEquals(3, getWeekInMonth(i))
         }
-        for(i in 22..28) {
+        for (i in 22..28) {
             assertEquals(4, getWeekInMonth(i))
         }
-        for(i in 29..31) {
+        for (i in 29..31) {
             assertEquals(5, getWeekInMonth(i))
         }
     }

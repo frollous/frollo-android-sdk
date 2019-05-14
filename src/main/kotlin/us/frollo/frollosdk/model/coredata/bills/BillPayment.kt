@@ -34,35 +34,35 @@ import java.math.BigDecimal
 /** Data representation of a Bill payment */
 data class BillPayment(
 
-        /** Unique ID of the bill payment */
-        @PrimaryKey
-        @ColumnInfo(name = "bill_payment_id") val billPaymentId: Long,
+    /** Unique ID of the bill payment */
+    @PrimaryKey
+    @ColumnInfo(name = "bill_payment_id") val billPaymentId: Long,
 
-        /** Bill ID of the parent bill */
-        @ColumnInfo(name = "bill_id") val billId: Long,
+    /** Bill ID of the parent bill */
+    @ColumnInfo(name = "bill_id") val billId: Long,
 
-        /** Name of the bill */
-        @ColumnInfo(name = "name") val name: String,
+    /** Name of the bill */
+    @ColumnInfo(name = "name") val name: String,
 
-        /** Merchant ID associated with the bill payment */
-        @ColumnInfo(name = "merchant_id") val merchantId: Long?,
+    /** Merchant ID associated with the bill payment */
+    @ColumnInfo(name = "merchant_id") val merchantId: Long?,
 
-        /** Date of the bill payment. See [BillPayment.DATE_FORMAT_PATTERN] for the date format pattern */
-        @ColumnInfo(name = "date") var date: String, // yyyy-MM-dd
+    /** Date of the bill payment. See [BillPayment.DATE_FORMAT_PATTERN] for the date format pattern */
+    @ColumnInfo(name = "date") var date: String, // yyyy-MM-dd
 
-        /** Status of the bill payment */
-        @ColumnInfo(name = "payment_status") var paymentStatus: BillPaymentStatus,
+    /** Status of the bill payment */
+    @ColumnInfo(name = "payment_status") var paymentStatus: BillPaymentStatus,
 
-        /** Frequency the bill payment occurs */
-        @ColumnInfo(name = "frequency") val frequency: BillFrequency,
+    /** Frequency the bill payment occurs */
+    @ColumnInfo(name = "frequency") val frequency: BillFrequency,
 
-        /** Amount of the payment */
-        @ColumnInfo(name = "amount") val amount: BigDecimal,
+    /** Amount of the payment */
+    @ColumnInfo(name = "amount") val amount: BigDecimal,
 
-        /** Indicates if the bill payment can be marked as unpaid */
-        @ColumnInfo(name = "unpayable") val unpayable: Boolean
+    /** Indicates if the bill payment can be marked as unpaid */
+    @ColumnInfo(name = "unpayable") val unpayable: Boolean
 
-): IAdapterModel {
+) : IAdapterModel {
 
     companion object {
 

@@ -23,8 +23,9 @@ import us.frollo.frollosdk.extensions.serializedName
  * Period - the time period the report is broken down to
  */
 enum class ReportPeriod(
-        /** Date format to convert date from stored date string to user's current locale */
-        val dateFormatPattern: String) {
+    /** Date format to convert date from stored date string to user's current locale */
+    val dateFormatPattern: String
+) {
 
     /** Days */
     @SerializedName("by_day") DAY(ReportDateFormat.DAILY),
@@ -36,9 +37,9 @@ enum class ReportPeriod(
     @SerializedName("by_week") WEEK(ReportDateFormat.WEEKLY);
 
     /** Enum to serialized string */
-    //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
+    // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =
-    //Try to get the annotation value if available instead of using plain .toString()
-    //Fallback to super.toString() in case annotation is not present/available
+    // Try to get the annotation value if available instead of using plain .toString()
+    // Fallback to super.toString() in case annotation is not present/available
             serializedName() ?: super.toString()
 }

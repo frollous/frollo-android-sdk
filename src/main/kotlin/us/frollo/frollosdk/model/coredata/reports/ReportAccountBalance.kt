@@ -33,22 +33,22 @@ import java.math.BigDecimal
 /** Data representation of account balance report */
 data class ReportAccountBalance(
 
-        /** Date of the report period. Check [ReportDateFormat] for the date formats. */
-        @ColumnInfo(name = "date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
+    /** Date of the report period. Check [ReportDateFormat] for the date formats. */
+    @ColumnInfo(name = "date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
 
-        /** Related account ID */
-        @ColumnInfo(name = "account_id") val accountId: Long,
+    /** Related account ID */
+    @ColumnInfo(name = "account_id") val accountId: Long,
 
-        /** Currency of the report. ISO 4217 code */
-        @ColumnInfo(name = "currency") val currency: String,
+    /** Currency of the report. ISO 4217 code */
+    @ColumnInfo(name = "currency") val currency: String,
 
-        /** Balance of the report */
-        @ColumnInfo(name = "value") val value: BigDecimal,
+    /** Balance of the report */
+    @ColumnInfo(name = "value") val value: BigDecimal,
 
-        /** Period of the report */
-        @ColumnInfo(name = "period") val period: ReportPeriod
+    /** Period of the report */
+    @ColumnInfo(name = "period") val period: ReportPeriod
 
-): IAdapterModel {
+) : IAdapterModel {
 
     /** Unique ID of the report */
     @PrimaryKey(autoGenerate = true)

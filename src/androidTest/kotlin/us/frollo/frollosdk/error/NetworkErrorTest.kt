@@ -21,7 +21,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Before
 import org.junit.Test
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import us.frollo.frollosdk.FrolloSDK
 import javax.net.ssl.SSLException
 

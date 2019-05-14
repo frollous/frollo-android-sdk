@@ -35,29 +35,29 @@ import javax.crypto.Cipher
  */
 data class ProviderLoginForm(
 
-        /** ID of the login form (optional) */
-        @SerializedName("id") val formId: String?,
+    /** ID of the login form (optional) */
+    @SerializedName("id") val formId: String?,
 
-        /** Forgot password URL for the selected provider (optional) */
-        @SerializedName("forgetPasswordURL") val forgetPasswordUrl: String?,
+    /** Forgot password URL for the selected provider (optional) */
+    @SerializedName("forgetPasswordURL") val forgetPasswordUrl: String?,
 
-        /** Additional help message for the current login form (optional) */
-        @SerializedName("help") val help: String?,
+    /** Additional help message for the current login form (optional) */
+    @SerializedName("help") val help: String?,
 
-        /** Additional information title for MFA login forms (optional) */
-        @SerializedName("mfaInfoTitle") val mfaInfoTitle: String?,
+    /** Additional information title for MFA login forms (optional) */
+    @SerializedName("mfaInfoTitle") val mfaInfoTitle: String?,
 
-        /** Additional information on how to complete the MFA challenge login form (optional) */
-        @SerializedName("mfaInfoText") val mfaInfoText: String?,
+    /** Additional information on how to complete the MFA challenge login form (optional) */
+    @SerializedName("mfaInfoText") val mfaInfoText: String?,
 
-        /** Time before the MFA challenge times out (optional) */
-        @SerializedName("mfaTimeout") val mfaTimeout: Long?,
+    /** Time before the MFA challenge times out (optional) */
+    @SerializedName("mfaTimeout") val mfaTimeout: Long?,
 
-        /** Type of login form see [ProviderFormType] for details */
-        @SerializedName("formType") val formType: ProviderFormType,
+    /** Type of login form see [ProviderFormType] for details */
+    @SerializedName("formType") val formType: ProviderFormType,
 
-        /** List of login form rows. Use a ProviderLoginFormDisplay to collate multiple choice rows together for easier UI display */
-        @SerializedName("row") val rows: List<ProviderFormRow>
+    /** List of login form rows. Use a ProviderLoginFormDisplay to collate multiple choice rows together for easier UI display */
+    @SerializedName("row") val rows: List<ProviderFormRow>
 ) {
 
     /**

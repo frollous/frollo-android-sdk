@@ -28,8 +28,10 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Test
-
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertEquals
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
@@ -90,7 +92,7 @@ class EventsTest {
     fun testTriggerEvent() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == EventsAPI.URL_EVENT) {
                     return MockResponse()
@@ -117,7 +119,7 @@ class EventsTest {
     fun testEventHandled() {
         initSetup()
 
-        events.handleEvent("TEST_EVENT") { handled, error  ->
+        events.handleEvent("TEST_EVENT") { handled, error ->
             assertNull(error)
             assertTrue(handled)
         }
@@ -134,7 +136,7 @@ class EventsTest {
 
         val payload = testTransactionUpdatedNotificationPayload()
 
-        events.handleEvent("T_UPDATED", notificationPayload = payload) { handled, error  ->
+        events.handleEvent("T_UPDATED", notificationPayload = payload) { handled, error ->
             assertNull(error)
             assertTrue(handled)
         }
@@ -153,7 +155,7 @@ class EventsTest {
     fun testEventNotHandled() {
         initSetup()
 
-        events.handleEvent("UNKNOWN_EVENT") { handled, error  ->
+        events.handleEvent("UNKNOWN_EVENT") { handled, error ->
             assertNull(error)
             assertFalse(handled)
         }

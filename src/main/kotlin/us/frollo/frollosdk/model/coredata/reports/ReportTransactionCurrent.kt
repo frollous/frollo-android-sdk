@@ -34,34 +34,34 @@ import java.math.BigDecimal
 /** Data representation of current transaction report */
 data class ReportTransactionCurrent(
 
-        /** Day of the month */
-        @ColumnInfo(name = "day") val day: Int,
+    /** Day of the month */
+    @ColumnInfo(name = "day") val day: Int,
 
-        /** Unique ID of the related object. E.g. merchant or category. null value represents no link or overall report */
-        @ColumnInfo(name = "linked_id") val linkedId: Long?,
+    /** Unique ID of the related object. E.g. merchant or category. null value represents no link or overall report */
+    @ColumnInfo(name = "linked_id") val linkedId: Long?,
 
-        /** Name of the related object (Optional) */
-        @ColumnInfo(name = "linked_name") val name: String?,
+    /** Name of the related object (Optional) */
+    @ColumnInfo(name = "linked_name") val name: String?,
 
-        /** Spend */
-        @ColumnInfo(name = "spend_value") val amount: BigDecimal?,
+    /** Spend */
+    @ColumnInfo(name = "spend_value") val amount: BigDecimal?,
 
-        /** Previous month spend */
-        @ColumnInfo(name = "previous_period_value") val previous: BigDecimal?,
+    /** Previous month spend */
+    @ColumnInfo(name = "previous_period_value") val previous: BigDecimal?,
 
-        /** Average amount from last 3 months */
-        @ColumnInfo(name = "average_value") val average: BigDecimal?,
+    /** Average amount from last 3 months */
+    @ColumnInfo(name = "average_value") val average: BigDecimal?,
 
-        /** Budgeted amount (Optional) */
-        @ColumnInfo(name = "budget_value") val budget: BigDecimal?,
+    /** Budgeted amount (Optional) */
+    @ColumnInfo(name = "budget_value") val budget: BigDecimal?,
 
-        /** Filter Budget Category - indicates the Budget Category the reports were filtered by (Optional) */
-        @ColumnInfo(name = "filtered_budget_category") val filteredBudgetCategory: BudgetCategory?,
+    /** Filter Budget Category - indicates the Budget Category the reports were filtered by (Optional) */
+    @ColumnInfo(name = "filtered_budget_category") val filteredBudgetCategory: BudgetCategory?,
 
-        /** Grouping - how the report response has been broken down */
-        @ColumnInfo(name = "report_grouping") val grouping: ReportGrouping
+    /** Grouping - how the report response has been broken down */
+    @ColumnInfo(name = "report_grouping") val grouping: ReportGrouping
 
-): IAdapterModel {
+) : IAdapterModel {
 
     /** Unique ID of the report */
     @PrimaryKey(autoGenerate = true)

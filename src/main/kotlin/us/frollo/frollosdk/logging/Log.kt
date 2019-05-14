@@ -17,7 +17,6 @@
 package us.frollo.frollosdk.logging
 
 import org.jetbrains.anko.doAsync
-import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.network.NetworkService
 
 internal object Log {
@@ -43,7 +42,7 @@ internal object Log {
         infoLoggers.clear()
         errorLoggers.clear()
 
-        when(level) {
+        when (level) {
             LogLevel.DEBUG -> {
                 debugLoggers.add(consoleLogger)
                 infoLoggers.add(consoleLogger)

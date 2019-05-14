@@ -23,7 +23,7 @@ import us.frollo.frollosdk.extensions.serializedName
  * Frollo API Error Codes
  */
 enum class APIErrorCode {
-    //400 Bad Request
+    // 400 Bad Request
     /** Invalid Value */
     @SerializedName("F0001") INVALID_VALUE,
     /** Invalid Length */
@@ -39,7 +39,7 @@ enum class APIErrorCode {
     /** Invalid Count */
     @SerializedName("F0007") INVALID_COUNT,
 
-    //401 Not authenticated
+    // 401 Not authenticated
     /** Invalid Access Token */
     @SerializedName("F0101") INVALID_ACCESS_TOKEN,
     /** Invalid Refresh Token */
@@ -53,19 +53,19 @@ enum class APIErrorCode {
     /** Account Locked */
     @SerializedName("F0114") ACCOUNT_LOCKED,
 
-    //403 Not authorised
+    // 403 Not authorised
     /** Unauthorised */
     @SerializedName("F0200") UNAUTHORISED,
 
-    //404 Object not found
+    // 404 Object not found
     /** Not Found */
     @SerializedName("F0300") NOT_FOUND,
 
-    //409 Conflict
+    // 409 Conflict
     /** Already Exists */
     @SerializedName("F0400") ALREADY_EXISTS,
 
-    //500 Internal Server Error
+    // 500 Internal Server Error
     /** Aggregator Error */
     @SerializedName("F9000") AGGREGATOR_ERROR,
     /** Unknown Server Error */
@@ -74,9 +74,9 @@ enum class APIErrorCode {
     @SerializedName("F9999") INTERNAL_EXCEPTION;
 
     /** Enum to serialized string */
-    //This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
+    // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =
-    //Try to get the annotation value if available instead of using plain .toString()
-    //Fallback to super.toString() in case annotation is not present/available
+    // Try to get the annotation value if available instead of using plain .toString()
+    // Fallback to super.toString() in case annotation is not present/available
             serializedName() ?: super.toString()
 }

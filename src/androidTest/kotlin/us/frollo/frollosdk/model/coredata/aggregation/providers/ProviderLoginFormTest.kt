@@ -22,7 +22,12 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.gson.Gson
 import org.junit.Test
 
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.error.LoginFormError
@@ -336,7 +341,6 @@ class ProviderLoginFormTest {
         assertNull(form.rows[0].fields[0].options)
         assertNull(form.rows[0].fields[0].suffix)
         assertNull(form.rows[0].fields[0].validations)
-
     }
 
     @Test
@@ -581,5 +585,4 @@ class ProviderLoginFormTest {
 
         assertFalse(form.shouldEncrypt(ProviderEncryptionType.UNSUPPORTED))
     }
-
 }

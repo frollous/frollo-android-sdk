@@ -23,7 +23,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRe
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.RefreshStatus
 import us.frollo.frollosdk.testutils.randomNumber
 
-internal fun testProviderAccountResponseData(providerAccountId: Long? = null, providerId: Long? = null) : ProviderAccountResponse {
+internal fun testProviderAccountResponseData(providerAccountId: Long? = null, providerId: Long? = null): ProviderAccountResponse {
 
     val refreshStatus = RefreshStatus(
             status = AccountRefreshStatus.NEEDS_ACTION,

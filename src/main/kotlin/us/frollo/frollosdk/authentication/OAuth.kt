@@ -85,7 +85,7 @@ class OAuth(val config: FrolloSDKConfiguration) {
 
         return authRequestBuilder
                 .setScopes(Scope.OFFLINE_ACCESS, Scope.OPENID, Scope.EMAIL)
-                //.setPrompt("login") // Specifies whether the Authorization Server prompts the End-User for re-authentication
+                // .setPrompt("login") // Specifies whether the Authorization Server prompts the End-User for re-authentication
                 .setAdditionalParameters(mutableMapOf(Pair("audience", config.serverUrl), Pair("domain", domain)))
                 .build()
     }

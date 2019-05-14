@@ -33,16 +33,17 @@ import us.frollo.frollosdk.authentication.AuthToken
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
-import us.frollo.frollosdk.error.*
+import us.frollo.frollosdk.error.OAuth2Error
 import us.frollo.frollosdk.extensions.handleOAuth2Failure
 import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
 import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.preferences.Preferences
 
 class NetworkService internal constructor(
-        internal val oAuth: OAuth,
-        keystore: Keystore,
-        pref: Preferences) : IApiProvider {
+    internal val oAuth: OAuth,
+    keystore: Keystore,
+    pref: Preferences
+) : IApiProvider {
 
     companion object {
         private const val TAG = "NetworkService"
@@ -119,7 +120,7 @@ class NetworkService internal constructor(
         }
     }
 
-    internal fun hasTokens() : Boolean =
+    internal fun hasTokens(): Boolean =
             authToken.getAccessToken() != null && authToken.getRefreshToken() != null
 
     internal fun handleTokens(tokenResponse: OAuthTokenResponse) {

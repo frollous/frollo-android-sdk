@@ -22,7 +22,9 @@ import android.content.Intent
 import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import net.openid.appauth.*
+import net.openid.appauth.AuthorizationException
+import net.openid.appauth.AuthorizationResponse
+import net.openid.appauth.AuthorizationService
 import okhttp3.Request
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -34,22 +36,33 @@ import us.frollo.frollosdk.core.ARGUMENT
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
+import us.frollo.frollosdk.error.OAuth2Error
+import us.frollo.frollosdk.extensions.enqueue
+import us.frollo.frollosdk.extensions.notify
+import us.frollo.frollosdk.extensions.toString
+import us.frollo.frollosdk.extensions.updateRequest
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.network.api.UserAPI
-import us.frollo.frollosdk.error.*
-import us.frollo.frollosdk.extensions.*
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.api.device.DeviceUpdateRequest
-import us.frollo.frollosdk.model.api.user.*
+import us.frollo.frollosdk.model.api.user.UserChangePasswordRequest
+import us.frollo.frollosdk.model.api.user.UserRegisterRequest
+import us.frollo.frollosdk.model.api.user.UserResetPasswordRequest
+import us.frollo.frollosdk.model.api.user.UserResponse
+import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.coredata.user.User
 import us.frollo.frollosdk.network.ErrorResponseType
 import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.preferences.Preferences
-import java.util.*
+import java.util.Date
+import java.util.TimeZone
 
 /**
  * Manages authentication, login, registration, logout and the user profile.
@@ -206,7 +219,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
 
                         // Fetch core details about the user. Fail and logout if we don't get necessary details
                         userAPI.fetchUser().enqueue { resource ->
-                            when(resource.status) {
+                            when (resource.status) {
                                 Resource.Status.ERROR -> {
                                     network.reset()
 
@@ -220,7 +233,6 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
                                 }
                             }
                         }
-
                     } ?: run {
                         completion.invoke(Result.error(DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_ACCESS_TOKEN)))
                     }
@@ -241,9 +253,16 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      * @param password Password for the user
      * @param completion Completion handler with any error that occurred
      */
-    fun registerUser(firstName: String, lastName: String? = null, mobileNumber: String? = null,
-                     postcode: String? = null, dateOfBirth: Date? = null, email: String, password: String,
-                     completion: OnFrolloSDKCompletionListener<Result>) {
+    fun registerUser(
+        firstName: String,
+        lastName: String? = null,
+        mobileNumber: String? = null,
+        postcode: String? = null,
+        dateOfBirth: Date? = null,
+        email: String,
+        password: String,
+        completion: OnFrolloSDKCompletionListener<Result>
+    ) {
         if (loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
             completion.invoke(Result.error(error))
@@ -266,7 +285,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
                 dateOfBirth = dateOfBirth?.toString("yyyy-MM"))
 
         userAPI.register(request).enqueue { userResource ->
-            when(userResource.status) {
+            when (userResource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#registerUser.register", userResource.error?.localizedDescription)
                     completion.invoke(Result.error(userResource.error))
@@ -316,7 +335,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      */
     fun resetPassword(email: String, completion: OnFrolloSDKCompletionListener<Result>) {
         userAPI.resetPassword(UserResetPasswordRequest(email)).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     completion.invoke(Result.success())
                 }
@@ -341,7 +360,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
         }
 
         userAPI.fetchUser().enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleUserResponse(resource.data, completion)
                 }
@@ -366,7 +385,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
         }
 
         userAPI.updateUser(user.updateRequest()).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleUserResponse(resource.data, completion)
                 }
@@ -391,7 +410,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
         }
 
         userAPI.updateUser(UserUpdateRequest(attribution = attribution)).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleUserResponse(resource.data, completion)
                 }
@@ -423,7 +442,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
 
         if (request.valid()) {
             userAPI.changePassword(request).enqueue { resource ->
-                when(resource.status) {
+                when (resource.status) {
                     Resource.Status.SUCCESS -> {
                         completion.invoke(Result.success())
                     }
@@ -452,7 +471,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
         }
 
         userAPI.deleteUser().enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     reset()
                     completion.invoke(Result.success())
@@ -500,7 +519,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
 
                         // Fetch core details about the user. Fail and logout if we don't get necessary details
                         userAPI.fetchUser().enqueue { resource ->
-                            when(resource.status) {
+                            when (resource.status) {
                                 Resource.Status.ERROR -> {
                                     network.reset()
 
@@ -514,7 +533,6 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
                                 }
                             }
                         }
-
                     } ?: run {
                         completion.invoke(Result.error(DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_ACCESS_TOKEN)))
                     }
@@ -552,7 +570,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
 
                         // Fetch core details about the user. Fail and logout if we don't get necessary details
                         userAPI.fetchUser().enqueue { resource ->
-                            when(resource.status) {
+                            when (resource.status) {
                                 Resource.Status.ERROR -> {
                                     network.reset()
 
@@ -566,7 +584,6 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
                                 }
                             }
                         }
-
                     } ?: run {
                         completion.invoke(Result.error(DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_ACCESS_TOKEN)))
                     }
@@ -629,7 +646,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
                 compliant = compliant)
 
         deviceAPI.updateDevice(request).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     completion?.invoke(Result.success())
                 }

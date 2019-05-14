@@ -17,7 +17,11 @@
 package us.frollo.frollosdk.database.dao
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionRelation

@@ -17,14 +17,21 @@
 package us.frollo.frollosdk.extensions
 
 import com.google.gson.Gson
-import okhttp3.*
-import org.junit.Assert.*
+import okhttp3.HttpUrl
+import okhttp3.MediaType
+import okhttp3.Protocol
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.ResponseBody
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import us.frollo.frollosdk.error.APIErrorType
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.coredata.user.Gender
-
 
 class UtilityExtensionTest {
 
@@ -73,7 +80,7 @@ class UtilityExtensionTest {
     @Test
     fun testGsonFromJson() {
         val json = "{\"network\":\"organic\",\"campaign\":\"frollo\"}"
-        val attr: Attribution? =  Gson().fromJson(json)
+        val attr: Attribution? = Gson().fromJson(json)
         assertEquals("organic", attr?.network)
         assertEquals("frollo", attr?.campaign)
         assertNull(attr?.adGroup)
@@ -105,8 +112,8 @@ class UtilityExtensionTest {
 
     @Test
     fun testCompareToFindMissingItems() {
-        val set1 = setOf<Long>(1,2,3,7)
-        val set2 = setOf<Long>(1,3,4,5,6)
+        val set1 = setOf<Long>(1, 2, 3, 7)
+        val set2 = setOf<Long>(1, 3, 4, 5, 6)
         val missingElements = set1.compareToFindMissingItems(set2)
         assertEquals(2, missingElements.size)
         assertTrue(missingElements.containsAll(listOf<Long>(2, 7)))

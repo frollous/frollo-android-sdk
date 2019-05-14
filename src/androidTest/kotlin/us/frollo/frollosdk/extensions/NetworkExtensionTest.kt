@@ -23,8 +23,11 @@ import com.google.gson.GsonBuilder
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
-import okhttp3.mockwebserver.*
-import org.junit.Assert.*
+import okhttp3.mockwebserver.Dispatcher
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -34,11 +37,23 @@ import us.frollo.frollosdk.testutils.TestAPI
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.wait
 import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
+import okhttp3.mockwebserver.SocketPolicy
 import retrofit2.Response
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Resource
+import us.frollo.frollosdk.error.APIError
+import us.frollo.frollosdk.error.APIErrorType
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
+import us.frollo.frollosdk.error.FrolloSDKError
+import us.frollo.frollosdk.error.NetworkError
+import us.frollo.frollosdk.error.NetworkErrorType
+import us.frollo.frollosdk.error.OAuth2Error
+import us.frollo.frollosdk.error.OAuth2ErrorType
 import us.frollo.frollosdk.network.ApiResponse
-import us.frollo.frollosdk.error.*
 import us.frollo.frollosdk.network.ErrorResponseType
 import us.frollo.frollosdk.testutils.trimmedPath
 import java.io.IOException
@@ -89,7 +104,7 @@ class NetworkExtensionTest {
     fun testNetworkCallResponseSuccess() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TestAPI.URL_TEST) {
                     return MockResponse()
@@ -117,7 +132,7 @@ class NetworkExtensionTest {
     fun testNetworkCallResponseFailure() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TestAPI.URL_TEST) {
                     return MockResponse()
@@ -147,7 +162,7 @@ class NetworkExtensionTest {
     fun testNetworkCallFailure() {
         initSetup()
 
-        mockServer.enqueue(MockResponse().apply {  socketPolicy = SocketPolicy.DISCONNECT_AFTER_REQUEST })
+        mockServer.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.DISCONNECT_AFTER_REQUEST })
 
         testAPI.testData().enqueue { resource ->
             assertEquals(Resource.Status.ERROR, resource.status)

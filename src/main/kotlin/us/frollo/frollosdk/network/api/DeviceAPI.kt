@@ -17,7 +17,9 @@
 package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.POST
+import retrofit2.http.PUT
 import us.frollo.frollosdk.model.api.device.DeviceUpdateRequest
 import us.frollo.frollosdk.model.api.device.LogRequest
 

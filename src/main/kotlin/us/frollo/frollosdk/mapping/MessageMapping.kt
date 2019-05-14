@@ -18,7 +18,12 @@ package us.frollo.frollosdk.mapping
 
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.model.api.messages.MessageResponse
-import us.frollo.frollosdk.model.coredata.messages.*
+import us.frollo.frollosdk.model.coredata.messages.ContentType
+import us.frollo.frollosdk.model.coredata.messages.Message
+import us.frollo.frollosdk.model.coredata.messages.MessageHTML
+import us.frollo.frollosdk.model.coredata.messages.MessageImage
+import us.frollo.frollosdk.model.coredata.messages.MessageText
+import us.frollo.frollosdk.model.coredata.messages.MessageVideo
 
 internal fun MessageResponse.toMessage(): Message? {
     val TAG = "MessageMapping"
@@ -123,7 +128,7 @@ internal fun MessageResponse.toMessage(): Message? {
                         width = content.width,
                         url = content.url)
             } else {
-                Log.e("$TAG#toMessage-IMAGE","IMAGE Message : Invalid data in content")
+                Log.e("$TAG#toMessage-IMAGE", "IMAGE Message : Invalid data in content")
                 null
             }
         }

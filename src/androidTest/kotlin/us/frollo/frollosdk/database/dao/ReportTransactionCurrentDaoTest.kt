@@ -22,16 +22,21 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertEquals
 import org.junit.Before
 
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.mapping.*
-import us.frollo.frollosdk.model.*
+import us.frollo.frollosdk.mapping.toMerchant
+import us.frollo.frollosdk.mapping.toTransactionCategory
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.model.testMerchantResponseData
+import us.frollo.frollosdk.model.testReportTransactionCurrentData
+import us.frollo.frollosdk.model.testTransactionCategoryResponseData
 import java.math.BigDecimal
 
 class ReportTransactionCurrentDaoTest {
@@ -135,7 +140,7 @@ class ReportTransactionCurrentDaoTest {
 
         db.reportsTransactionCurrent().insertAll(*list.toTypedArray())
 
-        var models = db.reportsTransactionCurrent().find(grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, linkedId = 678, days = intArrayOf(1,2,3))
+        var models = db.reportsTransactionCurrent().find(grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, linkedId = 678, days = intArrayOf(1, 2, 3))
         assertTrue(models.isNotEmpty())
         assertEquals(3, models.size)
 
@@ -143,11 +148,11 @@ class ReportTransactionCurrentDaoTest {
         assertTrue(models.isNotEmpty())
         assertEquals(1, models.size)
 
-        models = db.reportsTransactionCurrent().find(grouping = ReportGrouping.MERCHANT, budgetCategory = null, linkedId = 678, days = intArrayOf(1,2))
+        models = db.reportsTransactionCurrent().find(grouping = ReportGrouping.MERCHANT, budgetCategory = null, linkedId = 678, days = intArrayOf(1, 2))
         assertTrue(models.isNotEmpty())
         assertEquals(2, models.size)
 
-        models = db.reportsTransactionCurrent().find(grouping = ReportGrouping.MERCHANT, budgetCategory = null, linkedId = null, days = intArrayOf(1,2))
+        models = db.reportsTransactionCurrent().find(grouping = ReportGrouping.MERCHANT, budgetCategory = null, linkedId = null, days = intArrayOf(1, 2))
         assertTrue(models.isNotEmpty())
         assertEquals(2, models.size)
     }
@@ -172,12 +177,12 @@ class ReportTransactionCurrentDaoTest {
 
         db.reportsTransactionCurrent().insertAll(*list.toTypedArray())
 
-        var ids = db.reportsTransactionCurrent().findStaleIds(grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, linkedId = 678, days = intArrayOf(1,2,3))
+        var ids = db.reportsTransactionCurrent().findStaleIds(grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, linkedId = 678, days = intArrayOf(1, 2, 3))
         assertTrue(ids.isNotEmpty())
         assertEquals(1, ids.size)
         assertEquals(105, ids[0])
 
-        ids = db.reportsTransactionCurrent().findStaleIds(grouping = ReportGrouping.MERCHANT, budgetCategory = null, linkedId = 678, days = intArrayOf(1,2,4))
+        ids = db.reportsTransactionCurrent().findStaleIds(grouping = ReportGrouping.MERCHANT, budgetCategory = null, linkedId = 678, days = intArrayOf(1, 2, 4))
         assertTrue(ids.isNotEmpty())
         assertEquals(1, ids.size)
         assertEquals(110, ids[0])
@@ -242,7 +247,7 @@ class ReportTransactionCurrentDaoTest {
 
         db.reportsTransactionCurrent().insertAll(*list.toTypedArray())
 
-        db.reportsTransactionCurrent().deleteMany(longArrayOf(101,103))
+        db.reportsTransactionCurrent().deleteMany(longArrayOf(101, 103))
 
         val testObserver = db.reportsTransactionCurrent().load(grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING).test()
         testObserver.awaitValue()

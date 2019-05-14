@@ -23,15 +23,15 @@ import com.google.gson.annotations.SerializedName
  */
 data class Survey(
 
-        /** Unique identifier of the survey. */
-        @SerializedName("id") val id: Long,
+    /** Unique identifier of the survey. */
+    @SerializedName("id") val id: Long,
 
-        /** Survey Key. Used for fetching the survey. */
-        @SerializedName("key") val key: String,
+    /** Survey Key. Used for fetching the survey. */
+    @SerializedName("key") val key: String,
 
-        /** Name of the survey */
-        @SerializedName("name") val name: String?,
+    /** Name of the survey */
+    @SerializedName("name") val name: String?,
 
-        /** List of all questions within the survey. */
-        @SerializedName("questions") val questions: List<SurveyQuestion>
+    /** List of all questions within the survey. */
+    @SerializedName("questions") val questions: List<SurveyQuestion>
 )

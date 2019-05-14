@@ -20,10 +20,12 @@ import us.frollo.frollosdk.model.api.messages.MessageContent
 import us.frollo.frollosdk.model.api.messages.MessageResponse
 import us.frollo.frollosdk.model.coredata.messages.Action
 import us.frollo.frollosdk.model.coredata.messages.ContentType
-import us.frollo.frollosdk.testutils.*
+import us.frollo.frollosdk.testutils.randomBoolean
+import us.frollo.frollosdk.testutils.randomNumber
+import us.frollo.frollosdk.testutils.randomString
 import kotlin.random.Random
 
-internal fun testMessageResponseData(type: ContentType? = null, types: List<String>? = null, read: Boolean? = null, msgId: Long? = null) : MessageResponse {
+internal fun testMessageResponseData(type: ContentType? = null, types: List<String>? = null, read: Boolean? = null, msgId: Long? = null): MessageResponse {
     val htmlContent = MessageContent(
             footer = randomString(20),
             header = randomString(20),
@@ -48,7 +50,7 @@ internal fun testMessageResponseData(type: ContentType? = null, types: List<Stri
             width = randomNumber(1..1000).toDouble())
 
     val contentType = type?.let { it } ?: ContentType.values()[Random.nextInt(ContentType.values().size)]
-    val content = when(contentType) {
+    val content = when (contentType) {
         ContentType.TEXT -> textContent
         ContentType.IMAGE -> imageContent
         ContentType.VIDEO -> videoContent
@@ -71,7 +73,7 @@ internal fun testMessageResponseData(type: ContentType? = null, types: List<Stri
             userEventId = randomNumber(1..100000).toLong())
 }
 
-internal fun MessageResponse.testModifyUserResponseData(newTitle: String? = null, types: List<String>? = null, messageContent: MessageContent? = null) : MessageResponse {
+internal fun MessageResponse.testModifyUserResponseData(newTitle: String? = null, types: List<String>? = null, messageContent: MessageContent? = null): MessageResponse {
     return MessageResponse(
             messageId = messageId,
             action = action,

@@ -23,7 +23,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Before
 
 import org.junit.Rule
@@ -31,8 +33,18 @@ import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.extensions.sqlForTransactionByUserTags
 import us.frollo.frollosdk.extensions.sqlForTransactionStaleIds
-import us.frollo.frollosdk.mapping.*
-import us.frollo.frollosdk.model.*
+import us.frollo.frollosdk.mapping.toAccount
+import us.frollo.frollosdk.mapping.toMerchant
+import us.frollo.frollosdk.mapping.toProvider
+import us.frollo.frollosdk.mapping.toProviderAccount
+import us.frollo.frollosdk.mapping.toTransaction
+import us.frollo.frollosdk.mapping.toTransactionCategory
+import us.frollo.frollosdk.model.testAccountResponseData
+import us.frollo.frollosdk.model.testMerchantResponseData
+import us.frollo.frollosdk.model.testProviderAccountResponseData
+import us.frollo.frollosdk.model.testProviderResponseData
+import us.frollo.frollosdk.model.testTransactionCategoryResponseData
+import us.frollo.frollosdk.model.testTransactionResponseData
 
 class TransactionDaoTest {
 
@@ -474,11 +486,11 @@ class TransactionDaoTest {
     }
 
     @Test
-    fun testFetchTransactionsByTagsWithRelation(){
-        db.transactions().insert(testTransactionResponseData(transactionId = 122, accountId = 234, categoryId = 567, merchantId = 678,userTags = listOf("why", "are")).toTransaction())
-        db.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678,userTags = listOf("why", "are")).toTransaction())
-        db.transactions().insert(testTransactionResponseData(transactionId = 124, accountId = 235, categoryId = 567, merchantId = 678,userTags = listOf("why", "are")).toTransaction())
-        db.transactions().insert(testTransactionResponseData(transactionId = 125, accountId = 235, categoryId = 567, merchantId = 678,userTags = listOf("whyasdas", "areasdasd")).toTransaction())
+    fun testFetchTransactionsByTagsWithRelation() {
+        db.transactions().insert(testTransactionResponseData(transactionId = 122, accountId = 234, categoryId = 567, merchantId = 678, userTags = listOf("why", "are")).toTransaction())
+        db.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678, userTags = listOf("why", "are")).toTransaction())
+        db.transactions().insert(testTransactionResponseData(transactionId = 124, accountId = 235, categoryId = 567, merchantId = 678, userTags = listOf("why", "are")).toTransaction())
+        db.transactions().insert(testTransactionResponseData(transactionId = 125, accountId = 235, categoryId = 567, merchantId = 678, userTags = listOf("whyasdas", "areasdasd")).toTransaction())
         db.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())
         db.accounts().insert(testAccountResponseData(accountId = 235, providerAccountId = 345).toAccount())
         db.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 345, providerId = 456).toProviderAccount())
@@ -486,9 +498,9 @@ class TransactionDaoTest {
         db.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
         db.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
 
-        val tagList = listOf("why","are")
+        val tagList = listOf("why", "are")
         val sql = sqlForTransactionByUserTags(tagList)
-        var testObserver =  db.transactions().loadByQueryWithRelation(sql).test()
+        var testObserver = db.transactions().loadByQueryWithRelation(sql).test()
         testObserver.awaitValue()
 
         assertTrue(testObserver.value().isNotEmpty())

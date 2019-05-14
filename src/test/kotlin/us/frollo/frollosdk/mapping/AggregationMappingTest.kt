@@ -16,9 +16,15 @@
 
 package us.frollo.frollosdk.mapping
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import us.frollo.frollosdk.model.*
+import us.frollo.frollosdk.model.testAccountResponseData
+import us.frollo.frollosdk.model.testMerchantResponseData
+import us.frollo.frollosdk.model.testProviderAccountResponseData
+import us.frollo.frollosdk.model.testProviderResponseData
+import us.frollo.frollosdk.model.testTransactionCategoryResponseData
+import us.frollo.frollosdk.model.testTransactionResponseData
+import us.frollo.frollosdk.model.testTransactionsSummaryResponseData
 
 class AggregationMappingTest {
 

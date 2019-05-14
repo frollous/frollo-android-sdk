@@ -23,24 +23,24 @@ import com.google.gson.annotations.SerializedName
  */
 data class SurveyQuestion(
 
-        /** Unique identifier of the survey question. */
-        @SerializedName("id") val id: Long,
+    /** Unique identifier of the survey question. */
+    @SerializedName("id") val id: Long,
 
-        /** Type the survey question. Used for presentation purposes. */
-        @SerializedName("type") val type: SurveyQuestionType,
+    /** Type the survey question. Used for presentation purposes. */
+    @SerializedName("type") val type: SurveyQuestionType,
 
-        /** Title of the survey question */
-        @SerializedName("title") val title: String?,
+    /** Title of the survey question */
+    @SerializedName("title") val title: String?,
 
-        /** Additional information for the question. */
-        @SerializedName("display_text") val display_text: String?,
+    /** Additional information for the question. */
+    @SerializedName("display_text") val display_text: String?,
 
-        /** Url of the icon associated to the question. */
-        @SerializedName("icon_url") val icon_url: String?,
+    /** Url of the icon associated to the question. */
+    @SerializedName("icon_url") val icon_url: String?,
 
-        /** Optional indicator indicating if this question is required to be answered by the user */
-        @SerializedName("optional") val optional: Boolean?,
+    /** Optional indicator indicating if this question is required to be answered by the user */
+    @SerializedName("optional") val optional: Boolean?,
 
-        /** List of answers of the survey question. */
-        @SerializedName("answers") val answers: List<SurveyAnswer>
+    /** List of answers of the survey question. */
+    @SerializedName("answers") val answers: List<SurveyAnswer>
 )

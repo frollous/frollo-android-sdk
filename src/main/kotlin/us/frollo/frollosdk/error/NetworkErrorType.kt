@@ -24,8 +24,9 @@ import us.frollo.frollosdk.R
  * Indicates the type of error
  */
 enum class NetworkErrorType(
-        /** Localized string resource id */
-        @StringRes val textResource: Int) {
+    /** Localized string resource id */
+    @StringRes val textResource: Int
+) {
 
     /** Connection failure - usually poor connectivity */
     CONNECTION_FAILURE(R.string.FrolloSDK_Error_Network_ConnectionFailure),

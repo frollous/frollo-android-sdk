@@ -24,10 +24,11 @@ import us.frollo.frollosdk.R
  * Detailed type of the error
  */
 enum class DataErrorSubType(
-        /** [DataErrorType] for this subtype */
-        val type: DataErrorType,
-        /** Localized string resource id */
-        @StringRes val textResource: Int) {
+    /** [DataErrorType] for this subtype */
+    val type: DataErrorType,
+    /** Localized string resource id */
+    @StringRes val textResource: Int
+) {
 
     /** API - Invalid Data */
     INVALID_DATA(DataErrorType.API, R.string.FrolloSDK_Error_Data_API_InvalidData),

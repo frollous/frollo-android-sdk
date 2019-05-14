@@ -23,24 +23,24 @@ import com.google.gson.annotations.SerializedName
  */
 data class SurveyAnswer(
 
-        /** Unique identifier of the survey answer. */
-        @SerializedName("id") val id: Long,
+    /** Unique identifier of the survey answer. */
+    @SerializedName("id") val id: Long,
 
-        /** Type the survey answer. Used for presentation purposes. */
-        @SerializedName("type") val type: SurveyAnswerType,
+    /** Type the survey answer. Used for presentation purposes. */
+    @SerializedName("type") val type: SurveyAnswerType,
 
-        /** Title of the survey answer */
-        @SerializedName("title") val title: String?,
+    /** Title of the survey answer */
+    @SerializedName("title") val title: String?,
 
-        /** Additional information for the answer. */
-        @SerializedName("display_text") val display_text: String?,
+    /** Additional information for the answer. */
+    @SerializedName("display_text") val display_text: String?,
 
-        /** Url of the icon associated to the answer. */
-        @SerializedName("icon_url") val icon_url: String?,
+    /** Url of the icon associated to the answer. */
+    @SerializedName("icon_url") val icon_url: String?,
 
-        /** Value of the answer */
-        @SerializedName("value") var value: String,
+    /** Value of the answer */
+    @SerializedName("value") var value: String,
 
-        /** Indicates if this is the selected answer.  */
-        @SerializedName("selected") var selected: Boolean
+    /** Indicates if this is the selected answer.  */
+    @SerializedName("selected") var selected: Boolean
 )

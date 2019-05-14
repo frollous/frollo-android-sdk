@@ -20,22 +20,22 @@ import com.google.gson.annotations.SerializedName
 import java.math.BigDecimal
 
 internal data class TransactionHistoryReportResponse(
-        @SerializedName("data") val data: List<Report>
+    @SerializedName("data") val data: List<Report>
 ) {
 
     internal data class Report(
-            @SerializedName("date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
-            @SerializedName("value") val value: BigDecimal,
-            @SerializedName("budget") val budget: BigDecimal?,
-            @SerializedName("groups") val groups: List<GroupReport>
+        @SerializedName("date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
+        @SerializedName("value") val value: BigDecimal,
+        @SerializedName("budget") val budget: BigDecimal?,
+        @SerializedName("groups") val groups: List<GroupReport>
     ) {
 
         internal data class GroupReport(
-                @SerializedName("id") val id: Long,
-                @SerializedName("name") val name: String,
-                @SerializedName("budget") val budget: BigDecimal?,
-                @SerializedName("value") val value: BigDecimal,
-                @SerializedName("transaction_ids") val transactionIds: List<Long>
+            @SerializedName("id") val id: Long,
+            @SerializedName("name") val name: String,
+            @SerializedName("budget") val budget: BigDecimal?,
+            @SerializedName("value") val value: BigDecimal,
+            @SerializedName("transaction_ids") val transactionIds: List<Long>
         )
     }
 }

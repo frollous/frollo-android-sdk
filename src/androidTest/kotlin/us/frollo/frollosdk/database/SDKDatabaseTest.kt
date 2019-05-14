@@ -21,7 +21,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.junit.Before
 
-import org.junit.Assert.*
+import org.junit.Assert.assertNotNull
 import org.junit.Test
 
 class SDKDatabaseTest {

@@ -45,7 +45,7 @@ internal fun <T1, T2> ifNotNull(value1: T1?, value2: T2?, bothNotNull: (T1, T2) 
  * Converts a [json] to a given [T] object.
  * @return the converted object.
  */
-internal inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object: TypeToken<T>() {}.type)
+internal inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)
 
 /**
  * Retrieves the value from the [SerializedName] annotation, if present
@@ -58,7 +58,7 @@ internal fun Enum<*>.serializedName(): String? {
 }
 
 /* Network Extensions */
-internal val Response.clonedBodyString : String?
+internal val Response.clonedBodyString: String?
     get() {
         val source = this.body()?.source()
         source?.request(Long.MAX_VALUE) // Request the entire body.

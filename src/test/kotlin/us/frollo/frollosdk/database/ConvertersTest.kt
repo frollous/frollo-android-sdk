@@ -18,14 +18,28 @@ package us.frollo.frollosdk.database
 
 import org.junit.Test
 
-import org.junit.Assert.*
-import us.frollo.frollosdk.model.coredata.aggregation.accounts.*
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountGroup
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.BalanceTier
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantLocation
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
-import us.frollo.frollosdk.model.coredata.aggregation.providers.*
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderAuthType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderEncryptionType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderFormType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderMFAType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategoryType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
@@ -37,7 +51,13 @@ import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
-import us.frollo.frollosdk.model.coredata.user.*
+import us.frollo.frollosdk.model.coredata.user.Attribution
+import us.frollo.frollosdk.model.coredata.user.FeatureFlag
+import us.frollo.frollosdk.model.coredata.user.Gender
+import us.frollo.frollosdk.model.coredata.user.HouseholdType
+import us.frollo.frollosdk.model.coredata.user.Industry
+import us.frollo.frollosdk.model.coredata.user.Occupation
+import us.frollo.frollosdk.model.coredata.user.UserStatus
 import java.math.BigDecimal
 
 class ConvertersTest {

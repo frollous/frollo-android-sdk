@@ -21,7 +21,6 @@ import android.util.Log
 import androidx.annotation.RawRes
 import us.frollo.frollosdk.extensions.toString
 import java.io.InputStream
-import java.util.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import okhttp3.mockwebserver.MockResponse
@@ -31,16 +30,19 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeParseException
 import java.sql.Timestamp
+import java.util.Date
+import java.util.Random
+import java.util.UUID
 
-internal fun randomNumber(range: IntRange? = null)
-        = if (range == null) Random().nextInt() else range.random()
+internal fun randomNumber(range: IntRange? = null) =
+        if (range == null) Random().nextInt() else range.random()
 
 internal fun randomUUID() = UUID.randomUUID().toString()
 
 internal fun today(format: String) = Date().toString(format)
 
-internal fun randomString(length: Int) : String {
-    val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+internal fun randomString(length: Int): String {
+    val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
     return (1..length)
             .map { kotlin.random.Random.nextInt(0, charPool.size) }
             .map(charPool::get)
@@ -66,7 +68,7 @@ fun convertStreamToString(inputStream: InputStream): String {
 fun readStringFromJson(context: Context, @RawRes resId: Int): String {
     val stream = context.resources.openRawResource(resId)
     val ret = convertStreamToString(stream)
-    //Make sure you close all streams.
+    // Make sure you close all streams.
     stream.close()
     return ret
 }
@@ -86,19 +88,19 @@ val RecordedRequest.trimmedPath: String
 fun String.getDateTIme(): LocalDateTime? {
     try {
         return OffsetDateTime.parse(this).toLocalDateTime()
-    }catch (e: DateTimeParseException){
+    } catch (e: DateTimeParseException) {
         e.printStackTrace()
-        Log.d("","error parsing date")
+        Log.d("", "error parsing date")
     }
     return null
 }
 
 fun String.getDateTimeStamp(): Long {
     try {
-        return  Timestamp(OffsetDateTime.parse(this).toLocalDateTime().toEpochSecond(ZoneOffset.UTC)).time
-    }catch (e: DateTimeParseException){
+        return Timestamp(OffsetDateTime.parse(this).toLocalDateTime().toEpochSecond(ZoneOffset.UTC)).time
+    } catch (e: DateTimeParseException) {
         e.printStackTrace()
-        Log.d("","error parsing date")
+        Log.d("", "error parsing date")
     }
     return 0
 }

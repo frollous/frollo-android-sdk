@@ -19,7 +19,9 @@ package us.frollo.frollosdk.base
 import android.app.Application
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Test
-import org.junit.Assert.*
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.error.FrolloSDKError

@@ -29,33 +29,35 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginFor
  * Each [Container] should only show one [ProviderFormRow] at a time.
  */
 data class ProviderLoginFormDisplay(
-        /** ID of the login form (optional) */
-        val formId: String?,
-        /** Forgot password URL for the selected provider (optional) */
-        val forgetPasswordUrl: String?,
-        /** Additional help message for the current login form (optional) */
-        val help: String?,
-        /** Additional information title for MFA login forms (optional) */
-        val mfaInfoTitle: String?,
-        /** Additional information on how to complete the MFA challenge login form (optional) */
-        val mfaInfoText: String?,
-        /** Time before the MFA challenge times out (optional) */
-        val mfaTimeout: Long?,
-        /** Type of login form see [ProviderFormType] for details */
-        val formType: ProviderFormType,
-        /** List of containers containing the login form rows */
-        val containers: List<Container>) {
+    /** ID of the login form (optional) */
+    val formId: String?,
+    /** Forgot password URL for the selected provider (optional) */
+    val forgetPasswordUrl: String?,
+    /** Additional help message for the current login form (optional) */
+    val help: String?,
+    /** Additional information title for MFA login forms (optional) */
+    val mfaInfoTitle: String?,
+    /** Additional information on how to complete the MFA challenge login form (optional) */
+    val mfaInfoText: String?,
+    /** Time before the MFA challenge times out (optional) */
+    val mfaTimeout: Long?,
+    /** Type of login form see [ProviderFormType] for details */
+    val formType: ProviderFormType,
+    /** List of containers containing the login form rows */
+    val containers: List<Container>
+) {
 
     /**
      * Container that represents one or more rows that can be selected for a particular row in the login form view
      */
     data class Container(
-            /** The field row choice ID used to identify multiple choice rows */
-            val fieldRowChoice: String,
-            /** Provider login form rows see [ProviderFormRow] for details */
-            val rows: MutableList<ProviderFormRow>,
-            /** ID of the selected row if there are multiple rows. Update this from the UI as the user chooses different rows */
-            val selectedRowID: String?)
+        /** The field row choice ID used to identify multiple choice rows */
+        val fieldRowChoice: String,
+        /** Provider login form rows see [ProviderFormRow] for details */
+        val rows: MutableList<ProviderFormRow>,
+        /** ID of the selected row if there are multiple rows. Update this from the UI as the user chooses different rows */
+        val selectedRowID: String?
+    )
 
     /**
      * Convert the view model back to a data model suitable for sending back to the host

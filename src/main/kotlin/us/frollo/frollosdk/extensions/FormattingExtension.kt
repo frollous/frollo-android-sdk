@@ -21,12 +21,11 @@ import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.DateTimeFormatterBuilder
 import org.threeten.bp.format.DateTimeParseException
 import org.threeten.bp.temporal.ChronoField
-import org.threeten.bp.temporal.WeekFields
 import java.lang.Exception
 import java.lang.RuntimeException
 import java.text.SimpleDateFormat
-import java.time.temporal.TemporalField
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 internal fun LocalDate.toString(formatPattern: String): String =
         DateTimeFormatter.ofPattern(formatPattern).format(this)
@@ -38,9 +37,9 @@ internal fun String.isValidFormat(formatPattern: String): Boolean {
     val formatter = DateTimeFormatter.ofPattern(formatPattern)
     try {
         formatter.parse(this) // if not valid, it will throw DateTimeParseException
-    } catch(e: DateTimeParseException) {
+    } catch (e: DateTimeParseException) {
         return false
-    } catch(e: RuntimeException) {
+    } catch (e: RuntimeException) {
         return false
     }
     return true
@@ -56,7 +55,7 @@ internal fun String.changeDateFormat(from: String, to: String): String {
                 .toFormatter()
         val date = LocalDate.parse(this, sourceFormatter)
         dateStr = date.toString(to)
-    } catch(e: Exception) {
+    } catch (e: Exception) {
         e.printStackTrace()
     }
 
@@ -72,7 +71,7 @@ internal fun String.dailyToWeekly(): String {
         val monthlyDateStr = changeDateFormat("yyyy-MM-dd", "yyyy-MM")
         val weekInMonth = getWeekInMonth(dailyDate.dayOfMonth)
         dateStr = monthlyDateStr.plus("-$weekInMonth")
-    } catch(e: Exception) {
+    } catch (e: Exception) {
         e.printStackTrace()
     }
 

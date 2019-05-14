@@ -22,14 +22,18 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Before
 
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.mapping.*
-import us.frollo.frollosdk.model.*
+import us.frollo.frollosdk.mapping.toBill
+import us.frollo.frollosdk.mapping.toBillPayment
+import us.frollo.frollosdk.model.testBillPaymentResponseData
+import us.frollo.frollosdk.model.testBillResponseData
 
 class BillPaymentDaoTest {
 
@@ -162,7 +166,7 @@ class BillPaymentDaoTest {
 
         db.billPayments().insertAll(*list.map { it.toBillPayment() }.toList().toTypedArray())
 
-        val ids = db.billPayments().getIdsByBillIds(billIds = longArrayOf(200,202)).sorted()
+        val ids = db.billPayments().getIdsByBillIds(billIds = longArrayOf(200, 202)).sorted()
         assertEquals(3, ids.size)
         assertTrue(ids.containsAll(mutableListOf<Long>(100, 101, 103)))
     }

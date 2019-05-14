@@ -25,7 +25,9 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
-import org.junit.Assert.*
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
@@ -149,7 +151,7 @@ class ReportsTest {
         val requestPath = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$fromDate&to_date=$toDate"
 
         val body = readStringFromJson(app, R.raw.account_balance_reports_by_day_2018_10_29_2019_01_29)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -199,7 +201,7 @@ class ReportsTest {
         val requestPath = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$fromDate&to_date=$toDate"
 
         val body = readStringFromJson(app, R.raw.account_balance_reports_by_month_2018_10_29_2019_01_29)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -249,7 +251,7 @@ class ReportsTest {
         val requestPath = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$fromDate&to_date=$toDate"
 
         val body = readStringFromJson(app, R.raw.account_balance_reports_by_week_2018_10_29_2019_01_29)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -300,7 +302,7 @@ class ReportsTest {
         val requestPath = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$fromDate&to_date=$toDate&account_id=$accountId"
 
         val body = readStringFromJson(app, R.raw.account_balance_reports_by_day_account_id_937_2018_10_29_2019_01_29)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -350,7 +352,7 @@ class ReportsTest {
         val accountType = AccountType.BANK
         val requestPath = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$fromDate&to_date=$toDate&container=$accountType"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -410,7 +412,7 @@ class ReportsTest {
         val requestPath1 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$oldFromDate&to_date=$oldToDate"
         val requestPath2 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period&from_date=$newFromDate&to_date=$newToDate"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath1) {
                     return MockResponse()
@@ -510,7 +512,7 @@ class ReportsTest {
         val requestPath2 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period2&from_date=$fromDate&to_date=$toDate"
         val requestPath3 = "${ReportsAPI.URL_REPORT_ACCOUNT_BALANCE}?period=$period3&from_date=$fromDate&to_date=$toDate"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath1) {
                     return MockResponse()
@@ -604,7 +606,7 @@ class ReportsTest {
         val data1 = testReportTransactionCurrentData(grouping = ReportGrouping.BUDGET_CATEGORY, day = 1)
         val data2 = testReportTransactionCurrentData(grouping = ReportGrouping.MERCHANT, day = 4)
         val data3 = testReportTransactionCurrentData(grouping = ReportGrouping.BUDGET_CATEGORY, day = 7)
-        val data4 = testReportTransactionCurrentData(grouping = ReportGrouping.TRANSACTION_CATEGORY, day =25)
+        val data4 = testReportTransactionCurrentData(grouping = ReportGrouping.TRANSACTION_CATEGORY, day = 25)
         val data5 = testReportTransactionCurrentData(grouping = ReportGrouping.BUDGET_CATEGORY, day = 30, budgetCategory = BudgetCategory.LIVING)
         val list = mutableListOf(data1, data2, data3, data4, data5)
 
@@ -625,7 +627,7 @@ class ReportsTest {
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_CURRENT}?grouping=${ReportGrouping.BUDGET_CATEGORY}"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_current_budget_category)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -688,7 +690,7 @@ class ReportsTest {
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_CURRENT}?grouping=${ReportGrouping.MERCHANT}"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_current_merchant)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -750,7 +752,7 @@ class ReportsTest {
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_CURRENT}?grouping=${ReportGrouping.TRANSACTION_CATEGORY}"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_current_txn_category)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -812,7 +814,7 @@ class ReportsTest {
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_CURRENT}?grouping=${ReportGrouping.TRANSACTION_CATEGORY}&budget_category=${BudgetCategory.LIFESTYLE}"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_current_txn_category_lifestyle)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -873,7 +875,7 @@ class ReportsTest {
 
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_CURRENT}?grouping=${ReportGrouping.TRANSACTION_CATEGORY}"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             var count = 0
 
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -980,7 +982,7 @@ class ReportsTest {
         val requestPath2 = "${ReportsAPI.URL_REPORT_TRANSACTIONS_CURRENT}?grouping=${ReportGrouping.TRANSACTION_CATEGORY}&budget_category=${BudgetCategory.LIVING}"
         val requestPath3 = "${ReportsAPI.URL_REPORT_TRANSACTIONS_CURRENT}?grouping=${ReportGrouping.TRANSACTION_CATEGORY}&budget_category=${BudgetCategory.LIFESTYLE}"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath1) {
                     return MockResponse()
@@ -1124,7 +1126,7 @@ class ReportsTest {
 
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_CURRENT}?grouping=${ReportGrouping.MERCHANT}"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -1172,7 +1174,7 @@ class ReportsTest {
 
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_CURRENT}?grouping=${ReportGrouping.TRANSACTION_CATEGORY}"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -1267,7 +1269,7 @@ class ReportsTest {
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_history_budget_category_monthly_2018_01_01_2018_12_31)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -1334,7 +1336,7 @@ class ReportsTest {
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_history_merchant_monthly_2018_01_01_2018_12_31)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -1400,7 +1402,7 @@ class ReportsTest {
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_history_txn_category_daily_2018_01_01_2018_12_31)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -1466,7 +1468,7 @@ class ReportsTest {
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_history_txn_category_monthly_2018_01_01_2018_12_31)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -1532,7 +1534,7 @@ class ReportsTest {
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_history_txn_category_weekly_2018_01_01_2018_12_31)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -1599,7 +1601,7 @@ class ReportsTest {
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate&budget_category=$budgetCategory"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_history_txn_category_monthly_lifestyle_2018_01_01_2018_12_31)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -1667,7 +1669,7 @@ class ReportsTest {
         val requestPath1 = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$oldFromDate&to_date=$oldToDate"
         val requestPath2 = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$newFromDate&to_date=$newToDate"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath1) {
                     return MockResponse()
@@ -1795,7 +1797,7 @@ class ReportsTest {
         val requestPath2 = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate&budget_category=$lifestyle"
         val requestPath3 = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath1) {
                     return MockResponse()
@@ -1939,7 +1941,7 @@ class ReportsTest {
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_history_txn_category_monthly_2018_01_01_2018_12_31)
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -2039,7 +2041,7 @@ class ReportsTest {
         val grouping = ReportGrouping.MERCHANT
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
@@ -2091,7 +2093,7 @@ class ReportsTest {
         val grouping = ReportGrouping.TRANSACTION_CATEGORY
         val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()

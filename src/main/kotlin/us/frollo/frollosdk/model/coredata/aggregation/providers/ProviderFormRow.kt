@@ -25,21 +25,21 @@ import com.google.gson.annotations.SerializedName
  */
 data class ProviderFormRow(
 
-        /** Unique ID of the current row */
-        @SerializedName("id") val rowId: String,
+    /** Unique ID of the current row */
+    @SerializedName("id") val rowId: String,
 
-        /** Label of the row to be displayed to the user */
-        @SerializedName("label") val label: String,
+    /** Label of the row to be displayed to the user */
+    @SerializedName("label") val label: String,
 
-        /** Form name */
-        @SerializedName("form") val form: String,
+    /** Form name */
+    @SerializedName("form") val form: String,
 
-        /** Field row choice indicating if this should be grouped with another row or not */
-        @SerializedName("fieldRowChoice") val fieldRowChoice: String,
+    /** Field row choice indicating if this should be grouped with another row or not */
+    @SerializedName("fieldRowChoice") val fieldRowChoice: String,
 
-        /** A hint message to be displayed to the user (optional) */
-        @SerializedName("hint") val hint: String?,
+    /** A hint message to be displayed to the user (optional) */
+    @SerializedName("hint") val hint: String?,
 
-        /** List of fields for the row */
-        @SerializedName("field") val fields: List<ProviderFormField>
+    /** List of fields for the row */
+    @SerializedName("field") val fields: List<ProviderFormField>
 )

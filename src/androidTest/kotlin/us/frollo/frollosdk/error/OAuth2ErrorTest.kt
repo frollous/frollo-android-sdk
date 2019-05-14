@@ -19,7 +19,7 @@ package us.frollo.frollosdk.error
 import android.app.Application
 import androidx.test.platform.app.InstrumentationRegistry
 import net.openid.appauth.AuthorizationException
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import us.frollo.frollosdk.FrolloSDK

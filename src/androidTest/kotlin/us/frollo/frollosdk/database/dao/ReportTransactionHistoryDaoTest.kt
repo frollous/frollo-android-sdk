@@ -22,17 +22,22 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Before
 
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.mapping.*
-import us.frollo.frollosdk.model.*
+import us.frollo.frollosdk.mapping.toMerchant
+import us.frollo.frollosdk.mapping.toTransactionCategory
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.model.testMerchantResponseData
+import us.frollo.frollosdk.model.testReportGroupTransactionHistoryData
+import us.frollo.frollosdk.model.testReportTransactionHistoryData
+import us.frollo.frollosdk.model.testTransactionCategoryResponseData
 import java.math.BigDecimal
 
 class ReportTransactionHistoryDaoTest {
@@ -208,7 +213,7 @@ class ReportTransactionHistoryDaoTest {
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(3, testObserver.value().size)
 
-        db.reportsTransactionHistory().deleteMany(longArrayOf(101,102))
+        db.reportsTransactionHistory().deleteMany(longArrayOf(101, 102))
 
         testObserver = db.reportsTransactionHistory().load(fromDate = "2018-05", toDate = "2018-08", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null).test()
         testObserver.awaitValue()

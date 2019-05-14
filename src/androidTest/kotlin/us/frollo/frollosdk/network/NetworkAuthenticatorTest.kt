@@ -24,7 +24,9 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 
-import org.junit.Assert.*
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
@@ -38,7 +40,6 @@ import us.frollo.frollosdk.error.APIErrorType
 import us.frollo.frollosdk.network.api.UserAPI
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.keystore.Keystore
-import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
@@ -93,7 +94,7 @@ class NetworkAuthenticatorTest {
     fun testPreemptiveAccessTokenRefresh() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                         return MockResponse()
@@ -104,7 +105,7 @@ class NetworkAuthenticatorTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -139,7 +140,7 @@ class NetworkAuthenticatorTest {
     fun testInvalidAccessTokenRefresh() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             var failedOnce = false
 
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -159,7 +160,7 @@ class NetworkAuthenticatorTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -194,7 +195,7 @@ class NetworkAuthenticatorTest {
     fun testRequestsGetCancelledAfterMultipleInvalidAccessTokenFromServer() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -205,7 +206,7 @@ class NetworkAuthenticatorTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -242,7 +243,7 @@ class NetworkAuthenticatorTest {
     fun testInvalidAccessTokenRetriesReset() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             var userRequestCount = 0
 
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -262,7 +263,7 @@ class NetworkAuthenticatorTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -297,7 +298,7 @@ class NetworkAuthenticatorTest {
     fun testInvalidRefreshTokenFails() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 return MockResponse()
                         .setResponseCode(401)
@@ -329,7 +330,7 @@ class NetworkAuthenticatorTest {
     fun testRequestsGetRetriedAfterRefreshingAccessToken() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             var userRequestCount = 0
 
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -349,7 +350,7 @@ class NetworkAuthenticatorTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
@@ -398,7 +399,7 @@ class NetworkAuthenticatorTest {
     fun testRequestsGetCancelledAfterRefreshingAccessTokenFails() {
         initSetup()
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
@@ -409,7 +410,7 @@ class NetworkAuthenticatorTest {
             }
         })
 
-        mockTokenServer.setDispatcher(object: Dispatcher() {
+        mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()

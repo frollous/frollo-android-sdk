@@ -22,7 +22,9 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
@@ -156,7 +158,7 @@ class LogTest {
         initSetup()
         Log.logLevel = LogLevel.ERROR
 
-        mockServer.setDispatcher(object: Dispatcher() {
+        mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == DeviceAPI.URL_LOG) {
                     return MockResponse()
@@ -184,7 +186,7 @@ class LogTest {
         var networkLoggerFound = false
 
         loggers.forEach { logger ->
-            when(logger) {
+            when (logger) {
                 is ConsoleLogger -> consoleLoggerFound = true
                 is NetworkLogger -> networkLoggerFound = true
             }

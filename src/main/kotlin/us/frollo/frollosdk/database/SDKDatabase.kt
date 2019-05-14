@@ -23,7 +23,21 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import us.frollo.frollosdk.database.dao.*
+import us.frollo.frollosdk.database.dao.AccountDao
+import us.frollo.frollosdk.database.dao.BillDao
+import us.frollo.frollosdk.database.dao.BillPaymentDao
+import us.frollo.frollosdk.database.dao.MerchantDao
+import us.frollo.frollosdk.database.dao.MessageDao
+import us.frollo.frollosdk.database.dao.ProviderAccountDao
+import us.frollo.frollosdk.database.dao.ProviderDao
+import us.frollo.frollosdk.database.dao.ReportAccountBalanceDao
+import us.frollo.frollosdk.database.dao.ReportGroupTransactionHistoryDao
+import us.frollo.frollosdk.database.dao.ReportTransactionCurrentDao
+import us.frollo.frollosdk.database.dao.ReportTransactionHistoryDao
+import us.frollo.frollosdk.database.dao.TransactionCategoryDao
+import us.frollo.frollosdk.database.dao.TransactionDao
+import us.frollo.frollosdk.database.dao.TransactionUserTagsDao
+import us.frollo.frollosdk.database.dao.UserDao
 import us.frollo.frollosdk.model.api.messages.MessageResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
@@ -92,7 +106,7 @@ abstract class SDKDatabase : RoomDatabase() {
         private fun create(app: Application): SDKDatabase =
                 Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
                         .allowMainThreadQueries() // Needed for some tests
-                        //.fallbackToDestructiveMigration()
+                        // .fallbackToDestructiveMigration()
                         .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                         .build()
 

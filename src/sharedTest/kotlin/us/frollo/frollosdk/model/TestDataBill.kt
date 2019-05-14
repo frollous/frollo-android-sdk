@@ -28,7 +28,7 @@ import us.frollo.frollosdk.testutils.randomString
 import java.math.BigDecimal
 import kotlin.random.Random
 
-internal fun testBillResponseData(billId: Long? = null, merchantId: Long? = null, transactionCategoryId: Long? = null, accountId: Long? = null) : BillResponse {
+internal fun testBillResponseData(billId: Long? = null, merchantId: Long? = null, transactionCategoryId: Long? = null, accountId: Long? = null): BillResponse {
     val category = BillResponse.Category(
             id = transactionCategoryId ?: randomNumber().toLong(),
             name = randomString(20))
@@ -56,7 +56,7 @@ internal fun testBillResponseData(billId: Long? = null, merchantId: Long? = null
             notes = randomString(200))
 }
 
-internal fun testBillPaymentResponseData(billPaymentId: Long? = null, billId: Long? = null, date: String? = null) : BillPaymentResponse {
+internal fun testBillPaymentResponseData(billPaymentId: Long? = null, billId: Long? = null, date: String? = null): BillPaymentResponse {
     return BillPaymentResponse(
             billPaymentId = billPaymentId ?: randomNumber().toLong(),
             billId = billId ?: randomNumber().toLong(),

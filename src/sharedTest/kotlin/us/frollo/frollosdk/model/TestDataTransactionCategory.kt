@@ -24,7 +24,7 @@ import us.frollo.frollosdk.testutils.randomNumber
 import us.frollo.frollosdk.testutils.randomUUID
 import kotlin.random.Random
 
-internal fun testTransactionCategoryResponseData(transactionCategoryId: Long? = null) : TransactionCategoryResponse {
+internal fun testTransactionCategoryResponseData(transactionCategoryId: Long? = null): TransactionCategoryResponse {
     return TransactionCategoryResponse(
             transactionCategoryId = transactionCategoryId ?: randomNumber().toLong(),
             categoryType = TransactionCategoryType.values()[Random.nextInt(TransactionCategoryType.values().size)],

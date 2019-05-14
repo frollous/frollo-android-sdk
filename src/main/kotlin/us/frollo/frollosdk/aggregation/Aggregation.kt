@@ -38,9 +38,28 @@ import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
-import us.frollo.frollosdk.extensions.*
+import us.frollo.frollosdk.extensions.compareToFindMissingItems
+import us.frollo.frollosdk.extensions.enqueue
+import us.frollo.frollosdk.extensions.fetchMerchantsByIDs
+import us.frollo.frollosdk.extensions.fetchSuggestedTags
+import us.frollo.frollosdk.extensions.fetchTransactionsByIDs
+import us.frollo.frollosdk.extensions.fetchTransactionsByQuery
+import us.frollo.frollosdk.extensions.fetchTransactionsSummaryByIDs
+import us.frollo.frollosdk.extensions.fetchTransactionsSummaryByQuery
+import us.frollo.frollosdk.extensions.fetchUserTags
+import us.frollo.frollosdk.extensions.sqlForTransactionByUserTags
+import us.frollo.frollosdk.extensions.sqlForTransactionStaleIds
+import us.frollo.frollosdk.extensions.sqlForUserTags
+import us.frollo.frollosdk.extensions.transactionSearch
 import us.frollo.frollosdk.logging.Log
-import us.frollo.frollosdk.mapping.*
+import us.frollo.frollosdk.mapping.toAccount
+import us.frollo.frollosdk.mapping.toMerchant
+import us.frollo.frollosdk.mapping.toProvider
+import us.frollo.frollosdk.mapping.toProviderAccount
+import us.frollo.frollosdk.mapping.toTransaction
+import us.frollo.frollosdk.mapping.toTransactionCategory
+import us.frollo.frollosdk.mapping.toTransactionTag
+import us.frollo.frollosdk.mapping.toTransactionsSummary
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
@@ -154,7 +173,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      */
     fun refreshProvider(providerId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchProvider(providerId).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleProviderResponse(resource.data, completion)
                 }
@@ -175,7 +194,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      */
     fun refreshProviders(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchProviders().enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleProvidersResponse(response = resource.data, completion = completion)
                 }
@@ -298,7 +317,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      */
     fun refreshProviderAccount(providerAccountId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchProviderAccount(providerAccountId).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleProviderAccountResponse(response = resource.data, completion = completion)
                 }
@@ -317,7 +336,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      */
     fun refreshProviderAccounts(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchProviderAccounts().enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleProviderAccountsResponse(response = resource.data, completion = completion)
                 }
@@ -340,7 +359,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         val request = ProviderAccountCreateRequest(loginForm = loginForm, providerID = providerId)
 
         aggregationAPI.createProviderAccount(request).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleProviderAccountResponse(response = resource.data, completion = completion)
                 }
@@ -360,7 +379,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      */
     fun deleteProviderAccount(providerAccountId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.deleteProviderAccount(providerAccountId).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     removeCachedProviderAccounts(longArrayOf(providerAccountId))
                     completion?.invoke(Result.success())
@@ -384,7 +403,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         val request = ProviderAccountUpdateRequest(loginForm = loginForm)
 
         aggregationAPI.updateProviderAccount(providerAccountId, request).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleProviderAccountResponse(response = resource.data, completion = completion)
                 }
@@ -509,7 +528,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      */
     fun refreshAccount(accountId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchAccount(accountId).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleAccountResponse(response = resource.data, completion = completion)
                 }
@@ -528,7 +547,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      */
     fun refreshAccounts(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchAccounts().enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleAccountsResponse(response = resource.data, completion = completion)
                 }
@@ -551,9 +570,15 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param nickName Nickname given to the account for display and identification purposes (optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun updateAccount(accountId: Long, hidden: Boolean, included: Boolean, favourite: Boolean? = null,
-                      accountSubType: AccountSubType? = null, nickName: String? = null,
-                      completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun updateAccount(
+        accountId: Long,
+        hidden: Boolean,
+        included: Boolean,
+        favourite: Boolean? = null,
+        accountSubType: AccountSubType? = null,
+        nickName: String? = null,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
 
         val request = AccountUpdateRequest(
                 hidden = hidden,
@@ -570,7 +595,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
 
         aggregationAPI.updateAccount(accountId, request).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleAccountResponse(response = resource.data, completion = completion)
                 }
@@ -660,7 +685,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      */
     fun fetchTransactions(transactionIds: LongArray? = null): LiveData<Resource<List<Transaction>>> {
         val result = if (transactionIds != null) db.transactions().load(transactionIds)
-                     else db.transactions().load()
+        else db.transactions().load()
 
         return Transformations.map(result) { models ->
             Resource.success(models)
@@ -751,7 +776,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      */
     fun refreshTransaction(transactionId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchTransaction(transactionId).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleTransactionResponse(response = resource.data, completion = completion)
                 }
@@ -772,17 +797,28 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param transactionIncluded Boolean flag to indicate to fetch only those transactions that are excluded/included in budget (optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun refreshTransactions(fromDate: String, toDate: String, accountIds: LongArray? = null,
-                            transactionIncluded: Boolean? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun refreshTransactions(
+        fromDate: String,
+        toDate: String,
+        accountIds: LongArray? = null,
+        transactionIncluded: Boolean? = null,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         doAsync {
             refreshNextTransactions(fromDate, toDate, accountIds, transactionIncluded, 0, longArrayOf(), longArrayOf(), completion)
         }
     }
 
-    private fun refreshNextTransactions(fromDate: String, toDate: String, accountIds: LongArray? = null,
-                                        transactionIncluded: Boolean? = null, skip: Int,
-                                        updatedTransactionIds: LongArray, updatedMerchantIds: LongArray,
-                                        completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    private fun refreshNextTransactions(
+        fromDate: String,
+        toDate: String,
+        accountIds: LongArray? = null,
+        transactionIncluded: Boolean? = null,
+        skip: Int,
+        updatedTransactionIds: LongArray,
+        updatedMerchantIds: LongArray,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
 
         aggregationAPI.fetchTransactionsByQuery(fromDate = fromDate, toDate = toDate,
                 accountIds = accountIds, transactionIncluded = transactionIncluded,
@@ -816,11 +852,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * Refresh specific transactions by IDs from the host
      *
      * @param transactionIds List of transaction IDs to fetch
-     * @param  completion Optional completion handler with optional error if the request fails
+     * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshTransactions(transactionIds: LongArray, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchTransactionsByIDs(transactionIds).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleTransactionsByIDsResponse(response = resource.data, completion = completion)
                 }
@@ -840,8 +876,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param applyToAll Apply exclusion status to all similar transactions
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun excludeTransaction(transactionId: Long, excluded: Boolean, applyToAll: Boolean,
-                           completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun excludeTransaction(
+        transactionId: Long,
+        excluded: Boolean,
+        applyToAll: Boolean,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         doAsync {
 
             val transaction = db.transactions().loadTransaction(transactionId)
@@ -854,7 +894,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                             includeApplyAll = applyToAll)
 
                     aggregationAPI.updateTransaction(transactionId, request).enqueue { resource ->
-                        when(resource.status) {
+                        when (resource.status) {
                             Resource.Status.SUCCESS -> {
                                 handleTransactionResponse(response = resource.data, completion = completion)
                             }
@@ -879,8 +919,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param applyToAll Apply recategorisation to all similar transactions
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun recategoriseTransaction(transactionId: Long, transactionCategoryId: Long, applyToAll: Boolean,
-                                completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun recategoriseTransaction(
+        transactionId: Long,
+        transactionCategoryId: Long,
+        applyToAll: Boolean,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         doAsync {
 
             val transaction = db.transactions().loadTransaction(transactionId)
@@ -893,7 +937,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                             recategoriseAll = applyToAll)
 
                     aggregationAPI.updateTransaction(transactionId, request).enqueue { resource ->
-                        when(resource.status) {
+                        when (resource.status) {
                             Resource.Status.SUCCESS -> {
                                 handleTransactionResponse(response = resource.data, completion = completion)
                             }
@@ -921,11 +965,15 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param userTagsApplyAll a flag to apply the userTags to all transactions similar to current one. (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun updateTransaction(transactionId: Long, transaction: Transaction,
-                          recategoriseAll: Boolean? = null, includeApplyAll: Boolean? = null,
-                          userTags: List<String>? = null,
-                          userTagsApplyAll:Boolean? = null,
-                          completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun updateTransaction(
+        transactionId: Long,
+        transaction: Transaction,
+        recategoriseAll: Boolean? = null,
+        includeApplyAll: Boolean? = null,
+        userTags: List<String>? = null,
+        userTagsApplyAll: Boolean? = null,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
 
         val request = TransactionUpdateRequest(
                 budgetCategory = transaction.budgetCategory,
@@ -987,9 +1035,15 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param accountIncluded Only return results from accounts included in the budget (optional)
      * @param completion Completion handler with optional error if the request fails and array of transaction ids if succeeds
      */
-    fun transactionSearch(searchTerm: String, page: Int = 0, fromDate: String? = null, toDate: String? = null,
-                          accountIds: LongArray? = null, accountIncluded: Boolean? = null,
-                          completion: OnFrolloSDKCompletionListener<Resource<LongArray>>) {
+    fun transactionSearch(
+        searchTerm: String,
+        page: Int = 0,
+        fromDate: String? = null,
+        toDate: String? = null,
+        accountIds: LongArray? = null,
+        accountIncluded: Boolean? = null,
+        completion: OnFrolloSDKCompletionListener<Resource<LongArray>>
+    ) {
 
         if (searchTerm.isBlank()) {
             Log.d("$TAG#transactionSearch", "Search term is empty")
@@ -1004,7 +1058,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 searchTerm = searchTerm, fromDate = fromDate, toDate = toDate, accountIds = accountIds,
                 accountIncluded = accountIncluded, count = TRANSACTION_BATCH_SIZE, skip = skip).enqueue { resource ->
 
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#transactionSearch", resource.error?.localizedDescription)
                     completion.invoke(Resource.error(resource.error))
@@ -1041,9 +1095,14 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param onlyIncludedAccounts Boolean flag to indicate to fetch summary for only those transactions of excluded/included Accounts (optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun fetchTransactionsSummary(fromDate: String, toDate: String, accountIds: LongArray? = null,
-                                 onlyIncludedTransactions: Boolean? = null, onlyIncludedAccounts: Boolean? = null,
-                                 completion: OnFrolloSDKCompletionListener<Resource<TransactionsSummary>>) {
+    fun fetchTransactionsSummary(
+        fromDate: String,
+        toDate: String,
+        accountIds: LongArray? = null,
+        onlyIncludedTransactions: Boolean? = null,
+        onlyIncludedAccounts: Boolean? = null,
+        completion: OnFrolloSDKCompletionListener<Resource<TransactionsSummary>>
+    ) {
         aggregationAPI.fetchTransactionsSummaryByQuery(
                 fromDate = fromDate, toDate = toDate,
                 accountIds = accountIds, transactionIncluded = onlyIncludedTransactions,
@@ -1060,7 +1119,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * Fetch transactions summary of specific transaction IDs from the host
      *
      * @param transactionIds List of transaction IDs to fetch summary of
-     * @param  completion Optional completion handler with optional error if the request fails
+     * @param completion Optional completion handler with optional error if the request fails
      */
     fun fetchTransactionsSummary(transactionIds: LongArray, completion: OnFrolloSDKCompletionListener<Resource<TransactionsSummary>>) {
         aggregationAPI.fetchTransactionsSummaryByIDs(transactionIds).enqueue { resource ->
@@ -1073,7 +1132,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     // Do not call this method from main thread. Call this asynchronously.
-    private fun insertTransactions(response: List<TransactionResponse>) : LongArray {
+    private fun insertTransactions(response: List<TransactionResponse>): LongArray {
         val models = mapTransactionResponse(response)
         db.transactions().insertAll(*models.toTypedArray())
 
@@ -1081,9 +1140,14 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     // Do not call this method from main thread. Call this asynchronously.
-    private fun removeTransactions(fromDate: String, toDate: String,
-                                   accountIds: LongArray? = null, transactionIncluded: Boolean? = null,
-                                   excludingIds: LongArray, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    private fun removeTransactions(
+        fromDate: String,
+        toDate: String,
+        accountIds: LongArray? = null,
+        transactionIncluded: Boolean? = null,
+        excludingIds: LongArray,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
 
         val apiIds = excludingIds.sorted()
         val staleIds = ArrayList(db.transactions().getIdsQuery(
@@ -1099,8 +1163,10 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         completion?.invoke(Result.success())
     }
 
-    private fun handleTransactionsByIDsResponse(response: List<TransactionResponse>?,
-                                                completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    private fun handleTransactionsByIDsResponse(
+        response: List<TransactionResponse>?,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         response?.let {
             doAsync {
                 fetchMissingMerchants(response.map { it.merchant.id }.toSet())
@@ -1139,7 +1205,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of LiveData<Resource<List<TransactionTag>>> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactionUserTags(searchTerm: String? = null, sortBy: TagsSortType? = null, orderBy: OrderType? = null): LiveData<Resource<List<TransactionTag>>> {
-        return Transformations.map(db.userTags().custom(sqlForUserTags(searchTerm,sortBy,orderBy))) { models ->
+        return Transformations.map(db.userTags().custom(sqlForUserTags(searchTerm, sortBy, orderBy))) { models ->
             Resource.success(models)
         }
     }
@@ -1163,7 +1229,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      */
     fun refreshTransactionUserTags(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchUserTags().enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleTransactionUserTagsResponse(resource.data, completion)
                 }
@@ -1185,10 +1251,14 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param orderBy Order type for ordering the results. See [OrderType] for more details.(Optional)
      * @param completion Completion handler with optional error if the request fails and list of transaction tags if succeeds
      */
-    fun fetchTransactionSuggestedTags(searchTerm: String? = null, sortBy: SuggestedTagsSortType? = SuggestedTagsSortType.NAME,
-                                      orderBy: OrderType? = OrderType.ASC, completion:OnFrolloSDKCompletionListener <Resource<List<TransactionTag>>>) {
-        aggregationAPI.fetchSuggestedTags(searchTerm,sortBy.toString(),orderBy.toString()).enqueue { resource ->
-            when(resource.status) {
+    fun fetchTransactionSuggestedTags(
+        searchTerm: String? = null,
+        sortBy: SuggestedTagsSortType? = SuggestedTagsSortType.NAME,
+        orderBy: OrderType? = OrderType.ASC,
+        completion: OnFrolloSDKCompletionListener <Resource<List<TransactionTag>>>
+    ) {
+        aggregationAPI.fetchSuggestedTags(searchTerm, sortBy.toString(), orderBy.toString()).enqueue { resource ->
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     val tagsResource = resource.map { data -> data?.map { it.toTransactionTag() }?.toList() }
                     completion.invoke(tagsResource)
@@ -1244,7 +1314,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      */
     fun refreshTransactionCategories(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchTransactionCategories().enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleTransactionCategoriesResponse(response = resource.data, completion = completion)
                 }
@@ -1309,7 +1379,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      */
     fun refreshMerchant(merchantId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchMerchant(merchantId).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleMerchantResponse(response = resource.data, completion = completion)
                 }
@@ -1329,7 +1399,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      */
     fun refreshMerchants(merchantIds: LongArray, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchMerchantsByIDs(merchantIds).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleMerchantsResponse(response = resource.data, byIds = true, completion = completion)
                 }
@@ -1348,7 +1418,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      */
     internal fun refreshMerchants(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchMerchants().enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     handleMerchantsResponse(response = resource.data, completion = completion)
                 }
@@ -1395,7 +1465,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     private fun mapMerchantResponse(models: List<MerchantResponse>): List<Merchant> =
             models.map { it.toMerchant() }.toList()
 
-    ////////
+    // Internal methods
 
     private fun fetchMissingProviders(providerIds: Set<Long>) {
         doAsync {

@@ -19,11 +19,11 @@ package us.frollo.frollosdk.model.api.bills
 import com.google.gson.annotations.SerializedName
 
 internal data class BillsResponse(
-        @SerializedName("budget_period") val budgetPeriod: BudgetPeriod,
-        @SerializedName("bills") val bills: List<BillResponse>
+    @SerializedName("budget_period") val budgetPeriod: BudgetPeriod,
+    @SerializedName("bills") val bills: List<BillResponse>
 ) {
     internal data class BudgetPeriod(
-            @SerializedName("amount_paid") val amountPaid: Long,
-            @SerializedName("amount_remaining") val amountRemaining: String
+        @SerializedName("amount_paid") val amountPaid: Long,
+        @SerializedName("amount_remaining") val amountRemaining: String
     )
 }

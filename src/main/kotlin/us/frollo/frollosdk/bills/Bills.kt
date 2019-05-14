@@ -25,13 +25,24 @@ import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.extensions.enqueue
+import us.frollo.frollosdk.extensions.fetchBillPayments
 import us.frollo.frollosdk.network.NetworkService
-import us.frollo.frollosdk.extensions.*
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toBill
 import us.frollo.frollosdk.mapping.toBillPayment
-import us.frollo.frollosdk.model.api.bills.*
-import us.frollo.frollosdk.model.coredata.bills.*
+import us.frollo.frollosdk.model.api.bills.BillCreateRequest
+import us.frollo.frollosdk.model.api.bills.BillPaymentRequestStatus
+import us.frollo.frollosdk.model.api.bills.BillPaymentResponse
+import us.frollo.frollosdk.model.api.bills.BillPaymentUpdateRequest
+import us.frollo.frollosdk.model.api.bills.BillResponse
+import us.frollo.frollosdk.model.api.bills.BillUpdateRequest
+import us.frollo.frollosdk.model.api.bills.BillsResponse
+import us.frollo.frollosdk.model.coredata.bills.Bill
+import us.frollo.frollosdk.model.coredata.bills.BillFrequency
+import us.frollo.frollosdk.model.coredata.bills.BillPayment
+import us.frollo.frollosdk.model.coredata.bills.BillPaymentRelation
+import us.frollo.frollosdk.model.coredata.bills.BillRelation
 import us.frollo.frollosdk.network.api.BillsAPI
 import java.math.BigDecimal
 
@@ -100,9 +111,14 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @param notes Notes attached to the bill (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun createBill(transactionId: Long, frequency: BillFrequency, nextPaymentDate: String,
-                   name: String? = null, notes: String? = null,
-                   completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun createBill(
+        transactionId: Long,
+        frequency: BillFrequency,
+        nextPaymentDate: String,
+        name: String? = null,
+        notes: String? = null,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         val request = BillCreateRequest(
                 transactionId = transactionId,
                 dueAmount = null,
@@ -124,8 +140,14 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @param notes Notes attached to the bill (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun createBill(dueAmount: BigDecimal, frequency: BillFrequency, nextPaymentDate: String, name: String,
-                   notes: String? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun createBill(
+        dueAmount: BigDecimal,
+        frequency: BillFrequency,
+        nextPaymentDate: String,
+        name: String,
+        notes: String? = null,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         val request = BillCreateRequest(
                 transactionId = null,
                 dueAmount = dueAmount,
@@ -139,7 +161,7 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
 
     private fun createBill(request: BillCreateRequest, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         billsAPI.createBill(request).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#createBill", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
@@ -159,7 +181,7 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      */
     fun deleteBill(billId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         billsAPI.deleteBill(billId).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#deleteBill", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
@@ -180,7 +202,7 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      */
     fun refreshBills(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         billsAPI.fetchBills().enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshBills", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
@@ -200,7 +222,7 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      */
     fun refreshBill(billId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         billsAPI.fetchBill(billId).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshBill", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
@@ -229,7 +251,7 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
                 notes = bill.notes)
 
         billsAPI.updateBill(bill.billId, request).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#updateBill", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
@@ -341,7 +363,7 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      */
     fun deleteBillPayment(billPaymentId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         billsAPI.deleteBillPayment(billPaymentId).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#deleteBillPayment", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
@@ -362,7 +384,7 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      */
     fun refreshBillPayments(fromDate: String, toDate: String, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         billsAPI.fetchBillPayments(fromDate = fromDate, toDate = toDate).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshBillPayments", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
@@ -390,7 +412,7 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         val request = BillPaymentUpdateRequest(date = date, status = status)
 
         billsAPI.updateBillPayment(billPaymentId, request).enqueue { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#updateBillPayment", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
@@ -439,8 +461,12 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
 
-    private fun handleBillPaymentsResponse(response: List<BillPaymentResponse>?, fromDate: String, toDate: String,
-                                           completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    private fun handleBillPaymentsResponse(
+        response: List<BillPaymentResponse>?,
+        fromDate: String,
+        toDate: String,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         response?.let {
             doAsync {
                 val models = mapBillPaymentResponse(response)

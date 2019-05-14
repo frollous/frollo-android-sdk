@@ -24,8 +24,9 @@ import us.frollo.frollosdk.R
  * Type of error that has occurred on the API
  */
 enum class APIErrorType(
-        /** Localized string resource id */
-        @StringRes val textResource: Int) {
+    /** Localized string resource id */
+    @StringRes val textResource: Int
+) {
 
     /** Deprecated API */
     DEPRECATED(R.string.FrolloSDK_Error_API_DeprecatedError),

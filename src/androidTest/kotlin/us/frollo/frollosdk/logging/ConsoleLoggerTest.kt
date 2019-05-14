@@ -18,8 +18,6 @@ package us.frollo.frollosdk.logging
 
 import org.junit.Test
 
-import org.junit.Assert.*
-
 class ConsoleLoggerTest {
 
     @Test

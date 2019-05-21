@@ -34,10 +34,15 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.aggregation.Aggregation
+import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
@@ -85,13 +90,15 @@ class ReportsTest {
         val oAuth = OAuth(config = config)
         network = NetworkService(oAuth = oAuth, keystore = keystore, pref = preferences)
 
+        preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        aggregation = Aggregation(network, database, LocalBroadcastManager.getInstance(app))
+        val authentication = Authentication(oAuth, DeviceInfo(app), network, database, preferences)
+        aggregation = Aggregation(network, database, LocalBroadcastManager.getInstance(app), authentication)
 
-        reports = Reports(network, database, aggregation)
+        reports = Reports(network, database, aggregation, authentication)
     }
 
     private fun tearDown() {
@@ -137,6 +144,24 @@ class ReportsTest {
         } catch (e: FrolloSDKError) {
             assertEquals("Invalid format for from/to date", e.localizedMessage)
         }
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchingAccountBalanceReportsFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        reports.refreshAccountBalanceReports(period = ReportPeriod.DAY, fromDate = "2018-10-28", toDate = "2019-01-29") { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
 
         tearDown()
     }
@@ -616,6 +641,24 @@ class ReportsTest {
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
         assertEquals(2, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchingCurrentReportsFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        reports.refreshTransactionCurrentReports(grouping = ReportGrouping.BUDGET_CATEGORY) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
 
         tearDown()
     }
@@ -1254,6 +1297,29 @@ class ReportsTest {
         } catch (e: FrolloSDKError) {
             assertEquals("Invalid format for from/to date", e.localizedMessage)
         }
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchingHistoryReportsFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        reports.refreshTransactionHistoryReports(
+                grouping = ReportGrouping.BUDGET_CATEGORY,
+                period = ReportPeriod.MONTH,
+                fromDate = "2018-01-01",
+                toDate = "2018-12-31") { result ->
+
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
 
         tearDown()
     }

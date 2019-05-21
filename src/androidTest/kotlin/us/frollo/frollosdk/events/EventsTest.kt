@@ -27,6 +27,7 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
+import org.junit.Assert
 import org.junit.Test
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -35,11 +36,17 @@ import org.junit.Assert.assertEquals
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.ACTION.ACTION_REFRESH_TRANSACTIONS
 import us.frollo.frollosdk.core.ARGUMENT
+import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.testSDKConfig
+import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.EventsAPI
 import us.frollo.frollosdk.keystore.Keystore
@@ -75,11 +82,14 @@ class EventsTest {
         val oAuth = OAuth(config = config)
         network = NetworkService(oAuth = oAuth, keystore = keystore, pref = preferences)
 
+        preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        events = Events(network)
+        val database = SDKDatabase.getInstance(app)
+        val authentication = Authentication(oAuth, DeviceInfo(app), network, database, preferences)
+        events = Events(network, authentication)
     }
 
     private fun tearDown() {
@@ -109,6 +119,24 @@ class EventsTest {
 
         val request = mockServer.takeRequest()
         assertEquals(EventsAPI.URL_EVENT, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testTriggerEventFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        events.triggerEvent("TEST_EVENT", 15) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            Assert.assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 

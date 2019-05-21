@@ -34,10 +34,15 @@ import org.junit.Rule
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.MessagesAPI
 import us.frollo.frollosdk.keystore.Keystore
@@ -81,11 +86,13 @@ class MessagesTest {
         val oAuth = OAuth(config = config)
         network = NetworkService(oAuth = oAuth, keystore = keystore, pref = preferences)
 
+        preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        messages = Messages(network, database)
+        val authentication = Authentication(oAuth, DeviceInfo(app), network, database, preferences)
+        messages = Messages(network, database, authentication)
     }
 
     private fun tearDown() {
@@ -214,6 +221,24 @@ class MessagesTest {
     }
 
     @Test
+    fun testRefreshMessagesFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        messages.refreshMessages { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshMessagesSkipsInvalid() {
         initSetup()
 
@@ -292,6 +317,24 @@ class MessagesTest {
     }
 
     @Test
+    fun testRefreshMessageByIDFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        messages.refreshMessage(12345L) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshUnreadMessages() {
         initSetup()
 
@@ -335,6 +378,24 @@ class MessagesTest {
     }
 
     @Test
+    fun testRefreshUnreadMessagesFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        messages.refreshUnreadMessages { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testUpdateMessage() {
         initSetup()
 
@@ -363,6 +424,24 @@ class MessagesTest {
 
         val request = mockServer.takeRequest()
         assertEquals("messages/12345", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testUpdateMessageFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        messages.updateMessage(12345L, true, true) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 

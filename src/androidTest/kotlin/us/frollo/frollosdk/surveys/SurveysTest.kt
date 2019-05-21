@@ -30,9 +30,16 @@ import org.junit.Assert.assertEquals
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Resource
+import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.testSDKConfig
+import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.coredata.surveys.SurveyAnswerType
 import us.frollo.frollosdk.model.coredata.surveys.SurveyQuestionType
@@ -74,7 +81,9 @@ class SurveysTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        surveys = Surveys(network)
+        val database = SDKDatabase.getInstance(app)
+        val authentication = Authentication(oAuth, DeviceInfo(app), network, database, preferences)
+        surveys = Surveys(network, authentication)
     }
 
     private fun tearDown() {
@@ -115,6 +124,24 @@ class SurveysTest {
 
         val request = mockServer.takeRequest()
         assertEquals("user/surveys/$surveyKey", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchSurveyFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        surveys.fetchSurvey(surveyKey = "FINANCIAL_WELLBEING") { result ->
+            assertEquals(Resource.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 
@@ -196,6 +223,24 @@ class SurveysTest {
 
         val request = mockServer.takeRequest()
         assertEquals(SurveysAPI.URL_SURVEYS, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testSubmitSurveyFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        surveys.submitSurvey(survey = testSurveyData()) { result ->
+            assertEquals(Resource.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 

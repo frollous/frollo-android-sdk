@@ -142,6 +142,8 @@ internal interface AggregationAPI {
     @GET(URL_MERCHANTS)
     fun fetchMerchantsByIds(@QueryMap queryParams: Map<String, String>): Call<List<MerchantResponse>>
 
+    // Tags
+
     @GET(URL_USER_TAGS)
     fun fetchUserTags(@QueryMap queryParams: Map<String, String>): Call<List<TransactionTagResponse>>
 

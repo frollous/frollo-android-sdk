@@ -16,8 +16,12 @@
 
 package us.frollo.frollosdk.surveys
 
+import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchSurvey
 import us.frollo.frollosdk.logging.Log
@@ -28,7 +32,7 @@ import us.frollo.frollosdk.network.api.SurveysAPI
 /**
  * Manages fetching & submitting surveys
  */
-class Surveys(network: NetworkService) {
+class Surveys(network: NetworkService, private val authentication: Authentication) {
 
     companion object {
         private const val TAG = "Surveys"
@@ -44,6 +48,13 @@ class Surveys(network: NetworkService) {
      * @param completion Completion handler with optional error if the request fails and survey model if succeeds
      */
     fun fetchSurvey(surveyKey: String, latest: Boolean? = null, completion: OnFrolloSDKCompletionListener<Resource<Survey>>) {
+        if (!authentication.loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#fetchSurvey", error.localizedDescription)
+            completion.invoke(Resource.error(error))
+            return
+        }
+
         surveysAPI.fetchSurvey(surveyKey = surveyKey, latest = latest).enqueue { resource ->
             if (resource.status == Resource.Status.ERROR) {
                 Log.e("$TAG#fetchSurvey", resource.error?.localizedDescription)
@@ -59,6 +70,13 @@ class Surveys(network: NetworkService) {
      * @param completion Completion handler with optional error if the request fails and survey model if succeeds (optional)
      */
     fun submitSurvey(survey: Survey, completion: OnFrolloSDKCompletionListener<Resource<Survey>>? = null) {
+        if (!authentication.loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#submitSurvey", error.localizedDescription)
+            completion?.invoke(Resource.error(error))
+            return
+        }
+
         surveysAPI.submitSurvey(request = survey).enqueue { resource ->
             if (resource.status == Resource.Status.ERROR) {
                 Log.e("$TAG#submitSurvey", resource.error?.localizedDescription)

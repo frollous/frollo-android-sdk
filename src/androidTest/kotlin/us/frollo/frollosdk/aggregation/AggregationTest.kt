@@ -35,9 +35,11 @@ import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.network.NetworkService
@@ -97,11 +99,13 @@ class AggregationTest {
         val oAuth = OAuth(config = config)
         network = NetworkService(oAuth = oAuth, keystore = keystore, pref = preferences)
 
+        preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        aggregation = Aggregation(network, database, LocalBroadcastManager.getInstance(app))
+        val authentication = Authentication(oAuth, DeviceInfo(app), network, database, preferences)
+        aggregation = Aggregation(network, database, LocalBroadcastManager.getInstance(app), authentication)
     }
 
     private fun tearDown() {
@@ -232,6 +236,24 @@ class AggregationTest {
     }
 
     @Test
+    fun testRefreshProvidersFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.refreshProviders { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshProviderByID() {
         initSetup()
 
@@ -260,6 +282,24 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/providers/12345", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshProviderByIdFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.refreshProvider(12345L) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 
@@ -444,6 +484,24 @@ class AggregationTest {
     }
 
     @Test
+    fun testRefreshProviderAccountsByIdFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.refreshProviderAccounts { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshProviderAccountByID() {
         initSetup()
 
@@ -472,6 +530,24 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/provideraccounts/123", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshProviderAccountByIdFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.refreshProviderAccount(123L) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 
@@ -508,6 +584,24 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals(AggregationAPI.URL_PROVIDER_ACCOUNTS, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testCreateProviderAccountFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.createProviderAccount(providerId = 4078, loginForm = loginFormFilledData()) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 
@@ -552,6 +646,24 @@ class AggregationTest {
     }
 
     @Test
+    fun testDeleteProviderAccountFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.deleteProviderAccount(12345) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testUpdateProviderAccount() {
         initSetup()
 
@@ -581,6 +693,24 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/provideraccounts/123", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testUpdateProviderAccountFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.updateProviderAccount(loginForm = loginFormFilledData(), providerAccountId = 123) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 
@@ -810,6 +940,24 @@ class AggregationTest {
     }
 
     @Test
+    fun testRefreshAccountsFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.refreshAccounts { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshAccountByID() {
         initSetup()
 
@@ -845,6 +993,24 @@ class AggregationTest {
     }
 
     @Test
+    fun testRefreshAccountByIdFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.refreshAccount(542) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshTransactionUserTags() {
         initSetup()
 
@@ -860,7 +1026,7 @@ class AggregationTest {
             }
         })
 
-        aggregation.refreshTransactionUserTags() { result ->
+        aggregation.refreshTransactionUserTags { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -873,6 +1039,24 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals(AggregationAPI.URL_USER_TAGS, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshTransactionUserTagsFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.refreshTransactionUserTags { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 
@@ -903,6 +1087,24 @@ class AggregationTest {
             assertEquals(model?.size, 5)
         }
         wait(3)
+        tearDown()
+    }
+
+    @Test
+    fun testFetchSuggestedTransactionTagsFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.fetchTransactionSuggestedTags("ca") { result ->
+            assertEquals(Resource.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
         tearDown()
     }
 
@@ -971,6 +1173,30 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/accounts/542", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testUpdateAccountFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.updateAccount(
+                accountId = 542,
+                hidden = false,
+                included = true,
+                favourite = randomBoolean(),
+                accountSubType = AccountSubType.SAVINGS,
+                nickName = randomUUID()) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 
@@ -1376,6 +1602,24 @@ class AggregationTest {
     }
 
     @Test
+    fun testRefreshTransactionsFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.refreshTransactions(fromDate = "2018-06-01", toDate = "2018-08-08") { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshPaginatedTransactions() {
         initSetup()
 
@@ -1446,6 +1690,24 @@ class AggregationTest {
     }
 
     @Test
+    fun testRefreshTransactionByIdFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.refreshTransaction(194630L) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshTransactionsByIds() {
         initSetup()
 
@@ -1474,6 +1736,24 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals("${AggregationAPI.URL_TRANSACTIONS}?transaction_ids=1,2,3,4,5", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshTransactionByIdsFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.refreshTransactions(longArrayOf(1, 2, 3, 4, 5)) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 
@@ -1521,6 +1801,24 @@ class AggregationTest {
     }
 
     @Test
+    fun testExcludeTransactionFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.excludeTransaction(transactionId = 194630, excluded = true, applyToAll = true) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRecategoriseTransaction() {
         initSetup()
 
@@ -1554,6 +1852,24 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/transactions/194630", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRecategoriseTransactionFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.recategoriseTransaction(transactionId = 194630, transactionCategoryId = 77, applyToAll = true) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 
@@ -1600,6 +1916,24 @@ class AggregationTest {
     }
 
     @Test
+    fun testUpdateTransactionFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.updateTransaction(194630, testTransactionResponseData().toTransaction()) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testTransactionSearch() {
         initSetup()
 
@@ -1634,6 +1968,24 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testTransactionSearchFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.transactionSearch(searchTerm = "Travel") { result ->
+            assertEquals(Resource.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 
@@ -1778,6 +2130,24 @@ class AggregationTest {
     }
 
     @Test
+    fun testFetchTransactionsSummaryFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.fetchTransactionsSummary(fromDate = "2018-06-01", toDate = "2018-08-08") { result ->
+            assertEquals(Resource.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testFetchTransactionsSummaryByIDs() {
         initSetup()
 
@@ -1804,6 +2174,24 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals("${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?transaction_ids=1,2,3,4,5", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionsSummaryByIDsFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.fetchTransactionsSummary(transactionIds = longArrayOf(1, 2, 3, 4, 5)) { result ->
+            assertEquals(Resource.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 
@@ -1877,6 +2265,24 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals(AggregationAPI.URL_TRANSACTION_CATEGORIES, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshTransactionCategoriesFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.refreshTransactionCategories { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 
@@ -1957,6 +2363,24 @@ class AggregationTest {
     }
 
     @Test
+    fun testRefreshMerchantsFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.refreshMerchants { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshMerchantByID() {
         initSetup()
 
@@ -1992,6 +2416,24 @@ class AggregationTest {
     }
 
     @Test
+    fun testRefreshMerchantByIDFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.refreshMerchant(197L) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshMerchantsByIds() {
         initSetup()
 
@@ -2020,6 +2462,24 @@ class AggregationTest {
 
         val request = mockServer.takeRequest()
         assertEquals("${AggregationAPI.URL_MERCHANTS}?merchant_ids=22,30,31,106,691", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshMerchantsByIdsFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.refreshMerchants(longArrayOf(22, 30, 31, 106, 691)) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 

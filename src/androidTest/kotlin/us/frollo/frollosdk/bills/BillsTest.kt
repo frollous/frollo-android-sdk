@@ -35,10 +35,15 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.aggregation.Aggregation
+import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.toString
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.mapping.toAccount
@@ -93,12 +98,14 @@ class BillsTest {
         val oAuth = OAuth(config = config)
         network = NetworkService(oAuth = oAuth, keystore = keystore, pref = preferences)
 
+        preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        aggregation = Aggregation(network, database, LocalBroadcastManager.getInstance(app))
-        bills = Bills(network, database, aggregation)
+        val authentication = Authentication(oAuth, DeviceInfo(app), network, database, preferences)
+        aggregation = Aggregation(network, database, LocalBroadcastManager.getInstance(app), authentication)
+        bills = Bills(network, database, aggregation, authentication)
     }
 
     private fun tearDown() {
@@ -244,6 +251,26 @@ class BillsTest {
     }
 
     @Test
+    fun testCreateBillFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        val date = LocalDate.now().plusDays(1).toString(Bill.DATE_FORMAT_PATTERN)
+
+        bills.createBill(transactionId = 987, frequency = BillFrequency.MONTHLY, nextPaymentDate = date) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testCreateBillManually() {
         initSetup()
 
@@ -328,6 +355,24 @@ class BillsTest {
     }
 
     @Test
+    fun testDeleteBillFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        bills.deleteBill(12345) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshBills() {
         initSetup()
 
@@ -356,6 +401,24 @@ class BillsTest {
 
         val request = mockServer.takeRequest()
         assertEquals(BillsAPI.URL_BILLS, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshBillsFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        bills.refreshBills { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 
@@ -404,6 +467,24 @@ class BillsTest {
     }
 
     @Test
+    fun testRefreshBillByIdFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        bills.refreshBill(12345) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testUpdateBill() {
         initSetup()
 
@@ -442,6 +523,24 @@ class BillsTest {
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testUpdateBillByIdFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        bills.updateBill(testBillResponseData(billId = 12345).toBill()) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 
@@ -776,6 +875,24 @@ class BillsTest {
     }
 
     @Test
+    fun testDeleteBillPaymentFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        bills.deleteBillPayment(12345) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshBillPayments() {
         initSetup()
 
@@ -808,6 +925,24 @@ class BillsTest {
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshBillPaymentsFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        bills.refreshBillPayments(fromDate = "2018-12-01", toDate = "2021-12-02") { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 
@@ -853,6 +988,24 @@ class BillsTest {
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testUpdateBillPaymentFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        bills.updateBillPayment(billPaymentId = 12345, paid = true) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
 
         wait(3)
 

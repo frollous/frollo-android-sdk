@@ -22,10 +22,14 @@ import androidx.room.Transaction
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.aggregation.Aggregation
+import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.extensions.changeDateFormat
 import us.frollo.frollosdk.extensions.dailyToWeekly
@@ -65,7 +69,7 @@ import java.lang.Exception
 /**
  * Manages all aspects of reporting of aggregation data including spending and balances
  */
-class Reports(network: NetworkService, private val db: SDKDatabase, private val aggregation: Aggregation) {
+class Reports(network: NetworkService, private val db: SDKDatabase, private val aggregation: Aggregation, private val authentication: Authentication) {
 
     companion object {
         private const val TAG = "Reports"
@@ -119,6 +123,13 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         accountType: AccountType? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
+        if (!authentication.loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#refreshAccountBalanceReports", error.localizedDescription)
+            completion?.invoke(Result.error(error))
+            return
+        }
+
         reportsAPI.fetchAccountBalanceReports(period, fromDate, toDate, accountId, accountType).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -160,6 +171,13 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshTransactionCurrentReports(grouping: ReportGrouping, budgetCategory: BudgetCategory? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        if (!authentication.loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#refreshTransactionCurrentReports", error.localizedDescription)
+            completion?.invoke(Result.error(error))
+            return
+        }
+
         reportsAPI.fetchTransactionCurrentReports(grouping, budgetCategory).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -223,6 +241,13 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         budgetCategory: BudgetCategory? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
+        if (!authentication.loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#refreshTransactionHistoryReports", error.localizedDescription)
+            completion?.invoke(Result.error(error))
+            return
+        }
+
         reportsAPI.fetchTransactionHistoryReports(grouping, period, fromDate, toDate, budgetCategory).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {

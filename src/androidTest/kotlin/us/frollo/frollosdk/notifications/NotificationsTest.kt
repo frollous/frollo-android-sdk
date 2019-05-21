@@ -85,9 +85,9 @@ class NotificationsTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        messages = Messages(network, database)
-        events = Events(network)
         authentication = Authentication(oAuth, DeviceInfo(app), network, database, preferences)
+        messages = Messages(network, database, authentication)
+        events = Events(network, authentication)
 
         notifications = Notifications(authentication, events, messages)
     }

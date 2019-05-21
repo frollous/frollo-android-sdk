@@ -189,6 +189,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     fun loginUser(email: String, password: String, completion: OnFrolloSDKCompletionListener<Result>) {
         if (loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
+            Log.e("$TAG#loginUser", error.localizedDescription)
             completion.invoke(Result.error(error))
             return
         }
@@ -265,6 +266,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     ) {
         if (loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
+            Log.e("$TAG#registerUser", error.localizedDescription)
             completion.invoke(Result.error(error))
             return
         }
@@ -355,6 +357,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     fun refreshUser(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (!loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#refreshUser", error.localizedDescription)
             completion?.invoke(Result.error(error))
             return
         }
@@ -380,6 +383,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     fun updateUser(user: User, completion: OnFrolloSDKCompletionListener<Result>) {
         if (!loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#updateUser", error.localizedDescription)
             completion.invoke(Result.error(error))
             return
         }
@@ -405,6 +409,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     fun updateAttribution(attribution: Attribution, completion: OnFrolloSDKCompletionListener<Result>) {
         if (!loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#updateAttribution", error.localizedDescription)
             completion.invoke(Result.error(error))
             return
         }
@@ -432,6 +437,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     fun changePassword(currentPassword: String?, newPassword: String, completion: OnFrolloSDKCompletionListener<Result>) {
         if (!loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#changePassword", error.localizedDescription)
             completion.invoke(Result.error(error))
             return
         }
@@ -466,6 +472,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     internal fun deleteUser(completion: OnFrolloSDKCompletionListener<Result>) {
         if (!loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#deleteUser", error.localizedDescription)
             completion.invoke(Result.error(error))
             return
         }
@@ -494,6 +501,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     fun exchangeAuthorizationCode(code: String, codeVerifier: String? = null, completion: OnFrolloSDKCompletionListener<Result>) {
         if (loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
+            Log.e("$TAG#exchangeAuthorizationCode", error.localizedDescription)
             completion.invoke(Result.error(error))
             return
         }
@@ -633,6 +641,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     internal fun updateDevice(compliant: Boolean? = null, notificationToken: String? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (!loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#updateDevice", error.localizedDescription)
             completion?.invoke(Result.error(error))
             return
         }
@@ -663,6 +672,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      */
     internal fun logoutUser() {
         if (!loggedIn) {
+            Log.i("$TAG#logoutUser", "Cannot logout. User is not logged in.")
             return
         }
 

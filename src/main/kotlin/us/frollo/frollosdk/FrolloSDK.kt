@@ -186,19 +186,19 @@ object FrolloSDK {
             // 8. Setup Authentication
             _authentication = Authentication(oAuth, deviceInfo, network, database, preferences)
             // 9. Setup Aggregation
-            _aggregation = Aggregation(network, database, localBroadcastManager)
+            _aggregation = Aggregation(network, database, localBroadcastManager, authentication)
             // 10. Setup Messages
-            _messages = Messages(network, database)
+            _messages = Messages(network, database, authentication)
             // 11. Setup Events
-            _events = Events(network)
+            _events = Events(network, authentication)
             // 12. Setup Notifications
             _notifications = Notifications(authentication, events, messages)
             // 13. Setup Surveys
-            _surveys = Surveys(network)
+            _surveys = Surveys(network, authentication)
             // 14. Setup Reports
-            _reports = Reports(network, database, aggregation)
+            _reports = Reports(network, database, aggregation, authentication)
             // 15. Setup Bills
-            _bills = Bills(network, database, aggregation)
+            _bills = Bills(network, database, aggregation, authentication)
 
             if (version.migrationNeeded()) {
                 version.migrateVersion()

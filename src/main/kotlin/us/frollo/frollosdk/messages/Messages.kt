@@ -20,10 +20,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.MessagesAPI
 import us.frollo.frollosdk.extensions.enqueue
@@ -38,7 +42,7 @@ import us.frollo.frollosdk.model.coredata.messages.Message
 /**
  * Manages caching and refreshing of messages
  */
-class Messages(network: NetworkService, private val db: SDKDatabase) {
+class Messages(network: NetworkService, private val db: SDKDatabase, private val authentication: Authentication) {
 
     companion object {
         private const val TAG = "Messages"
@@ -91,6 +95,13 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshMessage(messageId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        if (!authentication.loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#refreshMessage", error.localizedDescription)
+            completion?.invoke(Result.error(error))
+            return
+        }
+
         messagesAPI.fetchMessage(messageId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -110,6 +121,13 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshMessages(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        if (!authentication.loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#refreshMessages", error.localizedDescription)
+            completion?.invoke(Result.error(error))
+            return
+        }
+
         messagesAPI.fetchMessages().enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -129,6 +147,13 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshUnreadMessages(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        if (!authentication.loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#refreshUnreadMessages", error.localizedDescription)
+            completion?.invoke(Result.error(error))
+            return
+        }
+
         messagesAPI.fetchUnreadMessages().enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -152,6 +177,13 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun updateMessage(messageId: Long, read: Boolean, interacted: Boolean, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        if (!authentication.loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#updateMessage", error.localizedDescription)
+            completion?.invoke(Result.error(error))
+            return
+        }
+
         messagesAPI.updateMessage(messageId, MessageUpdateRequest(read, interacted)).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {

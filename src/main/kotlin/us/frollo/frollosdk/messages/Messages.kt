@@ -18,6 +18,7 @@ package us.frollo.frollosdk.messages
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import androidx.sqlite.db.SimpleSQLiteQuery
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.authentication.Authentication
@@ -76,6 +77,18 @@ class Messages(network: NetworkService, private val db: SDKDatabase, private val
      */
     fun fetchMessages(messageTypes: List<String>? = null, read: Boolean? = null, contentType: ContentType? = null): LiveData<Resource<List<Message>>> =
             Transformations.map(db.messages().loadByQuery(generateSQLQueryMessages(messageTypes, read, contentType))) { response ->
+                Resource.success(mapMessageResponse(response))
+            }
+
+    /**
+     * Advanced method to fetch messages by SQL query from the cache
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches messages from the cache
+     *
+     * @return LiveData object of Resource<List<Message>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchMessages(query: SimpleSQLiteQuery): LiveData<Resource<List<Message>>> =
+            Transformations.map(db.messages().loadByQuery(query)) { response ->
                 Resource.success(mapMessageResponse(response))
             }
 

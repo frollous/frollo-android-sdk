@@ -4,7 +4,7 @@
 
 - Android Studio 3.4+
 - Kotlin version 1.3.30+
-- Gradle tools plugin version 3.4.0+ - In your project level **build.gradle**    
+- Gradle tools plugin version 3.4.1+ - In your project level **build.gradle**    
     ```    
         dependencies {    
             classpath "com.android.tools.build:gradle:3.4.0"    

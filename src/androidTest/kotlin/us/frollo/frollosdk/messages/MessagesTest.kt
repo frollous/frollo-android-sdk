@@ -178,6 +178,26 @@ class MessagesTest {
     }
 
     @Test
+    fun testFetchMessagesByContentType() {
+        initSetup()
+
+        val data1 = testMessageResponseData(type = ContentType.TEXT, read = true)
+        val data2 = testMessageResponseData(type = ContentType.TEXT, read = false)
+        val data3 = testMessageResponseData(type = ContentType.VIDEO, read = false)
+        val data4 = testMessageResponseData(type = ContentType.TEXT, read = false)
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        database.messages().insertAll(*list.toTypedArray())
+
+        val testObserver = messages.fetchMessages(read = false, contentType = ContentType.TEXT).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(2, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshMessages() {
         initSetup()
 

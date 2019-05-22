@@ -36,6 +36,7 @@ import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toMessage
 import us.frollo.frollosdk.model.api.messages.MessageResponse
 import us.frollo.frollosdk.model.api.messages.MessageUpdateRequest
+import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
 import us.frollo.frollosdk.model.coredata.messages.Message
 
@@ -67,26 +68,16 @@ class Messages(network: NetworkService, private val db: SDKDatabase, private val
      *
      * Fetches all messages if no params are passed.
      *
-     * @param messageTypes: List of message types to find matching Messages for (optional)
+     * @param messageTypes List of message types to find matching Messages for (optional)
      * @param read Fetch only read/unread messages (optional)
+     * @param contentType Filter the message by the type of content it contains (optional)
      *
      * @return LiveData object of Resource<List<Message>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchMessages(messageTypes: List<String>? = null, read: Boolean? = null): LiveData<Resource<List<Message>>> {
-        return if (messageTypes != null) {
-            Transformations.map(db.messages().loadByQuery(generateSQLQueryMessages(messageTypes, read))) { response ->
+    fun fetchMessages(messageTypes: List<String>? = null, read: Boolean? = null, contentType: ContentType? = null): LiveData<Resource<List<Message>>> =
+            Transformations.map(db.messages().loadByQuery(generateSQLQueryMessages(messageTypes, read, contentType))) { response ->
                 Resource.success(mapMessageResponse(response))
             }
-        } else if (read != null) {
-            Transformations.map(db.messages().load(read)) { response ->
-                Resource.success(mapMessageResponse(response))
-            }
-        } else {
-            Transformations.map(db.messages().load()) { response ->
-                Resource.success(mapMessageResponse(response))
-            }
-        }
-    }
 
     /**
      * Refresh a specific message by ID from the host

@@ -18,9 +18,11 @@ package us.frollo.frollosdk.extensions
 
 import android.os.Bundle
 import androidx.sqlite.db.SimpleSQLiteQuery
+import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
+import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
@@ -46,21 +48,28 @@ internal fun User.updateRequest(): UserUpdateRequest =
                 dateOfBirth = dateOfBirth,
                 driverLicense = driverLicense)
 
-internal fun generateSQLQueryMessages(searchParams: List<String>, read: Boolean? = null): SimpleSQLiteQuery {
-    val sb = StringBuilder()
+internal fun generateSQLQueryMessages(messageTypes: List<String>? = null, read: Boolean? = null, contentType: ContentType? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("message")
 
-    sb.append("(")
+    if (messageTypes != null && messageTypes.isNotEmpty()) {
+        val sb = StringBuilder()
+        sb.append("(")
 
-    searchParams.forEachIndexed { index, str ->
-        sb.append("(message_types LIKE '%|$str|%')")
-        if (index < searchParams.size - 1) sb.append(" OR ")
+        messageTypes.forEachIndexed { index, str ->
+            sb.append("(message_types LIKE '%|$str|%')")
+            if (index < messageTypes.size - 1) sb.append(" OR ")
+        }
+
+        sb.append(")")
+
+        sqlQueryBuilder.appendSelection(selection = sb.toString())
     }
 
-    sb.append(")")
+    read?.let { sqlQueryBuilder.appendSelection(selection = "read = ${ it.toInt() }") }
 
-    read?.let { sb.append(" AND read = ${ it.toInt() }") }
+    contentType?.let { sqlQueryBuilder.appendSelection(selection = "content_type = '${ it.name }'") }
 
-    return SimpleSQLiteQuery("SELECT * FROM message WHERE $sb")
+    return sqlQueryBuilder.create()
 }
 
 internal fun sqlForTransactionByUserTags(tags: List<String>): SimpleSQLiteQuery {

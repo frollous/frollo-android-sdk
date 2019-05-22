@@ -727,6 +727,94 @@ class ReportsTest {
     }
 
     @Test
+    fun testFetchingCurrentOverallReportsByBudgetCategory() {
+        initSetup()
+
+        val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_CURRENT}?grouping=${ReportGrouping.BUDGET_CATEGORY}"
+
+        val body = readStringFromJson(app, R.raw.transaction_reports_current_budget_category)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        reports.refreshTransactionCurrentReports(grouping = ReportGrouping.BUDGET_CATEGORY) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = reports.currentTransactionReports(grouping = ReportGrouping.BUDGET_CATEGORY, overall = true).test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+
+            // Check for overall reports
+            val overallReports = models?.filter { it.report?.linkedId == null }
+            assertEquals(31, overallReports?.size)
+
+            // Check for group reports
+            val groupReports = models?.filter { it.report?.linkedId != null }
+            assertEquals(0, groupReports?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchingCurrentGroupReportsByBudgetCategory() {
+        initSetup()
+
+        val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_CURRENT}?grouping=${ReportGrouping.BUDGET_CATEGORY}"
+
+        val body = readStringFromJson(app, R.raw.transaction_reports_current_budget_category)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        reports.refreshTransactionCurrentReports(grouping = ReportGrouping.BUDGET_CATEGORY) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = reports.currentTransactionReports(grouping = ReportGrouping.BUDGET_CATEGORY, overall = false).test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+
+            // Check for overall reports
+            val overallReports = models?.filter { it.report?.linkedId == null }
+            assertEquals(0, overallReports?.size)
+
+            // Check for group reports
+            val groupReports = models?.filter { it.report?.day == 3 && it.report?.linkedId != null }
+            assertEquals(5, groupReports?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testFetchingCurrentReportsByMerchant() {
         initSetup()
 

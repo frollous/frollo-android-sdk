@@ -19,12 +19,14 @@ package us.frollo.frollosdk.reports
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.room.Transaction
+import androidx.sqlite.db.SimpleSQLiteQuery
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.error.DataError
@@ -106,6 +108,20 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
     }
 
     /**
+     * Advanced method to fetch account balance reports by SQL query from the cache
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches account balance reports from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<ReportAccountBalanceRelation>> which can be observed using an Observer for future changes as well.
+     */
+    fun accountBalanceReports(query: SimpleSQLiteQuery): LiveData<Resource<List<ReportAccountBalanceRelation>>> =
+            Transformations.map(db.reportsAccountBalance().loadWithRelation(query)) { model ->
+                Resource.success(model)
+            }
+
+    /**
      * Refresh account balance reports from the host
      *
      * @param fromDate Start date in the format yyyy-MM-dd to fetch reports from (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
@@ -155,11 +171,32 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      *
      * @param grouping Grouping that reports should be broken down into
      * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
+     * @param overall Filter reports to show just overall reports or by breakdown categories, e.g. by budget category. Leaving this blank will return both overall and breakdown reports (Optional)
      *
      * @return LiveData object of Resource<List<ReportTransactionCurrentRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun currentTransactionReports(grouping: ReportGrouping, budgetCategory: BudgetCategory? = null): LiveData<Resource<List<ReportTransactionCurrentRelation>>> =
-            Transformations.map(db.reportsTransactionCurrent().load(grouping, budgetCategory)) { model ->
+    fun currentTransactionReports(grouping: ReportGrouping, budgetCategory: BudgetCategory? = null, overall: Boolean? = null): LiveData<Resource<List<ReportTransactionCurrentRelation>>> =
+            Transformations.map(db.reportsTransactionCurrent().load(grouping, budgetCategory)) { models ->
+                Resource.success(
+                        when (overall) {
+                            true -> models.filter { it.report?.linkedId == null }
+                            false -> models.filter { it.report?.linkedId != null }
+                            else -> models
+                        }
+                )
+            }
+
+    /**
+     * Advanced method to fetch current transaction reports by SQL query from the cache
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches current transaction reports from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<ReportTransactionCurrentRelation>> which can be observed using an Observer for future changes as well.
+     */
+    fun currentTransactionReports(query: SimpleSQLiteQuery): LiveData<Resource<List<ReportTransactionCurrentRelation>>> =
+            Transformations.map(db.reportsTransactionCurrent().loadByQuery(query)) { model ->
                 Resource.success(model)
             }
 
@@ -222,6 +259,20 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
             Resource.success(model)
         }
     }
+
+    /**
+     * Advanced method to fetch historic transaction reports by SQL query from the cache
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches historic transaction reports from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<ReportTransactionHistoryRelation>> which can be observed using an Observer for future changes as well.
+     */
+    fun historyTransactionReports(query: SimpleSQLiteQuery): LiveData<Resource<List<ReportTransactionHistoryRelation>>> =
+            Transformations.map(db.reportsTransactionHistory().loadByQuery(query)) { model ->
+                Resource.success(model)
+            }
 
     /**
      * Refresh transaction history reports from the host

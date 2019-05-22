@@ -35,7 +35,7 @@ internal data class MessageResponse(
     @PrimaryKey @ColumnInfo(name = "msg_id") @SerializedName("id") val messageId: Long,
     @ColumnInfo(name = "event") @SerializedName("event") val event: String,
     @ColumnInfo(name = "user_event_id") @SerializedName("user_event_id") val userEventId: Long?,
-    @ColumnInfo(name = "placement") @SerializedName("placement") val placement: Long, // 1
+    @ColumnInfo(name = "placement") @SerializedName("placement") val placement: Long,
     @ColumnInfo(name = "persists") @SerializedName("persists") val persists: Boolean,
     @ColumnInfo(name = "read") @SerializedName("read") val read: Boolean,
     @ColumnInfo(name = "interacted") @SerializedName("interacted") val interacted: Boolean,

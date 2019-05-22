@@ -24,6 +24,7 @@ import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.error.DataError
@@ -84,6 +85,8 @@ class Messages(network: NetworkService, private val db: SDKDatabase, private val
      * Advanced method to fetch messages by SQL query from the cache
      *
      * @param query SimpleSQLiteQuery: Select query which fetches messages from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
      *
      * @return LiveData object of Resource<List<Message>> which can be observed using an Observer for future changes as well.
      */

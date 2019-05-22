@@ -21,7 +21,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.room.Transaction
 import androidx.room.Update
+import androidx.sqlite.db.SupportSQLiteQuery
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
@@ -34,6 +37,10 @@ internal interface ReportTransactionHistoryDao {
     @androidx.room.Transaction
     @Query("SELECT * FROM report_transaction_history WHERE (date BETWEEN :fromDate AND :toDate) AND report_grouping = :grouping AND period = :period AND filtered_budget_category IS :budgetCategory")
     fun load(fromDate: String, toDate: String, grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory?): LiveData<List<ReportTransactionHistoryRelation>>
+
+    @Transaction
+    @RawQuery(observedEntities = [ReportTransactionHistory::class])
+    fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<ReportTransactionHistoryRelation>>
 
     @Query("SELECT * FROM report_transaction_history WHERE (date BETWEEN :fromDate AND :toDate) AND report_grouping = :grouping AND period = :period AND filtered_budget_category IS :budgetCategory AND date IN (:dates)")
     fun find(fromDate: String, toDate: String, grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory?, dates: Array<String>): MutableList<ReportTransactionHistory>

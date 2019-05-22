@@ -21,8 +21,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
 import androidx.room.Transaction
 import androidx.room.Update
+import androidx.sqlite.db.SupportSQLiteQuery
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrentRelation
@@ -31,9 +33,13 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 @Dao
 internal interface ReportTransactionCurrentDao {
 
-    @androidx.room.Transaction
+    @Transaction
     @Query("SELECT * FROM report_transaction_current WHERE report_grouping = :grouping AND filtered_budget_category IS :budgetCategory")
     fun load(grouping: ReportGrouping, budgetCategory: BudgetCategory?): LiveData<List<ReportTransactionCurrentRelation>>
+
+    @Transaction
+    @RawQuery(observedEntities = [ReportTransactionCurrent::class])
+    fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<ReportTransactionCurrentRelation>>
 
     @Query("SELECT * FROM report_transaction_current WHERE report_grouping = :grouping AND filtered_budget_category IS :budgetCategory AND linked_id IS :linkedId AND day IN (:days)")
     fun find(grouping: ReportGrouping, budgetCategory: BudgetCategory?, linkedId: Long?, days: IntArray): MutableList<ReportTransactionCurrent>

@@ -18,12 +18,14 @@ package us.frollo.frollosdk.bills
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import androidx.sqlite.db.SimpleSQLiteQuery
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.error.DataError
@@ -31,6 +33,8 @@ import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchBillPayments
+import us.frollo.frollosdk.extensions.sqlForBillPayments
+import us.frollo.frollosdk.extensions.sqlForBills
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toBill
@@ -46,7 +50,10 @@ import us.frollo.frollosdk.model.coredata.bills.Bill
 import us.frollo.frollosdk.model.coredata.bills.BillFrequency
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
 import us.frollo.frollosdk.model.coredata.bills.BillPaymentRelation
+import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.model.coredata.bills.BillRelation
+import us.frollo.frollosdk.model.coredata.bills.BillStatus
+import us.frollo.frollosdk.model.coredata.bills.BillType
 import us.frollo.frollosdk.network.api.BillsAPI
 import java.math.BigDecimal
 
@@ -76,11 +83,35 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
     /**
      * Fetch bills from the cache
      *
+     * @param frequency Filter by frequency of the bill payments (optional)
+     * @param paymentStatus Filter by the payment status (optional)
+     * @param status Filter by the status of the bill (optional)
+     * @param type Filter by the type of the bill (optional)
+     *
      * @return LiveData object of Resource<List<Bill> which can be observed using an Observer for future changes as well.
      */
-    fun fetchBills(): LiveData<Resource<List<Bill>>> =
-            Transformations.map(db.bills().load()) { models ->
+    fun fetchBills(
+            frequency: BillFrequency? = null,
+            paymentStatus: BillPaymentStatus? = null,
+            status: BillStatus? = null,
+            type: BillType? = null
+    ): LiveData<Resource<List<Bill>>> =
+            Transformations.map(db.bills().loadByQuery(sqlForBills(frequency, paymentStatus, status, type))) { models ->
                 Resource.success(models)
+            }
+
+    /**
+     * Advanced method to fetch bills by SQL query from the cache
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches bills from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<Bill>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchBills(query: SimpleSQLiteQuery): LiveData<Resource<List<Bill>>> =
+            Transformations.map(db.bills().loadByQuery(query)) { model ->
+                Resource.success(model)
             }
 
     /**
@@ -98,11 +129,35 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
     /**
      * Fetch bills from the cache along with other associated data.
      *
+     * @param frequency Filter by frequency of the bill payments (optional)
+     * @param paymentStatus Filter by the payment status (optional)
+     * @param status Filter by the status of the bill (optional)
+     * @param type Filter by the type of the bill (optional)
+     *
      * @return LiveData object of Resource<List<BillRelation> which can be observed using an Observer for future changes as well.
      */
-    fun fetchBillsWithRelation(): LiveData<Resource<List<BillRelation>>> =
-            Transformations.map(db.bills().loadWithRelation()) { models ->
+    fun fetchBillsWithRelation(
+            frequency: BillFrequency? = null,
+            paymentStatus: BillPaymentStatus? = null,
+            status: BillStatus? = null,
+            type: BillType? = null
+    ): LiveData<Resource<List<BillRelation>>> =
+            Transformations.map(db.bills().loadByQueryWithRelation(sqlForBills(frequency, paymentStatus, status, type))) { models ->
                 Resource.success(models)
+            }
+
+    /**
+     * Advanced method to fetch bills by SQL query from the cache along with other associated data.
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches bills from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<BillRelation>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchBillsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<BillRelation>>> =
+            Transformations.map(db.bills().loadByQueryWithRelation(query)) { model ->
+                Resource.success(model)
             }
 
     /**
@@ -317,36 +372,39 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
             }
 
     /**
-     * Fetch bill payments from the cache
+     * Fetch bill payments by bill ID from the cache
      *
-     * @param fromDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
-     * @param toDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
+     * @param billId Bill ID of the bill payments to fetch (optional)
+     * @param fromDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive) (optional). See [BillPayment.DATE_FORMAT_PATTERN]
+     * @param toDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive) (optional). See [BillPayment.DATE_FORMAT_PATTERN]
+     * @param frequency Filter by frequency of the bill payments (optional)
+     * @param paymentStatus Filter by the payment status (optional)
      *
      * @return LiveData object of Resource<List<BillPayment>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchBillPayments(fromDate: String, toDate: String): LiveData<Resource<List<BillPayment>>> =
-            Transformations.map(db.billPayments().load(fromDate = fromDate, toDate = toDate)) { models ->
+    fun fetchBillPayments(
+            billId: Long? = null,
+            fromDate: String? = null,
+            toDate: String? = null,
+            frequency: BillFrequency? = null,
+            paymentStatus: BillPaymentStatus? = null
+    ): LiveData<Resource<List<BillPayment>>> =
+            Transformations.map(db.billPayments().loadByQuery(sqlForBillPayments(billId, fromDate, toDate, frequency, paymentStatus))) { models ->
                 Resource.success(models)
             }
 
     /**
-     * Fetch bill payments by bill ID from the cache
+     * Advanced method to fetch bill payments by SQL query from the cache
      *
-     * @param billId Bill ID of the bill payments to fetch
-     * @param fromDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
-     * @param toDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
+     * @param query SimpleSQLiteQuery: Select query which fetches bill payments from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
      *
      * @return LiveData object of Resource<List<BillPayment>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchBillPaymentsByBillId(billId: Long, fromDate: String? = null, toDate: String? = null): LiveData<Resource<List<BillPayment>>> =
-            if (fromDate != null && toDate != null) {
-                Transformations.map(db.billPayments().loadByBillId(billId = billId, fromDate = fromDate, toDate = toDate)) { models ->
-                    Resource.success(models)
-                }
-            } else {
-                Transformations.map(db.billPayments().loadByBillId(billId = billId)) { models ->
-                    Resource.success(models)
-                }
+    fun fetchBillPayments(query: SimpleSQLiteQuery): LiveData<Resource<List<BillPayment>>> =
+            Transformations.map(db.billPayments().loadByQuery(query)) { model ->
+                Resource.success(model)
             }
 
     /**
@@ -364,34 +422,37 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
     /**
      * Fetch bill payments from the cache with associated data
      *
-     * @param fromDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
-     * @param toDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
+     * @param billId Bill ID of the bill payments to fetch (optional)
+     * @param fromDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive) (optional). See [BillPayment.DATE_FORMAT_PATTERN]
+     * @param toDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive) (optional). See [BillPayment.DATE_FORMAT_PATTERN]
+     * @param frequency Filter by frequency of the bill payments (optional)
+     * @param paymentStatus Filter by the payment status (optional)
      *
      * @return LiveData object of Resource<List<BillPaymentRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchBillPaymentsWithRelation(fromDate: String, toDate: String): LiveData<Resource<List<BillPaymentRelation>>> =
-            Transformations.map(db.billPayments().loadWithRelation(fromDate = fromDate, toDate = toDate)) { models ->
+    fun fetchBillPaymentsWithRelation(
+            billId: Long? = null,
+            fromDate: String? = null,
+            toDate: String? = null,
+            frequency: BillFrequency? = null,
+            paymentStatus: BillPaymentStatus? = null
+    ): LiveData<Resource<List<BillPaymentRelation>>> =
+            Transformations.map(db.billPayments().loadByQueryWithRelation(sqlForBillPayments(billId, fromDate, toDate, frequency, paymentStatus))) { models ->
                 Resource.success(models)
             }
 
     /**
-     * Fetch bill payments by bill ID from the cache with associated data
+     * Advanced method to fetch bill payments by SQL query from the cache with associated data
      *
-     * @param billId Bill ID of the bill payments to fetch
-     * @param fromDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
-     * @param toDate Start date in the format yyyy-MM-dd to fetch bill payments from (inclusive). See [BillPayment.DATE_FORMAT_PATTERN]
+     * @param query SimpleSQLiteQuery: Select query which fetches bill payments from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
      *
      * @return LiveData object of Resource<List<BillPaymentRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchBillPaymentsByBillIdWithRelation(billId: Long, fromDate: String? = null, toDate: String? = null): LiveData<Resource<List<BillPaymentRelation>>> =
-            if (fromDate != null && toDate != null) {
-                Transformations.map(db.billPayments().loadByBillIdWithRelation(billId = billId, fromDate = fromDate, toDate = toDate)) { models ->
-                    Resource.success(models)
-                }
-            } else {
-                Transformations.map(db.billPayments().loadByBillIdWithRelation(billId = billId)) { models ->
-                    Resource.success(models)
-                }
+    fun fetchBillPaymentsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<BillPaymentRelation>>> =
+            Transformations.map(db.billPayments().loadByQueryWithRelation(query)) { model ->
+                Resource.success(model)
             }
 
     /**

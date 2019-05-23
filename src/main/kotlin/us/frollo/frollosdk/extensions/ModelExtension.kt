@@ -22,6 +22,10 @@ import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
+import us.frollo.frollosdk.model.coredata.bills.BillFrequency
+import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
+import us.frollo.frollosdk.model.coredata.bills.BillStatus
+import us.frollo.frollosdk.model.coredata.bills.BillType
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
@@ -156,6 +160,28 @@ internal fun sqlForFetchingAccountBalanceReports(fromDate: String, toDate: Strin
     accountType?.let { sb.append(" AND a.attr_account_type = '${accountType.name}' ") }
 
     return SimpleSQLiteQuery(sb.toString())
+}
+
+internal fun sqlForBills(frequency: BillFrequency? = null, paymentStatus: BillPaymentStatus? = null, status: BillStatus? = null, type: BillType? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("bill")
+
+    frequency?.let { sqlQueryBuilder.appendSelection(selection = "frequency = '${ it.name }'") }
+    paymentStatus?.let { sqlQueryBuilder.appendSelection(selection = "payment_status = '${ it.name }'") }
+    status?.let { sqlQueryBuilder.appendSelection(selection = "status = '${ it.name }'") }
+    type?.let { sqlQueryBuilder.appendSelection(selection = "bill_type = '${ it.name }'") }
+
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForBillPayments(billId: Long? = null, fromDate: String? = null, toDate: String? = null, frequency: BillFrequency? = null, paymentStatus: BillPaymentStatus? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("bill_payment")
+
+    billId?.let { sqlQueryBuilder.appendSelection(selection = "bill_id = $it") }
+    ifNotNull(fromDate, toDate) { from, to -> sqlQueryBuilder.appendSelection(selection = "(date BETWEEN Date('$from') AND Date('$to'))") }
+    frequency?.let { sqlQueryBuilder.appendSelection(selection = "frequency = '${ it.name }'") }
+    paymentStatus?.let { sqlQueryBuilder.appendSelection(selection = "payment_status = '${ it.name }'") }
+
+    return sqlQueryBuilder.create()
 }
 
 internal fun Bundle.toNotificationPayload(): NotificationPayload =

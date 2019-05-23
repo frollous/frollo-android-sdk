@@ -28,7 +28,15 @@ import us.frollo.frollosdk.testutils.randomString
 import java.math.BigDecimal
 import kotlin.random.Random
 
-internal fun testBillResponseData(billId: Long? = null, merchantId: Long? = null, transactionCategoryId: Long? = null, accountId: Long? = null): BillResponse {
+internal fun testBillResponseData(
+        billId: Long? = null,
+        merchantId: Long? = null,
+        transactionCategoryId: Long? = null,
+        accountId: Long? = null,
+        frequency: BillFrequency? = null,
+        paymentStatus: BillPaymentStatus? = null
+): BillResponse {
+
     val category = BillResponse.Category(
             id = transactionCategoryId ?: randomNumber().toLong(),
             name = randomString(20))
@@ -46,8 +54,8 @@ internal fun testBillResponseData(billId: Long? = null, merchantId: Long? = null
             lastAmount = BigDecimal("101.23"),
             dueAmount = BigDecimal("79.65"),
             averageAmount = BigDecimal("99.89"),
-            frequency = BillFrequency.values()[Random.nextInt(BillFrequency.values().size)],
-            paymentStatus = BillPaymentStatus.values()[Random.nextInt(BillPaymentStatus.values().size)],
+            frequency = frequency ?: BillFrequency.values()[Random.nextInt(BillFrequency.values().size)],
+            paymentStatus = paymentStatus ?: BillPaymentStatus.values()[Random.nextInt(BillPaymentStatus.values().size)],
             lastPaymentDate = "2018-12-01",
             nextPaymentDate = "2019-01-01",
             category = category,
@@ -56,14 +64,20 @@ internal fun testBillResponseData(billId: Long? = null, merchantId: Long? = null
             notes = randomString(200))
 }
 
-internal fun testBillPaymentResponseData(billPaymentId: Long? = null, billId: Long? = null, date: String? = null): BillPaymentResponse {
+internal fun testBillPaymentResponseData(
+        billPaymentId: Long? = null,
+        billId: Long? = null,
+        date: String? = null,
+        frequency: BillFrequency? = null,
+        paymentStatus: BillPaymentStatus? = null
+): BillPaymentResponse {
     return BillPaymentResponse(
             billPaymentId = billPaymentId ?: randomNumber().toLong(),
             billId = billId ?: randomNumber().toLong(),
             name = randomString(50),
             amount = BigDecimal("70.05"),
-            frequency = BillFrequency.values()[Random.nextInt(BillFrequency.values().size)],
-            paymentStatus = BillPaymentStatus.values()[Random.nextInt(BillPaymentStatus.values().size)],
+            frequency = frequency ?: BillFrequency.values()[Random.nextInt(BillFrequency.values().size)],
+            paymentStatus = paymentStatus ?: BillPaymentStatus.values()[Random.nextInt(BillPaymentStatus.values().size)],
             date = date ?: "2018-12-01",
             merchantId = randomNumber().toLong(),
             unpayable = randomBoolean())

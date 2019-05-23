@@ -21,6 +21,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.room.Transaction
+import androidx.sqlite.db.SupportSQLiteQuery
 import us.frollo.frollosdk.model.coredata.bills.Bill
 import us.frollo.frollosdk.model.coredata.bills.BillRelation
 
@@ -32,6 +35,9 @@ internal interface BillDao {
 
     @Query("SELECT * FROM bill WHERE bill_id = :billId")
     fun load(billId: Long): LiveData<Bill?>
+
+    @RawQuery(observedEntities = [Bill::class])
+    fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<Bill>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: Bill): LongArray
@@ -60,4 +66,8 @@ internal interface BillDao {
     @androidx.room.Transaction
     @Query("SELECT * FROM bill WHERE bill_id = :billId")
     fun loadWithRelation(billId: Long): LiveData<BillRelation?>
+
+    @androidx.room.Transaction
+    @RawQuery(observedEntities = [BillRelation::class])
+    fun loadByQueryWithRelation(queryStr: SupportSQLiteQuery): LiveData<List<BillRelation>>
 }

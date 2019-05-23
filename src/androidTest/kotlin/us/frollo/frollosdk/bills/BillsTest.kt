@@ -53,6 +53,7 @@ import us.frollo.frollosdk.mapping.toMerchant
 import us.frollo.frollosdk.mapping.toTransactionCategory
 import us.frollo.frollosdk.model.coredata.bills.Bill
 import us.frollo.frollosdk.model.coredata.bills.BillFrequency
+import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.model.testAccountResponseData
 import us.frollo.frollosdk.model.testBillPaymentResponseData
 import us.frollo.frollosdk.model.testBillResponseData
@@ -137,19 +138,22 @@ class BillsTest {
     fun testFetchBills() {
         initSetup()
 
-        val data1 = testBillResponseData()
-        val data2 = testBillResponseData()
-        val data3 = testBillResponseData()
-        val data4 = testBillResponseData()
-        val list = mutableListOf(data1, data2, data3, data4)
+        val data1 = testBillResponseData(frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.DUE)
+        val data2 = testBillResponseData(frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.OVERDUE)
+        val data3 = testBillResponseData(frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.PAID)
+        val data4 = testBillResponseData(frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.DUE)
+        val data5 = testBillResponseData(frequency = BillFrequency.ANNUALLY, paymentStatus = BillPaymentStatus.DUE)
+        val data6 = testBillResponseData(frequency = BillFrequency.BIANNUALLY, paymentStatus = BillPaymentStatus.DUE)
+        val data7 = testBillResponseData(frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.DUE)
+        val list = mutableListOf(data1, data2, data3, data4, data5, data6, data7)
 
         database.bills().insertAll(*list.map { it.toBill() }.toList().toTypedArray())
 
-        val testObserver = bills.fetchBills().test()
+        val testObserver = bills.fetchBills(frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.DUE).test()
 
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
-        assertEquals(4, testObserver.value().data?.size)
+        assertEquals(3, testObserver.value().data?.size)
 
         tearDown()
     }
@@ -188,15 +192,17 @@ class BillsTest {
         database.transactionCategories().insert(testTransactionCategoryResponseData(transactionCategoryId = 567).toTransactionCategory())
         database.merchants().insert(testMerchantResponseData(merchantId = 678).toMerchant())
         database.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
-        database.bills().insert(testBillResponseData(billId = 123, accountId = 345, merchantId = 678, transactionCategoryId = 567).toBill())
+        database.bills().insert(testBillResponseData(billId = 123, accountId = 345, merchantId = 678, transactionCategoryId = 567, frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.DUE).toBill())
+        database.bills().insert(testBillResponseData(billId = 124, accountId = 345, merchantId = 679, transactionCategoryId = 567, frequency = BillFrequency.BIANNUALLY, paymentStatus = BillPaymentStatus.DUE).toBill())
+        database.bills().insert(testBillResponseData(billId = 125, accountId = 345, merchantId = 676, transactionCategoryId = 567, frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.DUE).toBill())
         database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 456, billId = 123).toBillPayment())
         database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 457, billId = 123).toBillPayment())
 
-        val testObserver = bills.fetchBillsWithRelation().test()
+        val testObserver = bills.fetchBillsWithRelation(frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.DUE).test()
 
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
-        assertEquals(1, testObserver.value().data?.size)
+        assertEquals(2, testObserver.value().data?.size)
 
         val model = testObserver.value().data?.get(0)
 
@@ -701,20 +707,24 @@ class BillsTest {
     fun testFetchBillPayments() {
         initSetup()
 
-        val data1 = testBillPaymentResponseData(billPaymentId = 100, date = "2019-01-01")
-        val data2 = testBillPaymentResponseData(billPaymentId = 101, date = "2019-02-01")
-        val data3 = testBillPaymentResponseData(billPaymentId = 102, date = "2019-02-06")
-        val data4 = testBillPaymentResponseData(billPaymentId = 103, date = "2019-04-01")
-        val data5 = testBillPaymentResponseData(billPaymentId = 104, date = "2019-04-30")
+        val data1 = testBillPaymentResponseData(billPaymentId = 100, date = "2019-01-01", frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.DUE)
+        val data2 = testBillPaymentResponseData(billPaymentId = 101, date = "2019-02-01", frequency = BillFrequency.WEEKLY, paymentStatus = BillPaymentStatus.DUE)
+        val data3 = testBillPaymentResponseData(billPaymentId = 102, date = "2019-02-06", frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.DUE)
+        val data4 = testBillPaymentResponseData(billPaymentId = 103, date = "2019-04-01", frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.PAID)
+        val data5 = testBillPaymentResponseData(billPaymentId = 104, date = "2019-04-30", frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.DUE)
         val list = mutableListOf(data1, data2, data3, data4, data5)
 
         database.billPayments().insertAll(*list.map { it.toBillPayment() }.toList().toTypedArray())
 
-        val testObserver = bills.fetchBillPayments(fromDate = "2019-02-06", toDate = "2019-04-30").test()
+        val testObserver = bills.fetchBillPayments(
+                fromDate = "2019-02-06",
+                toDate = "2019-04-30",
+                frequency = BillFrequency.MONTHLY,
+                paymentStatus = BillPaymentStatus.DUE).test()
 
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
-        assertEquals(3, testObserver.value().data?.size)
+        assertEquals(2, testObserver.value().data?.size)
 
         tearDown()
     }
@@ -723,16 +733,17 @@ class BillsTest {
     fun testFetchBillPaymentsByBillIdDated() {
         initSetup()
 
-        val data1 = testBillPaymentResponseData(billPaymentId = 100, billId = 200, date = "2019-01-01")
-        val data2 = testBillPaymentResponseData(billPaymentId = 101, billId = 200, date = "2019-02-01")
-        val data3 = testBillPaymentResponseData(billPaymentId = 102, billId = 201, date = "2019-02-06")
-        val data4 = testBillPaymentResponseData(billPaymentId = 103, billId = 200, date = "2019-04-01")
-        val data5 = testBillPaymentResponseData(billPaymentId = 104, billId = 201, date = "2019-04-30")
-        val list = mutableListOf(data1, data2, data3, data4, data5)
+        val data1 = testBillPaymentResponseData(billPaymentId = 100, billId = 200, date = "2019-01-01", frequency = BillFrequency.MONTHLY)
+        val data2 = testBillPaymentResponseData(billPaymentId = 101, billId = 200, date = "2019-02-01", frequency = BillFrequency.ANNUALLY)
+        val data3 = testBillPaymentResponseData(billPaymentId = 102, billId = 201, date = "2019-02-06", frequency = BillFrequency.MONTHLY)
+        val data4 = testBillPaymentResponseData(billPaymentId = 103, billId = 200, date = "2019-04-01", frequency = BillFrequency.MONTHLY)
+        val data5 = testBillPaymentResponseData(billPaymentId = 104, billId = 200, date = "2019-04-15", frequency = BillFrequency.MONTHLY)
+        val data6 = testBillPaymentResponseData(billPaymentId = 105, billId = 201, date = "2019-04-30", frequency = BillFrequency.MONTHLY)
+        val list = mutableListOf(data1, data2, data3, data4, data5, data6)
 
         database.billPayments().insertAll(*list.map { it.toBillPayment() }.toList().toTypedArray())
 
-        val testObserver = bills.fetchBillPaymentsByBillId(billId = 200, fromDate = "2019-02-01", toDate = "2019-04-30").test()
+        val testObserver = bills.fetchBillPayments(billId = 200, fromDate = "2019-02-01", toDate = "2019-04-30", frequency = BillFrequency.MONTHLY).test()
 
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
@@ -754,7 +765,7 @@ class BillsTest {
 
         database.billPayments().insertAll(*list.map { it.toBillPayment() }.toList().toTypedArray())
 
-        val testObserver = bills.fetchBillPaymentsByBillId(billId = 200).test()
+        val testObserver = bills.fetchBillPayments(billId = 200).test()
 
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
@@ -784,13 +795,16 @@ class BillsTest {
         initSetup()
 
         database.bills().insert(testBillResponseData(billId = 123, accountId = 345, merchantId = 678, transactionCategoryId = 567).toBill())
-        database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 456, billId = 123, date = "2019-01-01").toBillPayment())
+        database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 456, billId = 123, date = "2019-01-01", frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.PAID).toBillPayment())
+        database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 457, billId = 123, date = "2019-02-01", frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.DUE).toBillPayment())
+        database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 458, billId = 123, date = "2019-03-01", frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.DUE).toBillPayment())
+        database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 459, billId = 123, date = "2019-04-01", frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.FUTURE).toBillPayment())
 
-        val testObserver = bills.fetchBillPaymentsWithRelation(fromDate = "2019-01-01", toDate = "2019-04-30").test()
+        val testObserver = bills.fetchBillPaymentsWithRelation(fromDate = "2019-01-01", toDate = "2019-04-30", frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.DUE).test()
 
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
-        assertEquals(1, testObserver.value().data?.size)
+        assertEquals(2, testObserver.value().data?.size)
 
         tearDown()
     }
@@ -803,7 +817,7 @@ class BillsTest {
         database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 456, billId = 123, date = "2019-01-01").toBillPayment())
         database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 457, billId = 123, date = "2019-02-01").toBillPayment())
 
-        val testObserver = bills.fetchBillPaymentsByBillIdWithRelation(billId = 123, fromDate = "2019-02-01", toDate = "2019-04-30").test()
+        val testObserver = bills.fetchBillPaymentsWithRelation(billId = 123, fromDate = "2019-02-01", toDate = "2019-04-30").test()
 
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
@@ -820,7 +834,7 @@ class BillsTest {
         database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 456, billId = 123, date = "2019-01-01").toBillPayment())
         database.billPayments().insert(testBillPaymentResponseData(billPaymentId = 457, billId = 123, date = "2019-02-01").toBillPayment())
 
-        val testObserver = bills.fetchBillPaymentsByBillIdWithRelation(billId = 123).test()
+        val testObserver = bills.fetchBillPaymentsWithRelation(billId = 123).test()
 
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)

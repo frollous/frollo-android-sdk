@@ -34,6 +34,7 @@ import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.MessagesAPI
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.sqlForMessages
+import us.frollo.frollosdk.extensions.sqlForMessagesCount
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toMessage
 import us.frollo.frollosdk.model.api.messages.MessageResponse
@@ -94,6 +95,26 @@ class Messages(network: NetworkService, private val db: SDKDatabase, private val
             Transformations.map(db.messages().loadByQuery(query)) { response ->
                 Resource.success(mapMessageResponse(response))
             }
+
+    /**
+     * Fetch messages count from the cache
+     *
+     * @param messageTypes Filter by message types (optional)
+     * @param read Filter by read/unread messages (optional)
+     * @param contentType Filter the message by the type of content it contains (optional)
+     * @param completion Completion handler with optional error if the request fails or the messages count if success
+     */
+    fun fetchMessagesCount(
+            messageTypes: List<String>? = null,
+            read: Boolean? = null,
+            contentType: ContentType? = null,
+            completion: OnFrolloSDKCompletionListener<Resource<Long>>
+    ) {
+        doAsync {
+            val count = db.messages().loadMessageCount(sqlForMessagesCount(messageTypes, read, contentType))
+            uiThread { completion.invoke(Resource.success(count)) }
+        }
+    }
 
     /**
      * Refresh a specific message by ID from the host

@@ -198,6 +198,25 @@ class MessagesTest {
     }
 
     @Test
+    fun testFetchMessagesCount() {
+        initSetup()
+
+        val data1 = testMessageResponseData(read = false)
+        val data2 = testMessageResponseData(read = true)
+        val data3 = testMessageResponseData(read = false)
+        val data4 = testMessageResponseData(read = true)
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        database.messages().insertAll(*list.toTypedArray())
+
+        messages.fetchMessagesCount(read = true) { resource ->
+            assertEquals(2, resource.data)
+        }
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshMessages() {
         initSetup()
 

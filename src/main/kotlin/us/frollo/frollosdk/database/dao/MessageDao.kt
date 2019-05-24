@@ -42,6 +42,9 @@ internal interface MessageDao {
     @RawQuery(observedEntities = [MessageResponse::class])
     fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<MessageResponse>>
 
+    @RawQuery
+    fun loadMessageCount(queryStr: SupportSQLiteQuery): Long
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: MessageResponse): LongArray
 

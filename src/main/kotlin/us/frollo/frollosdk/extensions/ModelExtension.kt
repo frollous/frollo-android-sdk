@@ -85,6 +85,32 @@ internal fun sqlForMessages(messageTypes: List<String>? = null, read: Boolean? =
     return sqlQueryBuilder.create()
 }
 
+internal fun sqlForMessagesCount(messageTypes: List<String>? = null, read: Boolean? = null, contentType: ContentType? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("message")
+
+    if (messageTypes != null && messageTypes.isNotEmpty()) {
+        val sb = StringBuilder()
+        sb.append("(")
+
+        messageTypes.forEachIndexed { index, str ->
+            sb.append("(message_types LIKE '%|$str|%')")
+            if (index < messageTypes.size - 1) sb.append(" OR ")
+        }
+
+        sb.append(")")
+
+        sqlQueryBuilder.appendSelection(selection = sb.toString())
+    }
+
+    read?.let { sqlQueryBuilder.appendSelection(selection = "read = ${ it.toInt() }") }
+
+    contentType?.let { sqlQueryBuilder.appendSelection(selection = "content_type = '${ it.name }'") }
+
+    sqlQueryBuilder.columns(columns = arrayOf("COUNT(message_id)"))
+
+    return sqlQueryBuilder.create()
+}
+
 internal fun sqlForTransactionStaleIds(fromDate: String, toDate: String, accountIds: LongArray? = null, transactionIncluded: Boolean? = null): SimpleSQLiteQuery {
     val sb = StringBuilder()
 

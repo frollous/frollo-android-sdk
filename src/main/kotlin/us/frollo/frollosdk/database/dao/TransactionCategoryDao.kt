@@ -21,6 +21,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 
 @Dao
@@ -31,6 +33,9 @@ internal interface TransactionCategoryDao {
 
     @Query("SELECT * FROM transaction_category WHERE transaction_category_id = :transactionCategoryId")
     fun load(transactionCategoryId: Long): LiveData<TransactionCategory?>
+
+    @RawQuery(observedEntities = [TransactionCategory::class])
+    fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<TransactionCategory>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: TransactionCategory): LongArray

@@ -20,8 +20,17 @@ import android.os.Bundle
 import androidx.sqlite.db.SimpleSQLiteQuery
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
+import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
+import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategoryType
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
 import us.frollo.frollosdk.model.coredata.bills.BillFrequency
 import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.model.coredata.bills.BillStatus
@@ -52,7 +61,7 @@ internal fun User.updateRequest(): UserUpdateRequest =
                 dateOfBirth = dateOfBirth,
                 driverLicense = driverLicense)
 
-internal fun generateSQLQueryMessages(messageTypes: List<String>? = null, read: Boolean? = null, contentType: ContentType? = null): SimpleSQLiteQuery {
+internal fun sqlForMessages(messageTypes: List<String>? = null, read: Boolean? = null, contentType: ContentType? = null): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("message")
 
     if (messageTypes != null && messageTypes.isNotEmpty()) {
@@ -76,19 +85,6 @@ internal fun generateSQLQueryMessages(messageTypes: List<String>? = null, read: 
     return sqlQueryBuilder.create()
 }
 
-internal fun sqlForTransactionByUserTags(tags: List<String>): SimpleSQLiteQuery {
-    val sb = StringBuilder()
-
-    tags.forEachIndexed { index, str ->
-        sb.append("user_tags LIKE '%|$str|%'")
-        if (index < tags.size - 1)
-            sb.append(" AND ")
-    }
-
-    val query = "SELECT * FROM transaction_model WHERE $sb"
-    return SimpleSQLiteQuery(query)
-}
-
 internal fun sqlForTransactionStaleIds(fromDate: String, toDate: String, accountIds: LongArray? = null, transactionIncluded: Boolean? = null): SimpleSQLiteQuery {
     val sb = StringBuilder()
 
@@ -100,18 +96,6 @@ internal fun sqlForTransactionStaleIds(fromDate: String, toDate: String, account
                 "WHERE ((transaction_date BETWEEN Date('$fromDate') AND Date('$toDate')) $sb)"
 
     return SimpleSQLiteQuery(query)
-}
-
-internal fun sqlForUserTags(searchTerm: String? = null, sortBy: TagsSortType? = null, orderBy: OrderType? = null): SimpleSQLiteQuery {
-    var sort = TagsSortType.NAME.toString()
-    var order = OrderType.ASC.toString()
-    var where = ""
-    searchTerm?.let { where = " WHERE name LIKE '%$searchTerm%'" }
-    sortBy?.let { sort = it.toString() }
-    orderBy?.let { order = it.toString() }
-
-    val sql = "SELECT * FROM transaction_user_tags $where ORDER BY $sort $order"
-    return SimpleSQLiteQuery(sql)
 }
 
 internal fun sqlForExistingAccountBalanceReports(date: String, period: ReportPeriod, reportAccountIds: LongArray, accountId: Long? = null, accountType: AccountType? = null): SimpleSQLiteQuery {
@@ -162,6 +146,17 @@ internal fun sqlForFetchingAccountBalanceReports(fromDate: String, toDate: Strin
     return SimpleSQLiteQuery(sb.toString())
 }
 
+internal fun sqlForUserTags(searchTerm: String? = null, sortBy: TagsSortType? = null, orderBy: OrderType? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("transaction_user_tags")
+
+    val sort = sortBy?.toString() ?: TagsSortType.NAME.toString()
+    val order = orderBy?.toString() ?: OrderType.ASC.toString()
+    sqlQueryBuilder.orderBy(orderBy = "$sort $order")
+    searchTerm?.let { sqlQueryBuilder.appendSelection(selection = "name LIKE '%$searchTerm%'") }
+
+    return sqlQueryBuilder.create()
+}
+
 internal fun sqlForBills(frequency: BillFrequency? = null, paymentStatus: BillPaymentStatus? = null, status: BillStatus? = null, type: BillType? = null): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("bill")
 
@@ -180,6 +175,98 @@ internal fun sqlForBillPayments(billId: Long? = null, fromDate: String? = null, 
     ifNotNull(fromDate, toDate) { from, to -> sqlQueryBuilder.appendSelection(selection = "(date BETWEEN Date('$from') AND Date('$to'))") }
     frequency?.let { sqlQueryBuilder.appendSelection(selection = "frequency = '${ it.name }'") }
     paymentStatus?.let { sqlQueryBuilder.appendSelection(selection = "payment_status = '${ it.name }'") }
+
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForProviders(status: ProviderStatus? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("provider")
+
+    status?.let { sqlQueryBuilder.appendSelection(selection = "provider_status = '${ it.name }'") }
+
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForProviderAccounts(providerId: Long? = null, refreshStatus: AccountRefreshStatus? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("provider_account")
+
+    providerId?.let { sqlQueryBuilder.appendSelection(selection = "provider_id = $it") }
+    refreshStatus?.let { sqlQueryBuilder.appendSelection(selection = "r_status_status = '${ it.name }'") }
+
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForAccounts(
+        providerAccountId: Long? = null,
+        accountStatus: AccountStatus? = null,
+        accountSubType: AccountSubType? = null,
+        accountType: AccountType? = null,
+        accountClassification: AccountClassification? = null,
+        favourite: Boolean? = null,
+        hidden: Boolean? = null,
+        included: Boolean? = null,
+        refreshStatus: AccountRefreshStatus? = null
+): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("account")
+
+    providerAccountId?.let { sqlQueryBuilder.appendSelection(selection = "provider_account_id = $it") }
+    accountStatus?.let { sqlQueryBuilder.appendSelection(selection = "account_status = '${ it.name }'") }
+    accountSubType?.let { sqlQueryBuilder.appendSelection(selection = "attr_account_sub_type = '${ it.name }'") }
+    accountType?.let { sqlQueryBuilder.appendSelection(selection = "attr_account_type = '${ it.name }'") }
+    accountClassification?.let { sqlQueryBuilder.appendSelection(selection = "attr_account_classification = '${ it.name }'") }
+    favourite?.let { sqlQueryBuilder.appendSelection(selection = "favourite = ${ it.toInt() }") }
+    hidden?.let { sqlQueryBuilder.appendSelection(selection = "hidden = ${ it.toInt() }") }
+    included?.let { sqlQueryBuilder.appendSelection(selection = "included = ${ it.toInt() }") }
+    refreshStatus?.let { sqlQueryBuilder.appendSelection(selection = "r_status_status = '${ it.name }'") }
+
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForTransactions(
+        accountId: Long? = null,
+        userTags: List<String>? = null,
+        baseType: TransactionBaseType? = null,
+        budgetCategory: BudgetCategory? = null,
+        status: TransactionStatus? = null,
+        included: Boolean? = null,
+        fromDate: String? = null,
+        toDate: String? = null
+): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("transaction_model")
+
+    accountId?.let { sqlQueryBuilder.appendSelection(selection = "account_id = $it") }
+    if (userTags != null && userTags.isNotEmpty()) {
+        val sb = StringBuilder()
+        sb.append("(")
+        userTags.forEachIndexed { index, str ->
+            sb.append("(user_tags LIKE '%|$str|%')")
+            if (index < userTags.size - 1) sb.append(" AND ")
+        }
+        sb.append(")")
+        sqlQueryBuilder.appendSelection(selection = sb.toString())
+    }
+    baseType?.let { sqlQueryBuilder.appendSelection(selection = "base_type = '${ it.name }'") }
+    budgetCategory?.let { sqlQueryBuilder.appendSelection(selection = "budget_category = '${ it.name }'") }
+    status?.let { sqlQueryBuilder.appendSelection(selection = "status = '${ it.name }'") }
+    included?.let { sqlQueryBuilder.appendSelection(selection = "included = ${ it.toInt() }") }
+    ifNotNull(fromDate, toDate) { from, to -> sqlQueryBuilder.appendSelection(selection = "(transaction_date BETWEEN Date('$from') AND Date('$to'))") }
+
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForTransactionCategories(defaultBudgetCategory: BudgetCategory? = null, type: TransactionCategoryType? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("transaction_category")
+
+    defaultBudgetCategory?.let { sqlQueryBuilder.appendSelection(selection = "default_budget_category = '${ it.name }'") }
+    type?.let { sqlQueryBuilder.appendSelection(selection = "category_type = '${ it.name }'") }
+
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForMerchants(type: MerchantType? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("merchant")
+
+    type?.let { sqlQueryBuilder.appendSelection(selection = "merchant_type = '${ it.name }'") }
 
     return sqlQueryBuilder.create()
 }

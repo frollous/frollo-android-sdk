@@ -21,6 +21,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountRelation
 
@@ -35,6 +37,9 @@ internal interface AccountDao {
 
     @Query("SELECT * FROM account WHERE provider_account_id = :providerAccountId")
     fun loadByProviderAccountId(providerAccountId: Long): LiveData<List<Account>>
+
+    @RawQuery(observedEntities = [Account::class])
+    fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<Account>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: Account): LongArray
@@ -73,4 +78,8 @@ internal interface AccountDao {
     @androidx.room.Transaction
     @Query("SELECT * FROM account WHERE provider_account_id = :providerAccountId")
     fun loadByProviderAccountIdWithRelation(providerAccountId: Long): LiveData<List<AccountRelation>>
+
+    @androidx.room.Transaction
+    @RawQuery(observedEntities = [Account::class])
+    fun loadByQueryWithRelation(queryStr: SupportSQLiteQuery): LiveData<List<AccountRelation>>
 }

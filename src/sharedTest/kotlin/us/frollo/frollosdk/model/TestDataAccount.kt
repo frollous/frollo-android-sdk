@@ -37,7 +37,7 @@ import us.frollo.frollosdk.testutils.randomUUID
 import java.math.BigDecimal
 import kotlin.random.Random
 
-internal fun testAccountResponseData(accountId: Long? = null, providerAccountId: Long? = null, accountType: AccountType? = null): AccountResponse {
+internal fun testAccountResponseData(accountId: Long? = null, providerAccountId: Long? = null, accountType: AccountType? = null, accountRefreshStatus: AccountRefreshStatus? = null): AccountResponse {
 
     val balanceDetails = BalanceDetails(
             currentDescription = randomUUID(),
@@ -46,7 +46,7 @@ internal fun testAccountResponseData(accountId: Long? = null, providerAccountId:
     val holderProfile = HolderProfile(name = "Jacob Frollo")
 
     val refreshStatus = RefreshStatus(
-            status = AccountRefreshStatus.NEEDS_ACTION,
+            status = accountRefreshStatus ?: AccountRefreshStatus.NEEDS_ACTION,
             subStatus = AccountRefreshSubStatus.INPUT_REQUIRED,
             additionalStatus = AccountRefreshAdditionalStatus.MFA_NEEDED,
             lastRefreshed = "2019-01-01",

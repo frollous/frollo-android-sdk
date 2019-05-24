@@ -33,7 +33,7 @@ import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.MessagesAPI
 import us.frollo.frollosdk.extensions.enqueue
-import us.frollo.frollosdk.extensions.generateSQLQueryMessages
+import us.frollo.frollosdk.extensions.sqlForMessages
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toMessage
 import us.frollo.frollosdk.model.api.messages.MessageResponse
@@ -77,7 +77,7 @@ class Messages(network: NetworkService, private val db: SDKDatabase, private val
      * @return LiveData object of Resource<List<Message>> which can be observed using an Observer for future changes as well.
      */
     fun fetchMessages(messageTypes: List<String>? = null, read: Boolean? = null, contentType: ContentType? = null): LiveData<Resource<List<Message>>> =
-            Transformations.map(db.messages().loadByQuery(generateSQLQueryMessages(messageTypes, read, contentType))) { response ->
+            Transformations.map(db.messages().loadByQuery(sqlForMessages(messageTypes, read, contentType))) { response ->
                 Resource.success(mapMessageResponse(response))
             }
 

@@ -30,7 +30,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.extensions.generateSQLQueryMessages
+import us.frollo.frollosdk.extensions.sqlForMessages
 
 import us.frollo.frollosdk.model.testMessageResponseData
 import us.frollo.frollosdk.model.testModifyUserResponseData
@@ -112,7 +112,7 @@ class MessageDaoTest {
         db.messages().insertAll(*list.toTypedArray())
 
         val messageTypes = mutableListOf("survey", "dashboard_event")
-        val query = generateSQLQueryMessages(messageTypes, false)
+        val query = sqlForMessages(messageTypes, false)
 
         val testObserver = db.messages().loadByQuery(query).test()
         testObserver.awaitValue()

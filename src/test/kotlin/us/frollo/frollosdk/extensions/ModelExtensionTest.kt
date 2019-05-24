@@ -19,10 +19,25 @@ package us.frollo.frollosdk.extensions
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import us.frollo.frollosdk.mapping.toUser
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
+import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
+import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
+import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategoryType
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
+import us.frollo.frollosdk.model.coredata.bills.BillFrequency
+import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
+import us.frollo.frollosdk.model.coredata.bills.BillStatus
+import us.frollo.frollosdk.model.coredata.bills.BillType
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.model.testUserResponseData
 
 class ModelExtensionTest {
@@ -35,17 +50,17 @@ class ModelExtensionTest {
     }
 
     @Test
-    fun testGenerateSQLQueryMessages() {
-        var query = generateSQLQueryMessages(mutableListOf("survey", "event"), false)
+    fun testSQLForMessages() {
+        var query = sqlForMessages(mutableListOf("survey", "event"), false)
         assertEquals("SELECT  *  FROM message WHERE ((message_types LIKE '%|survey|%') OR (message_types LIKE '%|event|%')) AND read = 0 ", query.sql)
 
-        query = generateSQLQueryMessages(mutableListOf("survey", "event"), false, ContentType.VIDEO)
+        query = sqlForMessages(mutableListOf("survey", "event"), false, ContentType.VIDEO)
         assertEquals("SELECT  *  FROM message WHERE ((message_types LIKE '%|survey|%') OR (message_types LIKE '%|event|%')) AND read = 0 AND content_type = 'VIDEO' ", query.sql)
 
-        query = generateSQLQueryMessages(mutableListOf("survey", "event"))
+        query = sqlForMessages(mutableListOf("survey", "event"))
         assertEquals("SELECT  *  FROM message WHERE ((message_types LIKE '%|survey|%') OR (message_types LIKE '%|event|%')) ", query.sql)
 
-        query = generateSQLQueryMessages()
+        query = sqlForMessages()
         assertEquals("SELECT  *  FROM message", query.sql)
     }
 
@@ -98,6 +113,104 @@ class ModelExtensionTest {
 
         query = sqlForFetchingAccountBalanceReports(fromDate = "2019-01", toDate = "2019-12", period = ReportPeriod.MONTH, accountId = null, accountType = null)
         assertEquals("SELECT rab.* FROM report_account_balance AS rab  WHERE rab.period = 'MONTH' AND (rab.date BETWEEN '2019-01' AND '2019-12') ", query.sql)
+    }
+
+    @Test
+    fun testSQLForUserTags() {
+        var query = sqlForUserTags(searchTerm = "pub", sortBy = TagsSortType.CREATED_AT, orderBy = OrderType.ASC)
+        assertEquals("SELECT  *  FROM transaction_user_tags WHERE name LIKE '%pub%'  ORDER BY created_at asc", query.sql)
+
+        query = sqlForUserTags()
+        assertEquals("SELECT  *  FROM transaction_user_tags ORDER BY name asc", query.sql)
+    }
+
+    @Test
+    fun testSQLForBills() {
+        var query = sqlForBills(frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.FUTURE, status = BillStatus.CONFIRMED, type = BillType.MANUAL)
+        assertEquals("SELECT  *  FROM bill WHERE frequency = 'MONTHLY' AND payment_status = 'FUTURE' AND status = 'CONFIRMED' AND bill_type = 'MANUAL' ", query.sql)
+
+        query = sqlForBills()
+        assertEquals("SELECT  *  FROM bill", query.sql)
+    }
+
+    @Test
+    fun testSQLForBillPayments() {
+        var query = sqlForBillPayments(billId = 123, fromDate = "2019-03-01", toDate = "2019-03-31", frequency = BillFrequency.MONTHLY, paymentStatus = BillPaymentStatus.FUTURE)
+        assertEquals("SELECT  *  FROM bill_payment WHERE bill_id = 123 AND (date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) AND frequency = 'MONTHLY' AND payment_status = 'FUTURE' ", query.sql)
+
+        query = sqlForBillPayments()
+        assertEquals("SELECT  *  FROM bill_payment", query.sql)
+    }
+
+    @Test
+    fun testSQLForProviders() {
+        var query = sqlForProviders(status = ProviderStatus.SUPPORTED)
+        assertEquals("SELECT  *  FROM provider WHERE provider_status = 'SUPPORTED' ", query.sql)
+
+        query = sqlForProviders()
+        assertEquals("SELECT  *  FROM provider", query.sql)
+    }
+
+    @Test
+    fun testSQLForProviderAccounts() {
+        var query = sqlForProviderAccounts(providerId = 123, refreshStatus = AccountRefreshStatus.ADDING)
+        assertEquals("SELECT  *  FROM provider_account WHERE provider_id = 123 AND r_status_status = 'ADDING' ", query.sql)
+
+        query = sqlForProviderAccounts()
+        assertEquals("SELECT  *  FROM provider_account", query.sql)
+    }
+
+    @Test
+    fun testSQLForAccounts() {
+        var query = sqlForAccounts(
+                providerAccountId = 123,
+                accountStatus = AccountStatus.ACTIVE,
+                accountSubType = AccountSubType.BANK_ACCOUNT,
+                accountType = AccountType.BANK,
+                accountClassification = AccountClassification.CORPORATE,
+                favourite = true,
+                hidden = false,
+                included = true,
+                refreshStatus = AccountRefreshStatus.NEEDS_ACTION)
+        assertEquals("SELECT  *  FROM account WHERE provider_account_id = 123 AND account_status = 'ACTIVE' AND attr_account_sub_type = 'BANK_ACCOUNT' AND attr_account_type = 'BANK' AND attr_account_classification = 'CORPORATE' AND favourite = 1 AND hidden = 0 AND included = 1 AND r_status_status = 'NEEDS_ACTION' ", query.sql)
+
+        query = sqlForAccounts()
+        assertEquals("SELECT  *  FROM account", query.sql)
+    }
+
+    @Test
+    fun testSQLForTransactions() {
+        var query = sqlForTransactions(
+                accountId = 123,
+                userTags = listOf("pub", "holiday", "shopping"),
+                baseType = TransactionBaseType.CREDIT,
+                budgetCategory = BudgetCategory.INCOME,
+                status = TransactionStatus.PENDING,
+                included = false,
+                fromDate = "2019-03-01",
+                toDate = "2019-03-31")
+        assertEquals("SELECT  *  FROM transaction_model WHERE account_id = 123 AND ((user_tags LIKE '%|pub|%') AND (user_tags LIKE '%|holiday|%') AND (user_tags LIKE '%|shopping|%')) AND base_type = 'CREDIT' AND budget_category = 'INCOME' AND status = 'PENDING' AND included = 0 AND (transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
+
+        query = sqlForTransactions()
+        assertEquals("SELECT  *  FROM transaction_model", query.sql)
+    }
+
+    @Test
+    fun testSQLForTransactionCategories() {
+        var query = sqlForTransactionCategories(defaultBudgetCategory = BudgetCategory.INCOME, type = TransactionCategoryType.CREDIT_SCORE)
+        assertEquals("SELECT  *  FROM transaction_category WHERE default_budget_category = 'INCOME' AND category_type = 'CREDIT_SCORE' ", query.sql)
+
+        query = sqlForTransactionCategories()
+        assertEquals("SELECT  *  FROM transaction_category", query.sql)
+    }
+
+    @Test
+    fun testSQLForMerchants() {
+        var query = sqlForMerchants(type = MerchantType.RETAILER)
+        assertEquals("SELECT  *  FROM merchant WHERE merchant_type = 'RETAILER' ", query.sql)
+
+        query = sqlForMerchants()
+        assertEquals("SELECT  *  FROM merchant", query.sql)
     }
 
     @Test

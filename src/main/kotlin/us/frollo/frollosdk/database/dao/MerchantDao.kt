@@ -21,6 +21,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
 
 @Dao
@@ -31,6 +33,9 @@ internal interface MerchantDao {
 
     @Query("SELECT * FROM merchant WHERE merchant_id = :merchantId")
     fun load(merchantId: Long): LiveData<Merchant?>
+
+    @RawQuery(observedEntities = [Merchant::class])
+    fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<Merchant>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: Merchant): LongArray

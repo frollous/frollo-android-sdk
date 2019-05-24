@@ -29,6 +29,7 @@ import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.core.ACTION.ACTION_REFRESH_TRANSACTIONS
 import us.frollo.frollosdk.core.ARGUMENT.ARG_DATA
 import us.frollo.frollosdk.core.ARGUMENT.ARG_TRANSACTION_IDS
@@ -48,8 +49,13 @@ import us.frollo.frollosdk.extensions.fetchTransactionsByQuery
 import us.frollo.frollosdk.extensions.fetchTransactionsSummaryByIDs
 import us.frollo.frollosdk.extensions.fetchTransactionsSummaryByQuery
 import us.frollo.frollosdk.extensions.fetchUserTags
-import us.frollo.frollosdk.extensions.sqlForTransactionByUserTags
+import us.frollo.frollosdk.extensions.sqlForAccounts
+import us.frollo.frollosdk.extensions.sqlForMerchants
+import us.frollo.frollosdk.extensions.sqlForProviderAccounts
+import us.frollo.frollosdk.extensions.sqlForProviders
+import us.frollo.frollosdk.extensions.sqlForTransactionCategories
 import us.frollo.frollosdk.extensions.sqlForTransactionStaleIds
+import us.frollo.frollosdk.extensions.sqlForTransactions
 import us.frollo.frollosdk.extensions.sqlForUserTags
 import us.frollo.frollosdk.extensions.transactionSearch
 import us.frollo.frollosdk.logging.Log
@@ -74,22 +80,32 @@ import us.frollo.frollosdk.model.api.aggregation.transactioncategories.Transacti
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountRelation
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
+import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccountRelation
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderRelation
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
+import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategoryType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionDescription
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionRelation
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionsSummary
+import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import kotlin.collections.ArrayList
 
 /**
@@ -137,11 +153,27 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     /**
      * Fetch providers from the cache
      *
+     * @param status Filter by status of the provider support (Optional)
+     *
      * @return LiveData object of Resource<List<Provider>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchProviders(): LiveData<Resource<List<Provider>>> =
-            Transformations.map(db.providers().load()) { models ->
+    fun fetchProviders(status: ProviderStatus? = null): LiveData<Resource<List<Provider>>> =
+            Transformations.map(db.providers().loadByQuery(sqlForProviders(status = status))) { models ->
                 Resource.success(models)
+            }
+
+    /**
+     * Advanced method to fetch providers by SQL query from the cache
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches providers from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<Provider>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchProviders(query: SimpleSQLiteQuery): LiveData<Resource<List<Provider>>> =
+            Transformations.map(db.providers().loadByQuery(query)) { model ->
+                Resource.success(model)
             }
 
     /**
@@ -159,11 +191,27 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     /**
      * Fetch providers from the cache along with other associated data.
      *
+     * @param status Filter by status of the provider support (Optional)
+     *
      * @return LiveData object of Resource<List<ProviderRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchProvidersWithRelation(): LiveData<Resource<List<ProviderRelation>>> =
-            Transformations.map(db.providers().loadWithRelation()) { models ->
+    fun fetchProvidersWithRelation(status: ProviderStatus? = null): LiveData<Resource<List<ProviderRelation>>> =
+            Transformations.map(db.providers().loadByQueryWithRelation(sqlForProviders(status = status))) { models ->
                 Resource.success(models)
+            }
+
+    /**
+     * Advanced method to fetch providers by SQL query from the cache along with other associated data.
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches providers from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<ProviderRelation>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchProvidersWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<ProviderRelation>>> =
+            Transformations.map(db.providers().loadByQueryWithRelation(query)) { model ->
+                Resource.success(model)
             }
 
     /**
@@ -271,23 +319,28 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     /**
      * Fetch provider accounts from the cache
      *
+     * @param providerId Provider ID of the provider accounts to fetch (Optional)
+     * @param refreshStatus Filter by the current refresh status of the provider account (Optional)
+     *
      * @return LiveData object of Resource<List<ProviderAccount>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchProviderAccounts(): LiveData<Resource<List<ProviderAccount>>> =
-            Transformations.map(db.providerAccounts().load()) { models ->
+    fun fetchProviderAccounts(providerId: Long? = null, refreshStatus: AccountRefreshStatus? = null): LiveData<Resource<List<ProviderAccount>>> =
+            Transformations.map(db.providerAccounts().loadByQuery(sqlForProviderAccounts(providerId, refreshStatus))) { models ->
                 Resource.success(models)
             }
 
     /**
-     * Fetch provider accounts by provider ID from the cache
+     * Advanced method to fetch provider accounts by SQL query from the cache
      *
-     * @param providerId Provider ID of the provider accounts to fetch
+     * @param query SimpleSQLiteQuery: Select query which fetches provider accounts from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
      *
      * @return LiveData object of Resource<List<ProviderAccount>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchProviderAccountsByProviderId(providerId: Long): LiveData<Resource<List<ProviderAccount>>> =
-            Transformations.map(db.providerAccounts().loadByProviderId(providerId)) { models ->
-                Resource.success(models)
+    fun fetchProviderAccounts(query: SimpleSQLiteQuery): LiveData<Resource<List<ProviderAccount>>> =
+            Transformations.map(db.providerAccounts().loadByQuery(query)) { model ->
+                Resource.success(model)
             }
 
     /**
@@ -305,23 +358,28 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     /**
      * Fetch provider accounts from the cache along with other associated data.
      *
+     * @param providerId Provider ID of the provider accounts to fetch (Optional)
+     * @param refreshStatus Filter by the current refresh status of the provider account (Optional)
+     *
      * @return LiveData object of Resource<List<ProviderAccountRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchProviderAccountsWithRelation(): LiveData<Resource<List<ProviderAccountRelation>>> =
-            Transformations.map(db.providerAccounts().loadWithRelation()) { models ->
+    fun fetchProviderAccountsWithRelation(providerId: Long? = null, refreshStatus: AccountRefreshStatus? = null): LiveData<Resource<List<ProviderAccountRelation>>> =
+            Transformations.map(db.providerAccounts().loadByQueryWithRelation(sqlForProviderAccounts(providerId, refreshStatus))) { models ->
                 Resource.success(models)
             }
 
     /**
-     * Fetch provider accounts by provider ID from the cache along with other associated data.
+     * Advanced method to fetch provider accounts by SQL query from the cache along with other associated data.
      *
-     * @param providerId Provider ID of the provider accounts to fetch
+     * @param query SimpleSQLiteQuery: Select query which fetches provider accounts from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
      *
      * @return LiveData object of Resource<List<ProviderAccountRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchProviderAccountsByProviderIdWithRelation(providerId: Long): LiveData<Resource<List<ProviderAccountRelation>>> =
-            Transformations.map(db.providerAccounts().loadByProviderIdWithRelation(providerId)) { models ->
-                Resource.success(models)
+    fun fetchProviderAccountsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<ProviderAccountRelation>>> =
+            Transformations.map(db.providerAccounts().loadByQueryWithRelation(query)) { model ->
+                Resource.success(model)
             }
 
     /**
@@ -517,23 +575,55 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     /**
      * Fetch accounts from the cache
      *
+     * @param providerAccountId Filter by the Provider account ID (Optional)
+     * @param accountStatus Filter by the account status (Optional)
+     * @param accountSubType Filter by the sub type of account (Optional)
+     * @param accountType Filter by the type of the account (Optional)
+     * @param accountClassification Filter by the classification of the account (Optional)
+     * @param favourite Filter by favourited accounts (Optional)
+     * @param hidden Filter by hidden accounts (Optional)
+     * @param included Filter by accounts included in the budget (Optional)
+     * @param refreshStatus Filter by the current refresh status of the provider account (Optional)
+     *
      * @return LiveData object of Resource<List<Account>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchAccounts(): LiveData<Resource<List<Account>>> =
-            Transformations.map(db.accounts().load()) { models ->
+    fun fetchAccounts(
+            providerAccountId: Long? = null,
+            accountStatus: AccountStatus? = null,
+            accountSubType: AccountSubType? = null,
+            accountType: AccountType? = null,
+            accountClassification: AccountClassification? = null,
+            favourite: Boolean? = null,
+            hidden: Boolean? = null,
+            included: Boolean? = null,
+            refreshStatus: AccountRefreshStatus? = null
+    ): LiveData<Resource<List<Account>>> =
+            Transformations.map(db.accounts().loadByQuery(sqlForAccounts(
+                    providerAccountId = providerAccountId,
+                    accountStatus = accountStatus,
+                    accountSubType = accountSubType,
+                    accountType = accountType,
+                    accountClassification = accountClassification,
+                    favourite = favourite,
+                    hidden = hidden,
+                    included = included,
+                    refreshStatus = refreshStatus
+            ))) { models ->
                 Resource.success(models)
             }
 
     /**
-     * Fetch accounts by provider account ID from the cache
+     * Advanced method to fetch accounts by SQL query from the cache
      *
-     * @param providerAccountId Provider account ID of the accounts to fetch
+     * @param query SimpleSQLiteQuery: Select query which fetches accounts from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
      *
      * @return LiveData object of Resource<List<Account>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchAccountsByProviderAccountId(providerAccountId: Long): LiveData<Resource<List<Account>>> =
-            Transformations.map(db.accounts().loadByProviderAccountId(providerAccountId)) { models ->
-                Resource.success(models)
+    fun fetchAccounts(query: SimpleSQLiteQuery): LiveData<Resource<List<Account>>> =
+            Transformations.map(db.accounts().loadByQuery(query)) { model ->
+                Resource.success(model)
             }
 
     /**
@@ -551,23 +641,55 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     /**
      * Fetch accounts from the cache along with other associated data.
      *
+     * @param providerAccountId Filter by the Provider account ID (Optional)
+     * @param accountStatus Filter by the account status (Optional)
+     * @param accountSubType Filter by the sub type of account (Optional)
+     * @param accountType Filter by the type of the account (Optional)
+     * @param accountClassification Filter by the classification of the account (Optional)
+     * @param favourite Filter by favourited accounts (Optional)
+     * @param hidden Filter by hidden accounts (Optional)
+     * @param included Filter by accounts included in the budget (Optional)
+     * @param refreshStatus Filter by the current refresh status of the provider account (Optional)
+     *
      * @return LiveData object of Resource<List<AccountRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchAccountsWithRelation(): LiveData<Resource<List<AccountRelation>>> =
-            Transformations.map(db.accounts().loadWithRelation()) { models ->
+    fun fetchAccountsWithRelation(
+            providerAccountId: Long? = null,
+            accountStatus: AccountStatus? = null,
+            accountSubType: AccountSubType? = null,
+            accountType: AccountType? = null,
+            accountClassification: AccountClassification? = null,
+            favourite: Boolean? = null,
+            hidden: Boolean? = null,
+            included: Boolean? = null,
+            refreshStatus: AccountRefreshStatus? = null
+    ): LiveData<Resource<List<AccountRelation>>> =
+            Transformations.map(db.accounts().loadByQueryWithRelation(sqlForAccounts(
+                    providerAccountId = providerAccountId,
+                    accountStatus = accountStatus,
+                    accountSubType = accountSubType,
+                    accountType = accountType,
+                    accountClassification = accountClassification,
+                    favourite = favourite,
+                    hidden = hidden,
+                    included = included,
+                    refreshStatus = refreshStatus
+            ))) { models ->
                 Resource.success(models)
             }
 
     /**
-     * Fetch accounts by provider account ID from the cache along with other associated data.
+     * Advanced method to fetch accounts by SQL query from the cache along with other associated data.
      *
-     * @param providerAccountId Provider account ID of the accounts to fetch
+     * @param query SimpleSQLiteQuery: Select query which fetches accounts from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
      *
      * @return LiveData object of Resource<List<AccountRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchAccountsByProviderAccountIdWithRelation(providerAccountId: Long): LiveData<Resource<List<AccountRelation>>> =
-            Transformations.map(db.accounts().loadByProviderAccountIdWithRelation(providerAccountId)) { models ->
-                Resource.success(models)
+    fun fetchAccountsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<AccountRelation>>> =
+            Transformations.map(db.accounts().loadByQueryWithRelation(query)) { model ->
+                Resource.success(model)
             }
 
     /**
@@ -723,67 +845,66 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
             }
 
     /**
-     * Fetch transactions by user's tags
+     * Fetch transactions by IDs from the cache
      *
-     * @param userTags list of tags that are linked to a transaction
+     * @param transactionIds Unique list of IDs of the transactions to fetch
      *
-     * @return LiveData object of LiveData<Resource<List<Transaction>>> which can be observed using an Observer for future changes as well.
+     * @return LiveData object of Resource<List<Transaction>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchTransactionsByTags(userTags: List<String>): LiveData<Resource<List<Transaction>>> =
-            Transformations.map(db.transactions().loadByQuery(sqlForTransactionByUserTags(userTags))) { models ->
-                Resource.success(models)
-            }
-
-    /**
-     * Fetch transactions by user's tags
-     *
-     * @param userTags list of tags that are linked to a transaction
-     *
-     * @return LiveData object of LiveData<Resource<List<TransactionRelation>>> which can be observed using an Observer for future changes as well.
-     */
-    fun fetchTransactionsByTagsWithRelation(userTags: List<String>): LiveData<Resource<List<TransactionRelation>>> =
-            Transformations.map(db.transactions().loadByQueryWithRelation(sqlForTransactionByUserTags(userTags))) { models ->
+    fun fetchTransactions(transactionIds: LongArray): LiveData<Resource<List<Transaction>>> =
+            Transformations.map(db.transactions().load(transactionIds)) { models ->
                 Resource.success(models)
             }
 
     /**
      * Fetch transactions from the cache
      *
-     * @param transactionIds Unique list of IDs of the transactions to fetch (optional). If not specified this method returns all transactions from cache.
+     * @param accountId Filter by Account ID of the transactions (Optional)
+     * @param userTags Filter by list of tags that are linked to a transaction (Optional)
+     * @param baseType Filter by base type of the transaction (Optional)
+     * @param budgetCategory Filter by budget category of the transaction (Optional)
+     * @param status Filter by the status of the transaction (Optional)
+     * @param included Filter by transactions included in the budget (Optional)
+     * @param fromDate Start date to fetch transactions from (inclusive) (Optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param toDate End date to fetch transactions up to (inclusive) (Optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
      *
      * @return LiveData object of Resource<List<Transaction>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchTransactions(transactionIds: LongArray? = null): LiveData<Resource<List<Transaction>>> {
-        val result = if (transactionIds != null) db.transactions().load(transactionIds)
-        else db.transactions().load()
-
-        return Transformations.map(result) { models ->
-            Resource.success(models)
-        }
-    }
+    fun fetchTransactions(
+            accountId: Long? = null,
+            userTags: List<String>? = null,
+            baseType: TransactionBaseType? = null,
+            budgetCategory: BudgetCategory? = null,
+            status: TransactionStatus? = null,
+            included: Boolean? = null,
+            fromDate: String? = null,
+            toDate: String? = null
+    ): LiveData<Resource<List<Transaction>>> =
+            Transformations.map(db.transactions().loadByQuery(sqlForTransactions(
+                    accountId = accountId,
+                    userTags = userTags,
+                    baseType = baseType,
+                    budgetCategory = budgetCategory,
+                    status = status,
+                    included = included,
+                    fromDate = fromDate,
+                    toDate = toDate
+            ))) { models ->
+                Resource.success(models)
+            }
 
     /**
      * Advanced method to fetch transactions by SQL query from the cache
      *
      * @param query SimpleSQLiteQuery: Select query which fetches transactions from the cache
      *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
      * @return LiveData object of Resource<List<Transaction>> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactions(query: SimpleSQLiteQuery): LiveData<Resource<List<Transaction>>> =
-        Transformations.map(db.transactions().loadByQuery(query)) { model ->
-            Resource.success(model)
-        }
-
-    /**
-     * Fetch transactions by account ID from the cache.
-     *
-     * @param accountId Account ID of the transactions to fetch
-     *
-     * @return LiveData object of Resource<List<Transaction>> which can be observed using an Observer for future changes as well.
-     */
-    fun fetchTransactionsByAccountId(accountId: Long): LiveData<Resource<List<Transaction>>> =
-            Transformations.map(db.transactions().loadByAccountId(accountId)) { models ->
-                Resource.success(models)
+            Transformations.map(db.transactions().loadByQuery(query)) { model ->
+                Resource.success(model)
             }
 
     /**
@@ -815,27 +936,54 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     /**
+     * Fetch transactions from the cache along with other associated data.
+     *
+     * @param accountId Filter by Account ID of the transactions (Optional)
+     * @param userTags Filter by list of tags that are linked to a transaction (Optional)
+     * @param baseType Filter by base type of the transaction (Optional)
+     * @param budgetCategory Filter by budget category of the transaction (Optional)
+     * @param status Filter by the status of the transaction (Optional)
+     * @param included Filter by transactions included in the budget (Optional)
+     * @param fromDate Start date to fetch transactions from (inclusive) (Optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param toDate End date to fetch transactions up to (inclusive) (Optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
+     *
+     * @return LiveData object of Resource<List<TransactionRelation>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchTransactionsWithRelation(
+            accountId: Long? = null,
+            userTags: List<String>? = null,
+            baseType: TransactionBaseType? = null,
+            budgetCategory: BudgetCategory? = null,
+            status: TransactionStatus? = null,
+            included: Boolean? = null,
+            fromDate: String? = null,
+            toDate: String? = null
+    ): LiveData<Resource<List<TransactionRelation>>> =
+            Transformations.map(db.transactions().loadByQueryWithRelation(sqlForTransactions(
+                    accountId = accountId,
+                    userTags = userTags,
+                    baseType = baseType,
+                    budgetCategory = budgetCategory,
+                    status = status,
+                    included = included,
+                    fromDate = fromDate,
+                    toDate = toDate
+            ))) { models ->
+                Resource.success(models)
+            }
+
+    /**
      * Advanced method to fetch transactions by SQL query from the cache with other associated data.
      *
      * @param query SimpleSQLiteQuery: Select query which fetches transactions from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
      *
      * @return LiveData object of Resource<List<TransactionRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactionsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<TransactionRelation>>> =
             Transformations.map(db.transactions().loadByQueryWithRelation(query)) { model ->
                 Resource.success(model)
-            }
-
-    /**
-     * Fetch transactions by account ID from the cache with other associated data.
-     *
-     * @param accountId Account ID of the transactions to fetch
-     *
-     * @return LiveData object of Resource<List<TransactionRelation>> which can be observed using an Observer for future changes as well.
-     */
-    fun fetchTransactionsByAccountIdWithRelation(accountId: Long): LiveData<Resource<List<TransactionRelation>>> =
-            Transformations.map(db.transactions().loadByAccountIdWithRelation(accountId)) { models ->
-                Resource.success(models)
             }
 
     /**
@@ -1335,7 +1483,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of LiveData<Resource<List<TransactionTag>>> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactionUserTags(searchTerm: String? = null, sortBy: TagsSortType? = null, orderBy: OrderType? = null): LiveData<Resource<List<TransactionTag>>> {
-        return Transformations.map(db.userTags().custom(sqlForUserTags(searchTerm, sortBy, orderBy))) { models ->
+        return Transformations.map(db.userTags().loadByQuery(sqlForUserTags(searchTerm, sortBy, orderBy))) { models ->
             Resource.success(models)
         }
     }
@@ -1344,10 +1492,13 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * Advanced method to fetch transaction user tags by custom SQL query from the cache.
      *
      * @param query Custom query which fetches transaction user tags from the cache.
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
      * @return LiveData object of LiveData<Resource<List<TransactionTag>>> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactionUserTags(query: SimpleSQLiteQuery): LiveData<Resource<List<TransactionTag>>> {
-        return Transformations.map(db.userTags().custom(query)) { models ->
+        return Transformations.map(db.userTags().loadByQuery(query)) { models ->
             Resource.success(models)
         }
     }
@@ -1444,11 +1595,31 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     /**
      * Fetch transaction categories from the cache
      *
+     * @param defaultBudgetCategory Filter by the default budget category associated with the transaction category (Optional)
+     * @param type Filter by type of category (Optional)
+     *
      * @return LiveData object of Resource<List<TransactionCategory>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchTransactionCategories(): LiveData<Resource<List<TransactionCategory>>> =
-            Transformations.map(db.transactionCategories().load()) { models ->
+    fun fetchTransactionCategories(
+            defaultBudgetCategory: BudgetCategory? = null,
+            type: TransactionCategoryType? = null
+    ): LiveData<Resource<List<TransactionCategory>>> =
+            Transformations.map(db.transactionCategories().loadByQuery(sqlForTransactionCategories(defaultBudgetCategory, type))) { models ->
                 Resource.success(models)
+            }
+
+    /**
+     * Advanced method to fetch transaction categories by SQL query from the cache
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches transaction categories from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<TransactionCategory>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchTransactionCategories(query: SimpleSQLiteQuery): LiveData<Resource<List<TransactionCategory>>> =
+            Transformations.map(db.transactionCategories().loadByQuery(query)) { model ->
+                Resource.success(model)
             }
 
     /**
@@ -1515,11 +1686,27 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     /**
      * Fetch merchants from the cache
      *
+     * @param type Filter merchants by the type (Optional)
+     *
      * @return LiveData object of Resource<List<Merchant>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchMerchants(): LiveData<Resource<List<Merchant>>> =
-            Transformations.map(db.merchants().load()) { models ->
+    fun fetchMerchants(type: MerchantType? = null): LiveData<Resource<List<Merchant>>> =
+            Transformations.map(db.merchants().loadByQuery(sqlForMerchants(type))) { models ->
                 Resource.success(models)
+            }
+
+    /**
+     * Advanced method to fetch merchants by SQL query from the cache
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches merchants from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<Merchant>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchMerchants(query: SimpleSQLiteQuery): LiveData<Resource<List<Merchant>>> =
+            Transformations.map(db.merchants().loadByQuery(query)) { model ->
+                Resource.success(model)
             }
 
     /**

@@ -23,10 +23,10 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRe
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.RefreshStatus
 import us.frollo.frollosdk.testutils.randomNumber
 
-internal fun testProviderAccountResponseData(providerAccountId: Long? = null, providerId: Long? = null): ProviderAccountResponse {
+internal fun testProviderAccountResponseData(providerAccountId: Long? = null, providerId: Long? = null, accountRefreshStatus: AccountRefreshStatus? = null): ProviderAccountResponse {
 
     val refreshStatus = RefreshStatus(
-            status = AccountRefreshStatus.NEEDS_ACTION,
+            status = accountRefreshStatus ?: AccountRefreshStatus.NEEDS_ACTION,
             subStatus = AccountRefreshSubStatus.INPUT_REQUIRED,
             additionalStatus = AccountRefreshAdditionalStatus.MFA_NEEDED,
             lastRefreshed = "2019-01-01",

@@ -38,5 +38,5 @@ internal interface TransactionUserTagsDao {
     fun load(): LiveData<List<TransactionTag>>
 
     @RawQuery(observedEntities = [TransactionTag::class])
-    fun custom(queryStr: SupportSQLiteQuery): LiveData<List<TransactionTag>>
+    fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<TransactionTag>>
 }

@@ -16,6 +16,10 @@ Authentication manages the authentication of the user, managing the user profile
 
 Frollo SDK base classes
 
+# Package us.frollo.frollosdk.bills
+
+Manages bills and bill payments
+
 # Package us.frollo.frollosdk.core
 
 Frollo SDK core classes
@@ -44,37 +48,53 @@ Frollo SDK data models
 
 Frollo SDK shared models
 
-# us.frollo.frollosdk.model.coredata.aggregation.accounts
+# Package us.frollo.frollosdk.model.coredata.aggregation.accounts
 
 Frollo SDK account models
 
-# us.frollo.frollosdk.model.coredata.aggregation.merchants
+# Package us.frollo.frollosdk.model.coredata.aggregation.merchants
 
 Frollo SDK merchant models
 
-# us.frollo.frollosdk.model.coredata.aggregation.provideraccounts
+# Package us.frollo.frollosdk.model.coredata.aggregation.provideraccounts
 
 Frollo SDK provider account models
 
-# us.frollo.frollosdk.model.coredata.aggregation.providers
+# Package us.frollo.frollosdk.model.coredata.aggregation.providers
 
 Frollo SDK provider models
 
-# us.frollo.frollosdk.model.coredata.aggregation.transactioncategories
+# Package us.frollo.frollosdk.model.coredata.aggregation.tags
+
+Frollo SDK transaction user tag models
+
+# Package us.frollo.frollosdk.model.coredata.aggregation.transactioncategories
 
 Frollo SDK transaction category models
 
-# us.frollo.frollosdk.model.coredata.aggregation.transactions
+# Package us.frollo.frollosdk.model.coredata.aggregation.transactions
 
 Frollo SDK transaction models
+
+# Package us.frollo.frollosdk.model.coredata.bills
+
+Frollo SDK bill and bill payment models
 
 # Package us.frollo.frollosdk.model.coredata.messages
 
 Frollo SDK message models
 
+# Package us.frollo.frollosdk.model.coredata.reports
+
+Frollo SDK report models
+
 # Package us.frollo.frollosdk.model.coredata.shared
 
 Frollo SDK shared models
+
+# Package us.frollo.frollosdk.model.coredata.surveys
+
+Frollo SDK survey models
 
 # Package us.frollo.frollosdk.model.coredata.user
 
@@ -84,6 +104,18 @@ Frollo SDK user models
 
 Frollo SDK provider display models
 
+# Package us.frollo.frollosdk.model.display.reports
+
+Frollo SDK report display models
+
 # Package us.frollo.frollosdk.notifications
 
 Manages registration for and handling of incoming push notifications.
+
+# Package us.frollo.frollosdk.reports
+
+Manages all aspects of reporting of aggregation data including spending and balances.
+
+# Package us.frollo.frollosdk.surveys
+
+Manages fetching & submitting surveys.

@@ -1,5 +1,13 @@
 ## Changelog
 
+### 2.0.0
+- TBD
+- Enhanced methods for Aggregation, Reports, Surveys, Messages
+- Improved handling of logged out status
+
+#### Features
+- TBD
+
 ### 1.3.0
 - Bills
 - Enhanced Transaction - with Merchant location & phone

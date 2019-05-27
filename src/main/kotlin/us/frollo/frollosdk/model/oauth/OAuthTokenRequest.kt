@@ -29,7 +29,9 @@ internal data class OAuthTokenRequest(
     @SerializedName("refresh_token") val refreshToken: String? = null,
     @SerializedName("frollo_legacy_token") val legacyToken: String? = null,
     @SerializedName("username") val username: String? = null,
-    @SerializedName("password") val password: String? = null
+    @SerializedName("password") val password: String? = null,
+    @SerializedName("audience") val audience: String,
+    @SerializedName("scope") val scope: String? = null
 ) {
     val valid: Boolean
         get() = when (grantType) {

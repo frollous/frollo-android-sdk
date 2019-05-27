@@ -44,6 +44,7 @@ import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.notify
 import us.frollo.frollosdk.extensions.toString
 import us.frollo.frollosdk.extensions.updateRequest
+import us.frollo.frollosdk.model.oauth.OAuth2Scope
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.network.api.UserAPI
@@ -105,6 +106,8 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      * Initiate the authorization code login flow using a WebView
      *
      * @param activity Activity from which the ChromeTabs/Browser should be launched
+     * @param scopes OpenID Connect OAuth2 scopes to be sent. See [OAuth2Scope].
+     * @param additionalParameters Pass additional query parameters to the authorization endpoint (Optional)
      * @param completedIntent PendingIntent of an Activity to which the completed response from the ChromeTabs/Browser is delivered
      * @param cancelledIntent PendingIntent of an Activity to which the cancelled response from the ChromeTabs/Browser is delivered
      * @param toolBarColor Color of the CustomTabs toolbar using getColor() method
@@ -113,12 +116,19 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      * in the onCreate() of the pending intent activity
      */
     @Throws(DataError::class)
-    fun loginUserUsingWeb(activity: Activity, completedIntent: PendingIntent, cancelledIntent: PendingIntent, toolBarColor: Int? = null) {
+    fun loginUserUsingWeb(
+            activity: Activity,
+            scopes: List<String>,
+            additionalParameters: Map<String, String>? = null,
+            completedIntent: PendingIntent,
+            cancelledIntent: PendingIntent,
+            toolBarColor: Int? = null) {
+
         if (!oAuth.config.validForAuthorizationCodeFlow()) {
             throw DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)
         }
 
-        val authRequest = oAuth.getAuthorizationRequest()
+        val authRequest = oAuth.getAuthorizationRequest(scopes, additionalParameters)
 
         codeVerifier = authRequest.codeVerifier
 
@@ -134,18 +144,25 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      * Initiate the authorization code login flow using a WebView
      *
      * @param activity Activity from which the ChromeTabs/Browser should be launched
+     * @param scopes OpenID Connect OAuth2 scopes to be sent. See [OAuth2Scope].
+     * @param additionalParameters Pass additional query parameters to the authorization endpoint (Optional)
      * @param toolBarColor Color of the CustomTabs toolbar using getColor() method
      *
      * NOTE: When using this method you need to call [handleWebLoginResponse]
      * in the onActivityResult() of the activity from which you call this method
      */
     @Throws(DataError::class)
-    fun loginUserUsingWeb(activity: Activity, toolBarColor: Int? = null) {
+    fun loginUserUsingWeb(
+            activity: Activity,
+            scopes: List<String>,
+            additionalParameters: Map<String, String>? = null,
+            toolBarColor: Int? = null) {
+
         if (!oAuth.config.validForAuthorizationCodeFlow()) {
             throw DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)
         }
 
-        val authRequest = oAuth.getAuthorizationRequest()
+        val authRequest = oAuth.getAuthorizationRequest(scopes, additionalParameters)
 
         codeVerifier = authRequest.codeVerifier
 
@@ -160,9 +177,10 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      * Process the authorization response to continue WebView login flow
      *
      * @param authIntent Response intent received from WebView in onActivityResult or in onCreate of the pending intent Activity
+     * @param scopes OpenID Connect OAuth2 scopes to be sent. See [OAuth2Scope].
      * @param completion: Completion handler with any error that occurred
      */
-    fun handleWebLoginResponse(authIntent: Intent?, completion: OnFrolloSDKCompletionListener<Result>) {
+    fun handleWebLoginResponse(authIntent: Intent?, scopes: List<String>, completion: OnFrolloSDKCompletionListener<Result>) {
         authIntent?.let {
             val response = AuthorizationResponse.fromIntent(authIntent)
             val exception = AuthorizationException.fromIntent(authIntent)
@@ -170,7 +188,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
             val authorizationCode = response?.authorizationCode
 
             if (authorizationCode != null) {
-                exchangeAuthorizationCode(code = authorizationCode, codeVerifier = codeVerifier, completion = completion)
+                exchangeAuthorizationCode(code = authorizationCode, codeVerifier = codeVerifier, scopes = scopes, completion = completion)
             } else {
                 completion.invoke(Result.error(OAuth2Error(exception = exception)))
             }
@@ -184,9 +202,10 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      *
      * @param email Email address of the user
      * @param password Password for the user
+     * @param scopes OpenID Connect OAuth2 scopes to be sent. See [OAuth2Scope].
      * @param completion: Completion handler with any error that occurred
      */
-    fun loginUser(email: String, password: String, completion: OnFrolloSDKCompletionListener<Result>) {
+    fun loginUser(email: String, password: String, scopes: List<String>, completion: OnFrolloSDKCompletionListener<Result>) {
         if (loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
             completion.invoke(Result.error(error))
@@ -198,7 +217,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
             return
         }
 
-        val request = oAuth.getLoginRequest(username = email, password = password)
+        val request = oAuth.getLoginRequest(username = email, password = password, scopes = scopes)
         if (!request.valid) {
             completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
             return
@@ -251,6 +270,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      * @param dateOfBirth Date of birth of the user, if provided (optional)
      * @param email Email address of the user
      * @param password Password for the user
+     * @param scopes OpenID Connect OAuth2 scopes to be sent. See [OAuth2Scope].
      * @param completion Completion handler with any error that occurred
      */
     fun registerUser(
@@ -261,6 +281,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
         dateOfBirth: Date? = null,
         email: String,
         password: String,
+        scopes: List<String>,
         completion: OnFrolloSDKCompletionListener<Result>
     ) {
         if (loggedIn) {
@@ -293,7 +314,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
 
                 Resource.Status.SUCCESS -> {
                     // Authenticate the user at the token endpoint after creation
-                    val authRequest = oAuth.getRegisterRequest(username = email, password = password)
+                    val authRequest = oAuth.getRegisterRequest(username = email, password = password, scopes = scopes)
                     if (!authRequest.valid) {
                         completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
                         return@enqueue
@@ -489,16 +510,17 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      *
      * @param code Authorization code
      * @param codeVerifier Authorization code verifier for PKCE (Optional)
+     * @param scopes OpenID Connect OAuth2 scopes to be sent. See [OAuth2Scope].
      * @param completion Completion handler with any error that occurred
      */
-    fun exchangeAuthorizationCode(code: String, codeVerifier: String? = null, completion: OnFrolloSDKCompletionListener<Result>) {
+    fun exchangeAuthorizationCode(code: String, codeVerifier: String? = null, scopes: List<String>, completion: OnFrolloSDKCompletionListener<Result>) {
         if (loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
             completion.invoke(Result.error(error))
             return
         }
 
-        val request = oAuth.getExchangeAuthorizationCodeRequest(code = code, codeVerifier = codeVerifier)
+        val request = oAuth.getExchangeAuthorizationCodeRequest(code = code, codeVerifier = codeVerifier, scopes = scopes)
         if (!request.valid) {
             completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
             return
@@ -548,7 +570,8 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      * @param completion Completion handler with any error that occurred
      */
     fun exchangeLegacyToken(legacyToken: String, completion: OnFrolloSDKCompletionListener<Result>) {
-        val request = oAuth.getExchangeTokenRequest(legacyToken = legacyToken)
+        val scopes = listOf(OAuth2Scope.OFFLINE_ACCESS, OAuth2Scope.EMAIL, OAuth2Scope.OPENID)
+        val request = oAuth.getExchangeTokenRequest(legacyToken = legacyToken, scopes = scopes)
         if (!request.valid) {
             completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
             return

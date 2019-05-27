@@ -25,6 +25,7 @@ import net.openid.appauth.AuthorizationService
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.testutils.randomString
@@ -40,53 +41,58 @@ class OAuthTest {
         assertNotNull(request)
         assertTrue(request.valid)
         assertEquals(refreshToken, request.refreshToken)
+        assertNull(request.scope)
     }
 
     @Test
     fun testGetLoginRequest() {
         val username = randomString(32)
         val password = randomString(8)
-        val request = oAuth.getLoginRequest(username = username, password = password)
+        val request = oAuth.getLoginRequest(username = username, password = password, scopes = listOf("offline_access", "openid", "email"))
         assertNotNull(request)
         assertTrue(request.valid)
         assertEquals(username, request.username)
         assertEquals(password, request.password)
+        assertEquals("offline_access openid email", request.scope)
     }
 
     @Test
     fun testGetRegisterRequest() {
         val username = randomString(32)
         val password = randomString(8)
-        val request = oAuth.getRegisterRequest(username = username, password = password)
+        val request = oAuth.getRegisterRequest(username = username, password = password, scopes = listOf("offline_access", "openid", "email"))
         assertNotNull(request)
         assertTrue(request.valid)
         assertEquals(username, request.username)
         assertEquals(password, request.password)
+        assertEquals("offline_access openid email", request.scope)
     }
 
     @Test
     fun testGetExchangeAuthorizationCodeRequest() {
         val code = randomString(32)
         val codeVerifier = randomString(32)
-        val request = oAuth.getExchangeAuthorizationCodeRequest(code = code, codeVerifier = codeVerifier)
+        val request = oAuth.getExchangeAuthorizationCodeRequest(code = code, codeVerifier = codeVerifier, scopes = listOf("offline_access", "openid", "email"))
         assertNotNull(request)
         assertTrue(request.valid)
         assertEquals(code, request.code)
         assertEquals(codeVerifier, request.codeVerifier)
+        assertEquals("offline_access openid email", request.scope)
     }
 
     @Test
     fun testGetExchangeTokenRequest() {
         val legacyToken = randomString(32)
-        val request = oAuth.getExchangeTokenRequest(legacyToken = legacyToken)
+        val request = oAuth.getExchangeTokenRequest(legacyToken = legacyToken, scopes = listOf("offline_access", "openid", "email"))
         assertNotNull(request)
         assertTrue(request.valid)
         assertEquals(legacyToken, request.legacyToken)
+        assertEquals("offline_access openid email", request.scope)
     }
 
     @Test
     fun testGetAuthorizationRequest() {
-        val request = oAuth.getAuthorizationRequest()
+        val request = oAuth.getAuthorizationRequest(scopes = listOf("offline_access", "openid", "email"))
         assertNotNull(request)
         assertEquals(oAuth.config.clientId, request.clientId)
         assertEquals(oAuth.config.redirectUrl, request.redirectUri.toString())
@@ -98,7 +104,7 @@ class OAuthTest {
     @Test
     fun testGetCustomTabsIntent() {
         val service = AuthorizationService(app)
-        val request = oAuth.getAuthorizationRequest()
+        val request = oAuth.getAuthorizationRequest(scopes = listOf("offline_access", "openid", "email"))
         val intent = oAuth.getCustomTabsIntent(service, request)
 
         assertNotNull(intent)

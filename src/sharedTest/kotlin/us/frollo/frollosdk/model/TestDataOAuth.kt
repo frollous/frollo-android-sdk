@@ -36,6 +36,6 @@ internal fun testOAuthTokenRequestData(
             password = password,
             legacyToken = legacyToken,
             refreshToken = refreshToken,
-            code = authorizationCode
-    )
+            code = authorizationCode,
+            audience = "https://api.example.com/api/v2")
 }

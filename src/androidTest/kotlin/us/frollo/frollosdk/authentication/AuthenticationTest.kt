@@ -86,6 +86,7 @@ class AuthenticationTest {
     private lateinit var preferences: Preferences
     private lateinit var keystore: Keystore
     private lateinit var database: SDKDatabase
+    private val scopes = listOf("offline_access", "openid", "email")
 
     private fun initSetup() {
         mockServer = MockWebServer()
@@ -175,7 +176,7 @@ class AuthenticationTest {
             }
         })
 
-        authentication.loginUser("user@frollo.us", "password") { result ->
+        authentication.loginUser("user@frollo.us", "password", scopes) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -218,7 +219,7 @@ class AuthenticationTest {
             }
         })
 
-        authentication.loginUser("user@frollo.us", "wrong_password") { result ->
+        authentication.loginUser("user@frollo.us", "wrong_password", scopes) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
@@ -268,7 +269,7 @@ class AuthenticationTest {
             }
         })
 
-        authentication.loginUser("user@frollo.us", "password") { result ->
+        authentication.loginUser("user@frollo.us", "password", scopes) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
@@ -324,7 +325,7 @@ class AuthenticationTest {
 
         preferences.loggedIn = true
 
-        authentication.loginUser("user@frollo.us", "password") { result ->
+        authentication.loginUser("user@frollo.us", "password", scopes) { result ->
             assertTrue(authentication.loggedIn)
 
             assertEquals(Result.Status.ERROR, result.status)
@@ -382,7 +383,7 @@ class AuthenticationTest {
         val json = readStringFromJson(app, R.raw.authorization_code_valid)
         val intent = Intent().putExtra("net.openid.appauth.AuthorizationResponse", json)
 
-        authentication.handleWebLoginResponse(intent) { result ->
+        authentication.handleWebLoginResponse(intent, scopes) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -416,7 +417,7 @@ class AuthenticationTest {
 
         val intent = AuthorizationException.AuthorizationRequestErrors.ACCESS_DENIED.toIntent()
 
-        authentication.handleWebLoginResponse(intent) { result ->
+        authentication.handleWebLoginResponse(intent, scopes) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
@@ -469,7 +470,8 @@ class AuthenticationTest {
                 postcode = "2060",
                 dateOfBirth = Date(),
                 email = "user@frollo.us",
-                password = "password") { result ->
+                password = "password",
+                scopes = scopes) { result ->
 
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
@@ -531,7 +533,8 @@ class AuthenticationTest {
                 postcode = "2060",
                 dateOfBirth = Date(),
                 email = "user@frollo.us",
-                password = "password") { result ->
+                password = "password",
+                scopes = scopes) { result ->
 
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
@@ -587,7 +590,8 @@ class AuthenticationTest {
                 postcode = "2060",
                 dateOfBirth = Date(),
                 email = "user@frollo.us",
-                password = "password") { result ->
+                password = "password",
+                scopes = scopes) { result ->
 
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
@@ -651,7 +655,8 @@ class AuthenticationTest {
                 postcode = "2060",
                 dateOfBirth = Date(),
                 email = "user@frollo.us",
-                password = "password") { result ->
+                password = "password",
+                scopes = scopes) { result ->
 
             assertTrue(authentication.loggedIn)
 
@@ -1182,7 +1187,7 @@ class AuthenticationTest {
             }
         })
 
-        authentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32)) { result ->
+        authentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32), scopes = scopes) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -1225,7 +1230,7 @@ class AuthenticationTest {
             }
         })
 
-        authentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32)) { result ->
+        authentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32), scopes = scopes) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
@@ -1275,7 +1280,7 @@ class AuthenticationTest {
             }
         })
 
-        authentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32)) { result ->
+        authentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32), scopes = scopes) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 

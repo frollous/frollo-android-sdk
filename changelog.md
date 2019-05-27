@@ -1,5 +1,10 @@
 ## Changelog
 
+### 1.3.1
+
+#### Changes
+- Allow custom parameters in authorization code flow
+
 ### 1.3.0
 - Bills
 - Enhanced Transaction - with Merchant location & phone

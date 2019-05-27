@@ -19,7 +19,6 @@ package us.frollo.frollosdk.authentication
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import net.openid.appauth.AuthorizationRequest
-import net.openid.appauth.AuthorizationRequest.Scope
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ResponseTypeValues
@@ -40,41 +39,50 @@ class OAuth(val config: FrolloSDKConfiguration) {
                 grantType = OAuthGrantType.REFRESH_TOKEN,
                 clientId = config.clientId,
                 domain = domain,
-                refreshToken = refreshToken)
+                refreshToken = refreshToken,
+                audience = config.serverUrl)
 
-    internal fun getLoginRequest(username: String, password: String) =
+    internal fun getLoginRequest(username: String, password: String, scopes: List<String>) =
             OAuthTokenRequest(
                     grantType = OAuthGrantType.PASSWORD,
                     clientId = config.clientId,
                     domain = domain,
                     username = username,
-                    password = password)
+                    password = password,
+                    audience = config.serverUrl,
+                    scope = scopes.joinToString(" "))
 
-    internal fun getRegisterRequest(username: String, password: String) =
+    internal fun getRegisterRequest(username: String, password: String, scopes: List<String>) =
             OAuthTokenRequest(
                     grantType = OAuthGrantType.PASSWORD,
                     clientId = config.clientId,
                     domain = domain,
                     username = username,
-                    password = password)
+                    password = password,
+                    audience = config.serverUrl,
+                    scope = scopes.joinToString(" "))
 
-    internal fun getExchangeAuthorizationCodeRequest(code: String, codeVerifier: String? = null) =
+    internal fun getExchangeAuthorizationCodeRequest(scopes: List<String>, code: String, codeVerifier: String? = null) =
             OAuthTokenRequest(
                     grantType = OAuthGrantType.AUTHORIZATION_CODE,
                     clientId = config.clientId,
                     domain = domain,
                     code = code,
                     codeVerifier = codeVerifier,
-                    redirectUrl = config.redirectUrl)
+                    redirectUrl = config.redirectUrl,
+                    audience = config.serverUrl,
+                    scope = scopes.joinToString(" "))
 
-    internal fun getExchangeTokenRequest(legacyToken: String) =
+    internal fun getExchangeTokenRequest(legacyToken: String, scopes: List<String>) =
             OAuthTokenRequest(
                     grantType = OAuthGrantType.PASSWORD,
                     clientId = config.clientId,
                     domain = domain,
-                    legacyToken = legacyToken)
+                    legacyToken = legacyToken,
+                    audience = config.serverUrl,
+                    scope = scopes.joinToString(" "))
 
-    internal fun getAuthorizationRequest(): AuthorizationRequest {
+    internal fun getAuthorizationRequest(scopes: List<String>, additionalParameters: Map<String, String>? = null): AuthorizationRequest {
         val serviceConfig = AuthorizationServiceConfiguration(config.authorizationUri, config.tokenUri)
 
         val authRequestBuilder = AuthorizationRequest.Builder(
@@ -83,10 +91,13 @@ class OAuth(val config: FrolloSDKConfiguration) {
                 ResponseTypeValues.CODE,
                 config.redirectUri)
 
+        val customParameters = mutableMapOf(Pair("audience", config.serverUrl), Pair("domain", domain))
+        additionalParameters?.let { customParameters.putAll(it) }
+
         return authRequestBuilder
-                .setScopes(Scope.OFFLINE_ACCESS, Scope.OPENID, Scope.EMAIL)
-                // .setPrompt("login") // Specifies whether the Authorization Server prompts the End-User for re-authentication
-                .setAdditionalParameters(mutableMapOf(Pair("audience", config.serverUrl), Pair("domain", domain)))
+                .setScopes(scopes)
+                //.setPrompt("login") // Specifies whether the Authorization Server prompts the End-User for re-authentication
+                .setAdditionalParameters(customParameters)
                 .build()
     }
 

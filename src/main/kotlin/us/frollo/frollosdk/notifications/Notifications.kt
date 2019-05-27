@@ -17,18 +17,18 @@
 package us.frollo.frollosdk.notifications
 
 import android.os.Bundle
-import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.events.Events
 import us.frollo.frollosdk.extensions.toNotificationPayload
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
+import us.frollo.frollosdk.user.UserManagement
 import java.lang.Exception
 
 /**
  * Register for push notifications and handles incoming push notification payloads.
  */
-class Notifications(private val authentication: Authentication, private val events: Events, private val messages: Messages) {
+class Notifications(private val user: UserManagement, private val events: Events, private val messages: Messages) {
 
     companion object {
         private const val TAG = "Notifications"
@@ -40,7 +40,7 @@ class Notifications(private val authentication: Authentication, private val even
      * @param token Raw token data received from Firebase to be sent to the host
      */
     fun registerPushNotificationToken(token: String) {
-        authentication.updateDevice(notificationToken = token)
+        user.updateDevice(notificationToken = token)
     }
 
     /**

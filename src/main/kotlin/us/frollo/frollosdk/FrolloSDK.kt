@@ -27,6 +27,7 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.temporal.TemporalAdjusters
 import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.authentication.Authentication
+import us.frollo.frollosdk.authentication.AuthenticationCallback
 import us.frollo.frollosdk.authentication.AuthenticationStatus
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Result
@@ -51,6 +52,7 @@ import us.frollo.frollosdk.notifications.Notifications
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.reports.Reports
 import us.frollo.frollosdk.surveys.Surveys
+import us.frollo.frollosdk.user.UserManagement
 import us.frollo.frollosdk.version.Version
 import java.lang.Exception
 import java.util.Timer
@@ -59,7 +61,7 @@ import java.util.TimerTask
 /**
  * Frollo SDK manager and main instantiation. Responsible for managing the lifecycle and coordination of the SDK
  */
-object FrolloSDK {
+object FrolloSDK : AuthenticationCallback {
 
     private const val TAG = "FrolloSDK"
     private const val CACHE_EXPIRY = 120000L // 2 minutes
@@ -101,7 +103,7 @@ object FrolloSDK {
         get() = _notifications ?: throw IllegalAccessException("SDK not setup")
 
     /**
-     * Surveys - Handling surveys. See [Surveys] for details
+     * Surveys - Surveys management. See [Surveys] for details
      */
     val surveys: Surveys
         get() = _surveys ?: throw IllegalAccessException("SDK not setup")
@@ -118,6 +120,12 @@ object FrolloSDK {
     val bills: Bills
         get() = _bills ?: throw IllegalAccessException("SDK not setup")
 
+    /**
+     * User - User management. See [UserManagement] for details
+     */
+    val user: UserManagement
+        get() = _user ?: throw IllegalAccessException("SDK not setup")
+
     private var _setup = false
     private var _authentication: Authentication? = null
     private var _aggregation: Aggregation? = null
@@ -127,6 +135,7 @@ object FrolloSDK {
     private var _surveys: Surveys? = null
     private var _reports: Reports? = null
     private var _bills: Bills? = null
+    private var _user: UserManagement? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
@@ -184,21 +193,23 @@ object FrolloSDK {
             Log.deviceType = deviceInfo.deviceType
             Log.logLevel = configuration.logLevel
             // 8. Setup Authentication
-            _authentication = Authentication(oAuth, deviceInfo, network, database, preferences)
+            _authentication = Authentication(oAuth, network, preferences, this)
             // 9. Setup Aggregation
             _aggregation = Aggregation(network, database, localBroadcastManager, authentication)
             // 10. Setup Messages
             _messages = Messages(network, database, authentication)
             // 11. Setup Events
             _events = Events(network, authentication)
-            // 12. Setup Notifications
-            _notifications = Notifications(authentication, events, messages)
-            // 13. Setup Surveys
+            // 12. Setup Surveys
             _surveys = Surveys(network, authentication)
-            // 14. Setup Reports
+            // 13. Setup Reports
             _reports = Reports(network, database, aggregation, authentication)
-            // 15. Setup Bills
+            // 14. Setup Bills
             _bills = Bills(network, database, aggregation, authentication)
+            // 15. Setup User Management
+            _user = UserManagement(deviceInfo, network, database, preferences, authentication)
+            // 16. Setup Notifications
+            _notifications = Notifications(user, events, messages)
 
             if (version.migrationNeeded()) {
                 version.migrateVersion()
@@ -209,29 +220,6 @@ object FrolloSDK {
         } catch (e: Exception) {
             val error = FrolloSDKError("Setup failed : ${e.message}")
             completion.invoke(Result.error(error))
-        }
-    }
-
-    /**
-     * Logout the currently authenticated user. Resets all caches, preferences and databases.
-     * This resets the token storage.
-     */
-    fun logout() {
-        authentication.logoutUser()
-        reset()
-    }
-
-    /**
-     * Delete the user account and complete logout activities on success
-     *
-     * @param completion Completion handler with any error that occurred
-     */
-    fun deleteUser(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        authentication.deleteUser { result ->
-            when (result.status) {
-                Result.Status.SUCCESS -> reset(completion)
-                Result.Status.ERROR -> completion?.invoke(Result.error(result.error))
-            }
         }
     }
 
@@ -249,12 +237,17 @@ object FrolloSDK {
         pauseScheduledRefreshing()
         // NOTE: Keystore reset is not required as we do not store any data in there. Just keys.
         authentication.reset()
+        network.reset()
         preferences.reset()
         database.clearAllTables()
         completion?.invoke(Result.success())
 
         notify(ACTION_AUTHENTICATION_CHANGED,
                 bundleOf(Pair(ARG_AUTHENTICATION_STATUS, AuthenticationStatus.LOGGED_OUT)))
+    }
+
+    override fun authenticationReset(completion: OnFrolloSDKCompletionListener<Result>?) {
+        reset(completion)
     }
 
     private fun initializeThreeTenABP() {
@@ -293,7 +286,7 @@ object FrolloSDK {
         if (updateDevice) {
             deviceLastUpdated = now
 
-            authentication.updateDevice()
+            user.updateDevice()
         }
     }
 
@@ -317,7 +310,7 @@ object FrolloSDK {
         aggregation.refreshTransactions(
                 fromDate = LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth()).toString(Transaction.DATE_FORMAT_PATTERN),
                 toDate = LocalDate.now().toString(Transaction.DATE_FORMAT_PATTERN))
-        authentication.refreshUser()
+        user.refreshUser()
         messages.refreshUnreadMessages()
     }
 
@@ -340,7 +333,7 @@ object FrolloSDK {
         aggregation.refreshProviders()
         aggregation.refreshTransactionCategories()
         bills.refreshBills()
-        authentication.updateDevice()
+        user.updateDevice()
     }
 
     private fun resumeScheduledRefreshing() {

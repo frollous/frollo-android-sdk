@@ -28,7 +28,7 @@ import us.frollo.frollosdk.model.coredata.user.UserStatus
 
 internal data class UserResponse(
     @SerializedName("id") val userId: Long,
-    @SerializedName("first_name") val firstName: String,
+    @SerializedName("first_name") val firstName: String?,
     @SerializedName("email") val email: String,
     @SerializedName("email_verified") val emailVerified: Boolean,
     @SerializedName("status") val status: UserStatus,

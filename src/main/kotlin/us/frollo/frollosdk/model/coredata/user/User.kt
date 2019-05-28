@@ -36,7 +36,7 @@ data class User(
     /** Unique ID of the user */
     @PrimaryKey @ColumnInfo(name = "user_id") val userId: Long,
 
-    /** First name of the user */
+    /** First name of the user (optional) */
     @ColumnInfo(name = "first_name") var firstName: String?,
 
     /** Email address of the user */

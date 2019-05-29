@@ -30,7 +30,7 @@ internal data class OAuthTokenRequest(
     @SerializedName("frollo_legacy_token") val legacyToken: String? = null,
     @SerializedName("username") val username: String? = null,
     @SerializedName("password") val password: String? = null,
-    @SerializedName("audience") val audience: String,
+    @SerializedName("audience") val audience: String? = null,
     @SerializedName("scope") val scope: String? = null
 ) {
     val valid: Boolean

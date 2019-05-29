@@ -39,8 +39,7 @@ class OAuth(val config: FrolloSDKConfiguration) {
                 grantType = OAuthGrantType.REFRESH_TOKEN,
                 clientId = config.clientId,
                 domain = domain,
-                refreshToken = refreshToken,
-                audience = config.serverUrl)
+                refreshToken = refreshToken)
 
     internal fun getLoginRequest(username: String, password: String, scopes: List<String>) =
             OAuthTokenRequest(

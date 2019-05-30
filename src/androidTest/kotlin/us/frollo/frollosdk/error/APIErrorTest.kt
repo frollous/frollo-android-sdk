@@ -153,6 +153,18 @@ class APIErrorTest {
     }
 
     @Test
+    fun testAPIErrorAuth0Migration() {
+        val errorResponse = readStringFromJson(app, R.raw.error_auth0_migration)
+
+        val error = APIError(400, errorResponse)
+        assertEquals(app.resources.getString(APIErrorType.AUTH0_MIGRATION_ERROR.textResource), error.localizedDescription)
+        assertEquals(400, error.statusCode)
+        assertEquals(APIErrorType.AUTH0_MIGRATION_ERROR, error.type)
+        assertEquals(APIErrorCode.AUTH0_MIGRATION_ERROR, error.errorCode)
+        assertNotNull(error.message)
+    }
+
+    @Test
     fun testAPIErrorValueOverLimit() {
         val errorResponse = readStringFromJson(app, R.raw.error_value_over_limit)
 

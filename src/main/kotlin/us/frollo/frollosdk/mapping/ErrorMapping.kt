@@ -36,11 +36,11 @@ internal fun String.toAPIErrorResponse(): APIErrorResponse? {
 }
 
 internal fun Int.toAPIErrorType(errorCode: APIErrorCode?): APIErrorType {
-    val statusCode = this
-    return when (statusCode) {
+    return when (this) {
         400 -> {
             when (errorCode) {
                 APIErrorCode.INVALID_MUST_BE_DIFFERENT -> APIErrorType.PASSWORD_MUST_BE_DIFFERENT
+                APIErrorCode.AUTH0_MIGRATION_ERROR -> APIErrorType.AUTH0_MIGRATION_ERROR
                 else -> APIErrorType.BAD_REQUEST
             }
         }
@@ -79,8 +79,7 @@ internal fun String.toDataError(): DataError? {
 }
 
 internal fun AuthorizationException.toOAuth2ErrorType(): OAuth2ErrorType {
-    val exception = this
-    return when (exception) {
+    return when (this) {
         AuthorizationException.AuthorizationRequestErrors.ACCESS_DENIED -> OAuth2ErrorType.ACCESS_DENIED
         AuthorizationException.AuthorizationRequestErrors.CLIENT_ERROR -> OAuth2ErrorType.CLIENT_ERROR
         AuthorizationException.AuthorizationRequestErrors.INVALID_REQUEST -> OAuth2ErrorType.INVALID_REQUEST

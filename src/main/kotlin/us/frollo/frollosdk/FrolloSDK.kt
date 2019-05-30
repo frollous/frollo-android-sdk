@@ -27,6 +27,7 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.temporal.TemporalAdjusters
 import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.authentication.Authentication
+import us.frollo.frollosdk.authentication.AuthenticationCallback
 import us.frollo.frollosdk.authentication.AuthenticationStatus
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Result
@@ -59,7 +60,7 @@ import java.util.TimerTask
 /**
  * Frollo SDK manager and main instantiation. Responsible for managing the lifecycle and coordination of the SDK
  */
-object FrolloSDK {
+object FrolloSDK : AuthenticationCallback {
 
     private const val TAG = "FrolloSDK"
     private const val CACHE_EXPIRY = 120000L // 2 minutes
@@ -185,6 +186,7 @@ object FrolloSDK {
             Log.logLevel = configuration.logLevel
             // 8. Setup Authentication
             _authentication = Authentication(oAuth, deviceInfo, network, database, preferences)
+            authentication.authenticationCallback = this
             // 9. Setup Aggregation
             _aggregation = Aggregation(network, database, localBroadcastManager)
             // 10. Setup Messages
@@ -255,6 +257,10 @@ object FrolloSDK {
 
         notify(ACTION_AUTHENTICATION_CHANGED,
                 bundleOf(Pair(ARG_AUTHENTICATION_STATUS, AuthenticationStatus.LOGGED_OUT)))
+    }
+
+    override fun authenticationReset(completion: OnFrolloSDKCompletionListener<Result>?) {
+        reset(completion)
     }
 
     private fun initializeThreeTenABP() {

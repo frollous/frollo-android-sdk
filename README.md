@@ -20,13 +20,13 @@
     ```
 - You need to define a **appAuthRedirectScheme** in your module level **build.gradle**. This should be unique redirect uri for your app.    
 
-    Example:
+    Example: If your redirect url is `frollo-sdk-example://authorize`, then you would do as below
 
     ```
         defaultConfig {
             //..
             manifestPlaceholders = [
-                'appAuthRedirectScheme': 'frollo-sdk-example://authorize'
+                'appAuthRedirectScheme': 'frollo-sdk-example'
             ]
             //..
         }

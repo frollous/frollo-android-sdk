@@ -440,7 +440,7 @@ class AuthenticationTest {
     }
 
     @Test
-    fun testMigrateUserToAuth0() {
+    fun testMigrateUser() {
         initSetup()
 
         preferences.loggedIn = true
@@ -458,7 +458,7 @@ class AuthenticationTest {
             }
         })
 
-        authentication.migrateUserToAuth0(password = randomUUID()) { result ->
+        authentication.migrateUser(password = randomUUID()) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -477,7 +477,7 @@ class AuthenticationTest {
     }
 
     @Test
-    fun testMigrateUserToAuth0FailsMigrationError() {
+    fun testMigrateUserFailsMigrationError() {
         initSetup()
 
         preferences.loggedIn = true
@@ -491,18 +491,18 @@ class AuthenticationTest {
                 if (request?.trimmedPath == UserAPI.URL_MIGRATE_USER) {
                     return MockResponse()
                             .setResponseCode(400)
-                            .setBody(readStringFromJson(app, R.raw.error_auth0_migration))
+                            .setBody(readStringFromJson(app, R.raw.error_migration))
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
-        authentication.migrateUserToAuth0(password = randomUUID()) { result ->
+        authentication.migrateUser(password = randomUUID()) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
-            assertEquals(APIErrorType.AUTH0_MIGRATION_ERROR, (result.error as APIError).type)
-            assertEquals(APIErrorCode.AUTH0_MIGRATION_ERROR, (result.error as APIError).errorCode)
+            assertEquals(APIErrorType.MIGRATION_ERROR, (result.error as APIError).type)
+            assertEquals(APIErrorCode.MIGRATION_ERROR, (result.error as APIError).errorCode)
 
             assertTrue(preferences.loggedIn)
             assertEquals("ExistingAccessToken", keystore.decrypt(preferences.encryptedAccessToken))
@@ -519,12 +519,12 @@ class AuthenticationTest {
     }
 
     @Test
-    fun testMigrateUserToAuth0FailsIfNotLoggedIn() {
+    fun testMigrateUserFailsIfLoggedOut() {
         initSetup()
 
         preferences.loggedIn = false
 
-        authentication.migrateUserToAuth0(password = randomUUID()) { result ->
+        authentication.migrateUser(password = randomUUID()) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
@@ -532,6 +532,57 @@ class AuthenticationTest {
         }
 
         assertEquals(0, mockServer.requestCount)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testMigrateUserFailsMissingRefreshToken() {
+        initSetup()
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        val expiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+        preferences.accessTokenExpiry = expiry
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == UserAPI.URL_MIGRATE_USER) {
+                    return MockResponse()
+                            .setResponseCode(204)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        authentication.migrateUser(password = randomUUID()) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_REFRESH_TOKEN, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testMigrateUserFailsIfTooShort() {
+        initSetup()
+
+        preferences.loggedIn = true
+
+        authentication.migrateUser(password = "1234") { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+
+            assertEquals(DataErrorType.API, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.PASSWORD_TOO_SHORT, (result.error as DataError).subType)
+        }
 
         wait(3)
 

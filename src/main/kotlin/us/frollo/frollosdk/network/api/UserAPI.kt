@@ -23,7 +23,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import us.frollo.frollosdk.model.api.user.UserChangePasswordRequest
-import us.frollo.frollosdk.model.api.user.UserMigrateRequest
+import us.frollo.frollosdk.model.api.user.UserMigrationRequest
 import us.frollo.frollosdk.model.api.user.UserRegisterRequest
 import us.frollo.frollosdk.model.api.user.UserResetPasswordRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
@@ -58,5 +58,5 @@ internal interface UserAPI {
     fun deleteUser(): Call<Void>
 
     @POST(URL_MIGRATE_USER)
-    fun migrateUser(@Body request: UserMigrateRequest): Call<Void>
+    fun migrateUser(@Body request: UserMigrationRequest): Call<Void>
 }

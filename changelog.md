@@ -4,6 +4,7 @@
 
 #### Changes
 - Allow custom parameters in authorization code flow
+- Migrate user to new identity provider
 
 ### 1.3.0
 - Bills

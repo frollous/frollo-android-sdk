@@ -18,6 +18,8 @@ package us.frollo.frollosdk.model.api.user
 
 import com.google.gson.annotations.SerializedName
 
-internal data class UserMigrateRequest(
+internal data class UserMigrationRequest(
     @SerializedName("password") val password: String
-)
+) {
+    fun valid() = password.length >= 8
+}

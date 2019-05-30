@@ -50,8 +50,8 @@ enum class APIErrorType(
     ALREADY_EXISTS(R.string.FrolloSDK_Error_API_UserAlreadyExists),
     /** New password must be different from old password */
     PASSWORD_MUST_BE_DIFFERENT(R.string.FrolloSDK_Error_API_PasswordMustBeDifferent),
-    /** Error while migrating user from Frollo to Auth0 */
-    AUTH0_MIGRATION_ERROR(R.string.FrolloSDK_Error_API_Auth0MigrationError),
+    /** Error while migrating user from one identity provider to another */
+    MIGRATION_ERROR(R.string.FrolloSDK_Error_API_MigrationError),
 
     /** Invalid access token */
     INVALID_ACCESS_TOKEN(R.string.FrolloSDK_Error_API_InvalidAccessToken),

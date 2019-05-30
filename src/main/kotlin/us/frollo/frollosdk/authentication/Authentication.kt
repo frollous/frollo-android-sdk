@@ -52,7 +52,7 @@ import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.api.device.DeviceUpdateRequest
 import us.frollo.frollosdk.model.api.user.UserChangePasswordRequest
-import us.frollo.frollosdk.model.api.user.UserMigrateRequest
+import us.frollo.frollosdk.model.api.user.UserMigrationRequest
 import us.frollo.frollosdk.model.api.user.UserRegisterRequest
 import us.frollo.frollosdk.model.api.user.UserResetPasswordRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
@@ -200,32 +200,36 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     }
 
     /**
-     * Migrate a user from Frollo server to Auth0
-     *
-     * After migration is success, this method resets the SDK, clears all caches, databases and preferences and the user is logged out.
-     * The host app should call the new token endpoint to authenticate again.
+     * Migrates a user from one identity provider to another if available. The user will then be logged out and need to be authenticated again.
      *
      * @param password New password for the user to be used for Auth0 server
      * @param completion: Completion handler with any error that occurred
      */
-    fun migrateUserToAuth0(password: String, completion: OnFrolloSDKCompletionListener<Result>) {
+    fun migrateUser(password: String, completion: OnFrolloSDKCompletionListener<Result>) {
         if (!loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
             completion.invoke(Result.error(error))
             return
         }
 
-        userAPI.migrateUser(UserMigrateRequest(password = password)).enqueue { resource ->
-            when (resource.status) {
-                Resource.Status.SUCCESS -> {
-                    reset()
-                    authenticationCallback?.authenticationReset(completion)
-                }
-                Resource.Status.ERROR -> {
-                    Log.e("$TAG#migrateUserToAuth0", resource.error?.localizedDescription)
-                    completion.invoke(Result.error(resource.error))
+        val request = UserMigrationRequest(password = password)
+
+        if (request.valid()) {
+            userAPI.migrateUser(UserMigrationRequest(password = password)).enqueue { resource ->
+                when (resource.status) {
+                    Resource.Status.SUCCESS -> {
+                        reset()
+                        authenticationCallback?.authenticationReset(completion)
+                    }
+                    Resource.Status.ERROR -> {
+                        Log.e("$TAG#migrateUser", resource.error?.localizedDescription)
+                        completion.invoke(Result.error(resource.error))
+                    }
                 }
             }
+        } else {
+            val error = DataError(type = DataErrorType.API, subType = DataErrorSubType.PASSWORD_TOO_SHORT)
+            completion.invoke(Result.error(error))
         }
     }
 

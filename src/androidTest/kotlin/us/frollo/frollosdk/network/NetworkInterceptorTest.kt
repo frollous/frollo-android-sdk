@@ -40,7 +40,7 @@ import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.network.api.UserAPI
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.keystore.Keystore
-import us.frollo.frollosdk.model.api.user.UserMigrateRequest
+import us.frollo.frollosdk.model.api.user.UserMigrationRequest
 import us.frollo.frollosdk.model.testResetPasswordData
 import us.frollo.frollosdk.model.testValidRegisterData
 import us.frollo.frollosdk.preferences.Preferences
@@ -252,7 +252,7 @@ class NetworkInterceptorTest {
     }
 
     @Test
-    fun testRefreshTokenHeaderAppendedToMigrateAuth0Request() {
+    fun testRefreshTokenHeaderAppendedToMigrateUserRequest() {
         initSetup()
 
         mockServer.setDispatcher(object : Dispatcher() {
@@ -269,7 +269,7 @@ class NetworkInterceptorTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        userAPI.migrateUser(UserMigrateRequest(password = "password")).enqueue { }
+        userAPI.migrateUser(UserMigrationRequest(password = "password")).enqueue { }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_MIGRATE_USER, request.trimmedPath)

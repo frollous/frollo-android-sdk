@@ -40,6 +40,7 @@ import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.network.api.UserAPI
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.keystore.Keystore
+import us.frollo.frollosdk.model.api.user.UserMigrationRequest
 import us.frollo.frollosdk.model.testResetPasswordData
 import us.frollo.frollosdk.model.testValidRegisterData
 import us.frollo.frollosdk.preferences.Preferences
@@ -246,6 +247,33 @@ class NetworkInterceptorTest {
                 .build())
         assertNotNull(request)
         assertEquals("Bearer ExistingAccessToken", request.header("Authorization"))
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshTokenHeaderAppendedToMigrateUserRequest() {
+        initSetup()
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == UserAPI.URL_MIGRATE_USER) {
+                    return MockResponse()
+                            .setResponseCode(204)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        userAPI.migrateUser(UserMigrationRequest(password = "password")).enqueue { }
+
+        val request = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_MIGRATE_USER, request.trimmedPath)
+        assertEquals("Bearer ExistingRefreshToken", request.getHeader("Authorization"))
 
         tearDown()
     }

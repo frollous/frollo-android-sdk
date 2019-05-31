@@ -8,6 +8,11 @@
 #### Features
 - TBD
 
+### 1.3.2
+
+#### Changes
+- Migrate user to new identity provider
+
 ### 1.3.1
 
 #### Changes

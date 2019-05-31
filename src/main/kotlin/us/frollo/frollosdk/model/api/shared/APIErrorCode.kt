@@ -38,6 +38,8 @@ enum class APIErrorCode {
     @SerializedName("F0006") INVALID_OVER_LIMIT,
     /** Invalid Count */
     @SerializedName("F0007") INVALID_COUNT,
+    /** Migration Error */
+    @SerializedName("F0012") MIGRATION_ERROR,
 
     // 401 Not authenticated
     /** Invalid Access Token */

@@ -10,6 +10,7 @@
     <string name="FrolloSDK_Error_API_NotImplemented">API has not been implemented</string>
     <string name="FrolloSDK_Error_API_PasscodeError">You entered an incorrect passcode too many times and have been logged out</string>
     <string name="FrolloSDK_Error_API_PasswordMustBeDifferent">New password must be different to the current password</string>
+    <string name="FrolloSDK_Error_API_MigrationError">There was an error while migrating the user from one identity provider to another. Please contact support.</string>
     <string name="FrolloSDK_Error_API_RateLimit">The app has been rate limited. Wait before trying your request again</string>
     <string name="FrolloSDK_Error_API_ServerError">Something went wrong at our end. Please try again later. Contact support if this issue persists</string>
     <string name="FrolloSDK_Error_API_SuspendedDevice">This device has been logged out. Please login again to continue</string>

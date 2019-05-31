@@ -36,6 +36,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Rule
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
@@ -57,6 +58,7 @@ import us.frollo.frollosdk.network.api.UserAPI
 import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.mapping.toUser
+import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.testUserResponseData
@@ -108,6 +110,7 @@ class AuthenticationTest {
         val network = NetworkService(oAuth = oAuth, keystore = keystore, pref = preferences)
 
         authentication = Authentication(oAuth, DeviceInfo(app), network, database, preferences)
+        authentication.authenticationCallback = FrolloSDK
 
         AndroidThreeTen.init(app)
     }
@@ -432,6 +435,156 @@ class AuthenticationTest {
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1L, preferences.accessTokenExpiry)
         }
+
+        tearDown()
+    }
+
+    @Test
+    fun testMigrateUser() {
+        initSetup()
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == UserAPI.URL_MIGRATE_USER) {
+                    return MockResponse()
+                            .setResponseCode(204)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        authentication.migrateUser(password = randomUUID()) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            assertFalse(preferences.loggedIn)
+            assertNull(preferences.encryptedAccessToken)
+            assertNull(preferences.encryptedRefreshToken)
+            assertEquals(-1, preferences.accessTokenExpiry)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_MIGRATE_USER, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testMigrateUserFailsMigrationError() {
+        initSetup()
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        val expiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+        preferences.accessTokenExpiry = expiry
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == UserAPI.URL_MIGRATE_USER) {
+                    return MockResponse()
+                            .setResponseCode(400)
+                            .setBody(readStringFromJson(app, R.raw.error_migration))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        authentication.migrateUser(password = randomUUID()) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+
+            assertEquals(APIErrorType.MIGRATION_ERROR, (result.error as APIError).type)
+            assertEquals(APIErrorCode.MIGRATION_ERROR, (result.error as APIError).errorCode)
+
+            assertTrue(preferences.loggedIn)
+            assertEquals("ExistingAccessToken", keystore.decrypt(preferences.encryptedAccessToken))
+            assertEquals("ExistingRefreshToken", keystore.decrypt(preferences.encryptedRefreshToken))
+            assertEquals(expiry, preferences.accessTokenExpiry)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_MIGRATE_USER, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testMigrateUserFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        authentication.migrateUser(password = randomUUID()) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        assertEquals(0, mockServer.requestCount)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testMigrateUserFailsMissingRefreshToken() {
+        initSetup()
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        val expiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+        preferences.accessTokenExpiry = expiry
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == UserAPI.URL_MIGRATE_USER) {
+                    return MockResponse()
+                            .setResponseCode(204)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        authentication.migrateUser(password = randomUUID()) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_REFRESH_TOKEN, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testMigrateUserFailsIfTooShort() {
+        initSetup()
+
+        preferences.loggedIn = true
+
+        authentication.migrateUser(password = "1234") { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+
+            assertEquals(DataErrorType.API, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.PASSWORD_TOO_SHORT, (result.error as DataError).subType)
+        }
+
+        wait(3)
 
         tearDown()
     }

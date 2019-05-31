@@ -30,6 +30,7 @@ import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.toJson
 import us.frollo.frollosdk.logging.Log
+import us.frollo.frollosdk.network.api.UserAPI.Companion.URL_MIGRATE_USER
 import java.io.IOException
 
 internal class NetworkInterceptor(private val network: NetworkService, private val helper: NetworkHelper) : Interceptor {
@@ -91,6 +92,10 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
     private fun addAuthorizationHeader(request: Request, builder: Request.Builder) {
         val url = request.url().toString()
         if (request.headers().get(HEADER_AUTHORIZATION) == null &&
+                url.contains(URL_MIGRATE_USER)) {
+
+            appendRefreshToken(builder)
+        } else if (request.headers().get(HEADER_AUTHORIZATION) == null &&
                 !url.contains(URL_REGISTER) &&
                 !url.contains(URL_PASSWORD_RESET)) {
 
@@ -130,5 +135,15 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
         val nowDate = LocalDateTime.now(ZoneOffset.UTC)
 
         return nowDate.isBefore(adjustedExpiryDate)
+    }
+
+    @Throws(DataError::class)
+    private fun appendRefreshToken(builder: Request.Builder) {
+        helper.authRefreshToken?.let {
+            builder.addHeader(HEADER_AUTHORIZATION, it)
+        } ?: run {
+            Log.e("$TAG#validateAndAppendRefreshToken", "No valid refresh token when trying to migrate user to Auth0.")
+            throw DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_REFRESH_TOKEN)
+        }
     }
 }

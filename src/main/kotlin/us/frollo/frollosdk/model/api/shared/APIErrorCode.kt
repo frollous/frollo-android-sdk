@@ -39,7 +39,7 @@ enum class APIErrorCode {
     /** Invalid Count */
     @SerializedName("F0007") INVALID_COUNT,
     /** Migration Error */
-    @SerializedName("F0012") MIGRATION_ERROR,
+    @SerializedName("F0012") MIGRATION_FAILED,
 
     // 401 Not authenticated
     /** Invalid Access Token */

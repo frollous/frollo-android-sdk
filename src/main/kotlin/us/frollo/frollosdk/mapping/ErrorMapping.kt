@@ -40,7 +40,7 @@ internal fun Int.toAPIErrorType(errorCode: APIErrorCode?): APIErrorType {
         400 -> {
             when (errorCode) {
                 APIErrorCode.INVALID_MUST_BE_DIFFERENT -> APIErrorType.PASSWORD_MUST_BE_DIFFERENT
-                APIErrorCode.MIGRATION_ERROR -> APIErrorType.MIGRATION_ERROR
+                APIErrorCode.MIGRATION_FAILED -> APIErrorType.MIGRATION_FAILED
                 else -> APIErrorType.BAD_REQUEST
             }
         }

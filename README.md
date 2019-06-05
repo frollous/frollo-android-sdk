@@ -31,6 +31,8 @@
             //..
         }
     ```
+    For more details see **Integration Requirements** under **OAuth2 Authentication using Authorization Code**
+    
 - **minSdkVersion** in your gradle file must be **23** or above. Frollo SDK does not support Android versions below Marshmallow (6.0).
 - Frollo SDK disables auto-backup by default to ensure no data persists between installs. You might run into conflicts during integration if your app has defined **android:allowBackup="true"** in its manifest. Either you can disable auto-backup for your app or override by adding **tools:replace="android:allowBackup"** to **`<application>`** element in your **AndroidManifest.xml**.
 - Use AndroidX for your project instead of legacy support libraries. You can either enable "**Use AndroidX**" checkbox while creating a new Android project in Android Studio or migrate your existing project to AndroidX - [Migrating to AndroidX](https://developer.android.com/jetpack/androidx/migrate)

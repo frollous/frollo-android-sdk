@@ -69,6 +69,24 @@ If the user is not authenticated the [loginUser](us.frollo.frollosdk.auth/-authe
             //..
         }
     ```
+- If you are using a deep link scheme which is same as your `appAuthRedirectScheme`, then add below component to your manifest
+
+    Example: If your redirect url is `frollo-sdk-example://authorize`, and you have defined `appAuthRedirectScheme: 'frollo-sdk-example'` in your gradle file.
+    
+    ```
+        <!-- AppAuth Custom Redirect URI -->
+        <activity android:name="net.openid.appauth.RedirectUriReceiverActivity"
+            android:exported="true"
+            tools:node="replace">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                
+                <data android:scheme="${appAuthRedirectScheme}" android:host="authorize"/>
+            </intent-filter>
+        </activity>
+    ``` 
 
 ##### Method 1 - Using Pending Intents
 

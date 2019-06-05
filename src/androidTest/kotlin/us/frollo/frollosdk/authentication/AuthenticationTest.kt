@@ -36,7 +36,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
 import org.junit.Rule
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
@@ -501,8 +500,8 @@ class AuthenticationTest {
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
-            assertEquals(APIErrorType.MIGRATION_ERROR, (result.error as APIError).type)
-            assertEquals(APIErrorCode.MIGRATION_ERROR, (result.error as APIError).errorCode)
+            assertEquals(APIErrorType.MIGRATION_FAILED, (result.error as APIError).type)
+            assertEquals(APIErrorCode.MIGRATION_FAILED, (result.error as APIError).errorCode)
 
             assertTrue(preferences.loggedIn)
             assertEquals("ExistingAccessToken", keystore.decrypt(preferences.encryptedAccessToken))

@@ -56,8 +56,15 @@ class NetworkService internal constructor(
     private val tokenInterceptor = TokenInterceptor(helper)
     private var apiRetrofit = createRetrofit(oAuth.config.serverUrl)
     private var authRetrofit = createRetrofit(oAuth.config.tokenUrl)
+    private var revokeTokenRetrofit: Retrofit? = null
 
     internal var invalidTokenRetries: Int = 0
+
+    init {
+        oAuth.config.revokeTokenURL?.let { revokeTokenUrl ->
+            revokeTokenRetrofit = createRetrofit(revokeTokenUrl)
+        }
+    }
 
     private fun createRetrofit(baseUrl: String): Retrofit {
         val gson = GsonBuilder()
@@ -66,8 +73,16 @@ class NetworkService internal constructor(
                 .create()
 
         val httpClientBuilder = OkHttpClient.Builder()
-                .addInterceptor(if (baseUrl == oAuth.config.tokenUrl) tokenInterceptor else serverInterceptor)
-                .authenticator(if (baseUrl == oAuth.config.tokenUrl) TokenAuthenticator(this) else NetworkAuthenticator(this))
+                .addInterceptor(
+                        if (baseUrl == oAuth.config.tokenUrl || baseUrl == oAuth.config.revokeTokenURL)
+                            tokenInterceptor
+                        else
+                            serverInterceptor)
+                .authenticator(
+                        if (baseUrl == oAuth.config.tokenUrl || baseUrl == oAuth.config.revokeTokenURL)
+                            TokenAuthenticator(this)
+                        else
+                            NetworkAuthenticator(this))
 
         if (!BuildConfig.DEBUG && Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             val certPinner = CertificatePinner.Builder()
@@ -89,6 +104,7 @@ class NetworkService internal constructor(
 
     override fun <T> create(service: Class<T>): T = apiRetrofit.create(service)
     override fun <T> createAuth(service: Class<T>): T = authRetrofit.create(service)
+    override fun <T> createRevoke(service: Class<T>): T? = revokeTokenRetrofit?.create(service)
 
     /**
      * Refreshes the authentication token

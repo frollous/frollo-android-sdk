@@ -23,6 +23,7 @@
 
     <string name="FrolloSDK_Error_Data_API_InvalidData">API request or response data was invalid</string>
     <string name="FrolloSDK_Error_Data_API_PasswordTooShort">Password must be at least 8 characters long</string>
+    <string name="FrolloSDK_Error_Data_API_RevokeTokenURLMissing">Revoke token URL not provided.</string>
     <string name="FrolloSDK_Error_Data_API_Unknown">Unknown error occurred in the API request or response</string>
 
     <string name="FrolloSDK_Error_Data_Authentication_AlreadyLoggedIn">User is already logged in.</string>

@@ -60,6 +60,7 @@ import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.coredata.user.User
+import us.frollo.frollosdk.model.oauth.OAuthTokenRevokeRequest
 import us.frollo.frollosdk.network.ErrorResponseType
 import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.preferences.Preferences
@@ -88,6 +89,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     private val userAPI: UserAPI = network.create(UserAPI::class.java)
     private val deviceAPI: DeviceAPI = network.create(DeviceAPI::class.java)
     private val tokenAPI: TokenAPI = network.createAuth(TokenAPI::class.java)
+    private val revokeTokenAPI: TokenAPI? = network.createRevoke(TokenAPI::class.java)
 
     private var codeVerifier: String? = null
     internal var authenticationCallback: AuthenticationCallback? = null
@@ -733,6 +735,17 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
         if (!loggedIn) {
             Log.i("$TAG#logoutUser", "Cannot logout. User is not logged in.")
             return
+        }
+
+        // Revoke the refresh token if possible
+        network.authToken.getRefreshToken()?.let { refreshToken ->
+            val request = OAuthTokenRevokeRequest(clientId = oAuth.config.clientId, token = refreshToken)
+
+            revokeTokenAPI?.revokeToken(request)?.enqueue { resource ->
+                if (resource.status == Resource.Status.ERROR) {
+                    Log.d("$TAG#logoutUser", resource.error?.localizedDescription)
+                }
+            }
         }
 
         reset()

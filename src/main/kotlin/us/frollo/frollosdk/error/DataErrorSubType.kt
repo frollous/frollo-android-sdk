@@ -34,6 +34,8 @@ enum class DataErrorSubType(
     INVALID_DATA(DataErrorType.API, R.string.FrolloSDK_Error_Data_API_InvalidData),
     /** API - Password too short */
     PASSWORD_TOO_SHORT(DataErrorType.API, R.string.FrolloSDK_Error_Data_API_PasswordTooShort),
+    /** API - Revoke token URL not provided */
+    REVOKE_TOKEN_URL_MISSING(DataErrorType.API, R.string.FrolloSDK_Error_Data_API_RevokeTokenURLMissing),
 
     /** Authentication - Already logged in */
     ALREADY_LOGGED_IN(DataErrorType.AUTHENTICATION, R.string.FrolloSDK_Error_Data_Authentication_AlreadyLoggedIn),

@@ -47,6 +47,10 @@ data class FrolloSDKConfiguration(
      */
     val serverUrl: String,
     /**
+     * OAuth2 token endpoint to revoke refresh token on logout (if supported)
+     */
+    val revokeTokenURL: String? = null,
+    /**
      * Level of logging for debug and error messages. Default is [LogLevel.ERROR]
      */
     val logLevel: LogLevel = LogLevel.ERROR

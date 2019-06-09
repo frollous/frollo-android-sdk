@@ -30,4 +30,4 @@ internal fun testSDKConfig(
                 authorizationUrl = authorizationUrl ?: "https://id.example.com/oauth/authorize/",
                 tokenUrl = tokenUrl ?: "https://id.example.com/oauth/token/",
                 serverUrl = serverUrl ?: "https://api.example.com/",
-                revokeTokenURL = revokeTokenURL ?: "https://id.example.com/oauth/revoke")
+                revokeTokenURL = revokeTokenURL ?: "https://id.example.com/oauth/revoke/")

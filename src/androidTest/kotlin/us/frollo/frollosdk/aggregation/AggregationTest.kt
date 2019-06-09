@@ -1452,7 +1452,7 @@ class AggregationTest {
         val body = readStringFromJson(app, R.raw.transactions_2018_08_01_valid)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?transaction_ids=1,2,3,4,5") {
+                if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?transaction_ids=1%2C2%2C3%2C4%2C5") {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -1473,7 +1473,7 @@ class AggregationTest {
         }
 
         val request = mockServer.takeRequest()
-        assertEquals("${AggregationAPI.URL_TRANSACTIONS}?transaction_ids=1,2,3,4,5", request.trimmedPath)
+        assertEquals("${AggregationAPI.URL_TRANSACTIONS}?transaction_ids=1%2C2%2C3%2C4%2C5", request.trimmedPath)
 
         wait(3)
 
@@ -1784,7 +1784,7 @@ class AggregationTest {
         val body = readStringFromJson(app, R.raw.transactions_summary_valid)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?transaction_ids=1,2,3,4,5") {
+                if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?transaction_ids=1%2C2%2C3%2C4%2C5") {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -1803,7 +1803,7 @@ class AggregationTest {
         }
 
         val request = mockServer.takeRequest()
-        assertEquals("${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?transaction_ids=1,2,3,4,5", request.trimmedPath)
+        assertEquals("${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?transaction_ids=1%2C2%2C3%2C4%2C5", request.trimmedPath)
 
         wait(3)
 
@@ -1998,7 +1998,7 @@ class AggregationTest {
         val body = readStringFromJson(app, R.raw.merchants_by_id)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?merchant_ids=22,30,31,106,691") {
+                if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?merchant_ids=22%2C30%2C31%2C106%2C691") {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -2019,7 +2019,7 @@ class AggregationTest {
         }
 
         val request = mockServer.takeRequest()
-        assertEquals("${AggregationAPI.URL_MERCHANTS}?merchant_ids=22,30,31,106,691", request.trimmedPath)
+        assertEquals("${AggregationAPI.URL_MERCHANTS}?merchant_ids=22%2C30%2C31%2C106%2C691", request.trimmedPath)
 
         wait(3)
 

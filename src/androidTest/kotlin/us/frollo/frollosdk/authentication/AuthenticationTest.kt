@@ -74,6 +74,7 @@ class AuthenticationTest {
 
     companion object {
         private const val TOKEN_URL = "token/"
+        private const val REVOKE_TOKEN_URL = "revoke/"
     }
 
     @get:Rule val testRule = InstantTaskExecutorRule()
@@ -84,6 +85,7 @@ class AuthenticationTest {
 
     private lateinit var mockServer: MockWebServer
     private lateinit var mockTokenServer: MockWebServer
+    private lateinit var mockRevokeTokenServer: MockWebServer
     private lateinit var preferences: Preferences
     private lateinit var keystore: Keystore
     private lateinit var database: SDKDatabase
@@ -98,7 +100,11 @@ class AuthenticationTest {
         mockTokenServer.start()
         val baseTokenUrl = mockTokenServer.url("/$TOKEN_URL")
 
-        val config = testSDKConfig(serverUrl = baseUrl.toString(), tokenUrl = baseTokenUrl.toString())
+        mockRevokeTokenServer = MockWebServer()
+        mockRevokeTokenServer.start()
+        val baseRevokeTokenUrl = mockRevokeTokenServer.url("/$REVOKE_TOKEN_URL")
+
+        val config = testSDKConfig(serverUrl = baseUrl.toString(), tokenUrl = baseTokenUrl.toString(), revokeTokenURL = baseRevokeTokenUrl.toString())
         if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
 
         keystore = Keystore()
@@ -988,10 +994,22 @@ class AuthenticationTest {
     fun testLogoutUser() {
         initSetup()
 
+        var tokenRevoked = false
         preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        mockRevokeTokenServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == REVOKE_TOKEN_URL) {
+                    tokenRevoked = true
+                    return MockResponse()
+                            .setResponseCode(204)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
 
         authentication.logoutUser()
 
@@ -1001,6 +1019,7 @@ class AuthenticationTest {
         assertNull(preferences.encryptedAccessToken)
         assertNull(preferences.encryptedRefreshToken)
         assertEquals(-1, preferences.accessTokenExpiry)
+        assertTrue(tokenRevoked)
 
         tearDown()
     }

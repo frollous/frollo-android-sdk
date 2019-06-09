@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.network
+package us.frollo.frollosdk.model.oauth
 
-internal interface IApiProvider {
-    fun <T> create(service: Class<T>): T
-    fun <T> createAuth(service: Class<T>): T
-    fun <T> createRevoke(service: Class<T>): T?
-}
+import com.google.gson.annotations.SerializedName
+
+internal data class OAuthTokenRevokeRequest(
+    @SerializedName("client_id") val clientId: String,
+    @SerializedName("token") val token: String
+)

@@ -21,6 +21,7 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 import us.frollo.frollosdk.model.oauth.OAuthTokenRequest
 import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
+import us.frollo.frollosdk.model.oauth.OAuthTokenRevokeRequest
 
 internal interface TokenAPI {
     companion object {
@@ -29,4 +30,7 @@ internal interface TokenAPI {
 
     @POST(URL_TOKEN)
     fun refreshTokens(@Body request: OAuthTokenRequest): Call<OAuthTokenResponse>
+
+    @POST(URL_TOKEN)
+    fun revokeToken(@Body request: OAuthTokenRevokeRequest): Call<Void>
 }

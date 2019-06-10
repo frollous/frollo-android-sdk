@@ -220,7 +220,6 @@ object FrolloSDK : AuthenticationCallback {
      */
     fun logout() {
         authentication.logoutUser()
-        reset()
     }
 
     /**

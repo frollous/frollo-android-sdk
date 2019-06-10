@@ -220,8 +220,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
             userAPI.migrateUser(UserMigrationRequest(password = password)).enqueue { resource ->
                 when (resource.status) {
                     Resource.Status.SUCCESS -> {
-                        reset()
-                        authenticationCallback?.authenticationReset(completion)
+                        logoutUser(completion)
                     }
                     Resource.Status.ERROR -> {
                         Log.e("$TAG#migrateUser", resource.error?.localizedDescription)
@@ -722,7 +721,7 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
     /**
      * Log out the user and reset the token storage.
      */
-    internal fun logoutUser() {
+    internal fun logoutUser(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (!loggedIn) {
             return
         }
@@ -739,6 +738,8 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
         }
 
         reset()
+
+        authenticationCallback?.authenticationReset(completion)
     }
 
     private fun handleUserResponse(userResponse: UserResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {

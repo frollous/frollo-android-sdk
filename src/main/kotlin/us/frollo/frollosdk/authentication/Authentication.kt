@@ -121,12 +121,13 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      */
     @Throws(DataError::class)
     fun loginUserUsingWeb(
-            activity: Activity,
-            scopes: List<String>,
-            additionalParameters: Map<String, String>? = null,
-            completedIntent: PendingIntent,
-            cancelledIntent: PendingIntent,
-            toolBarColor: Int? = null) {
+        activity: Activity,
+        scopes: List<String>,
+        additionalParameters: Map<String, String>? = null,
+        completedIntent: PendingIntent,
+        cancelledIntent: PendingIntent,
+        toolBarColor: Int? = null
+    ) {
 
         if (!oAuth.config.validForAuthorizationCodeFlow()) {
             throw DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)
@@ -157,10 +158,11 @@ class Authentication(private val oAuth: OAuth, private val di: DeviceInfo, priva
      */
     @Throws(DataError::class)
     fun loginUserUsingWeb(
-            activity: Activity,
-            scopes: List<String>,
-            additionalParameters: Map<String, String>? = null,
-            toolBarColor: Int? = null) {
+        activity: Activity,
+        scopes: List<String>,
+        additionalParameters: Map<String, String>? = null,
+        toolBarColor: Int? = null
+    ) {
 
         if (!oAuth.config.validForAuthorizationCodeFlow()) {
             throw DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)

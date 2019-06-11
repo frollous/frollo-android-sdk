@@ -33,7 +33,6 @@ import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Resource
-import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase

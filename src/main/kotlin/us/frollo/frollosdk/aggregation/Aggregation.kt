@@ -591,15 +591,15 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<Account>> which can be observed using an Observer for future changes as well.
      */
     fun fetchAccounts(
-            providerAccountId: Long? = null,
-            accountStatus: AccountStatus? = null,
-            accountSubType: AccountSubType? = null,
-            accountType: AccountType? = null,
-            accountClassification: AccountClassification? = null,
-            favourite: Boolean? = null,
-            hidden: Boolean? = null,
-            included: Boolean? = null,
-            refreshStatus: AccountRefreshStatus? = null
+        providerAccountId: Long? = null,
+        accountStatus: AccountStatus? = null,
+        accountSubType: AccountSubType? = null,
+        accountType: AccountType? = null,
+        accountClassification: AccountClassification? = null,
+        favourite: Boolean? = null,
+        hidden: Boolean? = null,
+        included: Boolean? = null,
+        refreshStatus: AccountRefreshStatus? = null
     ): LiveData<Resource<List<Account>>> =
             Transformations.map(db.accounts().loadByQuery(sqlForAccounts(
                     providerAccountId = providerAccountId,
@@ -657,15 +657,15 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<AccountRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchAccountsWithRelation(
-            providerAccountId: Long? = null,
-            accountStatus: AccountStatus? = null,
-            accountSubType: AccountSubType? = null,
-            accountType: AccountType? = null,
-            accountClassification: AccountClassification? = null,
-            favourite: Boolean? = null,
-            hidden: Boolean? = null,
-            included: Boolean? = null,
-            refreshStatus: AccountRefreshStatus? = null
+        providerAccountId: Long? = null,
+        accountStatus: AccountStatus? = null,
+        accountSubType: AccountSubType? = null,
+        accountType: AccountType? = null,
+        accountClassification: AccountClassification? = null,
+        favourite: Boolean? = null,
+        hidden: Boolean? = null,
+        included: Boolean? = null,
+        refreshStatus: AccountRefreshStatus? = null
     ): LiveData<Resource<List<AccountRelation>>> =
             Transformations.map(db.accounts().loadByQueryWithRelation(sqlForAccounts(
                     providerAccountId = providerAccountId,
@@ -874,14 +874,14 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<Transaction>> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactions(
-            accountId: Long? = null,
-            userTags: List<String>? = null,
-            baseType: TransactionBaseType? = null,
-            budgetCategory: BudgetCategory? = null,
-            status: TransactionStatus? = null,
-            included: Boolean? = null,
-            fromDate: String? = null,
-            toDate: String? = null
+        accountId: Long? = null,
+        userTags: List<String>? = null,
+        baseType: TransactionBaseType? = null,
+        budgetCategory: BudgetCategory? = null,
+        status: TransactionStatus? = null,
+        included: Boolean? = null,
+        fromDate: String? = null,
+        toDate: String? = null
     ): LiveData<Resource<List<Transaction>>> =
             Transformations.map(db.transactions().loadByQuery(sqlForTransactions(
                     accountId = accountId,
@@ -953,14 +953,14 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<TransactionRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactionsWithRelation(
-            accountId: Long? = null,
-            userTags: List<String>? = null,
-            baseType: TransactionBaseType? = null,
-            budgetCategory: BudgetCategory? = null,
-            status: TransactionStatus? = null,
-            included: Boolean? = null,
-            fromDate: String? = null,
-            toDate: String? = null
+        accountId: Long? = null,
+        userTags: List<String>? = null,
+        baseType: TransactionBaseType? = null,
+        budgetCategory: BudgetCategory? = null,
+        status: TransactionStatus? = null,
+        included: Boolean? = null,
+        fromDate: String? = null,
+        toDate: String? = null
     ): LiveData<Resource<List<TransactionRelation>>> =
             Transformations.map(db.transactions().loadByQueryWithRelation(sqlForTransactions(
                     accountId = accountId,
@@ -1580,10 +1580,10 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     private fun handleUpdateTagsResponse(
-            response: List<TransactionTagUpdateResponse>?,
-            isAdd: Boolean = true,
-            transactionId: Long,
-            completion: OnFrolloSDKCompletionListener<Result>
+        response: List<TransactionTagUpdateResponse>?,
+        isAdd: Boolean = true,
+        transactionId: Long,
+        completion: OnFrolloSDKCompletionListener<Result>
     ) {
         response?.let {
             doAsync {
@@ -1733,8 +1733,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<TransactionCategory>> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactionCategories(
-            defaultBudgetCategory: BudgetCategory? = null,
-            type: TransactionCategoryType? = null
+        defaultBudgetCategory: BudgetCategory? = null,
+        type: TransactionCategoryType? = null
     ): LiveData<Resource<List<TransactionCategory>>> =
             Transformations.map(db.transactionCategories().loadByQuery(sqlForTransactionCategories(defaultBudgetCategory, type))) { models ->
                 Resource.success(models)

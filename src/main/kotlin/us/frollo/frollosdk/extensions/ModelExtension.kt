@@ -223,15 +223,15 @@ internal fun sqlForProviderAccounts(providerId: Long? = null, refreshStatus: Acc
 }
 
 internal fun sqlForAccounts(
-        providerAccountId: Long? = null,
-        accountStatus: AccountStatus? = null,
-        accountSubType: AccountSubType? = null,
-        accountType: AccountType? = null,
-        accountClassification: AccountClassification? = null,
-        favourite: Boolean? = null,
-        hidden: Boolean? = null,
-        included: Boolean? = null,
-        refreshStatus: AccountRefreshStatus? = null
+    providerAccountId: Long? = null,
+    accountStatus: AccountStatus? = null,
+    accountSubType: AccountSubType? = null,
+    accountType: AccountType? = null,
+    accountClassification: AccountClassification? = null,
+    favourite: Boolean? = null,
+    hidden: Boolean? = null,
+    included: Boolean? = null,
+    refreshStatus: AccountRefreshStatus? = null
 ): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("account")
 
@@ -249,14 +249,14 @@ internal fun sqlForAccounts(
 }
 
 internal fun sqlForTransactions(
-        accountId: Long? = null,
-        userTags: List<String>? = null,
-        baseType: TransactionBaseType? = null,
-        budgetCategory: BudgetCategory? = null,
-        status: TransactionStatus? = null,
-        included: Boolean? = null,
-        fromDate: String? = null,
-        toDate: String? = null
+    accountId: Long? = null,
+    userTags: List<String>? = null,
+    baseType: TransactionBaseType? = null,
+    budgetCategory: BudgetCategory? = null,
+    status: TransactionStatus? = null,
+    included: Boolean? = null,
+    fromDate: String? = null,
+    toDate: String? = null
 ): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("transaction_model")
 

@@ -20,6 +20,7 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -32,6 +33,8 @@ import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccoun
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
+import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagUpdateRequest
+import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagUpdateResponse
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
@@ -58,6 +61,7 @@ internal interface AggregationAPI {
         const val URL_TRANSACTIONS_SUMMARY = "aggregation/transactions/summary"
 
         // Tags URLs
+        const val URL_TRANSACTION_TAGS = "$URL_TRANSACTIONS/{transaction_id}/tags"
         const val URL_USER_TAGS = "$URL_TRANSACTIONS/tags/user"
         const val URL_SUGGESTED_TAGS = "$URL_TRANSACTIONS/tags/suggested"
 
@@ -143,6 +147,16 @@ internal interface AggregationAPI {
     fun fetchMerchantsByIds(@QueryMap queryParams: Map<String, String>): Call<List<MerchantResponse>>
 
     // Tags
+
+    @GET(URL_TRANSACTION_TAGS)
+    fun fetchTags(@Path("transaction_id") transactionId: Long): Call<List<TransactionTagUpdateResponse>>
+
+    @POST(URL_TRANSACTION_TAGS)
+    fun createTags(@Path("transaction_id") transactionId: Long, @Body requestArray: Array<TransactionTagUpdateRequest>): Call<List<TransactionTagUpdateResponse>>
+
+    // Workaround with HTTP instead of DELETE as DELETE does not support a body
+    @HTTP(method = "DELETE", path = URL_TRANSACTION_TAGS, hasBody = true)
+    fun deleteTags(@Path("transaction_id") transactionId: Long, @Body requestArray: Array<TransactionTagUpdateRequest>): Call<List<TransactionTagUpdateResponse>>
 
     @GET(URL_USER_TAGS)
     fun fetchUserTags(@QueryMap queryParams: Map<String, String>): Call<List<TransactionTagResponse>>

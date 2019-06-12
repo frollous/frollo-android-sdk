@@ -2134,13 +2134,11 @@ class AggregationTest {
     fun testAddTagsToTransaction() {
         initSetup()
 
-        val body = readStringFromJson(app, R.raw.transaction_update_tag)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}/12345/tags") {
                     return MockResponse()
                             .setResponseCode(200)
-                            .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -2212,13 +2210,11 @@ class AggregationTest {
     fun testRemoveTagsFromTransaction() {
         initSetup()
 
-        val body = readStringFromJson(app, R.raw.transaction_update_tag)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}/12345/tags") {
                     return MockResponse()
                             .setResponseCode(200)
-                            .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }

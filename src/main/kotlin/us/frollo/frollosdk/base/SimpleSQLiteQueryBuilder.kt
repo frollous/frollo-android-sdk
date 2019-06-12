@@ -23,26 +23,26 @@ import java.util.regex.Pattern
  * A simple query builder to create SQL SELECT queries.
  */
 class SimpleSQLiteQueryBuilder(
-        /** The table name to query. */
-        private val tableName : String
+    /** The table name to query. */
+    private val tableName: String
 ) {
 
     private val limitPattern = Pattern.compile("\\s*\\d+\\s*(,\\s*\\d+\\s*)?")
 
     private var distinct = false
     private val selections = mutableListOf<String>()
-    private var columns : Array<String>? = null
-    private var groupBy : String? = null
-    private var orderBy : String? = null
-    private var having : String? = null
-    private var limit : String? = null
+    private var columns: Array<String>? = null
+    private var groupBy: String? = null
+    private var orderBy: String? = null
+    private var having: String? = null
+    private var limit: String? = null
 
     /**
      * Sets the given list of columns as the columns that will be returned.
      *
      * @param columns The list of column names that should be returned.
      */
-    fun columns(columns : Array<String>) = apply {
+    fun columns(columns: Array<String>) = apply {
         this.columns = columns
     }
 
@@ -51,7 +51,7 @@ class SimpleSQLiteQueryBuilder(
      *
      * @param orderBy The order clause.
      */
-    fun orderBy(orderBy : String) = apply {
+    fun orderBy(orderBy: String) = apply {
         this.orderBy = orderBy
     }
 
@@ -60,7 +60,7 @@ class SimpleSQLiteQueryBuilder(
      *
      * @param groupBy The value of the GROUP BY statement.
      */
-    fun groupBy(groupBy : String) = apply {
+    fun groupBy(groupBy: String) = apply {
         this.groupBy = groupBy
     }
 
@@ -69,7 +69,7 @@ class SimpleSQLiteQueryBuilder(
      *
      * @param having The having clause.
      */
-    fun having(having : String) = apply {
+    fun having(having: String) = apply {
         this.having = having
     }
 
@@ -78,7 +78,7 @@ class SimpleSQLiteQueryBuilder(
      *
      * @param limit The limit value.
      */
-    fun limit(limit : String) = apply {
+    fun limit(limit: String) = apply {
         if (!isEmpty(limit) && !limitPattern.matcher(limit).matches()) {
             throw IllegalArgumentException("invalid LIMIT clauses:$limit")
         }
@@ -108,7 +108,7 @@ class SimpleSQLiteQueryBuilder(
      *
      * @return a new query
      */
-    fun create() : SimpleSQLiteQuery {
+    fun create(): SimpleSQLiteQuery {
         if (isEmpty(groupBy) && !isEmpty(having)) {
             throw IllegalArgumentException(
                     "HAVING clauses are only permitted when using a GROUP BY clause")

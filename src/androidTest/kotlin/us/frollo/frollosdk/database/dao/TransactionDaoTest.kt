@@ -202,6 +202,22 @@ class TransactionDaoTest {
     }
 
     @Test
+    fun testUpdate() {
+        var data = testTransactionResponseData(transactionId = 101, userTags = listOf("tag1", "tag2"))
+
+        db.transactions().insert(data.toTransaction())
+
+        data = testTransactionResponseData(transactionId = 101, userTags = listOf("tag1", "tag2", "tag3", "tag4"))
+
+        db.transactions().update(data.toTransaction())
+
+        val testObserver = db.transactions().load().test()
+        testObserver.awaitValue()
+        assertTrue(testObserver.value().isNotEmpty())
+        assertEquals(4, testObserver.value()[0].userTags?.size)
+    }
+
+    @Test
     fun testGetIdsByAccountIds() {
         val data1 = testTransactionResponseData(transactionId = 100, accountId = 1)
         val data2 = testTransactionResponseData(transactionId = 101, accountId = 2)

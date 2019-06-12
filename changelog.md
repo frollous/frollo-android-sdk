@@ -2,11 +2,16 @@
 
 ### 2.0.0
 - TBD
-- Enhanced methods for Aggregation, Reports, Surveys, Messages
-- Improved handling of logged out status
 
 #### Features
 - TBD
+
+### 1.4.0
+
+#### Changes
+- Update Tagging APIs & methods
+- Enhanced methods for Aggregation, Reports, Surveys, Messages
+- Improved handling of logged out status
 
 ### 1.3.3
 

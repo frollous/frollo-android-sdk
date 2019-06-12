@@ -95,7 +95,7 @@ class OAuth(val config: FrolloSDKConfiguration) {
 
         return authRequestBuilder
                 .setScopes(scopes)
-                //.setPrompt("login") // Specifies whether the Authorization Server prompts the End-User for re-authentication
+                // .setPrompt("login") // Specifies whether the Authorization Server prompts the End-User for re-authentication
                 .setAdditionalParameters(customParameters)
                 .build()
     }

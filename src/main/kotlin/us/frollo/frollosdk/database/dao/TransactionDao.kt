@@ -22,6 +22,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
+import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionRelation
@@ -55,6 +56,9 @@ internal interface TransactionDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(model: Transaction): Long
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    fun update(model: Transaction)
 
     @Query("SELECT transaction_id FROM transaction_model WHERE account_id IN (:accountIds)")
     fun getIdsByAccountIds(accountIds: LongArray): LongArray

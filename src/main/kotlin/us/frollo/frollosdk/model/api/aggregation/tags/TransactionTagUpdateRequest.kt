@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.core
+package us.frollo.frollosdk.model.api.aggregation.tags
 
-import us.frollo.frollosdk.error.LoginFormError
+import com.google.gson.annotations.SerializedName
 
-/**
- * Frollo SDK Completion Handler with success state or error state if an issue occurs
- */
-typealias OnFrolloSDKCompletionListener<T> = (T) -> Unit
-
-/**
- * Frollo SDK Validation Completion Handler with valid result and optional error if validation fails
- */
-typealias FormValidationCompletionListener = (valid: Boolean, error: LoginFormError?) -> Unit
-
-/**
- * Pair of tag name (String) and apply to all similar transactions (Boolean)
- */
-typealias TagApplyAllPair = Pair<String, Boolean>
+internal data class TransactionTagUpdateRequest(
+    @SerializedName("name") val name: String,
+    @SerializedName("apply_to_all") val applyToAll: Boolean
+)

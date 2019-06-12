@@ -105,10 +105,10 @@ class Messages(network: NetworkService, private val db: SDKDatabase, private val
      * @param completion Completion handler with optional error if the request fails or the messages count if success
      */
     fun fetchMessagesCount(
-            messageTypes: List<String>? = null,
-            read: Boolean? = null,
-            contentType: ContentType? = null,
-            completion: OnFrolloSDKCompletionListener<Resource<Long>>
+        messageTypes: List<String>? = null,
+        read: Boolean? = null,
+        contentType: ContentType? = null,
+        completion: OnFrolloSDKCompletionListener<Resource<Long>>
     ) {
         doAsync {
             val count = db.messages().loadMessageCount(sqlForMessagesCount(messageTypes, read, contentType))

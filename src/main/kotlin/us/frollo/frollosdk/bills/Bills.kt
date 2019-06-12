@@ -91,10 +91,10 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @return LiveData object of Resource<List<Bill> which can be observed using an Observer for future changes as well.
      */
     fun fetchBills(
-            frequency: BillFrequency? = null,
-            paymentStatus: BillPaymentStatus? = null,
-            status: BillStatus? = null,
-            type: BillType? = null
+        frequency: BillFrequency? = null,
+        paymentStatus: BillPaymentStatus? = null,
+        status: BillStatus? = null,
+        type: BillType? = null
     ): LiveData<Resource<List<Bill>>> =
             Transformations.map(db.bills().loadByQuery(sqlForBills(frequency, paymentStatus, status, type))) { models ->
                 Resource.success(models)
@@ -137,10 +137,10 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @return LiveData object of Resource<List<BillRelation> which can be observed using an Observer for future changes as well.
      */
     fun fetchBillsWithRelation(
-            frequency: BillFrequency? = null,
-            paymentStatus: BillPaymentStatus? = null,
-            status: BillStatus? = null,
-            type: BillType? = null
+        frequency: BillFrequency? = null,
+        paymentStatus: BillPaymentStatus? = null,
+        status: BillStatus? = null,
+        type: BillType? = null
     ): LiveData<Resource<List<BillRelation>>> =
             Transformations.map(db.bills().loadByQueryWithRelation(sqlForBills(frequency, paymentStatus, status, type))) { models ->
                 Resource.success(models)
@@ -383,11 +383,11 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @return LiveData object of Resource<List<BillPayment>> which can be observed using an Observer for future changes as well.
      */
     fun fetchBillPayments(
-            billId: Long? = null,
-            fromDate: String? = null,
-            toDate: String? = null,
-            frequency: BillFrequency? = null,
-            paymentStatus: BillPaymentStatus? = null
+        billId: Long? = null,
+        fromDate: String? = null,
+        toDate: String? = null,
+        frequency: BillFrequency? = null,
+        paymentStatus: BillPaymentStatus? = null
     ): LiveData<Resource<List<BillPayment>>> =
             Transformations.map(db.billPayments().loadByQuery(sqlForBillPayments(billId, fromDate, toDate, frequency, paymentStatus))) { models ->
                 Resource.success(models)
@@ -431,11 +431,11 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @return LiveData object of Resource<List<BillPaymentRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchBillPaymentsWithRelation(
-            billId: Long? = null,
-            fromDate: String? = null,
-            toDate: String? = null,
-            frequency: BillFrequency? = null,
-            paymentStatus: BillPaymentStatus? = null
+        billId: Long? = null,
+        fromDate: String? = null,
+        toDate: String? = null,
+        frequency: BillFrequency? = null,
+        paymentStatus: BillPaymentStatus? = null
     ): LiveData<Resource<List<BillPaymentRelation>>> =
             Transformations.map(db.billPayments().loadByQueryWithRelation(sqlForBillPayments(billId, fromDate, toDate, frequency, paymentStatus))) { models ->
                 Resource.success(models)

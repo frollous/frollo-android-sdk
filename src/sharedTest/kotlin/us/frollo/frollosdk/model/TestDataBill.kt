@@ -29,12 +29,12 @@ import java.math.BigDecimal
 import kotlin.random.Random
 
 internal fun testBillResponseData(
-        billId: Long? = null,
-        merchantId: Long? = null,
-        transactionCategoryId: Long? = null,
-        accountId: Long? = null,
-        frequency: BillFrequency? = null,
-        paymentStatus: BillPaymentStatus? = null
+    billId: Long? = null,
+    merchantId: Long? = null,
+    transactionCategoryId: Long? = null,
+    accountId: Long? = null,
+    frequency: BillFrequency? = null,
+    paymentStatus: BillPaymentStatus? = null
 ): BillResponse {
 
     val category = BillResponse.Category(
@@ -65,11 +65,11 @@ internal fun testBillResponseData(
 }
 
 internal fun testBillPaymentResponseData(
-        billPaymentId: Long? = null,
-        billId: Long? = null,
-        date: String? = null,
-        frequency: BillFrequency? = null,
-        paymentStatus: BillPaymentStatus? = null
+    billPaymentId: Long? = null,
+    billId: Long? = null,
+    date: String? = null,
+    frequency: BillFrequency? = null,
+    paymentStatus: BillPaymentStatus? = null
 ): BillPaymentResponse {
     return BillPaymentResponse(
             billPaymentId = billPaymentId ?: randomNumber().toLong(),

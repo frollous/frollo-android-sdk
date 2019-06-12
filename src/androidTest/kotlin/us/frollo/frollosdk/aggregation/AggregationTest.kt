@@ -40,6 +40,7 @@ import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.DeviceInfo
+import us.frollo.frollosdk.core.TagApplyAllPair
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.network.NetworkService
@@ -2078,6 +2079,208 @@ class AggregationTest {
     }
 
     // Transaction Tags Tests
+
+    @Test
+    fun testFetchTagsForTransaction() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.transaction_update_tag)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}/12345/tags") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.fetchTagsForTransaction(transactionId = 12345) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            assertNotNull(resource.data)
+            assertEquals(4, resource.data?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${AggregationAPI.URL_TRANSACTIONS}/12345/tags", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTagsForTransactionFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.fetchTagsForTransaction(transactionId = 12345) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (resource.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testAddTagsToTransaction() {
+        initSetup()
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}/12345/tags") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val data = testTransactionResponseData(transactionId = 12345, userTags = listOf("tagone", "tagfive"))
+        database.transactions().insert(data.toTransaction())
+
+        val tagPairs = arrayOf(
+                TagApplyAllPair("tagone", true),
+                TagApplyAllPair("tagtwo", true),
+                TagApplyAllPair("tagthree", true),
+                TagApplyAllPair("tagfour", true))
+
+        aggregation.addTagsToTransaction(transactionId = 12345, tagApplyAllPairs = tagPairs) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchTransaction(transactionId = 12345).test()
+            testObserver.awaitValue()
+            val model = testObserver.value().data
+            assertNotNull(model)
+            assertEquals(5, model?.userTags?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${AggregationAPI.URL_TRANSACTIONS}/12345/tags", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testAddTagsToTransactionFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.addTagsToTransaction(transactionId = 12345, tagApplyAllPairs = arrayOf(TagApplyAllPair("tag1", true))) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testAddTagsToTransactionFailsIfEmptyTags() {
+        initSetup()
+
+        aggregation.addTagsToTransaction(transactionId = 12345, tagApplyAllPairs = arrayOf()) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.API, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.INVALID_DATA, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRemoveTagsFromTransaction() {
+        initSetup()
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}/12345/tags") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val data = testTransactionResponseData(transactionId = 12345, userTags = listOf("tagone", "tagtwo", "tagfive"))
+        database.transactions().insert(data.toTransaction())
+
+        val tagPairs = arrayOf(
+                TagApplyAllPair("tagone", true),
+                TagApplyAllPair("tagtwo", true),
+                TagApplyAllPair("tagthree", true),
+                TagApplyAllPair("tagfour", true))
+
+        aggregation.removeTagsFromTransaction(transactionId = 12345, tagApplyAllPairs = tagPairs) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchTransaction(transactionId = 12345).test()
+            testObserver.awaitValue()
+            val model = testObserver.value().data
+            assertNotNull(model)
+            assertEquals(1, model?.userTags?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${AggregationAPI.URL_TRANSACTIONS}/12345/tags", request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRemoveTagsFromTransactionFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        aggregation.removeTagsFromTransaction(transactionId = 12345, tagApplyAllPairs = arrayOf(TagApplyAllPair("tag1", true))) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRemoveTagsFromTransactionFailsIfEmptyTags() {
+        initSetup()
+
+        aggregation.removeTagsFromTransaction(transactionId = 12345, tagApplyAllPairs = arrayOf()) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.API, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.INVALID_DATA, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
 
     @Test
     fun testFetchTransactionUserTags() {

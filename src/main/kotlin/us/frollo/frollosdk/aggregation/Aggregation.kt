@@ -78,7 +78,6 @@ import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
 import us.frollo.frollosdk.model.coredata.aggregation.tags.SuggestedTagsSortType
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagUpdateRequest
-import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagUpdateResponse
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
@@ -1521,6 +1520,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
             return
         }
 
+        val tagNames = tagApplyAllPairs.map { it.first }.toTypedArray()
+
         val requestArray = tagApplyAllPairs.map { TransactionTagUpdateRequest(
                 name = it.first,
                 applyToAll = it.second
@@ -1533,7 +1534,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     completion.invoke(Result.error(resource.error))
                 }
                 Resource.Status.SUCCESS -> {
-                    handleUpdateTagsResponse(response = resource.data, isAdd = true, transactionId = transactionId, completion = completion)
+                    handleUpdateTagsResponse(tagNames = tagNames, isAdd = true, transactionId = transactionId, completion = completion)
                 }
             }
         }
@@ -1561,6 +1562,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
             return
         }
 
+        val tagNames = tagApplyAllPairs.map { it.first }.toTypedArray()
+
         val requestArray = tagApplyAllPairs.map { TransactionTagUpdateRequest(
                 name = it.first,
                 applyToAll = it.second
@@ -1573,35 +1576,31 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     completion.invoke(Result.error(resource.error))
                 }
                 Resource.Status.SUCCESS -> {
-                    handleUpdateTagsResponse(response = resource.data, isAdd = false, transactionId = transactionId, completion = completion)
+                    handleUpdateTagsResponse(tagNames = tagNames, isAdd = false, transactionId = transactionId, completion = completion)
                 }
             }
         }
     }
 
     private fun handleUpdateTagsResponse(
-        response: List<TransactionTagUpdateResponse>?,
+        tagNames: Array<String>,
         isAdd: Boolean = true,
         transactionId: Long,
         completion: OnFrolloSDKCompletionListener<Result>
     ) {
-        response?.let {
-            doAsync {
-                val apiTags = response.map { it.name }
-
-                val model = db.transactions().loadTransaction(transactionId)
-                model?.let {
-                    val tags = if (isAdd)
-                        it.userTags?.plus(apiTags)?.toSet()
-                    else
-                        it.userTags?.minus(apiTags)?.toSet()
-                    it.userTags = tags?.toList()
-                    db.transactions().update(it)
-                }
-
-                uiThread { completion.invoke(Result.success()) }
+        doAsync {
+            val model = db.transactions().loadTransaction(transactionId)
+            model?.let {
+                val tags = if (isAdd)
+                    it.userTags?.plus(tagNames)?.toSet()
+                else
+                    it.userTags?.minus(tagNames)?.toSet()
+                it.userTags = tags?.toList()
+                db.transactions().update(it)
             }
-        } ?: run { completion.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+
+            uiThread { completion.invoke(Result.success()) }
+        }
     }
 
     // Transaction User Tags

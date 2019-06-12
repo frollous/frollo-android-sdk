@@ -34,7 +34,6 @@ import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccoun
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagUpdateRequest
-import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagUpdateResponse
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
@@ -149,14 +148,14 @@ internal interface AggregationAPI {
     // Tags
 
     @GET(URL_TRANSACTION_TAGS)
-    fun fetchTags(@Path("transaction_id") transactionId: Long): Call<List<TransactionTagUpdateResponse>>
+    fun fetchTags(@Path("transaction_id") transactionId: Long): Call<List<TransactionTagResponse>>
 
     @POST(URL_TRANSACTION_TAGS)
-    fun createTags(@Path("transaction_id") transactionId: Long, @Body requestArray: Array<TransactionTagUpdateRequest>): Call<List<TransactionTagUpdateResponse>>
+    fun createTags(@Path("transaction_id") transactionId: Long, @Body requestArray: Array<TransactionTagUpdateRequest>): Call<List<Void>>
 
     // Workaround with HTTP instead of DELETE as DELETE does not support a body
     @HTTP(method = "DELETE", path = URL_TRANSACTION_TAGS, hasBody = true)
-    fun deleteTags(@Path("transaction_id") transactionId: Long, @Body requestArray: Array<TransactionTagUpdateRequest>): Call<List<TransactionTagUpdateResponse>>
+    fun deleteTags(@Path("transaction_id") transactionId: Long, @Body requestArray: Array<TransactionTagUpdateRequest>): Call<List<Void>>
 
     @GET(URL_USER_TAGS)
     fun fetchUserTags(@QueryMap queryParams: Map<String, String>): Call<List<TransactionTagResponse>>

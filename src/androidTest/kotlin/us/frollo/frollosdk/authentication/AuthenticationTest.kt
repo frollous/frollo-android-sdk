@@ -24,7 +24,6 @@ import com.google.gson.Gson
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jraska.livedata.test
 import net.openid.appauth.AuthorizationException
-import okhttp3.Request
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -52,23 +51,18 @@ import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.error.OAuth2Error
 import us.frollo.frollosdk.error.OAuth2ErrorType
 import us.frollo.frollosdk.network.NetworkService
-import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.network.api.UserAPI
 import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.mapping.toUser
-import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import us.frollo.frollosdk.model.api.user.UserResponse
-import us.frollo.frollosdk.model.coredata.user.Attribution
-import us.frollo.frollosdk.model.testUserResponseData
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.randomString
-import us.frollo.frollosdk.testutils.randomUUID
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
-import java.util.Date
+import us.frollo.frollosdk.user.UserManagement
 
 class AuthenticationTest {
 
@@ -82,6 +76,7 @@ class AuthenticationTest {
     private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
 
     private lateinit var authentication: Authentication
+    private lateinit var userManagement: UserManagement
 
     private lateinit var mockServer: MockWebServer
     private lateinit var mockTokenServer: MockWebServer
@@ -114,8 +109,8 @@ class AuthenticationTest {
         val oAuth = OAuth(config = config)
         val network = NetworkService(oAuth = oAuth, keystore = keystore, pref = preferences)
 
-        authentication = Authentication(oAuth, DeviceInfo(app), network, database, preferences)
-        authentication.authenticationCallback = FrolloSDK
+        authentication = Authentication(oAuth, network, preferences, FrolloSDK)
+        userManagement = UserManagement(DeviceInfo(app), network, database, preferences, authentication)
 
         AndroidThreeTen.init(app)
     }
@@ -123,25 +118,10 @@ class AuthenticationTest {
     private fun tearDown() {
         mockServer.shutdown()
         mockTokenServer.shutdown()
+        userManagement.reset()
         authentication.reset()
         preferences.resetAll()
         database.clearAllTables()
-    }
-
-    @Test
-    fun testFetchUser() {
-        initSetup()
-
-        database.users().insert(testUserResponseData(userId = 12345).toUser())
-
-        val testObserver2 = authentication.fetchUser().test()
-        testObserver2.awaitValue()
-        assertNotNull(testObserver2.value().data)
-        assertEquals(12345L, testObserver2.value().data?.userId)
-
-        wait(3)
-
-        tearDown()
     }
 
     @Test
@@ -188,7 +168,7 @@ class AuthenticationTest {
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            val testObserver = authentication.fetchUser().test()
+            val testObserver = userManagement.fetchUser().test()
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
 
@@ -231,7 +211,7 @@ class AuthenticationTest {
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
-            val testObserver = authentication.fetchUser().test()
+            val testObserver = userManagement.fetchUser().test()
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
@@ -245,59 +225,6 @@ class AuthenticationTest {
 
         val request = mockTokenServer.takeRequest()
         assertEquals(TOKEN_URL, request.trimmedPath)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testInvalidLoginUserSecondaryFailure() {
-        initSetup()
-
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.error_invalid_access_token))
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        mockTokenServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == TOKEN_URL) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        authentication.loginUser("user@frollo.us", "password", scopes) { result ->
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-
-            val testObserver = authentication.fetchUser().test()
-            testObserver.awaitValue()
-            assertNull(testObserver.value().data)
-
-            assertEquals(APIErrorType.INVALID_ACCESS_TOKEN, (result.error as APIError).type)
-            assertFalse(authentication.loggedIn)
-
-            assertNull(preferences.encryptedAccessToken)
-            assertNull(preferences.encryptedRefreshToken)
-            assertEquals(-1L, preferences.accessTokenExpiry)
-        }
-
-        val request1 = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_USER_DETAILS, request1.trimmedPath)
-
-        val request2 = mockTokenServer.takeRequest()
-        assertEquals(TOKEN_URL, request2.trimmedPath)
 
         wait(3)
 
@@ -395,7 +322,7 @@ class AuthenticationTest {
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            val testObserver = authentication.fetchUser().test()
+            val testObserver = userManagement.fetchUser().test()
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
 
@@ -429,7 +356,7 @@ class AuthenticationTest {
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
-            val testObserver = authentication.fetchUser().test()
+            val testObserver = userManagement.fetchUser().test()
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
@@ -440,552 +367,6 @@ class AuthenticationTest {
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1L, preferences.accessTokenExpiry)
         }
-
-        tearDown()
-    }
-
-    @Test
-    fun testMigrateUser() {
-        initSetup()
-
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_MIGRATE_USER) {
-                    return MockResponse()
-                            .setResponseCode(204)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        authentication.migrateUser(password = randomUUID()) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            assertFalse(preferences.loggedIn)
-            assertNull(preferences.encryptedAccessToken)
-            assertNull(preferences.encryptedRefreshToken)
-            assertEquals(-1, preferences.accessTokenExpiry)
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_MIGRATE_USER, request.trimmedPath)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testMigrateUserFailsMigrationError() {
-        initSetup()
-
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        val expiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-        preferences.accessTokenExpiry = expiry
-
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_MIGRATE_USER) {
-                    return MockResponse()
-                            .setResponseCode(400)
-                            .setBody(readStringFromJson(app, R.raw.error_migration))
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        authentication.migrateUser(password = randomUUID()) { result ->
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-
-            assertEquals(APIErrorType.MIGRATION_FAILED, (result.error as APIError).type)
-            assertEquals(APIErrorCode.MIGRATION_FAILED, (result.error as APIError).errorCode)
-
-            assertTrue(preferences.loggedIn)
-            assertEquals("ExistingAccessToken", keystore.decrypt(preferences.encryptedAccessToken))
-            assertEquals("ExistingRefreshToken", keystore.decrypt(preferences.encryptedRefreshToken))
-            assertEquals(expiry, preferences.accessTokenExpiry)
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_MIGRATE_USER, request.trimmedPath)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testMigrateUserFailsIfLoggedOut() {
-        initSetup()
-
-        preferences.loggedIn = false
-
-        authentication.migrateUser(password = randomUUID()) { result ->
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
-        }
-
-        assertEquals(0, mockServer.requestCount)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testMigrateUserFailsMissingRefreshToken() {
-        initSetup()
-
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        val expiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-        preferences.accessTokenExpiry = expiry
-
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_MIGRATE_USER) {
-                    return MockResponse()
-                            .setResponseCode(204)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        authentication.migrateUser(password = randomUUID()) { result ->
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-
-            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.MISSING_REFRESH_TOKEN, (result.error as DataError).subType)
-        }
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testMigrateUserFailsIfTooShort() {
-        initSetup()
-
-        preferences.loggedIn = true
-
-        authentication.migrateUser(password = "1234") { result ->
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-
-            assertEquals(DataErrorType.API, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.PASSWORD_TOO_SHORT, (result.error as DataError).subType)
-        }
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testRegisterUser() {
-        initSetup()
-
-        val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_REGISTER) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        mockTokenServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == TOKEN_URL) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        authentication.registerUser(
-                firstName = "Frollo",
-                lastName = "User",
-                mobileNumber = "0412345678",
-                postcode = "2060",
-                dateOfBirth = Date(),
-                email = "user@frollo.us",
-                password = "password",
-                scopes = scopes) { result ->
-
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            val testObserver = authentication.fetchUser().test()
-            testObserver.awaitValue()
-            assertNotNull(testObserver.value().data)
-
-            val expectedResponse = Gson().fromJson<UserResponse>(body)
-            assertEquals(expectedResponse.toUser(), testObserver.value().data)
-            assertTrue(authentication.loggedIn)
-
-            assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
-            assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
-            assertEquals(2550794799, preferences.accessTokenExpiry)
-        }
-
-        val request1 = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_REGISTER, request1.trimmedPath)
-
-        val request2 = mockTokenServer.takeRequest()
-        assertEquals(TOKEN_URL, request2.trimmedPath)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testRegisterUserInvalid() {
-        initSetup()
-
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_REGISTER) {
-                    return MockResponse()
-                            .setResponseCode(409)
-                            .setBody(readStringFromJson(app, R.raw.error_duplicate))
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        mockTokenServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == TOKEN_URL) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        authentication.registerUser(
-                firstName = "Frollo",
-                lastName = "User",
-                mobileNumber = "0412345678",
-                postcode = "2060",
-                dateOfBirth = Date(),
-                email = "user@frollo.us",
-                password = "password",
-                scopes = scopes) { result ->
-
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-
-            val testObserver = authentication.fetchUser().test()
-            testObserver.awaitValue()
-            assertNull(testObserver.value().data)
-
-            assertEquals(APIErrorType.ALREADY_EXISTS, (result.error as APIError).type)
-            assertFalse(authentication.loggedIn)
-
-            assertNull(preferences.encryptedAccessToken)
-            assertNull(preferences.encryptedRefreshToken)
-            assertEquals(-1L, preferences.accessTokenExpiry)
-        }
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testRegisterUserInvalidSecondaryFailure() {
-        initSetup()
-
-        val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_REGISTER) {
-                    return MockResponse()
-                            .setResponseCode(201)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        mockTokenServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == TOKEN_URL) {
-                    return MockResponse()
-                            .setResponseCode(401)
-                            .setBody(readStringFromJson(app, R.raw.error_oauth2_invalid_client))
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        authentication.registerUser(
-                firstName = "Frollo",
-                lastName = "User",
-                mobileNumber = "0412345678",
-                postcode = "2060",
-                dateOfBirth = Date(),
-                email = "user@frollo.us",
-                password = "password",
-                scopes = scopes) { result ->
-
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-
-            val testObserver = authentication.fetchUser().test()
-            testObserver.awaitValue()
-            assertNull(testObserver.value().data)
-
-            assertEquals(OAuth2ErrorType.INVALID_CLIENT, (result.error as OAuth2Error).type)
-            assertFalse(authentication.loggedIn)
-
-            assertNull(preferences.encryptedAccessToken)
-            assertNull(preferences.encryptedRefreshToken)
-            assertEquals(-1L, preferences.accessTokenExpiry)
-        }
-
-        val request1 = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_REGISTER, request1.trimmedPath)
-
-        val request2 = mockTokenServer.takeRequest()
-        assertEquals(TOKEN_URL, request2.trimmedPath)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testRegisterUserFailsIfLoggedIn() {
-        initSetup()
-
-        val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_REGISTER) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        mockTokenServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == TOKEN_URL) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        preferences.loggedIn = true
-
-        authentication.registerUser(
-                firstName = "Frollo",
-                lastName = "User",
-                mobileNumber = "0412345678",
-                postcode = "2060",
-                dateOfBirth = Date(),
-                email = "user@frollo.us",
-                password = "password",
-                scopes = scopes) { result ->
-
-            assertTrue(authentication.loggedIn)
-
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-
-            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.ALREADY_LOGGED_IN, (result.error as DataError).subType)
-        }
-
-        assertEquals(0, mockServer.requestCount)
-        assertEquals(0, mockTokenServer.requestCount)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testRefreshUser() {
-        initSetup()
-
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        authentication.refreshUser { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            val testObserver = authentication.fetchUser().test()
-            testObserver.awaitValue()
-            assertNotNull(testObserver.value().data)
-
-            val expectedResponse = Gson().fromJson<UserResponse>(body)
-            assertEquals(expectedResponse.toUser(), testObserver.value().data)
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_USER_DETAILS, request.trimmedPath)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testUpdateUser() {
-        initSetup()
-
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        authentication.updateUser(testUserResponseData().toUser()) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            val testObserver = authentication.fetchUser().test()
-            testObserver.awaitValue()
-            assertNotNull(testObserver.value().data)
-
-            val expectedResponse = Gson().fromJson<UserResponse>(body)
-            assertEquals(expectedResponse.toUser(), testObserver.value().data)
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_USER_DETAILS, request.trimmedPath)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testUpdateUserFailsIfLoggedOut() {
-        initSetup()
-
-        preferences.loggedIn = false
-
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.user_details_complete))
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        authentication.updateUser(testUserResponseData().toUser()) { result ->
-            assertFalse(authentication.loggedIn)
-
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-
-            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
-        }
-
-        assertEquals(0, mockServer.requestCount)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testUpdateAttribution() {
-        initSetup()
-
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        val body = readStringFromJson(app, R.raw.user_details_complete)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        authentication.updateAttribution(Attribution(campaign = randomString(8))) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            val testObserver = authentication.fetchUser().test()
-            testObserver.awaitValue()
-            assertNotNull(testObserver.value().data)
-
-            val expectedResponse = Gson().fromJson<UserResponse>(body)
-            assertEquals(expectedResponse.toUser(), testObserver.value().data)
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_USER_DETAILS, request.trimmedPath)
-
-        wait(3)
 
         tearDown()
     }
@@ -1045,7 +426,7 @@ class AuthenticationTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        authentication.refreshUser { result ->
+        userManagement.refreshUser { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
@@ -1057,171 +438,6 @@ class AuthenticationTest {
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1, preferences.accessTokenExpiry)
         }
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testChangePassword() {
-        initSetup()
-
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_CHANGE_PASSWORD) {
-                    return MockResponse()
-                            .setResponseCode(204)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        authentication.changePassword(currentPassword = randomUUID(), newPassword = randomUUID()) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_CHANGE_PASSWORD, request.trimmedPath)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testChangePasswordFailsIfTooShort() {
-        initSetup()
-
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_CHANGE_PASSWORD) {
-                    return MockResponse()
-                            .setResponseCode(204)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        authentication.changePassword(currentPassword = randomUUID(), newPassword = "1234") { result ->
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-
-            assertEquals(DataErrorType.API, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.PASSWORD_TOO_SHORT, (result.error as DataError).subType)
-        }
-
-        assertEquals(0, mockServer.requestCount)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testDeleteUser() {
-        initSetup()
-
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_DELETE_USER) {
-                    return MockResponse()
-                            .setResponseCode(204)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        authentication.deleteUser { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            assertFalse(authentication.loggedIn)
-            assertNull(preferences.encryptedAccessToken)
-            assertNull(preferences.encryptedRefreshToken)
-            assertEquals(-1, preferences.accessTokenExpiry)
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_DELETE_USER, request.trimmedPath)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testDeleteUserFailsIfLoggedOut() {
-        initSetup()
-
-        preferences.loggedIn = false
-
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_DELETE_USER) {
-                    return MockResponse()
-                            .setResponseCode(204)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        authentication.deleteUser { result ->
-            assertFalse(authentication.loggedIn)
-
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-
-            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
-        }
-
-        assertEquals(0, mockServer.requestCount)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testResetPassword() {
-        initSetup()
-
-        preferences.loggedIn = true
-
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == UserAPI.URL_PASSWORD_RESET) {
-                    return MockResponse()
-                            .setResponseCode(202)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        authentication.resetPassword(email = "user@frollo.us") { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(UserAPI.URL_PASSWORD_RESET, request.trimmedPath)
 
         wait(3)
 
@@ -1248,7 +464,7 @@ class AuthenticationTest {
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        authentication.refreshUser { result ->
+        userManagement.refreshUser { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
@@ -1261,70 +477,6 @@ class AuthenticationTest {
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1, preferences.accessTokenExpiry)
         }
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testUpdateDevice() {
-        initSetup()
-
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == DeviceAPI.URL_DEVICE) {
-                    return MockResponse()
-                            .setResponseCode(204)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        authentication.updateDevice(notificationToken = "SomeToken12345") { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(DeviceAPI.URL_DEVICE, request.trimmedPath)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testUpdateDeviceCompliance() {
-        initSetup()
-
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == DeviceAPI.URL_DEVICE) {
-                    return MockResponse()
-                            .setResponseCode(204)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        authentication.updateDeviceCompliance(true) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(DeviceAPI.URL_DEVICE, request.trimmedPath)
 
         wait(3)
 
@@ -1362,7 +514,7 @@ class AuthenticationTest {
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            val testObserver = authentication.fetchUser().test()
+            val testObserver = userManagement.fetchUser().test()
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
 
@@ -1405,7 +557,7 @@ class AuthenticationTest {
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
-            val testObserver = authentication.fetchUser().test()
+            val testObserver = userManagement.fetchUser().test()
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
@@ -1455,7 +607,7 @@ class AuthenticationTest {
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
-            val testObserver = authentication.fetchUser().test()
+            val testObserver = userManagement.fetchUser().test()
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
@@ -1515,7 +667,7 @@ class AuthenticationTest {
             assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
             assertEquals(2550794799, preferences.accessTokenExpiry)
 
-            val testObserver = authentication.fetchUser().test()
+            val testObserver = userManagement.fetchUser().test()
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
 
@@ -1567,7 +719,7 @@ class AuthenticationTest {
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
-            val testObserver = authentication.fetchUser().test()
+            val testObserver = userManagement.fetchUser().test()
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
 
@@ -1586,24 +738,6 @@ class AuthenticationTest {
         assertEquals(TOKEN_URL, request2.trimmedPath)
 
         wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testAuthenticatingRequestManually() {
-        initSetup()
-
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        val request = authentication.authenticateRequest(Request.Builder()
-                .url("http://api.example.com/")
-                .build())
-        assertNotNull(request)
-        assertEquals("http://api.example.com/", request.url().toString())
-        assertEquals("Bearer ExistingAccessToken", request.header("Authorization"))
 
         tearDown()
     }

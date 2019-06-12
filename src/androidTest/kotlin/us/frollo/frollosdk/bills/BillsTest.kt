@@ -104,7 +104,7 @@ class BillsTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        val authentication = Authentication(oAuth, DeviceInfo(app), network, database, preferences)
+        val authentication = Authentication(oAuth, network, preferences, FrolloSDK)
         aggregation = Aggregation(network, database, LocalBroadcastManager.getInstance(app), authentication)
         bills = Bills(network, database, aggregation, authentication)
     }

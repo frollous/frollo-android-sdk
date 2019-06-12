@@ -313,7 +313,7 @@ class Authentication(internal val oAuth: OAuth, private val network: NetworkServ
      * Logout the currently authenticated user. Resets all caches, preferences and databases.
      * This resets the token storage.
      */
-    internal fun logoutUser(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun logoutUser(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (!loggedIn) {
             Log.i("$TAG#logoutUser", "Cannot logout. User is not logged in.")
             return
@@ -345,6 +345,11 @@ class Authentication(internal val oAuth: OAuth, private val network: NetworkServ
     }
 
     internal fun reset(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        if (!loggedIn) {
+            Log.d("$TAG#reset", "Reset did nothing as user not logged in")
+            return
+        }
+
         loggedIn = false
         authenticationCallback?.authenticationReset(completion)
     }

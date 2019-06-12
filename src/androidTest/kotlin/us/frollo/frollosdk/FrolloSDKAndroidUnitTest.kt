@@ -107,6 +107,7 @@ class FrolloSDKAndroidUnitTest {
             assertNotNull(FrolloSDK.surveys)
             assertNotNull(FrolloSDK.reports)
             assertNotNull(FrolloSDK.bills)
+            assertNotNull(FrolloSDK.user)
         }
     }
 
@@ -199,6 +200,17 @@ class FrolloSDKAndroidUnitTest {
     }
 
     @Test
+    fun testSDKUserThrowsErrorBeforeSetup() {
+        assertFalse(FrolloSDK.isSetup)
+
+        try {
+            FrolloSDK.user
+        } catch (e: IllegalAccessException) {
+            assertEquals("SDK not setup", e.localizedMessage)
+        }
+    }
+
+    @Test
     fun testPauseScheduledRefresh() {
         FrolloSDK.setup(app, testSDKConfig()) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
@@ -267,39 +279,6 @@ class FrolloSDKAndroidUnitTest {
         wait(8)
 
         tearDown()*/
-    }
-
-    @Test
-    fun testLogout() {
-        initSetup()
-
-        database.users().insert(testUserResponseData().toUser())
-
-        val testObserver = database.users().load().test()
-        testObserver.awaitValue()
-        assertNotNull(testObserver.value())
-
-        FrolloSDK.setup(app, testSDKConfig()) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            FrolloSDK.logout()
-
-            wait(3)
-
-            assertFalse(preferences.loggedIn)
-            assertNull(preferences.encryptedAccessToken)
-            assertNull(preferences.encryptedRefreshToken)
-            assertEquals(-1, preferences.accessTokenExpiry)
-
-            val testObserver2 = database.users().load().test()
-            testObserver2.awaitValue()
-            assertNull(testObserver2.value())
-        }
-
-        wait(3)
-
-        tearDown()
     }
 
     @Test

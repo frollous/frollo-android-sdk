@@ -113,7 +113,6 @@ class UserManagement(private val di: DeviceInfo, private val network: NetworkSer
      * @param dateOfBirth Date of birth of the user, if provided (optional)
      * @param email Email address of the user
      * @param password Password for the user
-     * @param scopes OpenID Connect OAuth2 scopes to be sent. See [OAuth2Scope].
      * @param completion Completion handler with any error that occurred
      */
     fun registerUser(
@@ -124,7 +123,6 @@ class UserManagement(private val di: DeviceInfo, private val network: NetworkSer
             dateOfBirth: Date? = null,
             email: String,
             password: String,
-            scopes: List<String>,
             completion: OnFrolloSDKCompletionListener<Result>
     ) {
         if (authentication.loggedIn) {
@@ -402,6 +400,11 @@ class UserManagement(private val di: DeviceInfo, private val network: NetworkSer
     }
 
     internal fun reset() {
+        if (!authentication.loggedIn) {
+            Log.d("$TAG#reset", "Reset did nothing as user not logged in")
+            return
+        }
+
         network.reset()
     }
 }

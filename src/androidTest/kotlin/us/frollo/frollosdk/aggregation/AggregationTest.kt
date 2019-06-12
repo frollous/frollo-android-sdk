@@ -39,7 +39,6 @@ import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.OAuth
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
-import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.TagApplyAllPair
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
@@ -109,7 +108,7 @@ class AggregationTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        val authentication = Authentication(oAuth, DeviceInfo(app), network, database, preferences)
+        val authentication = Authentication(oAuth, network, preferences, FrolloSDK)
         aggregation = Aggregation(network, database, LocalBroadcastManager.getInstance(app), authentication)
     }
 

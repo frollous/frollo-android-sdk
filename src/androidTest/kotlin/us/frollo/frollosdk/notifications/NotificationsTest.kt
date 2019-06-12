@@ -49,6 +49,7 @@ import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
+import us.frollo.frollosdk.user.UserManagement
 
 class NotificationsTest {
 
@@ -85,11 +86,12 @@ class NotificationsTest {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        authentication = Authentication(oAuth, DeviceInfo(app), network, database, preferences)
+        authentication = Authentication(oAuth, network, preferences, FrolloSDK)
+        val userManagement = UserManagement(DeviceInfo(app), network, database, preferences, authentication)
         messages = Messages(network, database, authentication)
         events = Events(network, authentication)
 
-        notifications = Notifications(authentication, events, messages)
+        notifications = Notifications(userManagement, events, messages)
     }
 
     private fun tearDown() {

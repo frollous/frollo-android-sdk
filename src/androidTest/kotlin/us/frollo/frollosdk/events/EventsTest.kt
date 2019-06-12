@@ -88,7 +88,7 @@ class EventsTest {
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
         val database = SDKDatabase.getInstance(app)
-        val authentication = Authentication(oAuth, DeviceInfo(app), network, database, preferences)
+        val authentication = Authentication(oAuth, network, preferences, FrolloSDK)
         events = Events(network, authentication)
     }
 

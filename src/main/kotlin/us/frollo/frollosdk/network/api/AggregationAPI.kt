@@ -151,11 +151,11 @@ internal interface AggregationAPI {
     fun fetchTags(@Path("transaction_id") transactionId: Long): Call<List<TransactionTagResponse>>
 
     @POST(URL_TRANSACTION_TAGS)
-    fun createTags(@Path("transaction_id") transactionId: Long, @Body requestArray: Array<TransactionTagUpdateRequest>): Call<List<Void>>
+    fun createTags(@Path("transaction_id") transactionId: Long, @Body requestArray: Array<TransactionTagUpdateRequest>): Call<Void>
 
     // Workaround with HTTP instead of DELETE as DELETE does not support a body
     @HTTP(method = "DELETE", path = URL_TRANSACTION_TAGS, hasBody = true)
-    fun deleteTags(@Path("transaction_id") transactionId: Long, @Body requestArray: Array<TransactionTagUpdateRequest>): Call<List<Void>>
+    fun deleteTags(@Path("transaction_id") transactionId: Long, @Body requestArray: Array<TransactionTagUpdateRequest>): Call<Void>
 
     @GET(URL_USER_TAGS)
     fun fetchUserTags(@QueryMap queryParams: Map<String, String>): Call<List<TransactionTagResponse>>

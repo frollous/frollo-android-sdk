@@ -25,25 +25,20 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import us.frollo.frollosdk.base.LiveDataCallAdapterFactory
 import us.frollo.frollosdk.keystore.Keystore
-import us.frollo.frollosdk.logging.Log
 import okhttp3.CertificatePinner
 import us.frollo.frollosdk.BuildConfig
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.AuthToken
-import us.frollo.frollosdk.authentication.OAuth
-import us.frollo.frollosdk.base.Result
-import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
-import us.frollo.frollosdk.error.OAuth2Error
-import us.frollo.frollosdk.extensions.handleOAuth2Failure
-import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
-import us.frollo.frollosdk.network.api.TokenAPI
+import us.frollo.frollosdk.authentication.Authentication
+import us.frollo.frollosdk.authentication.AuthenticationCallback
+import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.preferences.Preferences
 
 class NetworkService internal constructor(
-    internal val oAuth: OAuth,
-    keystore: Keystore,
-    pref: Preferences
-) : IApiProvider {
+        internal val oAuth2Helper: OAuth2Helper,
+        keystore: Keystore,
+        pref: Preferences
+) : IApiProvider, AuthenticationCallback {
 
     companion object {
         private const val TAG = "NetworkService"
@@ -54,14 +49,14 @@ class NetworkService internal constructor(
     private val helper = NetworkHelper(authToken)
     private val serverInterceptor = NetworkInterceptor(this, helper)
     private val tokenInterceptor = TokenInterceptor(helper)
-    private var apiRetrofit = createRetrofit(oAuth.config.serverUrl)
-    private var authRetrofit = createRetrofit(oAuth.config.tokenUrl)
+    private var apiRetrofit = createRetrofit(oAuth2Helper.config.serverUrl)
+    private var authRetrofit = createRetrofit(oAuth2Helper.oAuth2.tokenUrl)
     private var revokeTokenRetrofit: Retrofit? = null
-
+    internal var authentication: Authentication? = null
     internal var invalidTokenRetries: Int = 0
 
     init {
-        oAuth.config.revokeTokenURL?.let { revokeTokenUrl ->
+        oAuth2Helper.oAuth2.revokeTokenURL?.let { revokeTokenUrl ->
             revokeTokenRetrofit = createRetrofit(revokeTokenUrl)
         }
     }
@@ -74,15 +69,15 @@ class NetworkService internal constructor(
 
         val httpClientBuilder = OkHttpClient.Builder()
                 .addInterceptor(
-                        if (baseUrl == oAuth.config.tokenUrl || baseUrl == oAuth.config.revokeTokenURL)
+                        if (baseUrl == oAuth2Helper.oAuth2.tokenUrl || baseUrl == oAuth2Helper.oAuth2.revokeTokenURL)
                             tokenInterceptor
                         else
                             serverInterceptor)
                 .authenticator(
-                        if (baseUrl == oAuth.config.tokenUrl || baseUrl == oAuth.config.revokeTokenURL)
+                        if (baseUrl == oAuth2Helper.oAuth2.tokenUrl || baseUrl == oAuth2Helper.oAuth2.revokeTokenURL)
                             TokenAuthenticator(this)
                         else
-                            NetworkAuthenticator(this))
+                            NetworkAuthenticator(this, helper))
 
         if (!BuildConfig.DEBUG && Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             val certPinner = CertificatePinner.Builder()
@@ -106,45 +101,20 @@ class NetworkService internal constructor(
     override fun <T> createAuth(service: Class<T>): T = authRetrofit.create(service)
     override fun <T> createRevoke(service: Class<T>): T? = revokeTokenRetrofit?.create(service)
 
-    /**
-     * Refreshes the authentication token
-     * @return The new authentication token to be used
-     */
-    internal fun refreshTokens(completion: OnFrolloSDKCompletionListener<Result>? = null): String? {
-        val request = oAuth.getRefreshTokensRequest(authToken.getRefreshToken())
-        val tokenEndpoint = createAuth(TokenAPI::class.java)
-
-        val response = tokenEndpoint.refreshTokens(request).execute()
-        val apiResponse = ApiResponse(response)
-
-        if (apiResponse.isSuccessful) {
-            apiResponse.body?.let { handleTokens(it) }
-
-            completion?.invoke(Result.success())
-
-            return apiResponse.body?.accessToken
-        } else {
-            val error = OAuth2Error(response = apiResponse.errorMessage)
-
-            Log.e("$TAG#refreshTokens", error.localizedMessage)
-
-            handleOAuth2Failure(error)
-
-            completion?.invoke(Result.error(error))
-
-            return null
-        }
-    }
-
     internal fun hasTokens(): Boolean =
             authToken.getAccessToken() != null && authToken.getRefreshToken() != null
 
-    internal fun handleTokens(tokenResponse: OAuthTokenResponse) {
-        authToken.saveTokens(tokenResponse)
+    override fun saveAccessTokens(accessToken: String, expiry: Long) {
+        authToken.saveAccessToken(accessToken)
+        authToken.saveTokenExpiry(expiry)
     }
 
     internal fun authenticateRequest(request: Request): Request {
         return serverInterceptor.authenticateRequest(request)
+    }
+
+    override fun authenticationReset() {
+        reset()
     }
 
     internal fun reset() {

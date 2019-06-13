@@ -16,61 +16,44 @@
 
 package us.frollo.frollosdk.core
 
-import android.net.Uri
+import us.frollo.frollosdk.authentication.AuthenticationType
+import us.frollo.frollosdk.authentication.AuthenticationType.Custom
+import us.frollo.frollosdk.authentication.AuthenticationType.OAuth2
 import us.frollo.frollosdk.logging.LogLevel
 
 /**
- * Configuration of the SDK and additional optional preferences.
+ * Generate SDK configuration.
  *
- * Generates a valid OAuth2 SDK configuration for setting up the SDK. This configuration uses manually specified URLs the authorization and token endpoints the SDK should use.
+ * Generates a valid SDK configuration for setting up the SDK. This configuration specifies the authentication method and required parameters to be used.
  * Optional preferences can be set before running FrolloSDK.setup()
+ *
+ * @param authenticationType Type of authentication to be used. Valid options are [Custom] and [OAuth2]
+ * @param serverUrl Base URL of the Frollo API this SDK should point to
+ * @param logLevel Level of logging for debug and error messages. Default is [LogLevel.ERROR]
  */
 data class FrolloSDKConfiguration(
-    /**
-     * OAuth2 Client identifier. The unique identifier of the application implementing the SDK
-     */
-    val clientId: String,
-    /**
-     * OAuth2 Redirection URL. URL to redirect to after the authorization flow is complete. This should be a deep or universal link to the host app
-     */
-    val redirectUrl: String,
-    /**
-     * URL of the OAuth2 authorization endpoint for web based login
-     */
-    val authorizationUrl: String,
-    /**
-     * URL of the OAuth2 token endpoint for getting tokens and native login
-     */
-    val tokenUrl: String,
-    /**
-     * Base URL of the Frollo API this SDK should point to
-     */
+    val authenticationType: AuthenticationType,
     val serverUrl: String,
-    /**
-     * OAuth2 token endpoint to revoke refresh token on logout (if supported)
-     */
-    val revokeTokenURL: String? = null,
-    /**
-     * Level of logging for debug and error messages. Default is [LogLevel.ERROR]
-     */
     val logLevel: LogLevel = LogLevel.ERROR
 ) {
 
-    internal fun validForROPC() = clientId.isNotBlank() && tokenUrl.isNotBlank() && serverUrl.isNotBlank()
+    internal fun validForROPC() : Boolean {
+        if (authenticationType is OAuth2) {
+            return authenticationType.clientId.isNotBlank()
+                    && authenticationType.tokenUrl.isNotBlank()
+                    && serverUrl.isNotBlank()
+        }
+        return false
+    }
 
-    internal fun validForAuthorizationCodeFlow() = clientId.isNotBlank() && tokenUrl.isNotBlank() &&
-            redirectUrl.isNotBlank() && authorizationUrl.isNotBlank() && serverUrl.isNotBlank()
-
-    /**
-     * OAuth2 Redirection URL. URL to redirect to after the authorization flow is complete. This should be a deep or universal link to the host app
-     */
-    val redirectUri: Uri = Uri.parse(redirectUrl)
-    /**
-     * URL of the OAuth2 authorization endpoint for web based login
-     */
-    val authorizationUri: Uri = Uri.parse(authorizationUrl)
-    /**
-     * URL of the OAuth2 token endpoint for getting tokens and native login
-     */
-    val tokenUri: Uri = Uri.parse(tokenUrl)
+    internal fun validForAuthorizationCodeFlow() : Boolean {
+        if (authenticationType is OAuth2) {
+            return authenticationType.clientId.isNotBlank()
+                    && authenticationType.tokenUrl.isNotBlank()
+                    && authenticationType.redirectUrl.isNotBlank()
+                    && authenticationType.authorizationUrl.isNotBlank()
+                    && serverUrl.isNotBlank()
+        }
+        return false
+    }
 }

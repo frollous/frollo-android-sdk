@@ -36,7 +36,7 @@ import org.junit.Assert.assertNotEquals
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.authentication.OAuth
+import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.error.OAuth2Error
@@ -73,8 +73,8 @@ class NetworkServiceTest {
         keystore = Keystore()
         keystore.setup()
         preferences = Preferences(app)
-        val oAuth = OAuth(config = config)
-        network = NetworkService(oAuth = oAuth, keystore = keystore, pref = preferences)
+        val oAuth = OAuth2Helper(config = config)
+        network = NetworkService(oAuth2Helper = oAuth, keystore = keystore, pref = preferences)
     }
 
     @After

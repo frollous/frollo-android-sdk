@@ -27,9 +27,11 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.temporal.TemporalAdjusters
 import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.authentication.Authentication
-import us.frollo.frollosdk.authentication.AuthenticationCallback
 import us.frollo.frollosdk.authentication.AuthenticationStatus
-import us.frollo.frollosdk.authentication.OAuth
+import us.frollo.frollosdk.authentication.AuthenticationType.Custom
+import us.frollo.frollosdk.authentication.AuthenticationType.OAuth2
+import us.frollo.frollosdk.authentication.OAuth2Helper
+import us.frollo.frollosdk.authentication.OAuth2Authentication
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.bills.Bills
 import us.frollo.frollosdk.core.ACTION.ACTION_AUTHENTICATION_CHANGED
@@ -48,6 +50,7 @@ import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
+import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.notifications.Notifications
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.reports.Reports
@@ -61,7 +64,7 @@ import java.util.TimerTask
 /**
  * Frollo SDK manager and main instantiation. Responsible for managing the lifecycle and coordination of the SDK
  */
-object FrolloSDK : AuthenticationCallback {
+object FrolloSDK {
 
     private const val TAG = "FrolloSDK"
     private const val CACHE_EXPIRY = 120000L // 2 minutes
@@ -77,6 +80,12 @@ object FrolloSDK : AuthenticationCallback {
      */
     val authentication: Authentication
         get() = _authentication ?: throw IllegalAccessException("SDK not setup")
+
+    /**
+     * Default OAuth2 Authentication - Returns the default OAuth2 based authentication if no custom one has been applied
+     */
+    val defaultAuthentication: OAuth2Authentication?
+        get() = _authentication as? OAuth2Authentication
 
     /**
      * Aggregation - All account and transaction related data see [Aggregation] for details
@@ -172,18 +181,24 @@ object FrolloSDK : AuthenticationCallback {
 
             // 1. Initialize ThreeTenABP
             initializeThreeTenABP()
+
             // 2. Setup Keystore
             keyStore = Keystore()
             keyStore.setup()
+
             // 3. Setup Preferences
             preferences = Preferences(application.applicationContext)
+
             // 4. Setup Database
             database = SDKDatabase.getInstance(application)
+
             // 5. Setup Version Manager
             version = Version(preferences)
+
             // 6. Setup Network Stack
-            val oAuth = OAuth(config = configuration)
-            network = NetworkService(oAuth = oAuth, keystore = keyStore, pref = preferences)
+            val oAuth = OAuth2Helper(config = configuration)
+            network = NetworkService(oAuth2Helper = oAuth, keystore = keyStore, pref = preferences)
+
             // 7. Setup Logger
             // Initialize Log.network, Log.deviceId, Log.deviceName and Log.deviceType
             // before Log.logLevel as Log.logLevel is dependant on Log.network
@@ -192,22 +207,44 @@ object FrolloSDK : AuthenticationCallback {
             Log.deviceName = deviceInfo.deviceName
             Log.deviceType = deviceInfo.deviceType
             Log.logLevel = configuration.logLevel
-            // 8. Setup Authentication
-            _authentication = Authentication(oAuth, network, preferences, this)
+
+            // 8. Setup authentication stack
+            when (configuration.authenticationType) {
+                is Custom -> {
+                    configuration.authenticationType.authentication.authenticationCallback = network
+                    _authentication = configuration.authenticationType.authentication
+                }
+                is OAuth2 -> {
+                    _authentication = OAuth2Authentication(oAuth, preferences, network).apply {
+                        tokenAPI = network.createAuth(TokenAPI::class.java)
+                        revokeTokenAPI = network.createRevoke(TokenAPI::class.java)
+                        authToken = network.authToken
+                    }
+                }
+            }
+            network.authentication = _authentication
+
             // 9. Setup Aggregation
             _aggregation = Aggregation(network, database, localBroadcastManager, authentication)
+
             // 10. Setup Messages
             _messages = Messages(network, database, authentication)
+
             // 11. Setup Events
             _events = Events(network, authentication)
+
             // 12. Setup Surveys
             _surveys = Surveys(network, authentication)
+
             // 13. Setup Reports
             _reports = Reports(network, database, aggregation, authentication)
+
             // 14. Setup Bills
             _bills = Bills(network, database, aggregation, authentication)
+
             // 15. Setup User Management
             _user = UserManagement(deviceInfo, network, database, preferences, authentication)
+
             // 16. Setup Notifications
             _notifications = Notifications(user, events, messages)
 
@@ -244,10 +281,6 @@ object FrolloSDK : AuthenticationCallback {
 
         notify(ACTION_AUTHENTICATION_CHANGED,
                 bundleOf(Pair(ARG_AUTHENTICATION_STATUS, AuthenticationStatus.LOGGED_OUT)))
-    }
-
-    override fun authenticationReset(completion: OnFrolloSDKCompletionListener<Result>?) {
-        reset(completion)
     }
 
     private fun initializeThreeTenABP() {

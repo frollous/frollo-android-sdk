@@ -22,6 +22,7 @@ import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ResponseTypeValues
+import us.frollo.frollosdk.authentication.AuthenticationType.OAuth2
 import us.frollo.frollosdk.core.FrolloSDKConfiguration
 import us.frollo.frollosdk.model.oauth.OAuthGrantType
 import us.frollo.frollosdk.model.oauth.OAuthTokenRequest
@@ -29,7 +30,10 @@ import us.frollo.frollosdk.model.oauth.OAuthTokenRequest
 /**
  * @suppress
  */
-class OAuth(val config: FrolloSDKConfiguration) {
+class OAuth2Helper(val config: FrolloSDKConfiguration) {
+
+    internal val oAuth2: OAuth2
+        get() = config.authenticationType as OAuth2
 
     private val domain: String
         get() = Uri.parse(config.serverUrl).host ?: ""
@@ -37,14 +41,14 @@ class OAuth(val config: FrolloSDKConfiguration) {
     internal fun getRefreshTokensRequest(refreshToken: String?) =
             OAuthTokenRequest(
                 grantType = OAuthGrantType.REFRESH_TOKEN,
-                clientId = config.clientId,
+                clientId = oAuth2.clientId,
                 domain = domain,
                 refreshToken = refreshToken)
 
     internal fun getLoginRequest(username: String, password: String, scopes: List<String>) =
             OAuthTokenRequest(
                     grantType = OAuthGrantType.PASSWORD,
-                    clientId = config.clientId,
+                    clientId = oAuth2.clientId,
                     domain = domain,
                     username = username,
                     password = password,
@@ -54,7 +58,7 @@ class OAuth(val config: FrolloSDKConfiguration) {
     internal fun getRegisterRequest(username: String, password: String, scopes: List<String>) =
             OAuthTokenRequest(
                     grantType = OAuthGrantType.PASSWORD,
-                    clientId = config.clientId,
+                    clientId = oAuth2.clientId,
                     domain = domain,
                     username = username,
                     password = password,
@@ -64,31 +68,33 @@ class OAuth(val config: FrolloSDKConfiguration) {
     internal fun getExchangeAuthorizationCodeRequest(scopes: List<String>, code: String, codeVerifier: String? = null) =
             OAuthTokenRequest(
                     grantType = OAuthGrantType.AUTHORIZATION_CODE,
-                    clientId = config.clientId,
+                    clientId = oAuth2.clientId,
                     domain = domain,
                     code = code,
                     codeVerifier = codeVerifier,
-                    redirectUrl = config.redirectUrl,
+                    redirectUrl = oAuth2.redirectUrl,
                     audience = config.serverUrl,
                     scope = scopes.joinToString(" "))
 
     internal fun getExchangeTokenRequest(legacyToken: String, scopes: List<String>) =
             OAuthTokenRequest(
                     grantType = OAuthGrantType.PASSWORD,
-                    clientId = config.clientId,
+                    clientId = oAuth2.clientId,
                     domain = domain,
                     legacyToken = legacyToken,
                     audience = config.serverUrl,
                     scope = scopes.joinToString(" "))
 
     internal fun getAuthorizationRequest(scopes: List<String>, additionalParameters: Map<String, String>? = null): AuthorizationRequest {
-        val serviceConfig = AuthorizationServiceConfiguration(config.authorizationUri, config.tokenUri)
+        val serviceConfig = AuthorizationServiceConfiguration(
+                oAuth2.authorizationUri,
+                oAuth2.tokenUri)
 
         val authRequestBuilder = AuthorizationRequest.Builder(
                 serviceConfig,
-                config.clientId,
+                oAuth2.clientId,
                 ResponseTypeValues.CODE,
-                config.redirectUri)
+                oAuth2.redirectUri)
 
         val customParameters = mutableMapOf(Pair("audience", config.serverUrl), Pair("domain", domain))
         additionalParameters?.let { customParameters.putAll(it) }

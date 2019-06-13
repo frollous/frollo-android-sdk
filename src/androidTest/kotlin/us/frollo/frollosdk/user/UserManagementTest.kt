@@ -38,7 +38,7 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.Authentication
-import us.frollo.frollosdk.authentication.OAuth
+import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.testSDKConfig
@@ -108,8 +108,8 @@ class UserManagementTest {
         keystore.setup()
         preferences = Preferences(app)
         database = SDKDatabase.getInstance(app)
-        val oAuth = OAuth(config = config)
-        val network = NetworkService(oAuth = oAuth, keystore = keystore, pref = preferences)
+        val oAuth = OAuth2Helper(config = config)
+        val network = NetworkService(oAuth2Helper = oAuth, keystore = keystore, pref = preferences)
 
         authentication = Authentication(oAuth, network, preferences, FrolloSDK)
         userManagement = UserManagement(DeviceInfo(app), network, database, preferences, authentication)

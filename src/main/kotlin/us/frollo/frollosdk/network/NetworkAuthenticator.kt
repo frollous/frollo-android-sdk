@@ -37,7 +37,7 @@ import us.frollo.frollosdk.extensions.clonedBodyString
  * When authentication is requested by an origin server, the response code is 401 and the
  * implementation should respond with a new request that sets the "Authorization" header.
  */
-internal class NetworkAuthenticator(private val network: NetworkService) : Authenticator {
+internal class NetworkAuthenticator(private val network: NetworkService, private val helper: NetworkHelper) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response?): Request? {
 
@@ -49,8 +49,8 @@ internal class NetworkAuthenticator(private val network: NetworkService) : Authe
             when (apiError.type) {
                 APIErrorType.INVALID_ACCESS_TOKEN -> {
                     if (network.invalidTokenRetries < 5) {
-                        val newToken = network.refreshTokens()
-
+                        network.authentication?.refreshTokens()
+                        val newToken = helper.authAccessToken
                         if (newToken != null) {
                             newRequest = response.request().newBuilder()
                                     .header(HEADER_AUTHORIZATION, "Bearer $newToken")

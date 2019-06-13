@@ -16,341 +16,39 @@
 
 package us.frollo.frollosdk.authentication
 
-import android.app.Activity
-import android.app.PendingIntent
-import android.content.Intent
-import androidx.core.os.bundleOf
-import net.openid.appauth.AuthorizationException
-import net.openid.appauth.AuthorizationResponse
-import net.openid.appauth.AuthorizationService
-import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
-import us.frollo.frollosdk.core.ACTION
-import us.frollo.frollosdk.core.ARGUMENT
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
-import us.frollo.frollosdk.error.DataError
-import us.frollo.frollosdk.error.DataErrorSubType
-import us.frollo.frollosdk.error.DataErrorType
-import us.frollo.frollosdk.error.OAuth2Error
-import us.frollo.frollosdk.extensions.enqueue
-import us.frollo.frollosdk.extensions.notify
-import us.frollo.frollosdk.model.oauth.OAuth2Scope
-import us.frollo.frollosdk.network.NetworkService
-import us.frollo.frollosdk.logging.Log
-import us.frollo.frollosdk.model.oauth.OAuthTokenRevokeRequest
-import us.frollo.frollosdk.network.ErrorResponseType
-import us.frollo.frollosdk.network.api.TokenAPI
-import us.frollo.frollosdk.preferences.Preferences
 
 /**
  * Manages authentication, login, registration, logout and the user profile.
  */
-class Authentication(internal val oAuth: OAuth, private val network: NetworkService, private val pref: Preferences, private val authenticationCallback: AuthenticationCallback?) {
-
-    companion object {
-        private const val TAG = "Authentication"
-
-        /** Request Code for the Authorization Intent for Web based login */
-        const val RC_AUTH = 100
-    }
-
+abstract class Authentication {
     /**
      * Indicates if the user is currently authorised with Frollo
      */
-    var loggedIn: Boolean
-        get() = pref.loggedIn
-        private set(value) { pref.loggedIn = value }
-
-    private val tokenAPI: TokenAPI = network.createAuth(TokenAPI::class.java)
-    private val revokeTokenAPI: TokenAPI? = network.createRevoke(TokenAPI::class.java)
-
-    private var codeVerifier: String? = null
+    abstract val loggedIn: Boolean
 
     /**
-     * Login a user via WebView
-     *
-     * Initiate the authorization code login flow using a WebView
-     *
-     * @param activity Activity from which the ChromeTabs/Browser should be launched
-     * @param scopes OpenID Connect OAuth2 scopes to be sent. See [OAuth2Scope].
-     * @param additionalParameters Pass additional query parameters to the authorization endpoint (Optional)
-     * @param completedIntent PendingIntent of an Activity to which the completed response from the ChromeTabs/Browser is delivered
-     * @param cancelledIntent PendingIntent of an Activity to which the cancelled response from the ChromeTabs/Browser is delivered
-     * @param toolBarColor Color of the CustomTabs toolbar using getColor() method
-     *
-     * NOTE: When using this method you need to call [handleWebLoginResponse]
-     * in the onCreate() of the pending intent activity
+     * SDK callback to be called to update SDK about authentication events. SDK sets this as part of setup
      */
-    @Throws(DataError::class)
-    fun loginUserUsingWeb(
-        activity: Activity,
-        scopes: List<String>,
-        additionalParameters: Map<String, String>? = null,
-        completedIntent: PendingIntent,
-        cancelledIntent: PendingIntent,
-        toolBarColor: Int? = null
-    ) {
-
-        if (!oAuth.config.validForAuthorizationCodeFlow()) {
-            throw DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)
-        }
-
-        val authRequest = oAuth.getAuthorizationRequest(scopes, additionalParameters)
-
-        codeVerifier = authRequest.codeVerifier
-
-        val authService = AuthorizationService(activity)
-        val authIntent = oAuth.getCustomTabsIntent(authService, authRequest, toolBarColor)
-
-        authService.performAuthorizationRequest(authRequest, completedIntent, cancelledIntent, authIntent)
-    }
-
-    /**
-     * Login a user via WebView
-     *
-     * Initiate the authorization code login flow using a WebView
-     *
-     * @param activity Activity from which the ChromeTabs/Browser should be launched
-     * @param scopes OpenID Connect OAuth2 scopes to be sent. See [OAuth2Scope].
-     * @param additionalParameters Pass additional query parameters to the authorization endpoint (Optional)
-     * @param toolBarColor Color of the CustomTabs toolbar using getColor() method
-     *
-     * NOTE: When using this method you need to call [handleWebLoginResponse]
-     * in the onActivityResult() of the activity from which you call this method
-     */
-    @Throws(DataError::class)
-    fun loginUserUsingWeb(
-        activity: Activity,
-        scopes: List<String>,
-        additionalParameters: Map<String, String>? = null,
-        toolBarColor: Int? = null
-    ) {
-
-        if (!oAuth.config.validForAuthorizationCodeFlow()) {
-            throw DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)
-        }
-
-        val authRequest = oAuth.getAuthorizationRequest(scopes, additionalParameters)
-
-        codeVerifier = authRequest.codeVerifier
-
-        val authService = AuthorizationService(activity)
-        val tabsIntent = oAuth.getCustomTabsIntent(authService, authRequest, toolBarColor)
-        val authIntent = authService.getAuthorizationRequestIntent(authRequest, tabsIntent)
-
-        activity.startActivityForResult(authIntent, RC_AUTH)
-    }
-
-    /**
-     * Process the authorization response to continue WebView login flow
-     *
-     * @param authIntent Response intent received from WebView in onActivityResult or in onCreate of the pending intent Activity
-     * @param scopes OpenID Connect OAuth2 scopes to be sent. See [OAuth2Scope].
-     * @param completion: Completion handler with any error that occurred
-     */
-    fun handleWebLoginResponse(authIntent: Intent?, scopes: List<String>, completion: OnFrolloSDKCompletionListener<Result>) {
-        authIntent?.let {
-            val response = AuthorizationResponse.fromIntent(authIntent)
-            val exception = AuthorizationException.fromIntent(authIntent)
-
-            val authorizationCode = response?.authorizationCode
-
-            if (authorizationCode != null) {
-                exchangeAuthorizationCode(code = authorizationCode, codeVerifier = codeVerifier, scopes = scopes, completion = completion)
-            } else {
-                completion.invoke(Result.error(OAuth2Error(exception = exception)))
-            }
-        } ?: run {
-            completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
-        }
-    }
-
-    /**
-     * Login a user using email and password
-     *
-     * @param email Email address of the user
-     * @param password Password for the user
-     * @param scopes OpenID Connect OAuth2 scopes to be sent. See [OAuth2Scope].
-     * @param completion: Completion handler with any error that occurred
-     */
-    fun loginUser(email: String, password: String, scopes: List<String>, completion: OnFrolloSDKCompletionListener<Result>) {
-        if (loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
-            Log.e("$TAG#loginUser", error.localizedDescription)
-            completion.invoke(Result.error(error))
-            return
-        }
-
-        if (!oAuth.config.validForROPC()) {
-            completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
-            return
-        }
-
-        val request = oAuth.getLoginRequest(username = email, password = password, scopes = scopes)
-        if (!request.valid) {
-            completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
-            return
-        }
-
-        // Authorize the user
-        tokenAPI.refreshTokens(request).enqueue(ErrorResponseType.OAUTH2) { resource ->
-            when (resource.status) {
-                Resource.Status.ERROR -> {
-                    Log.e("$TAG#loginUser.refreshTokens", resource.error?.localizedDescription)
-
-                    completion.invoke(Result.error(resource.error))
-                }
-
-                Resource.Status.SUCCESS -> {
-                    resource.data?.let { response ->
-                        network.handleTokens(response)
-
-                        setLoggedIn()
-
-                        completion.invoke(Result.success())
-                    } ?: run {
-                        completion.invoke(Result.error(DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_ACCESS_TOKEN)))
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Exchange an authorization code and code verifier for a token
-     *
-     * @param code Authorization code
-     * @param codeVerifier Authorization code verifier for PKCE (Optional)
-     * @param scopes OpenID Connect OAuth2 scopes to be sent. See [OAuth2Scope].
-     * @param completion Completion handler with any error that occurred
-     */
-    fun exchangeAuthorizationCode(code: String, codeVerifier: String? = null, scopes: List<String>, completion: OnFrolloSDKCompletionListener<Result>) {
-        if (loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
-            Log.e("$TAG#exchangeAuthorizationCode", error.localizedDescription)
-            completion.invoke(Result.error(error))
-            return
-        }
-
-        val request = oAuth.getExchangeAuthorizationCodeRequest(code = code, codeVerifier = codeVerifier, scopes = scopes)
-        if (!request.valid) {
-            completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
-            return
-        }
-
-        // Authorize the user
-        tokenAPI.refreshTokens(request).enqueue(ErrorResponseType.OAUTH2) { resource ->
-            when (resource.status) {
-                Resource.Status.ERROR -> {
-                    Log.e("$TAG#exchangeAuthorizationCode.refreshTokens", resource.error?.localizedDescription)
-
-                    completion.invoke(Result.error(resource.error))
-                }
-
-                Resource.Status.SUCCESS -> {
-                    resource.data?.let { response ->
-                        network.handleTokens(response)
-
-                        setLoggedIn()
-
-                        completion.invoke(Result.success())
-                    } ?: run {
-                        completion.invoke(Result.error(DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_ACCESS_TOKEN)))
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Exchange a legacy refresh token for a new valid refresh access token pair.
-     *
-     * @param legacyToken Legacy refresh token to be exchanged
-     * @param completion Completion handler with any error that occurred
-     */
-    fun exchangeLegacyToken(legacyToken: String, completion: OnFrolloSDKCompletionListener<Result>) {
-        val scopes = listOf(OAuth2Scope.OFFLINE_ACCESS, OAuth2Scope.EMAIL, OAuth2Scope.OPENID)
-        val request = oAuth.getExchangeTokenRequest(legacyToken = legacyToken, scopes = scopes)
-        if (!request.valid) {
-            completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
-            return
-        }
-
-        tokenAPI.refreshTokens(request).enqueue(ErrorResponseType.OAUTH2) { resource ->
-            when (resource.status) {
-                Resource.Status.ERROR -> {
-                    Log.e("$TAG#exchangeToken.refreshTokens", resource.error?.localizedDescription)
-
-                    network.reset()
-
-                    completion.invoke(Result.error(resource.error))
-                }
-
-                Resource.Status.SUCCESS -> {
-                    resource.data?.let { response ->
-                        network.handleTokens(response)
-                        setLoggedIn()
-                    } ?: run {
-                        completion.invoke(Result.error(DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_ACCESS_TOKEN)))
-                    }
-                }
-            }
-        }
-    }
+    abstract var authenticationCallback: AuthenticationCallback?
 
     /**
      * Refresh Access Token
      *
-     * Forces a refresh of the access token using the refresh token if a 401 was encountered. For advanced usage only in combination with web request authentication.
+     * Forces a refresh of the access tokens if a 401 was encountered. For advanced usage only in combination with web request authentication.
      *
      * @param completion Completion handler with any error that occurred (Optional)
      */
-    fun refreshTokens(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        network.refreshTokens(completion)
-    }
+    abstract fun refreshTokens(completion: OnFrolloSDKCompletionListener<Result>? = null)
 
     /**
-     * Logout the currently authenticated user. Resets all caches, preferences and databases.
-     * This resets the token storage.
+     * Logout the user if possible and then reset and clear local caches
      */
-    fun logoutUser(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!loggedIn) {
-            Log.i("$TAG#logoutUser", "Cannot logout. User is not logged in.")
-            return
-        }
+    abstract fun logout()
 
-        // Revoke the refresh token if possible
-        network.authToken.getRefreshToken()?.let { refreshToken ->
-            val request = OAuthTokenRevokeRequest(clientId = oAuth.config.clientId, token = refreshToken)
-
-            revokeTokenAPI?.revokeToken(request)?.enqueue { resource ->
-                if (resource.status == Resource.Status.ERROR) {
-                    Log.d("$TAG#logoutUser", resource.error?.localizedDescription)
-                }
-            }
-        }
-
-        reset()
-
-        authenticationCallback?.authenticationReset(completion)
-    }
-
-    private fun setLoggedIn() {
-        if (!loggedIn) {
-            loggedIn = true
-
-            notify(ACTION.ACTION_AUTHENTICATION_CHANGED,
-                    bundleOf(Pair(ARGUMENT.ARG_AUTHENTICATION_STATUS, AuthenticationStatus.AUTHENTICATED)))
-        }
-    }
-
-    internal fun reset(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!loggedIn) {
-            Log.d("$TAG#reset", "Reset did nothing as user not logged in")
-            return
-        }
-
-        loggedIn = false
-        authenticationCallback?.authenticationReset(completion)
-    }
+    /**
+     * Resets any token cache etc and logout the user locally
+     */
+    abstract fun reset()
 }

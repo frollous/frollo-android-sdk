@@ -30,8 +30,8 @@ import org.junit.Test
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.testutils.randomString
 
-class OAuthTest {
-    val oAuth = OAuth(testSDKConfig())
+class OAuth2HelperTest {
+    val oAuth = OAuth2Helper(testSDKConfig())
     private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
 
     @Test

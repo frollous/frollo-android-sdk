@@ -56,7 +56,7 @@ internal class NetworkHelper(private val authToken: AuthToken) {
         get() = BuildConfig.APPLICATION_ID
 
     internal val softwareVersion: String
-        get() = "V${BuildConfig.VERSION_NAME}-B${BuildConfig.VERSION_CODE}"
+        get() = "SDK${BuildConfig.VERSION_NAME}-B${BuildConfig.VERSION_CODE}"
 
     internal val deviceVersion: String
         get() = "Android${Build.VERSION.RELEASE}"
@@ -66,10 +66,10 @@ internal class NetworkHelper(private val authToken: AuthToken) {
         get() = "${BuildConfig.APPLICATION_ID}|SDK${BuildConfig.VERSION_NAME}|B${BuildConfig.VERSION_CODE}|Android${Build.VERSION.RELEASE}|API$API_VERSION"
 
     internal fun addAdditionalHeaders(builder: Request.Builder) {
-        builder.removeHeader(NetworkHelper.HEADER_API_VERSION).addHeader(NetworkHelper.HEADER_API_VERSION, NetworkHelper.API_VERSION)
-        builder.removeHeader(NetworkHelper.HEADER_BUNDLE_ID).addHeader(NetworkHelper.HEADER_BUNDLE_ID, bundleId)
-        builder.removeHeader(NetworkHelper.HEADER_DEVICE_VERSION).addHeader(NetworkHelper.HEADER_DEVICE_VERSION, deviceVersion)
-        builder.removeHeader(NetworkHelper.HEADER_SOFTWARE_VERSION).addHeader(NetworkHelper.HEADER_SOFTWARE_VERSION, softwareVersion)
-        builder.removeHeader(NetworkHelper.HEADER_USER_AGENT).addHeader(NetworkHelper.HEADER_USER_AGENT, userAgent)
+        builder.removeHeader(HEADER_API_VERSION).addHeader(HEADER_API_VERSION, API_VERSION)
+        builder.removeHeader(HEADER_BUNDLE_ID).addHeader(HEADER_BUNDLE_ID, bundleId)
+        builder.removeHeader(HEADER_DEVICE_VERSION).addHeader(HEADER_DEVICE_VERSION, deviceVersion)
+        builder.removeHeader(HEADER_SOFTWARE_VERSION).addHeader(HEADER_SOFTWARE_VERSION, softwareVersion)
+        builder.removeHeader(HEADER_USER_AGENT).addHeader(HEADER_USER_AGENT, userAgent)
     }
 }

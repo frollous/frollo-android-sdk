@@ -16,10 +16,7 @@
 
 package us.frollo.frollosdk.authentication
 
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.keystore.Keystore
-import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
 import us.frollo.frollosdk.preferences.Preferences
 
 internal class AuthToken(private val keystore: Keystore, private val pref: Preferences) {
@@ -48,23 +45,19 @@ internal class AuthToken(private val keystore: Keystore, private val pref: Prefe
         return accessTokenExpiry
     }
 
-    fun saveTokens(tokenResponse: OAuthTokenResponse) {
-        accessToken = tokenResponse.accessToken
+    fun saveRefreshToken(token: String) {
+        refreshToken = token
+        pref.encryptedRefreshToken = keystore.encrypt(token)
+    }
+
+    fun saveAccessToken(token: String) {
+        accessToken = token
         pref.encryptedAccessToken = keystore.encrypt(accessToken)
+    }
 
-        // With OAuth you get refresh token only the very first time and it is for lifetime.
-        // Subsequent token refresh responses does not contain refresh token.
-        // Hence hold on to the old refresh token if the response does not has a refresh token.
-        tokenResponse.refreshToken?.let {
-            refreshToken = it
-            pref.encryptedRefreshToken = keystore.encrypt(it)
-        }
-
-        val createdAt = LocalDateTime.ofEpochSecond(tokenResponse.createdAt, 0, ZoneOffset.UTC) ?: LocalDateTime.now(ZoneOffset.UTC)
-        val tokenExpiry = createdAt.plusSeconds(tokenResponse.expiresIn).toEpochSecond(ZoneOffset.UTC)
-
-        accessTokenExpiry = tokenExpiry
-        pref.accessTokenExpiry = tokenExpiry
+    fun saveTokenExpiry(expiry: Long) {
+        accessTokenExpiry = expiry
+        pref.accessTokenExpiry = expiry
     }
 
     fun clearTokens() {

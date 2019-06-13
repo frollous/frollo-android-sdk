@@ -21,6 +21,7 @@ import androidx.lifecycle.Transformations
 import okhttp3.Request
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
@@ -228,8 +229,8 @@ class UserManagement(private val di: DeviceInfo, private val network: NetworkSer
                     completion.invoke(Result.error(resource.error))
                 }
                 Resource.Status.SUCCESS -> {
-                    authentication.reset(completion)
                     reset()
+                    if (FrolloSDK.isSetup) FrolloSDK.reset(completion)
                 }
             }
         }
@@ -360,7 +361,8 @@ class UserManagement(private val di: DeviceInfo, private val network: NetworkSer
                 when (resource.status) {
                     Resource.Status.SUCCESS -> {
                         reset()
-                        authentication.reset(completion)
+                        // Force logout the user as this refresh token is no longer valid
+                        if (FrolloSDK.isSetup) FrolloSDK.reset(completion)
                     }
                     Resource.Status.ERROR -> {
                         Log.e("$TAG#migrateUser", resource.error?.localizedDescription)

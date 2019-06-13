@@ -76,7 +76,7 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
         val builder = originalRequest.newBuilder()
 
         try {
-            if (originalRequest.url()?.host() == Uri.parse(network.oAuth.config.serverUrl).host) { // Precautionary check to not append headers for any external requests
+            if (originalRequest.url().host() == Uri.parse(network.oAuth2Helper.config.serverUrl).host) { // Precautionary check to not append headers for any external requests
                 addAuthorizationHeader(originalRequest, builder)
                 helper.addAdditionalHeaders(builder)
             }
@@ -111,13 +111,8 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
 
     @Throws(DataError::class)
     private fun validateAndAppendAccessToken(builder: Request.Builder) {
-        if (helper.authRefreshToken == null) {
-            Log.e("$TAG#validateAndAppendAccessToken", "No valid refresh token when trying to refresh access token.")
-            throw DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_REFRESH_TOKEN)
-        }
-
         if (!validAccessToken())
-            network.refreshTokens()
+            network.authentication?.refreshTokens()
 
         helper.authAccessToken?.let {
             builder.addHeader(HEADER_AUTHORIZATION, it)

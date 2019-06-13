@@ -100,6 +100,7 @@ class FrolloSDKAndroidUnitTest {
 
             assertTrue(FrolloSDK.isSetup)
             assertNotNull(FrolloSDK.authentication)
+            assertNotNull(FrolloSDK.defaultAuthentication)
             assertNotNull(FrolloSDK.aggregation)
             assertNotNull(FrolloSDK.messages)
             assertNotNull(FrolloSDK.events)
@@ -107,7 +108,7 @@ class FrolloSDKAndroidUnitTest {
             assertNotNull(FrolloSDK.surveys)
             assertNotNull(FrolloSDK.reports)
             assertNotNull(FrolloSDK.bills)
-            assertNotNull(FrolloSDK.user)
+            assertNotNull(FrolloSDK.userManagement)
         }
     }
 
@@ -117,6 +118,17 @@ class FrolloSDKAndroidUnitTest {
 
         try {
             FrolloSDK.authentication
+        } catch (e: IllegalAccessException) {
+            assertEquals("SDK not setup", e.localizedMessage)
+        }
+    }
+
+    @Test
+    fun testSDKDefaultAuthenticationThrowsErrorBeforeSetup() {
+        assertFalse(FrolloSDK.isSetup)
+
+        try {
+            FrolloSDK.defaultAuthentication
         } catch (e: IllegalAccessException) {
             assertEquals("SDK not setup", e.localizedMessage)
         }
@@ -200,11 +212,11 @@ class FrolloSDKAndroidUnitTest {
     }
 
     @Test
-    fun testSDKUserThrowsErrorBeforeSetup() {
+    fun testSDKUserManagementThrowsErrorBeforeSetup() {
         assertFalse(FrolloSDK.isSetup)
 
         try {
-            FrolloSDK.user
+            FrolloSDK.userManagement
         } catch (e: IllegalAccessException) {
             assertEquals("SDK not setup", e.localizedMessage)
         }

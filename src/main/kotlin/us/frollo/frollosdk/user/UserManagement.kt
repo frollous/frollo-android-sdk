@@ -354,6 +354,15 @@ class UserManagement(private val di: DeviceInfo, private val network: NetworkSer
             return
         }
 
+        val refreshToken = network.authToken.getRefreshToken()
+
+        if (refreshToken == null) {
+            val error = DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_REFRESH_TOKEN)
+            completion.invoke(Result.error(error))
+            Log.e("$TAG#migrateUser", error.localizedMessage)
+            return
+        }
+
         val request = UserMigrationRequest(password = password)
 
         if (request.valid()) {

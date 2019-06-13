@@ -28,7 +28,7 @@ import java.lang.Exception
 /**
  * Register for push notifications and handles incoming push notification payloads.
  */
-class Notifications(private val user: UserManagement, private val events: Events, private val messages: Messages) {
+class Notifications(private val userManagement: UserManagement, private val events: Events, private val messages: Messages) {
 
     companion object {
         private const val TAG = "Notifications"
@@ -40,7 +40,7 @@ class Notifications(private val user: UserManagement, private val events: Events
      * @param token Raw token data received from Firebase to be sent to the host
      */
     fun registerPushNotificationToken(token: String) {
-        user.updateDevice(notificationToken = token)
+        userManagement.updateDevice(notificationToken = token)
     }
 
     /**

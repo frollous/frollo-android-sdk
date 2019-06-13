@@ -85,7 +85,7 @@ object FrolloSDK {
      * Default OAuth2 Authentication - Returns the default OAuth2 based authentication if no custom one has been applied
      */
     val defaultAuthentication: OAuth2Authentication?
-        get() = _authentication as? OAuth2Authentication
+        get() = _authentication as? OAuth2Authentication ?: throw IllegalAccessException("SDK not setup")
 
     /**
      * Aggregation - All account and transaction related data see [Aggregation] for details
@@ -132,8 +132,8 @@ object FrolloSDK {
     /**
      * User - User management. See [UserManagement] for details
      */
-    val user: UserManagement
-        get() = _user ?: throw IllegalAccessException("SDK not setup")
+    val userManagement: UserManagement
+        get() = _userManagement ?: throw IllegalAccessException("SDK not setup")
 
     private var _setup = false
     private var _authentication: Authentication? = null
@@ -144,7 +144,7 @@ object FrolloSDK {
     private var _surveys: Surveys? = null
     private var _reports: Reports? = null
     private var _bills: Bills? = null
-    private var _user: UserManagement? = null
+    private var _userManagement: UserManagement? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
@@ -243,10 +243,10 @@ object FrolloSDK {
             _bills = Bills(network, database, aggregation, authentication)
 
             // 15. Setup User Management
-            _user = UserManagement(deviceInfo, network, database, preferences, authentication)
+            _userManagement = UserManagement(deviceInfo, network, database, preferences, authentication)
 
             // 16. Setup Notifications
-            _notifications = Notifications(user, events, messages)
+            _notifications = Notifications(userManagement, events, messages)
 
             if (version.migrationNeeded()) {
                 version.migrateVersion()
@@ -319,7 +319,7 @@ object FrolloSDK {
         if (updateDevice) {
             deviceLastUpdated = now
 
-            user.updateDevice()
+            userManagement.updateDevice()
         }
     }
 
@@ -343,7 +343,7 @@ object FrolloSDK {
         aggregation.refreshTransactions(
                 fromDate = LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth()).toString(Transaction.DATE_FORMAT_PATTERN),
                 toDate = LocalDate.now().toString(Transaction.DATE_FORMAT_PATTERN))
-        user.refreshUser()
+        userManagement.refreshUser()
         messages.refreshUnreadMessages()
     }
 
@@ -366,7 +366,7 @@ object FrolloSDK {
         aggregation.refreshProviders()
         aggregation.refreshTransactionCategories()
         bills.refreshBills()
-        user.updateDevice()
+        userManagement.updateDevice()
     }
 
     private fun resumeScheduledRefreshing() {

@@ -16,88 +16,34 @@
 
 package us.frollo.frollosdk.notifications
 
-import android.app.Application
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.platform.app.InstrumentationRegistry
 import com.jraska.livedata.test
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Test
 
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
-import org.junit.Rule
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
-import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.authentication.Authentication
-import us.frollo.frollosdk.authentication.OAuth2Helper
-import us.frollo.frollosdk.core.DeviceInfo
-import us.frollo.frollosdk.core.testSDKConfig
-import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.network.NetworkService
+import us.frollo.frollosdk.BaseAndroidTest
 import us.frollo.frollosdk.network.api.DeviceAPI
-import us.frollo.frollosdk.events.Events
-import us.frollo.frollosdk.keystore.Keystore
-import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.model.testEventNotificationBundle
 import us.frollo.frollosdk.model.testMessageNotificationBundle
-import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
-import us.frollo.frollosdk.user.UserManagement
 
-class NotificationsTest {
+class NotificationsTest : BaseAndroidTest() {
 
-    @get:Rule val testRule = InstantTaskExecutorRule()
-    private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
-    private lateinit var mockServer: MockWebServer
-    private lateinit var preferences: Preferences
-    private lateinit var keystore: Keystore
-    private lateinit var database: SDKDatabase
-    private lateinit var network: NetworkService
-
-    private lateinit var authentication: Authentication
-    private lateinit var events: Events
-    private lateinit var messages: Messages
-    private lateinit var notifications: Notifications
-
-    private fun initSetup() {
-        mockServer = MockWebServer()
-        mockServer.start()
-        val baseUrl = mockServer.url("/")
-
-        val config = testSDKConfig(serverUrl = baseUrl.toString())
-        if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
-
-        keystore = Keystore()
-        keystore.setup()
-        preferences = Preferences(app)
-        database = SDKDatabase.getInstance(app)
-        val oAuth = OAuth2Helper(config = config)
-        network = NetworkService(oAuth2Helper = oAuth, keystore = keystore, pref = preferences)
+    override fun initSetup() {
+        super.initSetup()
 
         preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        authentication = Authentication(oAuth, network, preferences, FrolloSDK)
-        val userManagement = UserManagement(DeviceInfo(app), network, database, preferences, authentication)
-        messages = Messages(network, database, authentication)
-        events = Events(network, authentication)
-
-        notifications = Notifications(userManagement, events, messages)
-    }
-
-    private fun tearDown() {
-        mockServer.shutdown()
-        preferences.resetAll()
-        database.clearAllTables()
     }
 
     @Test

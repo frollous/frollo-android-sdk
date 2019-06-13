@@ -16,13 +16,9 @@
 
 package us.frollo.frollosdk.messages
 
-import android.app.Application
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.platform.app.InstrumentationRegistry
 import com.jraska.livedata.test
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Test
 
@@ -30,21 +26,14 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
-import org.junit.Rule
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
-import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.authentication.Authentication
-import us.frollo.frollosdk.authentication.OAuth2Helper
+import us.frollo.frollosdk.BaseAndroidTest
 import us.frollo.frollosdk.base.Result
-import us.frollo.frollosdk.core.testSDKConfig
-import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
-import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.MessagesAPI
-import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.messages.MessageHTML
 import us.frollo.frollosdk.model.coredata.messages.MessageImage
@@ -52,52 +41,20 @@ import us.frollo.frollosdk.model.coredata.messages.MessageText
 import us.frollo.frollosdk.model.coredata.messages.MessageVideo
 import us.frollo.frollosdk.model.testMessageNotificationPayload
 import us.frollo.frollosdk.model.testMessageResponseData
-import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
 
-class MessagesTest {
+class MessagesTest : BaseAndroidTest() {
 
-    @get:Rule val testRule = InstantTaskExecutorRule()
-    private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
-    private lateinit var mockServer: MockWebServer
-    private lateinit var preferences: Preferences
-    private lateinit var keystore: Keystore
-    private lateinit var database: SDKDatabase
-    private lateinit var network: NetworkService
-
-    private lateinit var messages: Messages
-
-    private fun initSetup() {
-        mockServer = MockWebServer()
-        mockServer.start()
-        val baseUrl = mockServer.url("/")
-
-        val config = testSDKConfig(serverUrl = baseUrl.toString())
-        if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
-
-        keystore = Keystore()
-        keystore.setup()
-        preferences = Preferences(app)
-        database = SDKDatabase.getInstance(app)
-        val oAuth = OAuth2Helper(config = config)
-        network = NetworkService(oAuth2Helper = oAuth, keystore = keystore, pref = preferences)
+    override fun initSetup() {
+        super.initSetup()
 
         preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        val authentication = Authentication(oAuth, network, preferences, FrolloSDK)
-        messages = Messages(network, database, authentication)
-    }
-
-    private fun tearDown() {
-        mockServer.shutdown()
-        preferences.resetAll()
-        database.clearAllTables()
     }
 
     @Test

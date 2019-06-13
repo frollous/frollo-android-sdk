@@ -16,11 +16,8 @@
 
 package us.frollo.frollosdk.surveys
 
-import android.app.Application
-import androidx.test.platform.app.InstrumentationRegistry
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Test
 
@@ -29,64 +26,29 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
-import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.authentication.Authentication
-import us.frollo.frollosdk.authentication.OAuth2Helper
+import us.frollo.frollosdk.BaseAndroidTest
 import us.frollo.frollosdk.base.Resource
-import us.frollo.frollosdk.core.testSDKConfig
-import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
-import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.coredata.surveys.SurveyAnswerType
 import us.frollo.frollosdk.model.coredata.surveys.SurveyQuestionType
 import us.frollo.frollosdk.model.testSurveyData
-import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.SurveysAPI
-import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
 
-class SurveysTest {
+class SurveysTest : BaseAndroidTest() {
 
-    private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
-    private lateinit var mockServer: MockWebServer
-    private lateinit var preferences: Preferences
-    private lateinit var keystore: Keystore
-    private lateinit var network: NetworkService
-
-    private lateinit var surveys: Surveys
-
-    private fun initSetup() {
-        mockServer = MockWebServer()
-        mockServer.start()
-        val baseUrl = mockServer.url("/")
-
-        val config = testSDKConfig(serverUrl = baseUrl.toString())
-        if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
-
-        keystore = Keystore()
-        keystore.setup()
-        preferences = Preferences(app)
-        val oAuth = OAuth2Helper(config = config)
-        network = NetworkService(oAuth2Helper = oAuth, keystore = keystore, pref = preferences)
+    override fun initSetup() {
+        super.initSetup()
 
         preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        val database = SDKDatabase.getInstance(app)
-        val authentication = Authentication(oAuth, network, preferences, FrolloSDK)
-        surveys = Surveys(network, authentication)
-    }
-
-    private fun tearDown() {
-        mockServer.shutdown()
-        preferences.resetAll()
     }
 
     @Test

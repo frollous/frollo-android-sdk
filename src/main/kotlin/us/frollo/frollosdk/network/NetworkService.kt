@@ -101,9 +101,6 @@ class NetworkService internal constructor(
     override fun <T> createAuth(service: Class<T>): T = authRetrofit.create(service)
     override fun <T> createRevoke(service: Class<T>): T? = revokeTokenRetrofit?.create(service)
 
-    internal fun hasTokens(): Boolean =
-            authToken.getAccessToken() != null && authToken.getRefreshToken() != null
-
     override fun saveAccessTokens(accessToken: String, expiry: Long) {
         authToken.saveAccessToken(accessToken)
         authToken.saveTokenExpiry(expiry)

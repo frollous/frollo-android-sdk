@@ -16,6 +16,8 @@
 
 package us.frollo.frollosdk.core
 
+import us.frollo.frollosdk.authentication.AuthenticationType
+
 internal fun testSDKConfig(
     clientId: String? = null,
     serverUrl: String? = null,
@@ -25,9 +27,11 @@ internal fun testSDKConfig(
     revokeTokenURL: String? = null
 ) =
         FrolloSDKConfiguration(
-                clientId = clientId ?: "abc123",
-                redirectUrl = redirectUrl ?: "app://redirect",
-                authorizationUrl = authorizationUrl ?: "https://id.example.com/oauth/authorize/",
-                tokenUrl = tokenUrl ?: "https://id.example.com/oauth/token/",
-                serverUrl = serverUrl ?: "https://api.example.com/",
-                revokeTokenURL = revokeTokenURL ?: "https://id.example.com/oauth/revoke/")
+                authenticationType = AuthenticationType.OAuth2(
+                        clientId = clientId ?: "abc123",
+                        redirectUrl = redirectUrl ?: "app://redirect",
+                        authorizationUrl = authorizationUrl ?: "https://id.example.com/oauth/authorize/",
+                        tokenUrl = tokenUrl ?: "https://id.example.com/oauth/token/",
+                        revokeTokenURL = revokeTokenURL ?: "https://id.example.com/oauth/revoke/"
+                ),
+                serverUrl = serverUrl ?: "https://api.example.com/")

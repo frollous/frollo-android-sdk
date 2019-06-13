@@ -94,11 +94,11 @@ class OAuth2HelperTest {
     fun testGetAuthorizationRequest() {
         val request = oAuth.getAuthorizationRequest(scopes = listOf("offline_access", "openid", "email"))
         assertNotNull(request)
-        assertEquals(oAuth.config.clientId, request.clientId)
-        assertEquals(oAuth.config.redirectUrl, request.redirectUri.toString())
+        assertEquals(oAuth.oAuth2.clientId, request.clientId)
+        assertEquals(oAuth.oAuth2.redirectUrl, request.redirectUri.toString())
         assertTrue(request.scopeSet?.containsAll(setOf(OFFLINE_ACCESS, EMAIL, OPENID)) == true)
-        assertEquals(oAuth.config.authorizationUri, request.configuration.authorizationEndpoint)
-        assertEquals(oAuth.config.tokenUri, request.configuration.tokenEndpoint)
+        assertEquals(oAuth.oAuth2.authorizationUri, request.configuration.authorizationEndpoint)
+        assertEquals(oAuth.oAuth2.tokenUri, request.configuration.tokenEndpoint)
     }
 
     @Test

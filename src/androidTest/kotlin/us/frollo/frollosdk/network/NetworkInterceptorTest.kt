@@ -16,75 +16,39 @@
 
 package us.frollo.frollosdk.network
 
-import android.app.Application
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.platform.app.InstrumentationRegistry
-import com.jakewharton.threetenabp.AndroidThreeTen
 import okhttp3.FormBody
 import okhttp3.Request
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
-import org.junit.Rule
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
-import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.authentication.OAuth2Helper
-import us.frollo.frollosdk.core.testSDKConfig
+import us.frollo.frollosdk.BaseAndroidTest
 import us.frollo.frollosdk.network.api.UserAPI
 import us.frollo.frollosdk.extensions.enqueue
-import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.model.api.user.UserMigrationRequest
 import us.frollo.frollosdk.model.testResetPasswordData
 import us.frollo.frollosdk.model.testValidRegisterData
-import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.TestAPI
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
 
-class NetworkInterceptorTest {
+class NetworkInterceptorTest : BaseAndroidTest() {
 
-    @get:Rule val testRule = InstantTaskExecutorRule()
-
-    private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
-
-    private lateinit var mockServer: MockWebServer
-    private lateinit var keystore: Keystore
-    private lateinit var preferences: Preferences
-    private lateinit var network: NetworkService
     private lateinit var userAPI: UserAPI
     private lateinit var testAPI: TestAPI
 
-    private fun initSetup() {
-        mockServer = MockWebServer()
-        mockServer.start()
-        val baseUrl = mockServer.url("/")
+    override fun initSetup() {
+        super.initSetup()
 
-        val config = testSDKConfig(serverUrl = baseUrl.toString())
-        if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
-
-        keystore = Keystore()
-        keystore.setup()
-        preferences = Preferences(app)
-        val oAuth = OAuth2Helper(config = config)
-        network = NetworkService(oAuth2Helper = oAuth, keystore = keystore, pref = preferences)
         userAPI = network.create(UserAPI::class.java)
         testAPI = network.create(TestAPI::class.java)
-
-        AndroidThreeTen.init(app)
-    }
-
-    private fun tearDown() {
-        mockServer.shutdown()
-        network.reset()
-        preferences.resetAll()
     }
 
     @Test

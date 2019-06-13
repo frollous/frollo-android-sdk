@@ -25,7 +25,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
 import us.frollo.frollosdk.keystore.Keystore
-import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
 import us.frollo.frollosdk.preferences.Preferences
 
 class AuthTokenTest {
@@ -76,21 +75,26 @@ class AuthTokenTest {
     }
 
     @Test
-    fun testSaveTokens() {
+    fun testSaveRefreshToken() {
         assertNull(authToken.getRefreshToken())
-        assertNull(authToken.getAccessToken())
-        assertEquals(-1, authToken.getAccessTokenExpiry())
-        authToken.saveTokens(OAuthTokenResponse(
-                refreshToken = "IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk",
-                accessToken = "MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3",
-                createdAt = 2550792999,
-                expiresIn = 1800,
-                tokenType = "Bearer"))
-        assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", authToken.getAccessToken())
+        authToken.saveRefreshToken(token = "IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk")
         assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", authToken.getRefreshToken())
-        assertEquals(2550794799, authToken.getAccessTokenExpiry())
-        assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keyStore.decrypt(preferences.encryptedAccessToken))
         assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keyStore.decrypt(preferences.encryptedRefreshToken))
+    }
+
+    @Test
+    fun testSaveAccessToken() {
+        assertNull(authToken.getAccessToken())
+        authToken.saveAccessToken(token = "MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3")
+        assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", authToken.getAccessToken())
+        assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keyStore.decrypt(preferences.encryptedAccessToken))
+    }
+
+    @Test
+    fun testSaveTokenExpiry() {
+        assertEquals(-1, authToken.getAccessTokenExpiry())
+        authToken.saveTokenExpiry(expiry = 2550794799)
+        assertEquals(2550794799, authToken.getAccessTokenExpiry())
         assertEquals(2550794799, preferences.accessTokenExpiry)
     }
 

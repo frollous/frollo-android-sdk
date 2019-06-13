@@ -16,78 +16,35 @@
 
 package us.frollo.frollosdk.network
 
-import android.app.Application
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.platform.app.InstrumentationRegistry
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
-import org.junit.Rule
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
-import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.authentication.OAuth2Helper
+import us.frollo.frollosdk.BaseAndroidTest
 import us.frollo.frollosdk.base.Resource
-import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.error.APIError
 import us.frollo.frollosdk.error.APIErrorType
 import us.frollo.frollosdk.network.api.UserAPI
 import us.frollo.frollosdk.extensions.enqueue
-import us.frollo.frollosdk.keystore.Keystore
-import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
 
-class NetworkAuthenticatorTest {
+class NetworkAuthenticatorTest : BaseAndroidTest() {
 
-    companion object {
-        private const val TOKEN_URL = "token/"
-    }
-
-    @get:Rule val testRule = InstantTaskExecutorRule()
-
-    private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
-
-    private lateinit var mockServer: MockWebServer
-    private lateinit var mockTokenServer: MockWebServer
-    private lateinit var keystore: Keystore
-    private lateinit var preferences: Preferences
-    private lateinit var network: NetworkService
     private lateinit var userAPI: UserAPI
 
-    private fun initSetup() {
-        mockServer = MockWebServer()
-        mockServer.start()
-        val baseUrl = mockServer.url("/")
+    override fun initSetup() {
+        super.initSetup()
 
-        mockTokenServer = MockWebServer()
-        mockTokenServer.start()
-        val baseTokenUrl = mockTokenServer.url("/$TOKEN_URL")
-
-        val config = testSDKConfig(serverUrl = baseUrl.toString(), tokenUrl = baseTokenUrl.toString())
-        if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
-
-        keystore = Keystore()
-        keystore.setup()
-        preferences = Preferences(app)
-        val oAuth = OAuth2Helper(config = config)
-        network = NetworkService(oAuth2Helper = oAuth, keystore = keystore, pref = preferences)
         userAPI = network.create(UserAPI::class.java)
-    }
-
-    private fun tearDown() {
-        mockServer.shutdown()
-        mockTokenServer.shutdown()
-        network.reset()
-        preferences.resetAll()
     }
 
     @Test
@@ -289,7 +246,7 @@ class NetworkAuthenticatorTest {
             assertEquals(0, network.invalidTokenRetries)
         }
 
-        wait(3)
+        wait(120)
 
         tearDown()
     }

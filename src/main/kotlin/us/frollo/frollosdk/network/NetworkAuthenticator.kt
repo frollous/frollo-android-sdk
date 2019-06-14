@@ -58,8 +58,8 @@ internal class NetworkAuthenticator(private val network: NetworkService, private
                         }
 
                         // NOTE: No need for force logout in this block if newToken == null
-                        // as the failures of network.refreshTokens() is handled
-                        // in NetworkService, TokenAuthenticator and NetworkExtensions
+                        // as the failures of authentication.refreshTokens() is handled
+                        // in OAuth2Authentication or NetworkExtensions
                     }
 
                     network.invalidTokenRetries++

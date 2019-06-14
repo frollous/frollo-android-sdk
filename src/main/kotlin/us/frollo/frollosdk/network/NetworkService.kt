@@ -31,6 +31,7 @@ import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.AuthToken
 import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.AuthenticationCallback
+import us.frollo.frollosdk.authentication.AuthenticationType.OAuth2
 import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.preferences.Preferences
 
@@ -49,15 +50,22 @@ class NetworkService internal constructor(
     private val helper = NetworkHelper(authToken)
     private val serverInterceptor = NetworkInterceptor(this, helper)
     private val tokenInterceptor = TokenInterceptor(helper)
-    private var apiRetrofit = createRetrofit(oAuth2Helper.config.serverUrl)
-    private var authRetrofit = createRetrofit(oAuth2Helper.oAuth2.tokenUrl)
+    private val apiRetrofit = createRetrofit(oAuth2Helper.config.serverUrl)
+    private val authRetrofit: Retrofit?
+        get() {
+            return if (oAuth2Helper.config.authenticationType is OAuth2)
+                createRetrofit(oAuth2Helper.oAuth2.tokenUrl)
+            else null
+        }
     private var revokeTokenRetrofit: Retrofit? = null
     internal var authentication: Authentication? = null
     internal var invalidTokenRetries: Int = 0
 
     init {
-        oAuth2Helper.oAuth2.revokeTokenURL?.let { revokeTokenUrl ->
-            revokeTokenRetrofit = createRetrofit(revokeTokenUrl)
+        if (oAuth2Helper.config.authenticationType is OAuth2) {
+            oAuth2Helper.oAuth2.revokeTokenURL?.let { revokeTokenUrl ->
+                revokeTokenRetrofit = createRetrofit(revokeTokenUrl)
+            }
         }
     }
 
@@ -69,12 +77,14 @@ class NetworkService internal constructor(
 
         val httpClientBuilder = OkHttpClient.Builder()
                 .addInterceptor(
-                        if (baseUrl == oAuth2Helper.oAuth2.tokenUrl || baseUrl == oAuth2Helper.oAuth2.revokeTokenURL)
+                        if (oAuth2Helper.config.authenticationType is OAuth2
+                                && (baseUrl == oAuth2Helper.oAuth2.tokenUrl || baseUrl == oAuth2Helper.oAuth2.revokeTokenURL))
                             tokenInterceptor
                         else
                             serverInterceptor)
                 .authenticator(
-                        if (baseUrl == oAuth2Helper.oAuth2.tokenUrl || baseUrl == oAuth2Helper.oAuth2.revokeTokenURL)
+                        if (oAuth2Helper.config.authenticationType is OAuth2
+                                && (baseUrl == oAuth2Helper.oAuth2.tokenUrl || baseUrl == oAuth2Helper.oAuth2.revokeTokenURL))
                             TokenAuthenticator(this)
                         else
                             NetworkAuthenticator(this, helper))
@@ -98,7 +108,7 @@ class NetworkService internal constructor(
     }
 
     override fun <T> create(service: Class<T>): T = apiRetrofit.create(service)
-    override fun <T> createAuth(service: Class<T>): T = authRetrofit.create(service)
+    override fun <T> createAuth(service: Class<T>): T? = authRetrofit?.create(service)
     override fun <T> createRevoke(service: Class<T>): T? = revokeTokenRetrofit?.create(service)
 
     override fun saveAccessTokens(accessToken: String, expiry: Long) {

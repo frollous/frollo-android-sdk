@@ -16,6 +16,7 @@
 
 package us.frollo.frollosdk.core
 
+import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.AuthenticationType
 
 internal fun testSDKConfig(
@@ -34,4 +35,9 @@ internal fun testSDKConfig(
                         tokenUrl = tokenUrl ?: "https://id.example.com/oauth/token/",
                         revokeTokenURL = revokeTokenURL ?: "https://id.example.com/oauth/revoke/"
                 ),
+                serverUrl = serverUrl ?: "https://api.example.com/")
+
+internal fun testSDKCustomConfig(authentication: Authentication, serverUrl: String? = null) =
+        FrolloSDKConfiguration(
+                authenticationType = AuthenticationType.Custom(authentication = authentication),
                 serverUrl = serverUrl ?: "https://api.example.com/")

@@ -76,7 +76,7 @@ enum class OAuth2ErrorType(
     @SerializedName("user_cancelled") USER_CANCELLED(R.string.FrolloSDK_Error_OAuth_UserCancelled),
 
     /** An unknown issue with authorisation has occurred */
-    @SerializedName("other_authorisation") OTHER_AUTHORISATION(R.string.FrolloSDK_Error_OAuth_OtherAuthorisation),
+    @SerializedName("other_authorization") OTHER_AUTHORIZATION(R.string.FrolloSDK_Error_OAuth_OtherAuthorisation),
 
     /** Unknown error */
     @SerializedName("unknown") UNKNOWN(R.string.FrolloSDK_Error_OAuth_Unknown);

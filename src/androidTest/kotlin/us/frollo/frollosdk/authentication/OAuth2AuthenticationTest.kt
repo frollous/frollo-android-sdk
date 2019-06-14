@@ -49,6 +49,14 @@ import us.frollo.frollosdk.testutils.wait
 
 class OAuth2AuthenticationTest : BaseAndroidTest() {
 
+    private lateinit var localAuthentication: OAuth2Authentication
+
+    override fun initSetup() {
+        super.initSetup()
+
+        localAuthentication = authentication as OAuth2Authentication
+    }
+
     @Test
     fun testGetLoggedIn() {
         initSetup()
@@ -77,7 +85,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             }
         })
 
-        authentication.loginUser("user@frollo.us", "password", scopes) { result ->
+        localAuthentication.loginUser("user@frollo.us", "password", scopes) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -110,7 +118,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             }
         })
 
-        authentication.loginUser("user@frollo.us", "wrong_password", scopes) { result ->
+        localAuthentication.loginUser("user@frollo.us", "wrong_password", scopes) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
@@ -151,7 +159,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
 
         preferences.loggedIn = true
 
-        authentication.loginUser("user@frollo.us", "password", scopes) { result ->
+        localAuthentication.loginUser("user@frollo.us", "password", scopes) { result ->
             assertTrue(authentication.loggedIn)
 
             assertEquals(Result.Status.ERROR, result.status)
@@ -196,7 +204,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
         val json = readStringFromJson(app, R.raw.authorization_code_valid)
         val intent = Intent().putExtra("net.openid.appauth.AuthorizationResponse", json)
 
-        authentication.handleWebLoginResponse(intent, scopes) { result ->
+        localAuthentication.handleWebLoginResponse(intent, scopes) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -220,7 +228,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
 
         val intent = AuthorizationException.AuthorizationRequestErrors.ACCESS_DENIED.toIntent()
 
-        authentication.handleWebLoginResponse(intent, scopes) { result ->
+        localAuthentication.handleWebLoginResponse(intent, scopes) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
@@ -358,7 +366,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             }
         })
 
-        authentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32), scopes = scopes) { result ->
+        localAuthentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32), scopes = scopes) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -391,7 +399,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             }
         })
 
-        authentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32), scopes = scopes) { result ->
+        localAuthentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32), scopes = scopes) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
@@ -428,7 +436,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
 
         preferences.loggedIn = true
 
-        authentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32), scopes = scopes) { result ->
+        localAuthentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32), scopes = scopes) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
@@ -460,7 +468,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
 
         val legacyToken = randomString(32)
 
-        authentication.exchangeLegacyToken(legacyToken = legacyToken) { result ->
+        localAuthentication.exchangeLegacyToken(legacyToken = legacyToken) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -495,7 +503,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
 
         val legacyToken = randomString(32)
 
-        authentication.exchangeLegacyToken(legacyToken = legacyToken) { result ->
+        localAuthentication.exchangeLegacyToken(legacyToken = legacyToken) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 

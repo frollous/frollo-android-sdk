@@ -165,8 +165,8 @@ class OAuth2ErrorTest {
     fun testOtherAuthorisationError() {
         val exception = AuthorizationException.GeneralErrors.INVALID_DISCOVERY_DOCUMENT
         val authError = OAuth2Error(exception = exception)
-        assertEquals(OAuth2ErrorType.OTHER_AUTHORISATION, authError.type)
-        val localizedDescription = app.resources.getString(OAuth2ErrorType.OTHER_AUTHORISATION.textResource)
+        assertEquals(OAuth2ErrorType.OTHER_AUTHORIZATION, authError.type)
+        val localizedDescription = app.resources.getString(OAuth2ErrorType.OTHER_AUTHORIZATION.textResource)
         assertEquals(localizedDescription, authError.localizedDescription)
     }
 

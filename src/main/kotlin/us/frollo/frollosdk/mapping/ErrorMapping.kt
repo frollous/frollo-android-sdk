@@ -84,7 +84,7 @@ internal fun AuthorizationException.toOAuth2ErrorType(): OAuth2ErrorType {
         AuthorizationException.AuthorizationRequestErrors.CLIENT_ERROR -> OAuth2ErrorType.CLIENT_ERROR
         AuthorizationException.AuthorizationRequestErrors.INVALID_REQUEST -> OAuth2ErrorType.INVALID_REQUEST
         AuthorizationException.AuthorizationRequestErrors.INVALID_SCOPE -> OAuth2ErrorType.INVALID_SCOPE
-        AuthorizationException.AuthorizationRequestErrors.OTHER -> OAuth2ErrorType.OTHER_AUTHORISATION
+        AuthorizationException.AuthorizationRequestErrors.OTHER -> OAuth2ErrorType.OTHER_AUTHORIZATION
         AuthorizationException.AuthorizationRequestErrors.SERVER_ERROR -> OAuth2ErrorType.SERVER_ERROR
         AuthorizationException.AuthorizationRequestErrors.TEMPORARILY_UNAVAILABLE -> OAuth2ErrorType.SERVER_ERROR
         AuthorizationException.AuthorizationRequestErrors.UNAUTHORIZED_CLIENT -> OAuth2ErrorType.UNAUTHORIZED_CLIENT
@@ -94,7 +94,7 @@ internal fun AuthorizationException.toOAuth2ErrorType(): OAuth2ErrorType {
         AuthorizationException.TokenRequestErrors.CLIENT_ERROR -> OAuth2ErrorType.CLIENT_ERROR
         AuthorizationException.TokenRequestErrors.INVALID_CLIENT -> OAuth2ErrorType.INVALID_CLIENT
         AuthorizationException.TokenRequestErrors.INVALID_GRANT -> OAuth2ErrorType.INVALID_GRANT
-        AuthorizationException.TokenRequestErrors.OTHER -> OAuth2ErrorType.OTHER_AUTHORISATION
+        AuthorizationException.TokenRequestErrors.OTHER -> OAuth2ErrorType.OTHER_AUTHORIZATION
         AuthorizationException.TokenRequestErrors.UNAUTHORIZED_CLIENT -> OAuth2ErrorType.UNAUTHORIZED_CLIENT
         AuthorizationException.TokenRequestErrors.UNSUPPORTED_GRANT_TYPE -> OAuth2ErrorType.UNSUPPORTED_GRANT_TYPE
         AuthorizationException.TokenRequestErrors.INVALID_SCOPE -> OAuth2ErrorType.INVALID_SCOPE
@@ -103,12 +103,12 @@ internal fun AuthorizationException.toOAuth2ErrorType(): OAuth2ErrorType {
         AuthorizationException.RegistrationRequestErrors.INVALID_CLIENT_METADATA -> OAuth2ErrorType.INVALID_CLIENT_METADATA
         AuthorizationException.RegistrationRequestErrors.CLIENT_ERROR -> OAuth2ErrorType.CLIENT_ERROR
         AuthorizationException.RegistrationRequestErrors.INVALID_REQUEST -> OAuth2ErrorType.INVALID_REQUEST
-        AuthorizationException.RegistrationRequestErrors.OTHER -> OAuth2ErrorType.OTHER_AUTHORISATION
+        AuthorizationException.RegistrationRequestErrors.OTHER -> OAuth2ErrorType.OTHER_AUTHORIZATION
 
         AuthorizationException.GeneralErrors.USER_CANCELED_AUTH_FLOW -> OAuth2ErrorType.USER_CANCELLED
         AuthorizationException.GeneralErrors.SERVER_ERROR -> OAuth2ErrorType.SERVER_ERROR
         AuthorizationException.GeneralErrors.NETWORK_ERROR -> OAuth2ErrorType.NETWORK_ERROR
-        else -> OAuth2ErrorType.OTHER_AUTHORISATION
+        else -> OAuth2ErrorType.OTHER_AUTHORIZATION
     }
 }
 

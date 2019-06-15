@@ -2,25 +2,31 @@
 
 ### SDK Setup
 
-Import the FrolloSDK and ensure you run setup with your tenant URL provided by us. Do not attempt to use any APIs before the setup completion handler returns.
+Import the FrolloSDK and ensure you run setup with your tenant URL provided by us. Do not attempt to use any APIs before the setup completion handler returns. You will also need to pass in your custom authentication handler or use the default OAuth2 implementation.
 
 ```kotlin
     class StartupActivity : AppCompatActivity() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
 
-            // ...
-
+            // OAuth2 Config
             val configuration = FrolloSDKConfiguration(
-                                      clientId = "<APPLICATION_CLIENT_ID>",
-                                      redirectUri = "<REDIRECT_URI>",
-                                      authorizationUrl = "https://id.frollo.us/oauth/authorize",
-                                      tokenUrl = "https://id.frollo.us/oauth/token",
+                                      authenticationType = OAuth2(
+                                              clientId = "<APPLICATION_CLIENT_ID>",
+                                              redirectUri = "<REDIRECT_URI>",
+                                              authorizationUrl = "https://id.frollo.us/oauth/authorize",
+                                              tokenUrl = "https://id.frollo.us/oauth/token"),
+                                      serverUrl = "https://<API_TENANT>.frollo.us/api/v2/")
+
+            // Custom Authentication Config
+            val customAuthentication = CustomAuthentication()
+            val configuration = FrolloSDKConfiguration(
+                                      authenticationType = Custom(authentication = CustomAuthentication()),
                                       serverUrl = "https://<API_TENANT>.frollo.us/api/v2/")
 
             FrolloSDK.setup(application, configuration = configuration) { result ->
                 when (result.status) {
-                    Result.Status.SUCCESS -> completeStartup()
+                    Result.Status.SUCCESS -> completeSetup()
                     Result.Status.ERROR -> Log.e(TAG, result.error?.localizedDescription)
                 }
             }
@@ -30,7 +36,7 @@ Import the FrolloSDK and ensure you run setup with your tenant URL provided by u
 
 ### Authentication
 
-Before any data can be refreshed for a user they must be authenticated first. You can check the logged in status of the user on the [Authentication](us.frollo.frollosdk.auth/-authentication/index.html) class.
+Before any data can be refreshed for a user they must be authenticated first. You can check the logged in status of the user on the [Authentication](us.frollo.frollosdk.authentication/-authentication/index.html) class.
 
 ```kotlin
     if (FrolloSDK.authentication.loggedIn) {
@@ -40,19 +46,33 @@ Before any data can be refreshed for a user they must be authenticated first. Yo
     }
 ```
 
-#### OAuth2 Authentication using ROPC
-If the user is not authenticated the [loginUser](us.frollo.frollosdk.auth/-authentication/login-user.html) API should be called with the user's credentials.
+If the user is not authenticated then the user must login or an access token must be provided by the Authentication class. Authentication can be done using OAuth2 or a custom implementation can be provided if you wish to manage the user's access token manually or share it with other APIs.
+
+#### OAuth2 Authentication
+
+Using OAuth2 based authentication Resource Owner Password Credential flow and Authorization Code with PKCE flow are supported. Identity Providers must be OpenID Connect compliant to use the in-built [OAuth2Authentication](us.frollo.frollosdk.authentication/-o-auth2-authentication/index.html) authentication class. If using OAuth2 authentication you can use [defaultAuthentication](us.frollo.frollosdk/-frollo-s-d-k/default-authentication.html)
+
+##### ROPC Flow
+
+Using the ROPC flow is the simplest and can be used if you are implementing the SDK in your own highly trusted first party application. All it requires is email and password and can be used in conjunction with a native UI.
+
+See [loginUser(email:password:completion:)](us.frollo.frollosdk.authentication/-o-auth2-authentication/login-user.html)
+
 
 ```kotlin
-    FrolloSDK.authentication.loginUser(email = "jacob@example.com", password = "$uPer5ecr@t") { result ->
+    FrolloSDK.defaultAuthentication.loginUser(email = "jacob@example.com", password = "$uPer5ecr@t") { result ->
         when (result.status) {
             Result.Status.ERROR -> displayError(result.error?.localizedDescription, "Login Failed")
-            Result.Status.SUCCESS -> showMainActivity()
+            Result.Status.SUCCESS -> completeLogin()
         }
     }
 ```
 
-#### OAuth2 Authentication using Authorization Code
+#### Authorization Code with PKCE Flow
+
+Authenticating the user using Authorization Code flow involves a couple of extra steps to configure. The first is to present the ChromeTabs to the user to take them through the web based authorization flow. The Activity this should be presented from must be passed to the SDK.
+
+See [loginUserUsingWeb](us.frollo.frollosdk.authentication/-o-auth2-authentication/login-user-using-web.html)
 
 ##### Integration Requirements
 
@@ -107,19 +127,24 @@ Completion intent and Cancelled intent should be provided to the SDK to support 
             cancelIntent.putExtra(EXTRA_FAILED, true)
             cancelIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
 
-            FrolloSDK.authentication.loginUserUsingWeb(
+            FrolloSDK.defaultAuthentication.loginUserUsingWeb(
                     activity = this,
+                    scopes = listOf(OAuth2Scope.OFFLINE_ACCESS, OAuth2Scope.EMAIL, OAuth2Scope.OPENID),
                     completedIntent = PendingIntent.getActivity(this, 0, completionIntent, 0),
                     cancelledIntent = PendingIntent.getActivity(this, 0, cancelIntent, 0),
                     toolBarColor = resources.getColor(R.color.colorPrimary, null))
         }
     }
+```
 
+The next step is to pass the intent received by the Completion Activity to the SDK to complete the login process and exchange the authorization code for a token.
+
+```kotlin
     class CompletionLoginWebActivity : AppCompatActivity() {
 
         override fun onCreate(savedInstanceState: Bundle?) {
             //...
-            FrolloSDK.authentication.handleWebLoginResponse(intent) { result ->
+            FrolloSDK.defaultAuthentication.handleWebLoginResponse(intent) { result ->
                 when (result.status) {
                     Result.Status.SUCCESS -> {
                         startActivity<MainActivity>()
@@ -146,6 +171,7 @@ Completion intent and Cancelled intent should be provided to the SDK to support 
         private fun startAuthorizationCodeFlow() {
             FrolloSDK.authentication.loginUserUsingWeb(
                     activity = this,
+                    scopes = listOf(OAuth2Scope.OFFLINE_ACCESS, OAuth2Scope.EMAIL, OAuth2Scope.OPENID),
                     toolBarColor = resources.getColor(R.color.colorPrimary, null))
         }
 
@@ -156,6 +182,7 @@ Completion intent and Cancelled intent should be provided to the SDK to support 
                 if (resultCode == RESULT_CANCELED) {
                     displayAuthCancelled();
                 } else {
+                    // The next step is to pass the intent received to the SDK to complete the login process and exchange the authorization code for a token.
                     FrolloSDK.authentication.handleWebLoginResponse(intent) { result ->
                         when (result.status) {
                             Result.Status.SUCCESS -> {
@@ -171,6 +198,10 @@ Completion intent and Cancelled intent should be provided to the SDK to support 
         }
     }
 ```
+
+#### Custom Authentication
+
+Custom authentication can be provided by extending the [Authentication](us.frollo.frollosdk.authentication/-authentication/index.html) abstract class and ensuring [refreshTokens(completion:)](us.frollo.frollosdk.authentication/-authentication/refresh-tokens.html) and calls to the authenticationCallback are implemented appropriately.
 
 #### Refreshing Data
 

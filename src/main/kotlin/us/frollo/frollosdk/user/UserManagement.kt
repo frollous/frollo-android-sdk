@@ -48,7 +48,6 @@ import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.coredata.user.User
-import us.frollo.frollosdk.model.oauth.OAuth2Scope
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.network.api.UserAPI
@@ -117,14 +116,14 @@ class UserManagement(private val di: DeviceInfo, private val network: NetworkSer
      * @param completion Completion handler with any error that occurred
      */
     fun registerUser(
-            firstName: String,
-            lastName: String? = null,
-            mobileNumber: String? = null,
-            postcode: String? = null,
-            dateOfBirth: Date? = null,
-            email: String,
-            password: String,
-            completion: OnFrolloSDKCompletionListener<Result>
+        firstName: String,
+        lastName: String? = null,
+        mobileNumber: String? = null,
+        postcode: String? = null,
+        dateOfBirth: Date? = null,
+        email: String,
+        password: String,
+        completion: OnFrolloSDKCompletionListener<Result>
     ) {
         if (authentication.loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)

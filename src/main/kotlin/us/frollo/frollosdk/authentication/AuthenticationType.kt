@@ -39,11 +39,12 @@ sealed class AuthenticationType {
      * @param revokeTokenURL OAuth2 token endpoint to revoke refresh token on logout (if supported)
      */
     class OAuth2(
-            val clientId: String,
-            val redirectUrl: String,
-            val authorizationUrl: String,
-            val tokenUrl: String,
-            val revokeTokenURL: String? = null) : AuthenticationType() {
+        val clientId: String,
+        val redirectUrl: String,
+        val authorizationUrl: String,
+        val tokenUrl: String,
+        val revokeTokenURL: String? = null
+    ) : AuthenticationType() {
 
         /**
          * OAuth2 Redirection URL. URL to redirect to after the authorization flow is complete. This should be a deep or universal link to the host app

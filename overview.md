@@ -17,7 +17,6 @@ The Frollo Android SDK is broken down into multiple components that reflect the 
 - [Messages](#messages) - Nudges and other customisable messaging to inform the user and keep them on track
 - [Surveys](#surveys) - Questions and feedback from the user
 
-
 ### Authentication
 
 Authentication of the user is currently managed by use of OAuth2. Users can be authenticated by any OpenID Connect compliant identity provider or the Frollo identity provider.
@@ -29,7 +28,7 @@ Authentication is supported using the following OAuth2 flows:
 
 Authentication provides the access token needed to access Frollo APIs and manages refreshing the access token if it expires.
 
-See [Authentication](us.frollo.frollosdk.auth/-authentication/index.html) for more details.
+See [Authentication](us.frollo.frollosdk.authentication/-authentication/index.html) for more details.
 
 ### User
 
@@ -47,7 +46,7 @@ The following are available depending on how authentication and users are config
 * Changing the user's password
 * Reset password
 
-See [Authentication](us.frollo.frollosdk.auth/-authentication/index.html) for more details.
+See [Authentication](us.frollo.frollosdk.authentication/-authentication/index.html) for more details.
 
 ### Aggregation
 

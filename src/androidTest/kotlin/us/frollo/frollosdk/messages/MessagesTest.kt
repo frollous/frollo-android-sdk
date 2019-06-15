@@ -166,7 +166,7 @@ class MessagesTest : BaseAndroidTest() {
         database.messages().insertAll(*list.toTypedArray())
 
         messages.fetchMessagesCount(read = true) { resource ->
-            assertEquals(2, resource.data)
+            assertEquals(2L, resource.data)
         }
 
         tearDown()

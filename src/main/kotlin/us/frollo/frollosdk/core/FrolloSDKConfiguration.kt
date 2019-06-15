@@ -37,22 +37,22 @@ data class FrolloSDKConfiguration(
     val logLevel: LogLevel = LogLevel.ERROR
 ) {
 
-    internal fun validForROPC() : Boolean {
+    internal fun validForROPC(): Boolean {
         if (authenticationType is OAuth2) {
-            return authenticationType.clientId.isNotBlank()
-                    && authenticationType.tokenUrl.isNotBlank()
-                    && serverUrl.isNotBlank()
+            return authenticationType.clientId.isNotBlank() &&
+                    authenticationType.tokenUrl.isNotBlank() &&
+                    serverUrl.isNotBlank()
         }
         return false
     }
 
-    internal fun validForAuthorizationCodeFlow() : Boolean {
+    internal fun validForAuthorizationCodeFlow(): Boolean {
         if (authenticationType is OAuth2) {
-            return authenticationType.clientId.isNotBlank()
-                    && authenticationType.tokenUrl.isNotBlank()
-                    && authenticationType.redirectUrl.isNotBlank()
-                    && authenticationType.authorizationUrl.isNotBlank()
-                    && serverUrl.isNotBlank()
+            return authenticationType.clientId.isNotBlank() &&
+                    authenticationType.tokenUrl.isNotBlank() &&
+                    authenticationType.redirectUrl.isNotBlank() &&
+                    authenticationType.authorizationUrl.isNotBlank() &&
+                    serverUrl.isNotBlank()
         }
         return false
     }

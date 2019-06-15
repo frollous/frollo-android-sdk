@@ -2,8 +2,8 @@
 
 ### Requirements
 
-- Android Studio 3.4+
-- Kotlin version 1.3.30+
+- Android Studio 3.4.1+
+- Kotlin version 1.3.31+
 - Gradle tools plugin version 3.4.1+ - In your project level **build.gradle**    
     ```    
         dependencies {    

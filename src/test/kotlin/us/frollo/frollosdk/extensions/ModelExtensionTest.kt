@@ -67,10 +67,10 @@ class ModelExtensionTest {
     @Test
     fun testSQLForMessagesCount() {
         var query = sqlForMessagesCount(mutableListOf("survey", "event"), false, ContentType.VIDEO)
-        assertEquals("SELECT COUNT(message_id)  FROM message WHERE ((message_types LIKE '%|survey|%') OR (message_types LIKE '%|event|%')) AND read = 0 AND content_type = 'VIDEO' ", query.sql)
+        assertEquals("SELECT COUNT(msg_id)  FROM message WHERE ((message_types LIKE '%|survey|%') OR (message_types LIKE '%|event|%')) AND read = 0 AND content_type = 'VIDEO' ", query.sql)
 
         query = sqlForMessagesCount()
-        assertEquals("SELECT COUNT(message_id)  FROM message", query.sql)
+        assertEquals("SELECT COUNT(msg_id)  FROM message", query.sql)
     }
 
     @Test

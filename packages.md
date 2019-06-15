@@ -108,6 +108,10 @@ Frollo SDK provider display models
 
 Frollo SDK report display models
 
+# Package us.frollo.frollosdk.model.oauth
+
+Frollo SDK OAuth2 models
+
 # Package us.frollo.frollosdk.notifications
 
 Manages registration for and handling of incoming push notifications.
@@ -119,3 +123,7 @@ Manages all aspects of reporting of aggregation data including spending and bala
 # Package us.frollo.frollosdk.surveys
 
 Manages fetching & submitting surveys.
+
+# Package us.frollo.frollosdk.user
+
+Manages the user details and device

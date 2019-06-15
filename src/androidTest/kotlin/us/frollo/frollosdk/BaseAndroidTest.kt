@@ -27,11 +27,9 @@ import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.OAuth2Authentication
 import us.frollo.frollosdk.authentication.OAuth2Helper
-import us.frollo.frollosdk.authentication.TestCustomAuthentication
 import us.frollo.frollosdk.bills.Bills
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.testSDKConfig
-import us.frollo.frollosdk.core.testSDKCustomConfig
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.events.Events
 import us.frollo.frollosdk.keystore.Keystore
@@ -64,7 +62,6 @@ abstract class BaseAndroidTest {
     lateinit var keystore: Keystore
     lateinit var database: SDKDatabase
     lateinit var authentication: Authentication
-    lateinit var customAuthentication: TestCustomAuthentication
     lateinit var aggregation: Aggregation
     lateinit var userManagement: UserManagement
     lateinit var bills: Bills
@@ -75,8 +72,6 @@ abstract class BaseAndroidTest {
     lateinit var surveys: Surveys
 
     val scopes = listOf("offline_access", "openid", "email")
-
-    protected open val isCustom = false
 
     protected open fun initSetup() {
         mockServer = MockWebServer()
@@ -91,12 +86,7 @@ abstract class BaseAndroidTest {
         mockRevokeTokenServer.start()
         val baseRevokeTokenUrl = mockRevokeTokenServer.url("/$REVOKE_TOKEN_URL")
 
-        val config = if (isCustom) {
-            customAuthentication = TestCustomAuthentication()
-            testSDKCustomConfig(authentication = customAuthentication, serverUrl = baseUrl.toString())
-        } else {
-            testSDKConfig(serverUrl = baseUrl.toString(), tokenUrl = baseTokenUrl.toString(), revokeTokenURL = baseRevokeTokenUrl.toString())
-        }
+        val config = testSDKConfig(serverUrl = baseUrl.toString(), tokenUrl = baseTokenUrl.toString(), revokeTokenURL = baseRevokeTokenUrl.toString())
         if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
 
         keystore = Keystore()
@@ -106,15 +96,11 @@ abstract class BaseAndroidTest {
         val oAuth = OAuth2Helper(config = config)
         network = NetworkService(oAuth2Helper = oAuth, keystore = keystore, pref = preferences)
 
-        authentication = if (isCustom) {
-            customAuthentication
-        } else {
-            OAuth2Authentication(oAuth, preferences, network).apply {
+        authentication = OAuth2Authentication(oAuth, preferences, network).apply {
                 tokenAPI = network.createAuth(TokenAPI::class.java)
                 revokeTokenAPI = network.createRevoke(TokenAPI::class.java)
                 authToken = network.authToken
             }
-        }
         network.authentication = authentication
         userManagement = UserManagement(DeviceInfo(app), network, database, preferences, authentication)
         aggregation = Aggregation(network, database, LocalBroadcastManager.getInstance(app), authentication)
@@ -135,7 +121,6 @@ abstract class BaseAndroidTest {
         network.reset()
         userManagement.reset()
         authentication.reset()
-        customAuthentication.reset()
         preferences.resetAll()
         database.clearAllTables()
     }

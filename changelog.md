@@ -1,10 +1,10 @@
 ## Changelog
 
 ### 2.0.0
-- TBD
+- Custom Authentication - Custom handling of authentication can be provided to the SDK
 
 #### Features
-- TBD
+- Custom Authentication
 
 ### 1.4.0
 

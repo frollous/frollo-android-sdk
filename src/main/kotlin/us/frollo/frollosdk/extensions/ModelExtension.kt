@@ -106,7 +106,7 @@ internal fun sqlForMessagesCount(messageTypes: List<String>? = null, read: Boole
 
     contentType?.let { sqlQueryBuilder.appendSelection(selection = "content_type = '${ it.name }'") }
 
-    sqlQueryBuilder.columns(columns = arrayOf("COUNT(message_id)"))
+    sqlQueryBuilder.columns(columns = arrayOf("COUNT(msg_id)"))
 
     return sqlQueryBuilder.create()
 }

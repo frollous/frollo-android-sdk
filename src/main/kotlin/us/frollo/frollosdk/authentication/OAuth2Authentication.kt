@@ -50,9 +50,10 @@ import us.frollo.frollosdk.preferences.Preferences
  * Manages authentication, login, registration, logout and the user profile.
  */
 class OAuth2Authentication(
-        internal val oAuth2Helper: OAuth2Helper,
-        private val pref: Preferences,
-        callback: AuthenticationCallback) : Authentication() {
+    internal val oAuth2Helper: OAuth2Helper,
+    private val pref: Preferences,
+    callback: AuthenticationCallback
+) : Authentication() {
 
     companion object {
         private const val TAG = "OAuth2Authentication"

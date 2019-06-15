@@ -30,7 +30,7 @@ import us.frollo.frollosdk.testutils.randomString
 import us.frollo.frollosdk.testutils.randomUUID
 import us.frollo.frollosdk.testutils.trimmedPath
 
-class NetworkLoggerTest : BaseAndroidTest(){
+class NetworkLoggerTest : BaseAndroidTest() {
 
     override fun initSetup() {
         super.initSetup()

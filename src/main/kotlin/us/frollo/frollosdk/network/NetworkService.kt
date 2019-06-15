@@ -36,9 +36,9 @@ import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.preferences.Preferences
 
 class NetworkService internal constructor(
-        internal val oAuth2Helper: OAuth2Helper,
-        keystore: Keystore,
-        pref: Preferences
+    internal val oAuth2Helper: OAuth2Helper,
+    keystore: Keystore,
+    pref: Preferences
 ) : IApiProvider, AuthenticationCallback {
 
     companion object {
@@ -77,14 +77,14 @@ class NetworkService internal constructor(
 
         val httpClientBuilder = OkHttpClient.Builder()
                 .addInterceptor(
-                        if (oAuth2Helper.config.authenticationType is OAuth2
-                                && (baseUrl == oAuth2Helper.oAuth2.tokenUrl || baseUrl == oAuth2Helper.oAuth2.revokeTokenURL))
+                        if (oAuth2Helper.config.authenticationType is OAuth2 &&
+                                (baseUrl == oAuth2Helper.oAuth2.tokenUrl || baseUrl == oAuth2Helper.oAuth2.revokeTokenURL))
                             tokenInterceptor
                         else
                             serverInterceptor)
                 .authenticator(
-                        if (oAuth2Helper.config.authenticationType is OAuth2
-                                && (baseUrl == oAuth2Helper.oAuth2.tokenUrl || baseUrl == oAuth2Helper.oAuth2.revokeTokenURL))
+                        if (oAuth2Helper.config.authenticationType is OAuth2 &&
+                                (baseUrl == oAuth2Helper.oAuth2.tokenUrl || baseUrl == oAuth2Helper.oAuth2.revokeTokenURL))
                             TokenAuthenticator(this)
                         else
                             NetworkAuthenticator(this, helper))

@@ -25,6 +25,7 @@ import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
+import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.ACTION
@@ -363,6 +364,7 @@ class OAuth2Authentication(
         }
 
         reset()
+        if (FrolloSDK.isSetup) FrolloSDK.reset()
     }
 
     private fun handleTokens(tokenResponse: OAuthTokenResponse) {

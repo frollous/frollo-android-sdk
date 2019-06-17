@@ -124,17 +124,6 @@ class FrolloSDKAndroidUnitTest {
     }
 
     @Test
-    fun testSDKDefaultAuthenticationThrowsErrorBeforeSetup() {
-        assertFalse(FrolloSDK.isSetup)
-
-        try {
-            FrolloSDK.defaultAuthentication
-        } catch (e: IllegalAccessException) {
-            assertEquals("SDK not setup", e.localizedMessage)
-        }
-    }
-
-    @Test
     fun testSDKAggregationThrowsErrorBeforeSetup() {
         assertFalse(FrolloSDK.isSetup)
 

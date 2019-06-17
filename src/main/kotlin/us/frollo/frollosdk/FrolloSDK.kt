@@ -85,7 +85,7 @@ object FrolloSDK {
      * Default OAuth2 Authentication - Returns the default OAuth2 based authentication if no custom one has been applied
      */
     val defaultAuthentication: OAuth2Authentication?
-        get() = _authentication as? OAuth2Authentication ?: throw IllegalAccessException("SDK not setup")
+        get() = _authentication as? OAuth2Authentication
 
     /**
      * Aggregation - All account and transaction related data see [Aggregation] for details

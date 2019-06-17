@@ -47,7 +47,16 @@ class Result private constructor(
     }
 
     companion object {
-        internal fun success(): Result = Result(Status.SUCCESS)
-        internal fun error(error: FrolloSDKError?): Result = Result(Status.ERROR, error)
+        /**
+         * Instantiate Result with status Success
+         */
+        fun success(): Result = Result(Status.SUCCESS)
+
+        /**
+         * Instantiate Result with status Error
+         *
+         * @param error Associated error conforming [FrolloSDKError]
+         */
+        fun error(error: FrolloSDKError?): Result = Result(Status.ERROR, error)
     }
 }

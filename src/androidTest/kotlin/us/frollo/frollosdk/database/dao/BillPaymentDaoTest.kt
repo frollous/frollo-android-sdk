@@ -172,7 +172,7 @@ class BillPaymentDaoTest {
     }
 
     @Test
-    fun testGetStaleIds() {
+    fun testGetIds() {
         val data1 = testBillPaymentResponseData(billPaymentId = 100, date = "2019-01-01")
         val data2 = testBillPaymentResponseData(billPaymentId = 101, date = "2019-02-01")
         val data3 = testBillPaymentResponseData(billPaymentId = 102, date = "2019-02-06")
@@ -182,10 +182,10 @@ class BillPaymentDaoTest {
 
         db.billPayments().insertAll(*list.map { it.toBillPayment() }.toList().toTypedArray())
 
-        val staleIds = db.billPayments().getStaleIds(apiIds = longArrayOf(102, 103), fromDate = "2019-02-06", toDate = "2019-04-30").sorted()
+        val staleIds = db.billPayments().getIds(fromDate = "2019-02-06", toDate = "2019-04-30").sorted()
 
-        assertEquals(1, staleIds.size)
-        assertTrue(staleIds.containsAll(mutableListOf<Long>(104)))
+        assertEquals(3, staleIds.size)
+        assertTrue(staleIds.containsAll(mutableListOf<Long>(102, 103, 104)))
     }
 
     @Test

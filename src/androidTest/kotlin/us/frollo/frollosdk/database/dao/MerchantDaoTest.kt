@@ -121,21 +121,6 @@ class MerchantDaoTest {
     }
 
     @Test
-    fun testGetStaleIds() {
-        val data1 = testMerchantResponseData(merchantId = 100)
-        val data2 = testMerchantResponseData(merchantId = 101)
-        val data3 = testMerchantResponseData(merchantId = 102)
-        val data4 = testMerchantResponseData(merchantId = 103)
-        val list = mutableListOf(data1, data2, data3, data4)
-
-        db.merchants().insertAll(*list.map { it.toMerchant() }.toList().toTypedArray())
-
-        val staleIds = db.merchants().getStaleIds(longArrayOf(100, 103)).sorted()
-        assertEquals(2, staleIds.size)
-        assertTrue(staleIds.containsAll(mutableListOf<Long>(101, 102)))
-    }
-
-    @Test
     fun testDeleteMany() {
         val data1 = testMerchantResponseData(merchantId = 100)
         val data2 = testMerchantResponseData(merchantId = 101)

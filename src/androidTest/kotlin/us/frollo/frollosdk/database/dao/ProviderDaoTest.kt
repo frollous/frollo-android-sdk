@@ -123,21 +123,6 @@ class ProviderDaoTest {
     }
 
     @Test
-    fun testGetStaleIds() {
-        val data1 = testProviderResponseData(providerId = 100)
-        val data2 = testProviderResponseData(providerId = 101)
-        val data3 = testProviderResponseData(providerId = 102)
-        val data4 = testProviderResponseData(providerId = 103)
-        val list = mutableListOf(data1, data2, data3, data4)
-
-        db.providers().insertAll(*list.map { it.toProvider() }.toList().toTypedArray())
-
-        val staleIds = db.providers().getStaleIds(longArrayOf(100, 103)).sorted()
-        assertEquals(2, staleIds.size)
-        assertTrue(staleIds.containsAll(mutableListOf<Long>(101, 102)))
-    }
-
-    @Test
     fun testDeleteMany() {
         val data1 = testProviderResponseData(providerId = 100)
         val data2 = testProviderResponseData(providerId = 101)

@@ -277,8 +277,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 val models = mapProviderResponse(response)
                 db.providers().insertAll(*models.toTypedArray())
 
-                val apiIds = response.map { it.providerId }.toList()
-                val staleIds = db.providers().getStaleIds(apiIds.toLongArray())
+                val apiIds = response.map { it.providerId }.toHashSet()
+                val allProviderIds = db.providers().getIds().toHashSet()
+                val staleIds = allProviderIds.minus(apiIds)
 
                 if (staleIds.isNotEmpty()) {
                     removeCachedProviders(staleIds.toLongArray())
@@ -1940,7 +1941,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 refreshingMerchantIDs = refreshingMerchantIDs.minus(apiIds)
 
                 if (!byIds) {
-                    val staleIds = db.merchants().getStaleIds(apiIds.toLongArray())
+                    val allMerchantIds = db.merchants().getIds().toHashSet()
+                    val staleIds = allMerchantIds.minus(apiIds.toHashSet())
 
                     if (staleIds.isNotEmpty()) {
                         db.merchants().deleteMany(staleIds.toLongArray())

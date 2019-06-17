@@ -235,21 +235,6 @@ class TransactionDaoTest {
     }
 
     @Test
-    fun testGetStaleIds() {
-        val data1 = testTransactionResponseData(transactionId = 100)
-        val data2 = testTransactionResponseData(transactionId = 101)
-        val data3 = testTransactionResponseData(transactionId = 102)
-        val data4 = testTransactionResponseData(transactionId = 103)
-        val list = mutableListOf(data1, data2, data3, data4)
-
-        db.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
-
-        val staleIds = db.transactions().getStaleIds(longArrayOf(100, 103)).sorted()
-        assertEquals(2, staleIds.size)
-        assertTrue(staleIds.containsAll(mutableListOf<Long>(101, 102)))
-    }
-
-    @Test
     fun testDeleteMany() {
         val data1 = testTransactionResponseData(transactionId = 100)
         val data2 = testTransactionResponseData(transactionId = 101)

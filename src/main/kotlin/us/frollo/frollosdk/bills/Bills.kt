@@ -596,8 +596,9 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
 
                 db.billPayments().insertAll(*models.toTypedArray())
 
-                val apiIds = models.map { it.billPaymentId }.toList()
-                val staleIds = db.billPayments().getStaleIds(apiIds = apiIds.toLongArray(), fromDate = fromDate, toDate = toDate)
+                val apiIds = models.map { it.billPaymentId }.toHashSet()
+                val allBillPaymentIds = db.billPayments().getIds(fromDate = fromDate, toDate = toDate).toHashSet()
+                val staleIds = allBillPaymentIds.minus(apiIds)
 
                 if (staleIds.isNotEmpty()) {
                     removeCachedBillPayments(staleIds.toLongArray())

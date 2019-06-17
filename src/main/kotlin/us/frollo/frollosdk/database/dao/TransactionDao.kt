@@ -63,9 +63,6 @@ internal interface TransactionDao {
     @Query("SELECT transaction_id FROM transaction_model WHERE account_id IN (:accountIds)")
     fun getIdsByAccountIds(accountIds: LongArray): LongArray
 
-    @Query("SELECT transaction_id FROM transaction_model WHERE transaction_id NOT IN (:apiIds)")
-    fun getStaleIds(apiIds: LongArray): List<Long>
-
     @Query("DELETE FROM transaction_model WHERE transaction_id IN (:transactionIds)")
     fun deleteMany(transactionIds: LongArray)
 

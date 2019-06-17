@@ -53,8 +53,8 @@ internal interface BillPaymentDao {
     @Query("SELECT bill_payment_id FROM bill_payment WHERE bill_id IN (:billIds)")
     fun getIdsByBillIds(billIds: LongArray): LongArray
 
-    @Query("SELECT bill_payment_id FROM bill_payment WHERE bill_payment_id NOT IN (:apiIds) AND (date BETWEEN Date(:fromDate) AND Date(:toDate))")
-    fun getStaleIds(apiIds: LongArray, fromDate: String, toDate: String): List<Long>
+    @Query("SELECT bill_payment_id FROM bill_payment WHERE (date BETWEEN Date(:fromDate) AND Date(:toDate))")
+    fun getIds(fromDate: String, toDate: String): List<Long>
 
     @Query("DELETE FROM bill_payment WHERE bill_payment_id IN (:billPaymentIds)")
     fun deleteMany(billPaymentIds: LongArray)

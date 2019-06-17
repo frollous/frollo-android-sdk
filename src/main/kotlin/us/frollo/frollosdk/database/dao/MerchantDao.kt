@@ -43,9 +43,6 @@ internal interface MerchantDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(model: Merchant): Long
 
-    @Query("SELECT merchant_id FROM merchant WHERE merchant_id NOT IN (:apiIds)")
-    fun getStaleIds(apiIds: LongArray): List<Long>
-
     @Query("SELECT merchant_id FROM merchant")
     fun getIds(): List<Long>
 

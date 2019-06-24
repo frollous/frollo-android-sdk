@@ -6,6 +6,11 @@
 #### Features
 - Custom Authentication
 
+### 1.4.1
+
+#### Changes
+- Refactor Aggregation - createProviderAccount to return the ID of the provider account created.
+
 ### 1.4.0
 
 #### Changes

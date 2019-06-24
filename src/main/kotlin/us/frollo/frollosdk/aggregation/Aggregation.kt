@@ -442,13 +442,13 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      *
      * @param providerId ID of the provider which an account should be created for
      * @param loginForm Provider login form with validated and encrypted values with the user's details
-     * @param completion Optional completion handler with optional error if the request fails
+     * @param completion Optional completion handler with optional error if the request fails else ID of the ProviderAccount created if success
      */
-    fun createProviderAccount(providerId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun createProviderAccount(providerId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null) {
         if (!authentication.loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
             Log.e("$TAG#createProviderAccount", error.localizedDescription)
-            completion?.invoke(Result.error(error))
+            completion?.invoke(Resource.error(error))
             return
         }
 
@@ -457,11 +457,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         aggregationAPI.createProviderAccount(request).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleProviderAccountResponse(response = resource.data, completion = completion)
+                    handleProviderAccountResponse(response = resource.data, completionWithData = completion)
                 }
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#createProviderAccount", resource.error?.localizedDescription)
-                    completion?.invoke(Result.error(resource.error))
+                    completion?.invoke(Resource.error(resource.error))
                 }
             }
         }
@@ -545,16 +545,25 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
 
-    private fun handleProviderAccountResponse(response: ProviderAccountResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    private fun handleProviderAccountResponse(
+            response: ProviderAccountResponse?,
+            completion: OnFrolloSDKCompletionListener<Result>? = null,
+            completionWithData: OnFrolloSDKCompletionListener<Resource<Long>>? = null) {
         response?.let {
             doAsync {
                 fetchMissingProviders(setOf(response.providerId))
 
                 db.providerAccounts().insert(response.toProviderAccount())
 
-                uiThread { completion?.invoke(Result.success()) }
+                uiThread {
+                    completion?.invoke(Result.success())
+                    completionWithData?.invoke(Resource.success(response.providerAccountId))
+                }
             }
-        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+        } ?: run {
+            completion?.invoke(Result.success())
+            completionWithData?.invoke(Resource.success(null))
+        } // Explicitly invoke completion callback if response is null.
     }
 
     private fun mapProviderAccountResponse(models: List<ProviderAccountResponse>): List<ProviderAccount> =

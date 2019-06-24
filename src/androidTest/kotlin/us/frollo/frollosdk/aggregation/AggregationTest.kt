@@ -575,9 +575,10 @@ class AggregationTest {
             }
         })
 
-        aggregation.createProviderAccount(providerId = 4078, loginForm = loginFormFilledData()) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        aggregation.createProviderAccount(providerId = 4078, loginForm = loginFormFilledData()) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+            assertEquals(123L, resource.data)
 
             val testObserver = aggregation.fetchProviderAccounts().test()
             testObserver.awaitValue()
@@ -601,11 +602,11 @@ class AggregationTest {
 
         preferences.loggedIn = false
 
-        aggregation.createProviderAccount(providerId = 4078, loginForm = loginFormFilledData()) { result ->
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        aggregation.createProviderAccount(providerId = 4078, loginForm = loginFormFilledData()) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (resource.error as DataError).subType)
         }
 
         wait(3)

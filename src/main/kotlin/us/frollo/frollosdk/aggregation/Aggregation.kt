@@ -546,9 +546,10 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     private fun handleProviderAccountResponse(
-            response: ProviderAccountResponse?,
-            completion: OnFrolloSDKCompletionListener<Result>? = null,
-            completionWithData: OnFrolloSDKCompletionListener<Resource<Long>>? = null) {
+        response: ProviderAccountResponse?,
+        completion: OnFrolloSDKCompletionListener<Result>? = null,
+        completionWithData: OnFrolloSDKCompletionListener<Resource<Long>>? = null
+    ) {
         response?.let {
             doAsync {
                 fetchMissingProviders(setOf(response.providerId))

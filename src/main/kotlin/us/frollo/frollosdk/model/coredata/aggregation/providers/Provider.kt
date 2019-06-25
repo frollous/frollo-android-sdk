@@ -38,10 +38,10 @@ data class Provider(
     /** Name of the provider */
     @ColumnInfo(name = "provider_name") val providerName: String,
 
-    /** URL to the small logo image (optional) */
+    /** URL to the small logo image (optional). Empty if no logo image available. */
     @ColumnInfo(name = "small_logo_url") val smallLogoUrl: String,
 
-    /** Small Logo Revision */
+    /** Small Logo Revision (optional). 0 if no logo image revision available. */
     @ColumnInfo(name = "small_logo_revision") val smallLogoRevision: Int,
 
     /** Status of the provider */

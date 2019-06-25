@@ -38,8 +38,8 @@ internal fun ProviderResponse.toProvider(): Provider =
         Provider(
                 providerId = providerId,
                 providerName = providerName,
-                smallLogoUrl = smallLogoUrl,
-                smallLogoRevision = smallLogoRevision,
+                smallLogoUrl = smallLogoUrl ?: "", // Set empty string if null as the field in DB is non-nullable
+                smallLogoRevision = smallLogoRevision ?: 0, // Set 0 if null as the field in DB is non-nullable
                 providerStatus = providerStatus,
                 popular = popular,
                 containerNames = containerNames.map { ProviderContainerName.valueOf(it.toUpperCase()) }.toList(),

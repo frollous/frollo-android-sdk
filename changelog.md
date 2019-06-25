@@ -6,6 +6,11 @@
 #### Features
 - Custom Authentication
 
+### 1.4.2
+
+#### Changes
+- Update Frollo Host API version to 2.4 to support the refactored Account Balance Reports API.
+
 ### 1.4.1
 
 #### Changes

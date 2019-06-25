@@ -26,8 +26,8 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 internal data class ProviderResponse(
     @SerializedName("id") val providerId: Long,
     @SerializedName("name") val providerName: String,
-    @SerializedName("small_logo_url") val smallLogoUrl: String,
-    @SerializedName("small_logo_revision") val smallLogoRevision: Int,
+    @SerializedName("small_logo_url") val smallLogoUrl: String?,
+    @SerializedName("small_logo_revision") val smallLogoRevision: Int?,
     @SerializedName("status") val providerStatus: ProviderStatus,
     @SerializedName("popular") val popular: Boolean,
     @SerializedName("container_names") val containerNames: List<String>,

@@ -50,10 +50,10 @@ internal class NetworkAuthenticator(private val network: NetworkService, private
                 APIErrorType.INVALID_ACCESS_TOKEN -> {
                     if (network.invalidTokenRetries < 5) {
                         network.authentication?.refreshTokens()
-                        val newToken = helper.authAccessToken
-                        if (newToken != null) {
+                        val newBearerAuth = helper.authAccessToken
+                        if (newBearerAuth != null) {
                             newRequest = response.request().newBuilder()
-                                    .header(HEADER_AUTHORIZATION, "Bearer $newToken")
+                                    .header(HEADER_AUTHORIZATION, newBearerAuth)
                                     .build()
                         }
 
@@ -65,7 +65,11 @@ internal class NetworkAuthenticator(private val network: NetworkService, private
                     network.invalidTokenRetries++
                 }
 
-                APIErrorType.INVALID_REFRESH_TOKEN, APIErrorType.SUSPENDED_DEVICE, APIErrorType.SUSPENDED_USER, APIErrorType.OTHER_AUTHORISATION -> {
+                APIErrorType.INVALID_REFRESH_TOKEN,
+                APIErrorType.SUSPENDED_DEVICE,
+                APIErrorType.SUSPENDED_USER,
+                APIErrorType.ACCOUNT_LOCKED,
+                APIErrorType.OTHER_AUTHORISATION -> {
                     network.triggerForcedLogout()
                 }
 

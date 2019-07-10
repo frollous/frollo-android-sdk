@@ -33,7 +33,6 @@ import org.threeten.bp.ZoneOffset
 
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.Authentication
-import us.frollo.frollosdk.authentication.AuthenticationCallback
 import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
@@ -136,12 +135,10 @@ class TestCustomAuthentication : Authentication() {
 
     override var loggedIn: Boolean = false
 
-    override var authenticationCallback: AuthenticationCallback? = null
-
     fun login() {
         loggedIn = true
 
-        authenticationCallback?.saveAccessTokens(
+        tokenCallback?.saveAccessTokens(
                 accessToken = validTokens[tokenIndex],
                 expiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 3600)
     }
@@ -153,7 +150,7 @@ class TestCustomAuthentication : Authentication() {
             tokenIndex = 0
         }
 
-        authenticationCallback?.saveAccessTokens(
+        tokenCallback?.saveAccessTokens(
                 accessToken = validTokens[tokenIndex],
                 expiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 3600)
 

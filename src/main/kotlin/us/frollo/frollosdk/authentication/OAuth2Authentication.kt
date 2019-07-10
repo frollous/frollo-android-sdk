@@ -25,7 +25,6 @@ import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
-import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.ACTION
@@ -53,7 +52,8 @@ import us.frollo.frollosdk.preferences.Preferences
 class OAuth2Authentication(
     internal val oAuth2Helper: OAuth2Helper,
     private val pref: Preferences,
-    callback: AuthenticationCallback
+    authenticationCallback: AuthenticationCallback,
+    tokenCallback: AuthenticationTokenCallback
 ) : Authentication() {
 
     companion object {
@@ -67,13 +67,16 @@ class OAuth2Authentication(
         get() = pref.loggedIn
         private set(value) { pref.loggedIn = value }
 
-    override var authenticationCallback: AuthenticationCallback? = callback
-
     internal var tokenAPI: TokenAPI? = null
     internal var revokeTokenAPI: TokenAPI? = null
     internal var authToken: AuthToken? = null
 
     private var codeVerifier: String? = null
+
+    init {
+        this.authenticationCallback = authenticationCallback
+        this.tokenCallback = tokenCallback
+    }
 
     /**
      * Login a user via WebView
@@ -364,7 +367,6 @@ class OAuth2Authentication(
         }
 
         reset()
-        if (FrolloSDK.isSetup) FrolloSDK.reset()
     }
 
     private fun handleTokens(tokenResponse: OAuthTokenResponse) {
@@ -378,7 +380,7 @@ class OAuth2Authentication(
         val createdAt = LocalDateTime.ofEpochSecond(tokenResponse.createdAt, 0, ZoneOffset.UTC) ?: LocalDateTime.now(ZoneOffset.UTC)
         val tokenExpiry = createdAt.plusSeconds(tokenResponse.expiresIn).toEpochSecond(ZoneOffset.UTC)
 
-        authenticationCallback?.saveAccessTokens(tokenResponse.accessToken, tokenExpiry)
+        tokenCallback?.saveAccessTokens(tokenResponse.accessToken, tokenExpiry)
     }
 
     private fun setLoggedIn() {

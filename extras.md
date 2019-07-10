@@ -201,7 +201,7 @@ The next step is to pass the intent received by the Completion Activity to the S
 
 #### Custom Authentication
 
-Custom authentication can be provided by extending the [Authentication](us.frollo.frollosdk.authentication/-authentication/index.html) abstract class and ensuring [refreshTokens(completion:)](us.frollo.frollosdk.authentication/-authentication/refresh-tokens.html) and calls to the authenticationCallback are implemented appropriately.
+Custom authentication can be provided by extending the [Authentication](us.frollo.frollosdk.authentication/-authentication/index.html) abstract class and ensuring [refreshTokens(completion:)](us.frollo.frollosdk.authentication/-authentication/refresh-tokens.html) and calls to the tokenCallback are implemented appropriately.
 
 #### Refreshing Data
 

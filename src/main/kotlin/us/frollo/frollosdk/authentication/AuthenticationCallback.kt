@@ -16,10 +16,13 @@
 
 package us.frollo.frollosdk.authentication
 
+import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
+
 /**
  * Authentication Callback
  *
- * Called by the authentication class to notify other parts of the SDK of token or authentication changes.
+ * Called by the authentication class to notify other parts of the SDK of authentication changes.
  * This must be implemented by all custom authentication implementations.
  */
 interface AuthenticationCallback {
@@ -30,17 +33,8 @@ interface AuthenticationCallback {
      * This should be called when the user's authentication is no longer valid and no possible automated
      * re-authentication can be performed. For example when a refresh token has been revoked so no more
      * access tokens can be obtained.
-     */
-    fun authenticationReset()
-
-    /**
-     * Update the SDK with the latest access token
-     * Allows the SDK to cache and use the latest access token available for API requests. This should
-     * be called whenever the access token is refreshed or the user has authenticated and obtained a new
-     * access token.
      *
-     * @param accessToken: Current valid access token
-     * @param expiry: Indicates the number of seconds since the Unix Epoch (UTC) when the access token expires so SDK can pre-emptively request a new one
+     * @param completion Completion handler with option error if something goes wrong (optional)
      */
-    fun saveAccessTokens(accessToken: String, expiry: Long)
+    fun authenticationReset(completion: OnFrolloSDKCompletionListener<Result>? = null)
 }

@@ -30,7 +30,7 @@ import us.frollo.frollosdk.BuildConfig
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.AuthToken
 import us.frollo.frollosdk.authentication.Authentication
-import us.frollo.frollosdk.authentication.AuthenticationCallback
+import us.frollo.frollosdk.authentication.AuthenticationTokenCallback
 import us.frollo.frollosdk.authentication.AuthenticationType.OAuth2
 import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.preferences.Preferences
@@ -39,7 +39,7 @@ class NetworkService internal constructor(
     internal val oAuth2Helper: OAuth2Helper,
     keystore: Keystore,
     pref: Preferences
-) : IApiProvider, AuthenticationCallback {
+) : IApiProvider, AuthenticationTokenCallback {
 
     companion object {
         private const val TAG = "NetworkService"
@@ -118,10 +118,6 @@ class NetworkService internal constructor(
 
     internal fun authenticateRequest(request: Request): Request {
         return serverInterceptor.authenticateRequest(request)
-    }
-
-    override fun authenticationReset() {
-        reset()
     }
 
     internal fun reset() {

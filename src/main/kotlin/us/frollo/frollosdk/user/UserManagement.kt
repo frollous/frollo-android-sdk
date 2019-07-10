@@ -21,8 +21,8 @@ import androidx.lifecycle.Transformations
 import okhttp3.Request
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.Authentication
+import us.frollo.frollosdk.authentication.AuthenticationCallback
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.ACTION
@@ -58,7 +58,14 @@ import java.util.TimeZone
 /**
  * Manages the user details and device
  */
-class UserManagement(private val di: DeviceInfo, private val network: NetworkService, private val db: SDKDatabase, private val pref: Preferences, private val authentication: Authentication) {
+class UserManagement(
+    private val di: DeviceInfo,
+    private val network: NetworkService,
+    private val db: SDKDatabase,
+    private val pref: Preferences,
+    private val authentication: Authentication,
+    private val authenticationCallback: AuthenticationCallback
+) {
 
     companion object {
         private const val TAG = "UserManagement"
@@ -228,8 +235,7 @@ class UserManagement(private val di: DeviceInfo, private val network: NetworkSer
                     completion.invoke(Result.error(resource.error))
                 }
                 Resource.Status.SUCCESS -> {
-                    reset()
-                    if (FrolloSDK.isSetup) FrolloSDK.reset(completion)
+                    reset(completion)
                 }
             }
         }
@@ -368,9 +374,8 @@ class UserManagement(private val di: DeviceInfo, private val network: NetworkSer
             userAPI.migrateUser(UserMigrationRequest(password = password)).enqueue { resource ->
                 when (resource.status) {
                     Resource.Status.SUCCESS -> {
-                        reset()
                         // Force logout the user as this refresh token is no longer valid
-                        if (FrolloSDK.isSetup) FrolloSDK.reset(completion)
+                        reset(completion)
                     }
                     Resource.Status.ERROR -> {
                         Log.e("$TAG#migrateUser", resource.error?.localizedDescription)
@@ -409,12 +414,7 @@ class UserManagement(private val di: DeviceInfo, private val network: NetworkSer
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
 
-    internal fun reset() {
-        if (!authentication.loggedIn) {
-            Log.d("$TAG#reset", "Reset did nothing as user not logged in")
-            return
-        }
-
-        network.reset()
+    internal fun reset(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        authenticationCallback.authenticationReset(completion)
     }
 }

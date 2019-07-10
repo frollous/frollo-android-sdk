@@ -96,13 +96,13 @@ abstract class BaseAndroidTest {
         val oAuth = OAuth2Helper(config = config)
         network = NetworkService(oAuth2Helper = oAuth, keystore = keystore, pref = preferences)
 
-        authentication = OAuth2Authentication(oAuth, preferences, network).apply {
+        authentication = OAuth2Authentication(oAuth, preferences, authenticationCallback = FrolloSDK, tokenCallback = network).apply {
                 tokenAPI = network.createAuth(TokenAPI::class.java)
                 revokeTokenAPI = network.createRevoke(TokenAPI::class.java)
                 authToken = network.authToken
             }
         network.authentication = authentication
-        userManagement = UserManagement(DeviceInfo(app), network, database, preferences, authentication)
+        userManagement = UserManagement(DeviceInfo(app), network, database, preferences, authentication, authenticationCallback = FrolloSDK)
         aggregation = Aggregation(network, database, LocalBroadcastManager.getInstance(app), authentication)
         bills = Bills(network, database, aggregation, authentication)
         events = Events(network, authentication)
@@ -119,7 +119,6 @@ abstract class BaseAndroidTest {
         mockTokenServer.shutdown()
         mockRevokeTokenServer.shutdown()
         network.reset()
-        userManagement.reset()
         authentication.reset()
         preferences.resetAll()
         database.clearAllTables()

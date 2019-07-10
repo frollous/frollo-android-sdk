@@ -31,7 +31,12 @@ abstract class Authentication {
     /**
      * SDK callback to be called to update SDK about authentication events. SDK sets this as part of setup
      */
-    abstract var authenticationCallback: AuthenticationCallback?
+    var authenticationCallback: AuthenticationCallback? = null
+
+    /**
+     * SDK callback to be called to update SDK about token change events. SDK sets this as part of setup
+     */
+    var tokenCallback: AuthenticationTokenCallback? = null
 
     /**
      * Refresh Access Token

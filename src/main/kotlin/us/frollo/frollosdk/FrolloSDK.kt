@@ -27,6 +27,7 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.temporal.TemporalAdjusters
 import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.authentication.Authentication
+import us.frollo.frollosdk.authentication.AuthenticationCallback
 import us.frollo.frollosdk.authentication.AuthenticationStatus
 import us.frollo.frollosdk.authentication.AuthenticationType.Custom
 import us.frollo.frollosdk.authentication.AuthenticationType.OAuth2
@@ -64,7 +65,7 @@ import java.util.TimerTask
 /**
  * Frollo SDK manager and main instantiation. Responsible for managing the lifecycle and coordination of the SDK
  */
-object FrolloSDK {
+object FrolloSDK : AuthenticationCallback {
 
     private const val TAG = "FrolloSDK"
     private const val CACHE_EXPIRY = 120000L // 2 minutes
@@ -211,11 +212,12 @@ object FrolloSDK {
             // 8. Setup authentication stack
             when (configuration.authenticationType) {
                 is Custom -> {
-                    configuration.authenticationType.authentication.authenticationCallback = network
+                    configuration.authenticationType.authentication.authenticationCallback = this
+                    configuration.authenticationType.authentication.tokenCallback = network
                     _authentication = configuration.authenticationType.authentication
                 }
                 is OAuth2 -> {
-                    _authentication = OAuth2Authentication(oAuth, preferences, network).apply {
+                    _authentication = OAuth2Authentication(oAuth, preferences, authenticationCallback = this, tokenCallback = network).apply {
                         tokenAPI = network.createAuth(TokenAPI::class.java)
                         revokeTokenAPI = network.createRevoke(TokenAPI::class.java)
                         authToken = network.authToken
@@ -243,7 +245,7 @@ object FrolloSDK {
             _bills = Bills(network, database, aggregation, authentication)
 
             // 15. Setup User Management
-            _userManagement = UserManagement(deviceInfo, network, database, preferences, authentication)
+            _userManagement = UserManagement(deviceInfo, network, database, preferences, authentication, authenticationCallback = this)
 
             // 16. Setup Notifications
             _notifications = Notifications(userManagement, events, messages)
@@ -272,8 +274,8 @@ object FrolloSDK {
         if (!_setup) throw IllegalAccessException("SDK not setup")
 
         pauseScheduledRefreshing()
-        // NOTE: Keystore reset is not required as we do not store any data in there. Just keys.
         authentication.reset()
+        // NOTE: Keystore reset is not required as we do not store any data in there. Just keys.
         network.reset()
         preferences.reset()
         database.clearAllTables()
@@ -281,6 +283,23 @@ object FrolloSDK {
 
         notify(ACTION_AUTHENTICATION_CHANGED,
                 bundleOf(Pair(ARG_AUTHENTICATION_STATUS, AuthenticationStatus.LOGGED_OUT)))
+    }
+
+    /**
+     * Notifies the SDK that authentication of the user is no longer valid and to reset itself
+     *
+     * This should not be called directly. Instead use [FrolloSDK.reset]
+     *
+     * This should be called when the user's authentication is no longer valid and no possible automated
+     * re-authentication can be performed. For example when a refresh token has been revoked so no more
+     * access tokens can be obtained.
+     *
+     * @param completion Completion handler with option error if something goes wrong (optional)
+     */
+    override fun authenticationReset(completion: OnFrolloSDKCompletionListener<Result>?) {
+        if (authentication.loggedIn) { // This check is important. Without this the logout call goes to infinite loop.
+            reset(completion)
+        }
     }
 
     private fun initializeThreeTenABP() {
@@ -394,7 +413,8 @@ object FrolloSDK {
     }
 
     internal fun forcedLogout() {
-        if (authentication.loggedIn)
+        if (authentication.loggedIn) {
             reset()
+        }
     }
 }

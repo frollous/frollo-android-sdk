@@ -45,9 +45,9 @@ data class Goal(
 
     @ColumnInfo(name = "account_id") val accountId: Long?,
 
-    @ColumnInfo(name = "type") var type: String,
+    @ColumnInfo(name = "type") var type: String?,
 
-    @ColumnInfo(name = "sub_type") var subType: String,
+    @ColumnInfo(name = "sub_type") var subType: String?,
 
     @ColumnInfo(name = "tracking_status") var trackingStatus: GoalTrackingStatus,
 

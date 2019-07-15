@@ -338,10 +338,10 @@ internal class Converters {
     fun stringFromGoalStatus(value: GoalStatus?): String? = value?.name ?: GoalStatus.UNSTARTED.name
 
     @TypeConverter
-    fun stringToGoalFrequency(value: String?): GoalFrequency? = if (value == null) GoalFrequency.SINGULAR else GoalFrequency.valueOf(value)
+    fun stringToGoalFrequency(value: String?): GoalFrequency? = if (value == null) GoalFrequency.UNKNOWN else GoalFrequency.valueOf(value)
 
     @TypeConverter
-    fun stringFromGoalFrequency(value: GoalFrequency?): String? = value?.name ?: GoalFrequency.SINGULAR.name
+    fun stringFromGoalFrequency(value: GoalFrequency?): String? = value?.name ?: GoalFrequency.UNKNOWN.name
 
     // Shared
 

@@ -21,13 +21,23 @@ import us.frollo.frollosdk.extensions.serializedName
 
 enum class GoalFrequency {
 
-    @SerializedName("weekly") WEEKLY,
+    @SerializedName("annually") ANNUALLY,
 
-    @SerializedName("fortnight") FORTNIGHT,
+    @SerializedName("biannually") BIANNUALLY,
+
+    @SerializedName("fortnightly") FORTNIGHTLY,
+
+    @SerializedName("four_weekly") FOUR_WEEKLY,
+
+    @SerializedName("irregular") IRREGULAR,
 
     @SerializedName("monthly") MONTHLY,
 
-    @SerializedName("singular") SINGULAR;
+    @SerializedName("quarterly") QUARTERLY,
+
+    @SerializedName("weekly") WEEKLY,
+
+    @SerializedName("unknown") UNKNOWN;
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

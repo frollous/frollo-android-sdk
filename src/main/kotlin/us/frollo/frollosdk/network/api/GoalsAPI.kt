@@ -32,5 +32,4 @@ internal interface GoalsAPI {
     // Query parameters: {from_date, to_date, skip, count}
     @GET(URL_GOALS)
     fun fetchGoals(@QueryMap queryParams: Map<String, String>): Call<List<GoalResponse>>
-
 }

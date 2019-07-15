@@ -301,10 +301,11 @@ internal fun sqlForMerchants(type: MerchantType? = null): SimpleSQLiteQuery {
 }
 
 internal fun sqlForGoals(
-        frequency: GoalFrequency? = null,
-        status: GoalStatus? = null,
-        trackingStatus: GoalTrackingStatus? = null,
-        accountId: Long? = null): SimpleSQLiteQuery {
+    frequency: GoalFrequency? = null,
+    status: GoalStatus? = null,
+    trackingStatus: GoalTrackingStatus? = null,
+    accountId: Long? = null
+): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("goal")
 
     frequency?.let { sqlQueryBuilder.appendSelection(selection = "frequency = '${ it.name }'") }
@@ -316,8 +317,9 @@ internal fun sqlForGoals(
 }
 
 internal fun sqlForGoalIds(
-        status: GoalStatus? = null,
-        trackingStatus: GoalTrackingStatus? = null): SimpleSQLiteQuery {
+    status: GoalStatus? = null,
+    trackingStatus: GoalTrackingStatus? = null
+): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("goal")
 
     sqlQueryBuilder.columns(arrayOf("goal_id"))

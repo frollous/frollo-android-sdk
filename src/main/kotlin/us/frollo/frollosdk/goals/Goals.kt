@@ -70,10 +70,10 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
             }
 
     fun fetchGoalsWithRelation(
-            frequency: GoalFrequency? = null,
-            status: GoalStatus? = null,
-            trackingStatus: GoalTrackingStatus? = null,
-            accountId: Long? = null
+        frequency: GoalFrequency? = null,
+        status: GoalStatus? = null,
+        trackingStatus: GoalTrackingStatus? = null,
+        accountId: Long? = null
     ): LiveData<Resource<List<GoalRelation>>> =
             Transformations.map(db.goals().loadByQueryWithRelation(sqlForGoals(frequency, status, trackingStatus, accountId))) { models ->
                 Resource.success(models)
@@ -85,9 +85,10 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
             }
 
     fun refreshGoals(
-            status: GoalStatus? = null,
-            trackingStatus: GoalTrackingStatus? = null,
-            completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        status: GoalStatus? = null,
+        trackingStatus: GoalTrackingStatus? = null,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         if (!authentication.loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
             Log.e("$TAG#refreshGoals", error.localizedDescription)
@@ -111,10 +112,11 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
     // Response Handlers
 
     private fun handleGoalsResponse(
-            response: List<GoalResponse>?,
-            status: GoalStatus? = null,
-            trackingStatus: GoalTrackingStatus? = null,
-            completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        response: List<GoalResponse>?,
+        status: GoalStatus? = null,
+        trackingStatus: GoalTrackingStatus? = null,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         response?.let {
             doAsync {
                 val models = mapGoalsResponse(response)

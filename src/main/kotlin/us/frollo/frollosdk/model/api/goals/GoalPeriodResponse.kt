@@ -21,12 +21,12 @@ import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
 import java.math.BigDecimal
 
 data class GoalPeriodResponse(
-        @SerializedName("id") val goalPeriodId: Long,
-        @SerializedName("goal_id") val goalId: Long,
-        @SerializedName("start_date") val startDate: String, // yyyy-MM-dd
-        @SerializedName("end_date") val endDate: String, // yyyy-MM-dd
-        @SerializedName("tracking_status") var trackingStatus: GoalTrackingStatus,
-        @SerializedName("current_amount") val currentAmount: BigDecimal,
-        @SerializedName("target_amount") val targetAmount: BigDecimal,
-        @SerializedName("required_amount") val requiredAmount: BigDecimal
+    @SerializedName("id") val goalPeriodId: Long,
+    @SerializedName("goal_id") val goalId: Long,
+    @SerializedName("start_date") val startDate: String, // yyyy-MM-dd
+    @SerializedName("end_date") val endDate: String, // yyyy-MM-dd
+    @SerializedName("tracking_status") var trackingStatus: GoalTrackingStatus,
+    @SerializedName("current_amount") val currentAmount: BigDecimal,
+    @SerializedName("target_amount") val targetAmount: BigDecimal,
+    @SerializedName("required_amount") val requiredAmount: BigDecimal
 )

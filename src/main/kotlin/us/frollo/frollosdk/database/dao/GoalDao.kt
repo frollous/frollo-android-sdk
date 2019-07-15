@@ -45,8 +45,8 @@ internal interface GoalDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(model: Goal): Long
 
-    @Query("SELECT goal_id FROM goal WHERE goal_id NOT IN (:apiIds)")
-    fun getStaleIds(apiIds: LongArray): List<Long>
+    @RawQuery
+    fun getIdsByQuery(queryStr: SupportSQLiteQuery): List<Long>
 
     @Query("DELETE FROM goal WHERE goal_id IN (:goalIds)")
     fun deleteMany(goalIds: LongArray)

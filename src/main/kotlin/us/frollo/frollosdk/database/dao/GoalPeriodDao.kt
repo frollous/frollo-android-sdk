@@ -45,8 +45,8 @@ internal interface GoalPeriodDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(model: GoalPeriod): Long
 
-    @Query("SELECT goal_period_id FROM goal_period WHERE goal_id = :goalId")
-    fun getIdsByGoalId(goalId: Long): LongArray
+    @Query("SELECT goal_period_id FROM goal_period WHERE goal_id IN (:goalIds)")
+    fun getIdsByGoalIds(goalIds: LongArray): LongArray
 
     @Query("DELETE FROM goal_period WHERE goal_period_id IN (:goalPeriodIds)")
     fun deleteMany(goalPeriodIds: LongArray)

@@ -26,6 +26,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import us.frollo.frollosdk.database.dao.AccountDao
 import us.frollo.frollosdk.database.dao.BillDao
 import us.frollo.frollosdk.database.dao.BillPaymentDao
+import us.frollo.frollosdk.database.dao.GoalDao
+import us.frollo.frollosdk.database.dao.GoalPeriodDao
 import us.frollo.frollosdk.database.dao.MerchantDao
 import us.frollo.frollosdk.database.dao.MessageDao
 import us.frollo.frollosdk.database.dao.ProviderAccountDao
@@ -53,6 +55,8 @@ import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
 import us.frollo.frollosdk.model.coredata.user.User
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
+import us.frollo.frollosdk.model.coredata.goals.Goal
+import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
 
 @Database(entities = [
     User::class,
@@ -69,8 +73,10 @@ import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
     ReportAccountBalance::class,
     Bill::class,
     BillPayment::class,
-    TransactionTag::class
-], version = 4, exportSchema = true)
+    TransactionTag::class,
+    Goal::class,
+    GoalPeriod::class
+], version = 5, exportSchema = true)
 
 @TypeConverters(Converters::class)
 abstract class SDKDatabase : RoomDatabase() {
@@ -90,6 +96,8 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun bills(): BillDao
     internal abstract fun billPayments(): BillPaymentDao
     internal abstract fun userTags(): TransactionUserTagsDao
+    internal abstract fun goals(): GoalDao
+    internal abstract fun goalPeriods(): GoalPeriodDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"

@@ -1,5 +1,10 @@
 ## Changelog
 
+### 1.3.4
+
+#### Changes
+- Token Injection
+
 ### 1.3.3
 
 #### Changes

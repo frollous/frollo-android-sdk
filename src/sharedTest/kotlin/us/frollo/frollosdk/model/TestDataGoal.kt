@@ -1,0 +1,74 @@
+/*
+ * Copyright 2019 Frollo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package us.frollo.frollosdk.model
+
+import us.frollo.frollosdk.model.api.goals.GoalPeriodResponse
+import us.frollo.frollosdk.model.api.goals.GoalResponse
+import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
+import us.frollo.frollosdk.model.coredata.goals.GoalStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTarget
+import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
+import us.frollo.frollosdk.testutils.randomElement
+import us.frollo.frollosdk.testutils.randomNumber
+import us.frollo.frollosdk.testutils.randomString
+import java.math.BigDecimal
+
+internal fun testGoalResponseData(
+    goalId: Long? = null,
+    accountId: Long? = null
+): GoalResponse {
+    return GoalResponse(
+            goalId = goalId ?: randomNumber().toLong(),
+            name = randomString(20),
+            description = randomString(100),
+            imageUrl = "https://example.com/image.png",
+            accountId = accountId ?: randomNumber().toLong(),
+            type = randomString(20),
+            subType = randomString(20),
+            trackingStatus = GoalTrackingStatus.values().randomElement(),
+            trackingType = GoalTrackingType.values().randomElement(),
+            status = GoalStatus.values().randomElement(),
+            frequency = GoalFrequency.values().randomElement(),
+            target = GoalTarget.values().randomElement(),
+            currency = "AUD",
+            currentAmount = BigDecimal("7500.0"),
+            periodAmount = BigDecimal("300.0"),
+            startAmount = BigDecimal("0.0"),
+            targetAmount = BigDecimal("20000.0"),
+            startDate = "2019-07-01",
+            endDate = "2019-12-01",
+            estimatedEndDate = "2019-12-01",
+            estimatedTargetAmount = BigDecimal("20000.0"),
+            periodsCount = 52,
+            currentPeriod = testGoalPeriodResponseData())
+}
+
+internal fun testGoalPeriodResponseData(
+    goalPeriodId: Long? = null,
+    goalId: Long? = null
+): GoalPeriodResponse {
+    return GoalPeriodResponse(
+            goalPeriodId = goalPeriodId ?: randomNumber().toLong(),
+            goalId = goalId ?: randomNumber().toLong(),
+            startDate = "2019-08-01",
+            endDate = "2019-08-31",
+            trackingStatus = GoalTrackingStatus.values().randomElement(),
+            currentAmount = BigDecimal("200.00"),
+            targetAmount = BigDecimal("300.0"),
+            requiredAmount = BigDecimal("100.0"))
+}

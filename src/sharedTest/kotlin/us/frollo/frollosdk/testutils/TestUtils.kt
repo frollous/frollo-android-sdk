@@ -51,6 +51,9 @@ internal fun randomString(length: Int): String {
 
 internal fun randomBoolean() = Random().nextBoolean()
 
+internal fun <T : Enum<*>> Array<T>.randomElement() =
+        this[kotlin.random.Random.nextInt(this.size)]
+
 @Throws(Exception::class)
 fun convertStreamToString(inputStream: InputStream): String {
     val reader = BufferedReader(InputStreamReader(inputStream))

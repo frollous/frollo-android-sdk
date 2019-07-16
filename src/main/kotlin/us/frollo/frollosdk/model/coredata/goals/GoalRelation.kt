@@ -28,7 +28,7 @@ data class GoalRelation(
     var goal: Goal? = null,
 
     @Relation(parentColumn = "goal_id", entityColumn = "goal_id", entity = GoalPeriod::class)
-    var payments: List<GoalPeriod>? = null,
+    var periods: List<GoalPeriod>? = null,
 
     @Relation(parentColumn = "account_id", entityColumn = "account_id", entity = Account::class)
     var accounts: List<AccountRelation>? = null

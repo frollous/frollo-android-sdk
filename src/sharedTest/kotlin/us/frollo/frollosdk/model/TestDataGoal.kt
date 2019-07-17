@@ -50,9 +50,9 @@ internal fun testGoalResponseData(
             periodAmount = BigDecimal("300.0"),
             startAmount = BigDecimal("0.0"),
             targetAmount = BigDecimal("20000.0"),
-            startDate = "2019-07-01",
-            endDate = "2019-12-01",
-            estimatedEndDate = "2019-12-01",
+            startDate = "2019-01-02",
+            endDate = "2019-11-02",
+            estimatedEndDate = "2019-12-02",
             estimatedTargetAmount = BigDecimal("20000.0"),
             periodsCount = 52,
             currentPeriod = testGoalPeriodResponseData())

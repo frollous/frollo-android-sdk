@@ -4,6 +4,7 @@
 
 #### Changes
 - Token Injection
+- Bug Fix - Token Expiry Calculation
 
 ### 2.0.0
 - Custom Authentication - Custom handling of authentication can be provided to the SDK

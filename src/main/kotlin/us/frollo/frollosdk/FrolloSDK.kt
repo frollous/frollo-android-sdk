@@ -33,6 +33,7 @@ import us.frollo.frollosdk.authentication.AuthenticationType.Custom
 import us.frollo.frollosdk.authentication.AuthenticationType.OAuth2
 import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.authentication.OAuth2Authentication
+import us.frollo.frollosdk.authentication.TokenInjector
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.bills.Bills
 import us.frollo.frollosdk.core.ACTION.ACTION_AUTHENTICATION_CHANGED
@@ -156,6 +157,7 @@ object FrolloSDK : AuthenticationCallback {
     private lateinit var version: Version
     private lateinit var network: NetworkService
     private lateinit var database: SDKDatabase
+    private var tokenInjector: TokenInjector? = null
     internal var refreshTimer: Timer? = null
         private set
     private var deviceLastUpdated: LocalDateTime? = null
@@ -194,6 +196,7 @@ object FrolloSDK : AuthenticationCallback {
 
             // 3. Setup Preferences
             preferences = Preferences(application.applicationContext)
+            tokenInjector = TokenInjector(keyStore, preferences)
 
             // 4. Setup Database
             database = SDKDatabase.getInstance(application)
@@ -269,6 +272,12 @@ object FrolloSDK : AuthenticationCallback {
             completion.invoke(Result.error(error))
         }
     }
+
+    /**
+     * Get Token Injector. See [TokenInjector] for details
+     */
+    fun getTokenInjector(): TokenInjector =
+            tokenInjector ?: throw IllegalAccessException("SDK not setup")
 
     /**
      * Reset the SDK. Clears all caches, databases and preferences. Called automatically from logout.

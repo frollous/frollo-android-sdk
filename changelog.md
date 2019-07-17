@@ -1,5 +1,10 @@
 ## Changelog
 
+### 2.0.1
+
+#### Changes
+- Token Injection
+
 ### 2.0.0
 - Custom Authentication - Custom handling of authentication can be provided to the SDK
 

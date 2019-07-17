@@ -377,7 +377,10 @@ class OAuth2Authentication(
             authToken?.saveRefreshToken(it)
         }
 
-        val createdAt = LocalDateTime.ofEpochSecond(tokenResponse.createdAt, 0, ZoneOffset.UTC) ?: LocalDateTime.now(ZoneOffset.UTC)
+        val createdAt = if (tokenResponse.createdAt > 0L)
+            LocalDateTime.ofEpochSecond(tokenResponse.createdAt, 0, ZoneOffset.UTC)
+        else
+            LocalDateTime.now(ZoneOffset.UTC)
         val tokenExpiry = createdAt.plusSeconds(tokenResponse.expiresIn).toEpochSecond(ZoneOffset.UTC)
 
         tokenCallback?.saveAccessTokens(tokenResponse.accessToken, tokenExpiry)

@@ -60,7 +60,10 @@ internal class AuthToken(private val keystore: Keystore, private val pref: Prefe
             pref.encryptedRefreshToken = keystore.encrypt(it)
         }
 
-        val createdAt = LocalDateTime.ofEpochSecond(tokenResponse.createdAt, 0, ZoneOffset.UTC) ?: LocalDateTime.now(ZoneOffset.UTC)
+        val createdAt = if (tokenResponse.createdAt > 0L)
+            LocalDateTime.ofEpochSecond(tokenResponse.createdAt, 0, ZoneOffset.UTC)
+        else
+            LocalDateTime.now(ZoneOffset.UTC)
         val tokenExpiry = createdAt.plusSeconds(tokenResponse.expiresIn).toEpochSecond(ZoneOffset.UTC)
 
         accessTokenExpiry = tokenExpiry

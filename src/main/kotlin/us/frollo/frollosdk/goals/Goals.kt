@@ -299,6 +299,27 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
                 Resource.success(model)
             }
 
+    fun refreshGoalPeriod(goalId: Long, goalPeriodId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        if (!authentication.loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#refreshGoalPeriod", error.localizedDescription)
+            completion?.invoke(Result.error(error))
+            return
+        }
+
+        goalsAPI.fetchGoalPeriod(goalId = goalId, periodId = goalPeriodId).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshGoalPeriod", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleGoalPeriodResponse(response = resource.data, completion = completion)
+                }
+            }
+        }
+    }
+
     fun refreshGoalPeriods(goalId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (!authentication.loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
@@ -353,6 +374,18 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
                 if (staleIds.isNotEmpty()) {
                     removeCachedGoals(staleIds.toLongArray())
                 }
+
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    private fun handleGoalPeriodResponse(response: GoalPeriodResponse?, completion: OnFrolloSDKCompletionListener<Result>?) {
+        response?.let {
+            doAsync {
+                val model = response.toGoalPeriod()
+
+                db.goalPeriods().insert(model)
 
                 uiThread { completion?.invoke(Result.success()) }
             }

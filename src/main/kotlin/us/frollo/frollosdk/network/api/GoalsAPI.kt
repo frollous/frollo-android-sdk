@@ -37,6 +37,7 @@ internal interface GoalsAPI {
 
         // Goal Period URLs
         const val URL_GOAL_PERIODS = "goals/{goal_id}/periods"
+        const val URL_GOAL_PERIOD = "goals/{goal_id}/periods/{period_id}"
     }
 
     // Goal API
@@ -61,4 +62,7 @@ internal interface GoalsAPI {
 
     @GET(URL_GOAL_PERIODS)
     fun fetchGoalPeriods(@Path("goal_id") goalId: Long): Call<List<GoalPeriodResponse>>
+
+    @GET(URL_GOAL_PERIOD)
+    fun fetchGoalPeriod(@Path("goal_id") goalId: Long, @Path("period_id") periodId: Long): Call<GoalPeriodResponse>
 }

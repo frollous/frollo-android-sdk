@@ -17,6 +17,7 @@
 package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.QueryMap
@@ -31,10 +32,13 @@ internal interface GoalsAPI {
 
     // Goal API
 
-    // Query parameters: {from_date, to_date, skip, count}
+    // Query parameters: {status, tracking_status}
     @GET(URL_GOALS)
     fun fetchGoals(@QueryMap queryParams: Map<String, String>): Call<List<GoalResponse>>
 
     @GET(URL_GOAL)
     fun fetchGoal(@Path("goal_id") goalId: Long): Call<GoalResponse>
+
+    @DELETE(URL_GOAL)
+    fun deleteGoal(@Path("goal_id") goalId: Long): Call<Void>
 }

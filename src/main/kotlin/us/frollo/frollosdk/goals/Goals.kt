@@ -140,6 +140,28 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
         }
     }
 
+    fun deleteGoal(goalId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        if (!authentication.loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#deleteGoal", error.localizedDescription)
+            completion?.invoke(Result.error(error))
+            return
+        }
+
+        goalsAPI.deleteGoal(goalId).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#deleteGoal", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    removeCachedGoals(longArrayOf(goalId))
+                    completion?.invoke(Result.success())
+                }
+            }
+        }
+    }
+
     // Response Handlers
 
     private fun handleGoalResponse(response: GoalResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {

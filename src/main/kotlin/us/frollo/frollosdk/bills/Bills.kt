@@ -261,6 +261,7 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
                 }
                 Resource.Status.SUCCESS -> {
                     removeCachedBills(longArrayOf(billId))
+                    completion?.invoke(Result.success())
                 }
             }
         }
@@ -477,6 +478,7 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
                 }
                 Resource.Status.SUCCESS -> {
                     removeCachedBillPayments(longArrayOf(billPaymentId))
+                    completion?.invoke(Result.success())
                 }
             }
         }

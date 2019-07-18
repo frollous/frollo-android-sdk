@@ -217,4 +217,67 @@ class GoalsTest : BaseAndroidTest() {
 
         tearDown()
     }
+
+    @Test
+    fun testDeleteGoal() {
+        initSetup()
+
+        val goalId: Long = 3211
+
+        val requestPath = "goals/$goalId"
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(204)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        database.goals().insert(testGoalResponseData(goalId = goalId).toGoal())
+
+        var testObserver = goals.fetchGoal(goalId).test()
+
+        testObserver.awaitValue()
+        val model = testObserver.value().data
+        assertNotNull(model)
+        assertEquals(goalId, model?.goalId)
+
+        goals.deleteGoal(goalId) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            testObserver = goals.fetchGoal(goalId).test()
+
+            testObserver.awaitValue()
+            assertNull(testObserver.value().data)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testDeleteGoalFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        goals.deleteGoal(3211) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
 }

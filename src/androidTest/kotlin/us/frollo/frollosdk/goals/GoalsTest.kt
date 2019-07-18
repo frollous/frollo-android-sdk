@@ -439,6 +439,70 @@ class GoalsTest : BaseAndroidTest() {
     }
 
     @Test
+    fun testUpdateGoal() {
+        initSetup()
+
+        val goalId: Long = 3211
+
+        val requestPath = "goals/$goalId"
+
+        val body = readStringFromJson(app, R.raw.goal_id_3211)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val goal = testGoalResponseData(goalId = goalId).toGoal()
+
+        database.goals().insert(goal)
+
+        goals.updateGoal(goal) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = goals.fetchGoal(goalId = goalId).test()
+
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(goalId, models?.goalId)
+            assertEquals("Holiday Fund", models?.name)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testUpdateGoalFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        val goal = testGoalResponseData(goalId = 3211).toGoal()
+        goals.updateGoal(goal) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testDeleteGoal() {
         initSetup()
 

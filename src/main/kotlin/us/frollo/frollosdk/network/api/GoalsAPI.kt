@@ -21,10 +21,12 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.QueryMap
 import us.frollo.frollosdk.model.api.goals.GoalCreateRequest
 import us.frollo.frollosdk.model.api.goals.GoalResponse
+import us.frollo.frollosdk.model.api.goals.GoalUpdateRequest
 
 internal interface GoalsAPI {
     companion object {
@@ -44,6 +46,9 @@ internal interface GoalsAPI {
 
     @POST(URL_GOALS)
     fun createGoal(@Body request: GoalCreateRequest): Call<GoalResponse>
+
+    @PUT(URL_GOAL)
+    fun updateGoal(@Path("goal_id") goalId: Long, @Body request: GoalUpdateRequest): Call<GoalResponse>
 
     @DELETE(URL_GOAL)
     fun deleteGoal(@Path("goal_id") goalId: Long): Call<Void>

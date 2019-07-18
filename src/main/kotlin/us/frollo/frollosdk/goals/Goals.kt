@@ -38,6 +38,7 @@ import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toGoal
 import us.frollo.frollosdk.model.api.goals.GoalCreateRequest
 import us.frollo.frollosdk.model.api.goals.GoalResponse
+import us.frollo.frollosdk.model.api.goals.GoalUpdateRequest
 import us.frollo.frollosdk.model.coredata.goals.Goal
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalRelation
@@ -194,6 +195,32 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#createGoal", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleGoalResponse(response = resource.data, completion = completion)
+                }
+            }
+        }
+    }
+
+    fun updateGoal(goal: Goal, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        if (!authentication.loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#updateGoal", error.localizedDescription)
+            completion?.invoke(Result.error(error))
+            return
+        }
+
+        val request = GoalUpdateRequest(
+                name = goal.name,
+                description = goal.description,
+                imageUrl = goal.imageUrl)
+
+        goalsAPI.updateGoal(goal.goalId, request).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#updateGoal", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
                 }
                 Resource.Status.SUCCESS -> {

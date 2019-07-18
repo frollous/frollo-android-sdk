@@ -39,27 +39,27 @@ data class Goal(
 
     @ColumnInfo(name = "name") var name: String,
 
-    @ColumnInfo(name = "description") val description: String?,
+    @ColumnInfo(name = "description") var description: String?,
 
-    @ColumnInfo(name = "image_url") val imageUrl: String?,
+    @ColumnInfo(name = "image_url") var imageUrl: String?,
 
     @ColumnInfo(name = "account_id") val accountId: Long?,
 
-    @ColumnInfo(name = "type") var type: String?,
+    @ColumnInfo(name = "type") val type: String?,
 
-    @ColumnInfo(name = "sub_type") var subType: String?,
+    @ColumnInfo(name = "sub_type") val subType: String?,
 
-    @ColumnInfo(name = "tracking_status") var trackingStatus: GoalTrackingStatus,
+    @ColumnInfo(name = "tracking_status") val trackingStatus: GoalTrackingStatus,
 
-    @ColumnInfo(name = "tracking_type") var trackingType: GoalTrackingType,
+    @ColumnInfo(name = "tracking_type") val trackingType: GoalTrackingType,
 
-    @ColumnInfo(name = "status") var status: GoalStatus,
+    @ColumnInfo(name = "status") val status: GoalStatus,
 
-    @ColumnInfo(name = "frequency") var frequency: GoalFrequency,
+    @ColumnInfo(name = "frequency") val frequency: GoalFrequency,
 
-    @ColumnInfo(name = "target") var target: GoalTarget,
+    @ColumnInfo(name = "target") val target: GoalTarget,
 
-    @ColumnInfo(name = "currency") var currency: String,
+    @ColumnInfo(name = "currency") val currency: String,
 
     @ColumnInfo(name = "current_amount") val currentAmount: BigDecimal,
 

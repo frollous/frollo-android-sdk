@@ -42,7 +42,7 @@ data class GoalPeriod(
 
     @ColumnInfo(name = "end_date") val endDate: String, // yyyy-MM-dd
 
-    @ColumnInfo(name = "tracking_status") var trackingStatus: GoalTrackingStatus,
+    @ColumnInfo(name = "tracking_status") val trackingStatus: GoalTrackingStatus,
 
     @ColumnInfo(name = "current_amount") val currentAmount: BigDecimal,
 

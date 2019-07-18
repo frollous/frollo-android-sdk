@@ -16,6 +16,7 @@
 
 package us.frollo.frollosdk.model
 
+import us.frollo.frollosdk.model.api.goals.GoalCreateRequest
 import us.frollo.frollosdk.model.api.goals.GoalPeriodResponse
 import us.frollo.frollosdk.model.api.goals.GoalResponse
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
@@ -74,4 +75,27 @@ internal fun testGoalPeriodResponseData(
             currentAmount = BigDecimal("200.00"),
             targetAmount = BigDecimal("300.0"),
             requiredAmount = BigDecimal("100.0"))
+}
+
+internal fun testGoalRequestTargetData(
+    target: GoalTarget,
+    targetAmount: BigDecimal? = null,
+    periodAmount: BigDecimal? = null,
+    endDate: String? = null
+): GoalCreateRequest {
+    return GoalCreateRequest(
+            accountId = randomNumber().toLong(),
+            description = randomString(200),
+            endDate = endDate,
+            frequency = GoalFrequency.MONTHLY,
+            imageUrl = "https://example.com/image.png",
+            name = randomString(20),
+            periodAmount = periodAmount,
+            startAmount = BigDecimal(0),
+            startDate = "2018-10-01",
+            subType = randomString(20),
+            target = target,
+            targetAmount = targetAmount,
+            trackingType = GoalTrackingType.values().randomElement(),
+            type = randomString(20))
 }

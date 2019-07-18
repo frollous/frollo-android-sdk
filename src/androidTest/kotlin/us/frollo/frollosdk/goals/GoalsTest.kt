@@ -35,13 +35,16 @@ import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.mapping.toGoal
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTarget
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
 import us.frollo.frollosdk.model.testGoalResponseData
 import us.frollo.frollosdk.network.api.GoalsAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
+import java.math.BigDecimal
 
 class GoalsTest : BaseAndroidTest() {
 
@@ -211,6 +214,223 @@ class GoalsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testCreateGoalTargetAmount() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.goal_id_3211)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == GoalsAPI.URL_GOALS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        goals.createGoal(
+                name = "My test goal",
+                description = "The bestest test goal",
+                imageUrl = "https://example.com/image.png",
+                type = "Holiday",
+                subType = "Winter",
+                target = GoalTarget.AMOUNT,
+                trackingType = GoalTrackingType.CREDIT,
+                frequency = GoalFrequency.WEEKLY,
+                startDate = null,
+                endDate = "2019-07-15",
+                periodAmount = BigDecimal(700),
+                startAmount = BigDecimal(0),
+                targetAmount = BigDecimal(20000),
+                accountId = 123
+        ) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = goals.fetchGoal(goalId = 3211).test()
+
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
+            assertEquals(3211L, testObserver.value().data?.goalId)
+            assertEquals(GoalTarget.AMOUNT, testObserver.value().data?.target)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(GoalsAPI.URL_GOALS, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testCreateGoalTargetDate() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.goal_id_3212)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == GoalsAPI.URL_GOALS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        goals.createGoal(
+                name = "My test goal",
+                description = "The bestest test goal",
+                imageUrl = "https://example.com/image.png",
+                type = "Holiday",
+                subType = "Winter",
+                target = GoalTarget.DATE,
+                trackingType = GoalTrackingType.CREDIT,
+                frequency = GoalFrequency.WEEKLY,
+                startDate = null,
+                endDate = "2019-07-15",
+                periodAmount = BigDecimal(700),
+                startAmount = BigDecimal(0),
+                targetAmount = BigDecimal(20000),
+                accountId = 123
+        ) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = goals.fetchGoal(goalId = 3212).test()
+
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
+            assertEquals(3212L, testObserver.value().data?.goalId)
+            assertEquals(GoalTarget.DATE, testObserver.value().data?.target)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(GoalsAPI.URL_GOALS, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testCreateGoalTargetOpenEnded() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.goal_id_3213)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == GoalsAPI.URL_GOALS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        goals.createGoal(
+                name = "My test goal",
+                description = "The bestest test goal",
+                imageUrl = "https://example.com/image.png",
+                type = "Holiday",
+                subType = "Winter",
+                target = GoalTarget.OPEN_ENDED,
+                trackingType = GoalTrackingType.CREDIT,
+                frequency = GoalFrequency.WEEKLY,
+                startDate = null,
+                endDate = "2019-07-15",
+                periodAmount = BigDecimal(700),
+                startAmount = BigDecimal(0),
+                targetAmount = BigDecimal(20000),
+                accountId = 123
+        ) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = goals.fetchGoal(goalId = 3213).test()
+
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
+            assertEquals(3213L, testObserver.value().data?.goalId)
+            assertEquals(GoalTarget.OPEN_ENDED, testObserver.value().data?.target)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(GoalsAPI.URL_GOALS, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testCreateGoalFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        goals.createGoal(
+                name = "My test goal",
+                description = "The bestest test goal",
+                imageUrl = "https://example.com/image.png",
+                type = "Holiday",
+                subType = "Winter",
+                target = GoalTarget.AMOUNT,
+                trackingType = GoalTrackingType.CREDIT,
+                frequency = GoalFrequency.WEEKLY,
+                startDate = null,
+                endDate = "2019-07-15",
+                periodAmount = BigDecimal(700),
+                startAmount = BigDecimal(0),
+                targetAmount = BigDecimal(20000),
+                accountId = 123
+        ) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testCreateGoalInvalidDataFails() {
+        initSetup()
+
+        goals.createGoal(
+                name = "My test goal",
+                description = "The bestest test goal",
+                imageUrl = "https://example.com/image.png",
+                type = "Holiday",
+                subType = "Winter",
+                target = GoalTarget.AMOUNT,
+                trackingType = GoalTrackingType.CREDIT,
+                frequency = GoalFrequency.WEEKLY,
+                startDate = null,
+                endDate = "2019-07-15",
+                periodAmount = BigDecimal(700),
+                startAmount = BigDecimal(0),
+                targetAmount = null,
+                accountId = 123
+        ) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.API, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.INVALID_DATA, (result.error as DataError).subType)
         }
 
         wait(3)

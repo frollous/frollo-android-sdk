@@ -25,7 +25,9 @@ enum class GoalStatus {
 
     @SerializedName("active") ACTIVE,
 
-    @SerializedName("complete") COMPLETE,
+    @SerializedName("completed") COMPLETED,
+
+    @SerializedName("failed") FAILED,
 
     @SerializedName("finalising") FINALISING,
 

@@ -36,13 +36,17 @@ import us.frollo.frollosdk.extensions.sqlForGoals
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toGoal
+import us.frollo.frollosdk.model.api.goals.GoalCreateRequest
 import us.frollo.frollosdk.model.api.goals.GoalResponse
 import us.frollo.frollosdk.model.coredata.goals.Goal
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalRelation
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTarget
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
 import us.frollo.frollosdk.network.api.GoalsAPI
+import java.math.BigDecimal
 
 class Goals(network: NetworkService, private val db: SDKDatabase, private val authentication: Authentication) {
 
@@ -135,6 +139,65 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
                 }
                 Resource.Status.SUCCESS -> {
                     handleGoalsResponse(response = resource.data, completion = completion)
+                }
+            }
+        }
+    }
+
+    fun createGoal(
+        name: String,
+        description: String? = null,
+        imageUrl: String? = null,
+        type: String? = null,
+        subType: String? = null,
+        target: GoalTarget,
+        trackingType: GoalTrackingType,
+        frequency: GoalFrequency,
+        startDate: String? = null,
+        endDate: String?,
+        periodAmount: BigDecimal?,
+        startAmount: BigDecimal = BigDecimal(0),
+        targetAmount: BigDecimal?,
+        accountId: Long,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
+        if (!authentication.loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#createGoal", error.localizedDescription)
+            completion?.invoke(Result.error(error))
+            return
+        }
+
+        val request = GoalCreateRequest(
+                name = name,
+                description = description,
+                imageUrl = imageUrl,
+                type = type,
+                subType = subType,
+                target = target,
+                trackingType = trackingType,
+                frequency = frequency,
+                startDate = startDate,
+                endDate = endDate,
+                periodAmount = periodAmount,
+                startAmount = startAmount,
+                targetAmount = targetAmount,
+                accountId = accountId)
+
+        if (!request.valid()) {
+            val error = DataError(type = DataErrorType.API, subType = DataErrorSubType.INVALID_DATA)
+            completion?.invoke(Result.error(error))
+            return
+        }
+
+        goalsAPI.createGoal(request).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#createGoal", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleGoalResponse(response = resource.data, completion = completion)
                 }
             }
         }

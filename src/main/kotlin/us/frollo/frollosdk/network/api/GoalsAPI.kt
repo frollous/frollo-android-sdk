@@ -17,10 +17,13 @@
 package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
+import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.QueryMap
+import us.frollo.frollosdk.model.api.goals.GoalCreateRequest
 import us.frollo.frollosdk.model.api.goals.GoalResponse
 
 internal interface GoalsAPI {
@@ -38,6 +41,9 @@ internal interface GoalsAPI {
 
     @GET(URL_GOAL)
     fun fetchGoal(@Path("goal_id") goalId: Long): Call<GoalResponse>
+
+    @POST(URL_GOALS)
+    fun createGoal(@Body request: GoalCreateRequest): Call<GoalResponse>
 
     @DELETE(URL_GOAL)
     fun deleteGoal(@Path("goal_id") goalId: Long): Call<Void>

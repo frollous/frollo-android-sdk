@@ -29,15 +29,13 @@ enum class GoalFrequency {
 
     @SerializedName("four_weekly") FOUR_WEEKLY,
 
-    @SerializedName("irregular") IRREGULAR,
-
     @SerializedName("monthly") MONTHLY,
 
     @SerializedName("quarterly") QUARTERLY,
 
-    @SerializedName("weekly") WEEKLY,
+    @SerializedName("singular") SINGULAR,
 
-    @SerializedName("unknown") UNKNOWN;
+    @SerializedName("weekly") WEEKLY;
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

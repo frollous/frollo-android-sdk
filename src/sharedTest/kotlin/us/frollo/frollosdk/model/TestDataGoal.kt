@@ -30,7 +30,10 @@ import java.math.BigDecimal
 
 internal fun testGoalResponseData(
     goalId: Long? = null,
-    accountId: Long? = null
+    accountId: Long? = null,
+    frequency: GoalFrequency? = null,
+    status: GoalStatus? = null,
+    trackingStatus: GoalTrackingStatus? = null
 ): GoalResponse {
     return GoalResponse(
             goalId = goalId ?: randomNumber().toLong(),
@@ -40,10 +43,10 @@ internal fun testGoalResponseData(
             accountId = accountId ?: randomNumber().toLong(),
             type = randomString(20),
             subType = randomString(20),
-            trackingStatus = GoalTrackingStatus.values().randomElement(),
+            trackingStatus = trackingStatus ?: GoalTrackingStatus.values().randomElement(),
             trackingType = GoalTrackingType.values().randomElement(),
-            status = GoalStatus.values().randomElement(),
-            frequency = GoalFrequency.values().randomElement(),
+            status = status ?: GoalStatus.values().randomElement(),
+            frequency = frequency ?: GoalFrequency.values().randomElement(),
             target = GoalTarget.values().randomElement(),
             currency = "AUD",
             currentAmount = BigDecimal("7500.0"),

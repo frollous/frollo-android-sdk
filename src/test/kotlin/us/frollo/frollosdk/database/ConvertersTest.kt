@@ -800,7 +800,7 @@ class ConvertersTest {
         val status = Converters.instance.stringToGoalFrequency("ANNUALLY")
         assertEquals(GoalFrequency.ANNUALLY, status)
 
-        assertEquals(GoalFrequency.UNKNOWN, Converters.instance.stringToGoalFrequency(null))
+        assertEquals(GoalFrequency.SINGULAR, Converters.instance.stringToGoalFrequency(null))
     }
 
     @Test
@@ -808,6 +808,6 @@ class ConvertersTest {
         val str = Converters.instance.stringFromGoalFrequency(GoalFrequency.ANNUALLY)
         assertEquals("ANNUALLY", str)
 
-        assertEquals("UNKNOWN", Converters.instance.stringFromGoalFrequency(null))
+        assertEquals("SINGULAR", Converters.instance.stringFromGoalFrequency(null))
     }
 }

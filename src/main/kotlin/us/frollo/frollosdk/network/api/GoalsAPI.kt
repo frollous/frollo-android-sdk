@@ -18,6 +18,7 @@ package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.QueryMap
 import us.frollo.frollosdk.model.api.goals.GoalResponse
 
@@ -25,6 +26,7 @@ internal interface GoalsAPI {
     companion object {
         // Goal URLs
         const val URL_GOALS = "goals"
+        const val URL_GOAL = "goals/{goal_id}"
     }
 
     // Goal API
@@ -32,4 +34,7 @@ internal interface GoalsAPI {
     // Query parameters: {from_date, to_date, skip, count}
     @GET(URL_GOALS)
     fun fetchGoals(@QueryMap queryParams: Map<String, String>): Call<List<GoalResponse>>
+
+    @GET(URL_GOAL)
+    fun fetchGoal(@Path("goal_id") goalId: Long): Call<GoalResponse>
 }

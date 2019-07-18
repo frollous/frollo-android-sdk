@@ -54,6 +54,16 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
 
     // Goal
 
+    fun fetchGoal(goalId: Long): LiveData<Resource<Goal>> =
+            Transformations.map(db.goals().load(goalId)) { model ->
+                Resource.success(model)
+            }
+
+    fun fetchGoalWithRelation(goalId: Long): LiveData<Resource<GoalRelation>> =
+            Transformations.map(db.goals().loadWithRelation(goalId)) { model ->
+                Resource.success(model)
+            }
+
     fun fetchGoals(
         frequency: GoalFrequency? = null,
         status: GoalStatus? = null,
@@ -84,6 +94,27 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
                 Resource.success(model)
             }
 
+    fun refreshGoal(goalId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        if (!authentication.loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#refreshGoal", error.localizedDescription)
+            completion?.invoke(Result.error(error))
+            return
+        }
+
+        goalsAPI.fetchGoal(goalId).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshGoal", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleGoalResponse(response = resource.data, completion = completion)
+                }
+            }
+        }
+    }
+
     fun refreshGoals(
         status: GoalStatus? = null,
         trackingStatus: GoalTrackingStatus? = null,
@@ -110,6 +141,18 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
     }
 
     // Response Handlers
+
+    private fun handleGoalResponse(response: GoalResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        response?.let {
+            doAsync {
+                val model = response.toGoal()
+
+                db.goals().insert(model)
+
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
 
     private fun handleGoalsResponse(
         response: List<GoalResponse>?,

@@ -55,6 +55,28 @@ class GoalsTest : BaseAndroidTest() {
     }
 
     // Goal Tests
+
+    @Test
+    fun testFetchGoalById() {
+        initSetup()
+
+        val data1 = testGoalResponseData(goalId = 100)
+        val data2 = testGoalResponseData(goalId = 101)
+        val data3 = testGoalResponseData(goalId = 102)
+
+        val list = mutableListOf(data1, data2, data3)
+
+        database.goals().insertAll(*list.map { it.toGoal() }.toList().toTypedArray())
+
+        val testObserver = goals.fetchGoal(goalId = 101).test()
+
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(101L, testObserver.value().data?.goalId)
+
+        tearDown()
+    }
+
     @Test
     fun testFetchGoals() {
         initSetup()
@@ -82,6 +104,63 @@ class GoalsTest : BaseAndroidTest() {
         testObserver.awaitValue()
         assertTrue(testObserver.value().data?.isNotEmpty() == true)
         assertEquals(3, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshGoalById() {
+        initSetup()
+
+        val goalId: Long = 3211
+
+        val requestPath = "goals/$goalId"
+
+        val body = readStringFromJson(app, R.raw.goal_id_3211)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        goals.refreshGoal(goalId = goalId) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = goals.fetchGoal(goalId = goalId).test()
+
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
+            assertEquals(goalId, testObserver.value().data?.goalId)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshGoalByIdFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        goals.refreshGoal(goalId = 3211) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
 
         tearDown()
     }

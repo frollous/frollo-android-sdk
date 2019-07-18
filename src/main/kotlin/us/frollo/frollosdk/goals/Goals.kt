@@ -37,7 +37,9 @@ import us.frollo.frollosdk.extensions.sqlForGoals
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toGoal
+import us.frollo.frollosdk.mapping.toGoalPeriod
 import us.frollo.frollosdk.model.api.goals.GoalCreateRequest
+import us.frollo.frollosdk.model.api.goals.GoalPeriodResponse
 import us.frollo.frollosdk.model.api.goals.GoalResponse
 import us.frollo.frollosdk.model.api.goals.GoalUpdateRequest
 import us.frollo.frollosdk.model.coredata.goals.Goal
@@ -297,6 +299,27 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
                 Resource.success(model)
             }
 
+    fun refreshGoalPeriods(goalId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        if (!authentication.loggedIn) {
+            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
+            Log.e("$TAG#refreshGoalPeriods", error.localizedDescription)
+            completion?.invoke(Result.error(error))
+            return
+        }
+
+        goalsAPI.fetchGoalPeriods(goalId = goalId).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshGoalPeriods", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleGoalPeriodsResponse(response = resource.data, goalId = goalId, completion = completion)
+                }
+            }
+        }
+    }
+
     // Response Handlers
 
     private fun handleGoalResponse(response: GoalResponse?, completion: OnFrolloSDKCompletionListener<Result>?) {
@@ -336,8 +359,35 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
 
+    private fun handleGoalPeriodsResponse(
+        response: List<GoalPeriodResponse>?,
+        goalId: Long,
+        completion: OnFrolloSDKCompletionListener<Result>?
+    ) {
+        response?.let {
+            doAsync {
+                val models = mapGoalPeriodsResponse(response)
+
+                db.goalPeriods().insertAll(*models.toTypedArray())
+
+                val apiIds = models.map { it.goalPeriodId }.toHashSet()
+                val allGoalPeriodIds = db.goalPeriods().getIdsByGoalIds(longArrayOf(goalId)).toHashSet()
+                val staleIds = allGoalPeriodIds.minus(apiIds)
+
+                if (staleIds.isNotEmpty()) {
+                    removeCachedGoalPeriods(staleIds.toLongArray())
+                }
+
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
     private fun mapGoalsResponse(models: List<GoalResponse>): List<Goal> =
             models.map { it.toGoal() }.toList()
+
+    private fun mapGoalPeriodsResponse(models: List<GoalPeriodResponse>): List<GoalPeriod> =
+            models.map { it.toGoalPeriod() }.toList()
 
     // WARNING: Do not call this method on the main thread
     private fun removeCachedGoals(goalIds: LongArray) {

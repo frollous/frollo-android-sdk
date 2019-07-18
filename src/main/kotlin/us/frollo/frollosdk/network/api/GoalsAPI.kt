@@ -25,6 +25,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.QueryMap
 import us.frollo.frollosdk.model.api.goals.GoalCreateRequest
+import us.frollo.frollosdk.model.api.goals.GoalPeriodResponse
 import us.frollo.frollosdk.model.api.goals.GoalResponse
 import us.frollo.frollosdk.model.api.goals.GoalUpdateRequest
 
@@ -33,6 +34,9 @@ internal interface GoalsAPI {
         // Goal URLs
         const val URL_GOALS = "goals"
         const val URL_GOAL = "goals/{goal_id}"
+
+        // Goal Period URLs
+        const val URL_GOAL_PERIODS = "goals/{goal_id}/periods"
     }
 
     // Goal API
@@ -52,4 +56,9 @@ internal interface GoalsAPI {
 
     @DELETE(URL_GOAL)
     fun deleteGoal(@Path("goal_id") goalId: Long): Call<Void>
+
+    // Goal Period API
+
+    @GET(URL_GOAL_PERIODS)
+    fun fetchGoalPeriods(@Path("goal_id") goalId: Long): Call<List<GoalPeriodResponse>>
 }

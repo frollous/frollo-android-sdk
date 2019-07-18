@@ -1995,39 +1995,70 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
     // WARNING: Do not call this method on the main thread
     private fun removeCachedProviders(providerIds: LongArray) {
-        db.providers().deleteMany(providerIds)
+        if (providerIds.isNotEmpty()) {
+            db.providers().deleteMany(providerIds)
 
-        // Manually delete other data linked to this provider
-        // as we are not using ForeignKeys because ForeignKey constraints
-        // do not allow to insert data into child table prior to parent table
-        val providerAccountIds = db.providerAccounts().getIdsByProviderIds(providerIds)
-        removeCachedProviderAccounts(providerAccountIds)
+            // Manually delete other data linked to this provider
+            // as we are not using ForeignKeys because ForeignKey constraints
+            // do not allow to insert data into child table prior to parent table
+            val providerAccountIds = db.providerAccounts().getIdsByProviderIds(providerIds)
+            removeCachedProviderAccounts(providerAccountIds)
+        }
     }
 
     // WARNING: Do not call this method on the main thread
     private fun removeCachedProviderAccounts(providerAccountIds: LongArray) {
-        db.providerAccounts().deleteMany(providerAccountIds)
+        if (providerAccountIds.isNotEmpty()) {
+            db.providerAccounts().deleteMany(providerAccountIds)
 
-        // Manually delete other data linked to this provider account
-        // as we are not using ForeignKeys because ForeignKey constraints
-        // do not allow to insert data into child table prior to parent table
-        val accountIds = db.accounts().getIdsByProviderAccountIds(providerAccountIds)
-        removeCachedAccounts(accountIds)
+            // Manually delete other data linked to this provider account
+            // as we are not using ForeignKeys because ForeignKey constraints
+            // do not allow to insert data into child table prior to parent table
+            val accountIds = db.accounts().getIdsByProviderAccountIds(providerAccountIds)
+            removeCachedAccounts(accountIds)
+        }
     }
 
     // WARNING: Do not call this method on the main thread
     private fun removeCachedAccounts(accountIds: LongArray) {
-        db.accounts().deleteMany(accountIds)
+        if (accountIds.isNotEmpty()) {
+            db.accounts().deleteMany(accountIds)
 
-        // Manually delete other data linked to this account
-        // as we are not using ForeignKeys because ForeignKey constraints
-        // do not allow to insert data into child table prior to parent table
-        val transactionIds = db.transactions().getIdsByAccountIds(accountIds)
-        removeCachedTransactions(transactionIds)
+            // Manually delete other data linked to this account
+            // as we are not using ForeignKeys because ForeignKey constraints
+            // do not allow to insert data into child table prior to parent table
+            val transactionIds = db.transactions().getIdsByAccountIds(accountIds)
+            removeCachedTransactions(transactionIds)
+
+            val goalIds = db.goals().getIdsByAccountIds(accountIds)
+            removeCachedGoals(goalIds)
+        }
     }
 
     // WARNING: Do not call this method on the main thread
     private fun removeCachedTransactions(transactionIds: LongArray) {
-        db.transactions().deleteMany(transactionIds)
+        if (transactionIds.isNotEmpty()) {
+            db.transactions().deleteMany(transactionIds)
+        }
+    }
+
+    // WARNING: Do not call this method on the main thread
+    private fun removeCachedGoals(goalIds: LongArray) {
+        if (goalIds.isNotEmpty()) {
+            db.goals().deleteMany(goalIds)
+
+            // Manually delete goal periods associated to this goal
+            // as we are not using ForeignKeys because ForeignKey constraints
+            // do not allow to insert data into child table prior to parent table
+            val goalPeriodIds = db.goalPeriods().getIdsByGoalIds(goalIds)
+            removeCachedGoalPeriods(goalPeriodIds)
+        }
+    }
+
+    // WARNING: Do not call this method on the main thread
+    private fun removeCachedGoalPeriods(goalPeriodIds: LongArray) {
+        if (goalPeriodIds.isNotEmpty()) {
+            db.goalPeriods().deleteMany(goalPeriodIds)
+        }
     }
 }

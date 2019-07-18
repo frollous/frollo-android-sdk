@@ -977,7 +977,7 @@ class BillsTest : BaseAndroidTest() {
     }
 
     @Test
-    fun testBillsLinkToBills() {
+    fun testBillPaymentsLinkToBills() {
         initSetup()
 
         val fromDate = "2018-12-01"

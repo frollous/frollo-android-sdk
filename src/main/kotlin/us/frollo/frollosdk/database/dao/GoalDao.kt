@@ -48,6 +48,9 @@ internal interface GoalDao {
     @RawQuery
     fun getIdsByQuery(queryStr: SupportSQLiteQuery): List<Long>
 
+    @Query("SELECT goal_id FROM goal WHERE account_id IN (:accountIds)")
+    fun getIdsByAccountIds(accountIds: LongArray): LongArray
+
     @Query("DELETE FROM goal WHERE goal_id IN (:goalIds)")
     fun deleteMany(goalIds: LongArray)
 

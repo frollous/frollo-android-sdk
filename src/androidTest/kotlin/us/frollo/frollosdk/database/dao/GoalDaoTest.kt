@@ -151,6 +151,23 @@ class GoalDaoTest {
     }
 
     @Test
+    fun testGetIdsByAccountIds() {
+        val data1 = testGoalResponseData(goalId = 100, accountId = 1)
+        val data2 = testGoalResponseData(goalId = 101, accountId = 2)
+        val data3 = testGoalResponseData(goalId = 102, accountId = 2)
+        val data4 = testGoalResponseData(goalId = 103, accountId = 1)
+        val data5 = testGoalResponseData(goalId = 104, accountId = 3)
+        val data6 = testGoalResponseData(goalId = 105, accountId = 1)
+        val list = mutableListOf(data1, data2, data3, data4, data5, data6)
+        db.goals().insertAll(*list.map { it.toGoal() }.toList().toTypedArray())
+
+        val ids = db.goals().getIdsByAccountIds(longArrayOf(2, 3))
+        assertTrue(ids.isNotEmpty())
+        assertEquals(3, ids.size)
+        assertTrue(ids.toList().containsAll(listOf<Long>(101, 102, 104)))
+    }
+
+    @Test
     fun testDeleteMany() {
         val data1 = testGoalResponseData(goalId = 100)
         val data2 = testGoalResponseData(goalId = 101)

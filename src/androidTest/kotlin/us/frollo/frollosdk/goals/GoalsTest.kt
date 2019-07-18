@@ -616,4 +616,14 @@ class GoalsTest : BaseAndroidTest() {
 
         tearDown()
     }
+
+    @Test
+    fun testGoalPeriodsLinkToGoals() {
+        // TODO: to be implemented
+    }
+
+    @Test
+    fun testLinkingRemoveCachedCascade() {
+        // TODO: to be implemented
+    }
 }

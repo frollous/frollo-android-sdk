@@ -41,6 +41,7 @@ import us.frollo.frollosdk.model.api.goals.GoalResponse
 import us.frollo.frollosdk.model.api.goals.GoalUpdateRequest
 import us.frollo.frollosdk.model.coredata.goals.Goal
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
+import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
 import us.frollo.frollosdk.model.coredata.goals.GoalRelation
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -256,6 +257,13 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
         }
     }
 
+    // Goal Period
+
+    fun fetchGoalPeriod(goalPeriodId: Long): LiveData<Resource<GoalPeriod>> =
+            Transformations.map(db.goalPeriods().load(goalPeriodId)) { model ->
+                Resource.success(model)
+            }
+
     // Response Handlers
 
     private fun handleGoalResponse(response: GoalResponse?, completion: OnFrolloSDKCompletionListener<Result>?) {
@@ -300,17 +308,21 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
 
     // WARNING: Do not call this method on the main thread
     private fun removeCachedGoals(goalIds: LongArray) {
-        db.goals().deleteMany(goalIds)
+        if (goalIds.isNotEmpty()) {
+            db.goals().deleteMany(goalIds)
 
-        // Manually delete goal periods associated to this goal
-        // as we are not using ForeignKeys because ForeignKey constraints
-        // do not allow to insert data into child table prior to parent table
-        val goalPeriodIds = db.goalPeriods().getIdsByGoalIds(goalIds)
-        removeCachedGoalPeriods(goalPeriodIds)
+            // Manually delete goal periods associated to this goal
+            // as we are not using ForeignKeys because ForeignKey constraints
+            // do not allow to insert data into child table prior to parent table
+            val goalPeriodIds = db.goalPeriods().getIdsByGoalIds(goalIds)
+            removeCachedGoalPeriods(goalPeriodIds)
+        }
     }
 
     // WARNING: Do not call this method on the main thread
     private fun removeCachedGoalPeriods(goalPeriodIds: LongArray) {
-        db.goalPeriods().deleteMany(goalPeriodIds)
+        if (goalPeriodIds.isNotEmpty()) {
+            db.goalPeriods().deleteMany(goalPeriodIds)
+        }
     }
 }

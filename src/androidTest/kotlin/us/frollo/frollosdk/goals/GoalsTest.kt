@@ -204,6 +204,58 @@ class GoalsTest : BaseAndroidTest() {
     }
 
     @Test
+    fun testRefreshGoalsFiltered() {
+        initSetup()
+
+        val status = GoalStatus.CANCELLED
+        val trackingStatus = GoalTrackingStatus.ON_TRACK
+
+        val requestPath = "goals?status=$status&tracking_status=$trackingStatus"
+
+        val body = readStringFromJson(app, R.raw.goals_filtered_cancelled_ontrack)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val goal = testGoalResponseData(goalId = 3211, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.AHEAD).toGoal()
+        database.goals().insert(goal)
+
+        // Check goal 3211 is added
+        val testObserver1 = goals.fetchGoal(goalId = 3211).test()
+        testObserver1.awaitValue()
+        assertEquals(3211L, testObserver1.value().data?.goalId)
+
+        goals.refreshGoals(status = status, trackingStatus = trackingStatus) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            // Check goal still exists that doesn't match filter
+            val testObserver2 = goals.fetchGoal(goalId = 3211).test()
+            testObserver2.awaitValue()
+            assertEquals(3211L, testObserver2.value().data?.goalId)
+
+            // Check new goals added
+            val testObserver3 = goals.fetchGoals(status = status, trackingStatus = trackingStatus).test()
+            testObserver3.awaitValue()
+            assertEquals(2, testObserver3.value().data?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshGoalsFailsIfLoggedOut() {
         initSetup()
 

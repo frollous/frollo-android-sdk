@@ -139,7 +139,11 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
                     completion?.invoke(Result.error(resource.error))
                 }
                 Resource.Status.SUCCESS -> {
-                    handleGoalsResponse(response = resource.data, completion = completion)
+                    handleGoalsResponse(
+                            response = resource.data,
+                            status = status,
+                            trackingStatus = trackingStatus,
+                            completion = completion)
                 }
             }
         }
@@ -254,7 +258,7 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
 
     // Response Handlers
 
-    private fun handleGoalResponse(response: GoalResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    private fun handleGoalResponse(response: GoalResponse?, completion: OnFrolloSDKCompletionListener<Result>?) {
         response?.let {
             doAsync {
                 val model = response.toGoal()
@@ -268,9 +272,9 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
 
     private fun handleGoalsResponse(
         response: List<GoalResponse>?,
-        status: GoalStatus? = null,
-        trackingStatus: GoalTrackingStatus? = null,
-        completion: OnFrolloSDKCompletionListener<Result>? = null
+        status: GoalStatus?,
+        trackingStatus: GoalTrackingStatus?,
+        completion: OnFrolloSDKCompletionListener<Result>?
     ) {
         response?.let {
             doAsync {

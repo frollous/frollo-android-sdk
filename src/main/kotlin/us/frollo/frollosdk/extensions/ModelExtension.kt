@@ -329,6 +329,18 @@ internal fun sqlForGoalIds(
     return sqlQueryBuilder.create()
 }
 
+internal fun sqlForGoalPeriods(
+    goalId: Long? = null,
+    trackingStatus: GoalTrackingStatus? = null
+): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("goal_period")
+
+    goalId?.let { sqlQueryBuilder.appendSelection(selection = "goal_id = $it") }
+    trackingStatus?.let { sqlQueryBuilder.appendSelection(selection = "tracking_status = '${ it.name }'") }
+
+    return sqlQueryBuilder.create()
+}
+
 internal fun Bundle.toNotificationPayload(): NotificationPayload =
         createNotificationPayload(
                 getString(NotificationPayloadNames.EVENT.toString()),

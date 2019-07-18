@@ -64,14 +64,15 @@ internal fun testGoalResponseData(
 
 internal fun testGoalPeriodResponseData(
     goalPeriodId: Long? = null,
-    goalId: Long? = null
+    goalId: Long? = null,
+    trackingStatus: GoalTrackingStatus? = null
 ): GoalPeriodResponse {
     return GoalPeriodResponse(
             goalPeriodId = goalPeriodId ?: randomNumber().toLong(),
             goalId = goalId ?: randomNumber().toLong(),
             startDate = "2019-02-01",
             endDate = "2020-01-31",
-            trackingStatus = GoalTrackingStatus.values().randomElement(),
+            trackingStatus = trackingStatus ?: GoalTrackingStatus.values().randomElement(),
             currentAmount = BigDecimal("243.11"),
             targetAmount = BigDecimal("300.0"),
             requiredAmount = BigDecimal("355.0"))

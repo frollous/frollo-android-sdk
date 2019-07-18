@@ -32,6 +32,7 @@ import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchGoals
 import us.frollo.frollosdk.extensions.sqlForGoalIds
+import us.frollo.frollosdk.extensions.sqlForGoalPeriods
 import us.frollo.frollosdk.extensions.sqlForGoals
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.logging.Log
@@ -42,6 +43,7 @@ import us.frollo.frollosdk.model.api.goals.GoalUpdateRequest
 import us.frollo.frollosdk.model.coredata.goals.Goal
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
+import us.frollo.frollosdk.model.coredata.goals.GoalPeriodRelation
 import us.frollo.frollosdk.model.coredata.goals.GoalRelation
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -261,6 +263,37 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
 
     fun fetchGoalPeriod(goalPeriodId: Long): LiveData<Resource<GoalPeriod>> =
             Transformations.map(db.goalPeriods().load(goalPeriodId)) { model ->
+                Resource.success(model)
+            }
+
+    fun fetchGoalPeriods(
+        goalId: Long? = null,
+        trackingStatus: GoalTrackingStatus? = null
+    ): LiveData<Resource<List<GoalPeriod>>> =
+            Transformations.map(db.goalPeriods().loadByQuery(sqlForGoalPeriods(goalId, trackingStatus))) { models ->
+                Resource.success(models)
+            }
+
+    fun fetchGoalPeriods(query: SimpleSQLiteQuery): LiveData<Resource<List<GoalPeriod>>> =
+            Transformations.map(db.goalPeriods().loadByQuery(query)) { model ->
+                Resource.success(model)
+            }
+
+    fun fetchGoalPeriodWithRelation(goalPeriodId: Long): LiveData<Resource<GoalPeriodRelation>> =
+            Transformations.map(db.goalPeriods().loadWithRelation(goalPeriodId)) { model ->
+                Resource.success(model)
+            }
+
+    fun fetchGoalPeriodsWithRelation(
+        goalId: Long? = null,
+        trackingStatus: GoalTrackingStatus? = null
+    ): LiveData<Resource<List<GoalPeriodRelation>>> =
+            Transformations.map(db.goalPeriods().loadByQueryWithRelation(sqlForGoalPeriods(goalId, trackingStatus))) { models ->
+                Resource.success(models)
+            }
+
+    fun fetchGoalPeriodsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<GoalPeriodRelation>>> =
+            Transformations.map(db.goalPeriods().loadByQueryWithRelation(query)) { model ->
                 Resource.success(model)
             }
 

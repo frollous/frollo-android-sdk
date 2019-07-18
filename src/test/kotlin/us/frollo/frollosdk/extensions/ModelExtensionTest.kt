@@ -244,6 +244,15 @@ class ModelExtensionTest {
     }
 
     @Test
+    fun testSQLForGoalPeriods() {
+        var query = sqlForGoalPeriods(goalId = 12345, trackingStatus = GoalTrackingStatus.ON_TRACK)
+        assertEquals("SELECT  *  FROM goal_period WHERE goal_id = 12345 AND tracking_status = 'ON_TRACK' ", query.sql)
+
+        query = sqlForGoalPeriods()
+        assertEquals("SELECT  *  FROM goal_period", query.sql)
+    }
+
+    @Test
     fun testStringToBudgetCategory() {
         var category = "living".toBudgetCategory()
         assertEquals(BudgetCategory.LIVING, category)

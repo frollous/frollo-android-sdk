@@ -33,11 +33,13 @@ import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.mapping.toGoal
+import us.frollo.frollosdk.mapping.toGoalPeriod
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
+import us.frollo.frollosdk.model.testGoalPeriodResponseData
 import us.frollo.frollosdk.model.testGoalResponseData
 import us.frollo.frollosdk.network.api.GoalsAPI
 import us.frollo.frollosdk.test.R
@@ -615,6 +617,108 @@ class GoalsTest : BaseAndroidTest() {
         wait(3)
 
         tearDown()
+    }
+
+    @Test
+    fun testGoalsLinkToAccounts() {
+        // TODO: to be implemented
+    }
+
+    // Goal Period Tests
+
+    @Test
+    fun testFetchGoalPeriodById() {
+        initSetup()
+
+        val data1 = testGoalPeriodResponseData(goalPeriodId = 100)
+        val data2 = testGoalPeriodResponseData(goalPeriodId = 101)
+        val data3 = testGoalPeriodResponseData(goalPeriodId = 102)
+        val data4 = testGoalPeriodResponseData(goalPeriodId = 103)
+        val data5 = testGoalPeriodResponseData(goalPeriodId = 104)
+        val list = mutableListOf(data1, data2, data3, data4, data5)
+
+        database.goalPeriods().insertAll(*list.map { it.toGoalPeriod() }.toList().toTypedArray())
+
+        val testObserver = goals.fetchGoalPeriod(data3.goalPeriodId).test()
+
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(data3.goalPeriodId, testObserver.value().data?.goalPeriodId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchGoalPeriods() {
+        initSetup()
+
+        val data1 = testGoalPeriodResponseData(goalPeriodId = 100, goalId = 200, trackingStatus = GoalTrackingStatus.ON_TRACK)
+        val data2 = testGoalPeriodResponseData(goalPeriodId = 101, goalId = 200, trackingStatus = GoalTrackingStatus.AHEAD)
+        val data3 = testGoalPeriodResponseData(goalPeriodId = 102, goalId = 201, trackingStatus = GoalTrackingStatus.ON_TRACK)
+        val data4 = testGoalPeriodResponseData(goalPeriodId = 103, goalId = 200, trackingStatus = GoalTrackingStatus.ON_TRACK)
+        val data5 = testGoalPeriodResponseData(goalPeriodId = 104, goalId = 201, trackingStatus = GoalTrackingStatus.ON_TRACK)
+        val list = mutableListOf(data1, data2, data3, data4, data5)
+
+        database.goalPeriods().insertAll(*list.map { it.toGoalPeriod() }.toList().toTypedArray())
+
+        val testObserver = goals.fetchGoalPeriods(goalId = 200, trackingStatus = GoalTrackingStatus.ON_TRACK).test()
+
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(2, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchGoalPeriodByIdWithRelation() {
+        initSetup()
+
+        database.goals().insert(testGoalResponseData(goalId = 123).toGoal())
+        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 456, goalId = 123).toGoalPeriod())
+
+        val testObserver = goals.fetchGoalPeriodWithRelation(goalPeriodId = 456).test()
+
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(456L, testObserver.value().data?.goalPeriod?.goalPeriodId)
+        assertEquals(123L, testObserver.value().data?.goal?.goal?.goalId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchGoalPeriodsWithRelation() {
+        initSetup()
+
+        database.goals().insert(testGoalResponseData(goalId = 123).toGoal())
+        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 456, goalId = 123, trackingStatus = GoalTrackingStatus.ON_TRACK).toGoalPeriod())
+        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 457, goalId = 123, trackingStatus = GoalTrackingStatus.AHEAD).toGoalPeriod())
+        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 458, goalId = 123, trackingStatus = GoalTrackingStatus.BEHIND).toGoalPeriod())
+        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 459, goalId = 123, trackingStatus = GoalTrackingStatus.ON_TRACK).toGoalPeriod())
+        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 460, goalId = 223, trackingStatus = GoalTrackingStatus.ON_TRACK).toGoalPeriod())
+
+        val testObserver = goals.fetchGoalPeriodsWithRelation(
+                goalId = 123,
+                trackingStatus = GoalTrackingStatus.ON_TRACK
+        ).test()
+
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(2, testObserver.value().data?.size)
+        assertEquals(123L, testObserver.value().data?.get(0)?.goal?.goal?.goalId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshGoalPeriods() {
+        // TODO: to be implemented
+    }
+
+    @Test
+    fun testRefreshGoalPeriodsFailsIfLoggedOut() {
+        // TODO: to be implemented
     }
 
     @Test

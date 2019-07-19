@@ -3,14 +3,20 @@
 ### 2.0.1
 
 #### Changes
-- Token Injection
-- Bug Fix - Token Expiry Calculation
+- Token Injection (cherrypicked from 1.3.4)
+- Bug Fix - Token Expiry Calculation (cherrypicked from 1.3.4)
 
 ### 2.0.0
 - Custom Authentication - Custom handling of authentication can be provided to the SDK
 
 #### Features
 - Custom Authentication
+
+### 1.4.3
+
+#### Changes
+- Token Injection (cherrypicked from 1.3.4)
+- Bug Fix - Token Expiry Calculation (cherrypicked from 1.3.4)
 
 ### 1.4.2
 
@@ -28,6 +34,12 @@
 - Update Tagging APIs & methods
 - Enhanced methods for Aggregation, Reports, Surveys, Messages
 - Improved handling of logged out status
+
+### 1.3.4
+
+#### Changes
+- Token Injection
+- Bug Fix - Token Expiry Calculation
 
 ### 1.3.3
 

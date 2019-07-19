@@ -6,6 +6,12 @@
 #### Features
 - TBD
 
+### 1.4.3
+
+#### Changes
+- Token Injection (cherrypicked from 1.3.4)
+- Bug Fix - Token Expiry Calculation (cherrypicked from 1.3.4)
+
 ### 1.4.2
 
 #### Changes
@@ -22,6 +28,12 @@
 - Update Tagging APIs & methods
 - Enhanced methods for Aggregation, Reports, Surveys, Messages
 - Improved handling of logged out status
+
+### 1.3.4
+
+#### Changes
+- Token Injection
+- Bug Fix - Token Expiry Calculation
 
 ### 1.3.3
 

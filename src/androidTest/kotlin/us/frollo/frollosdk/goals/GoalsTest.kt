@@ -713,12 +713,68 @@ class GoalsTest : BaseAndroidTest() {
 
     @Test
     fun testRefreshGoalPeriods() {
-        // TODO: to be implemented
+        initSetup()
+
+        val goalId: Long = 123
+        val requestPath = "goals/$goalId/periods"
+
+        val body = readStringFromJson(app, R.raw.goal_periods_valid)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        goals.refreshGoalPeriods(goalId = goalId) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = goals.fetchGoalPeriods(goalId = goalId).test()
+
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
+            assertEquals(3, testObserver.value().data?.size)
+
+            val period = testObserver.value().data?.first()
+            assertEquals(7822L, period?.goalPeriodId)
+            assertEquals(123L, period?.goalId)
+            assertEquals(BigDecimal("111.42"), period?.currentAmount)
+            assertEquals("2019-07-25", period?.endDate)
+            assertEquals(BigDecimal("173.5"), period?.requiredAmount)
+            assertEquals("2019-07-18", period?.startDate)
+            assertEquals(BigDecimal("150"), period?.targetAmount)
+            assertEquals(GoalTrackingStatus.BEHIND, period?.trackingStatus)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
     }
 
     @Test
     fun testRefreshGoalPeriodsFailsIfLoggedOut() {
-        // TODO: to be implemented
+        initSetup()
+
+        preferences.loggedIn = false
+
+        goals.refreshGoalPeriods(goalId = 123) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
     }
 
     @Test

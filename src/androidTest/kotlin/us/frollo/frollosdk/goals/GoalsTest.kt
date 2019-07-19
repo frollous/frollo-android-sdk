@@ -836,11 +836,115 @@ class GoalsTest : BaseAndroidTest() {
 
     @Test
     fun testGoalPeriodsLinkToGoals() {
-        // TODO: to be implemented
+        initSetup()
+
+        val goalId: Long = 3211
+        val requestPath = "goals/$goalId/periods"
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.goal_periods_linked_valid))
+                } else if (request?.trimmedPath == GoalsAPI.URL_GOALS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.goals_valid))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        goals.refreshGoals { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+        }
+
+        goals.refreshGoalPeriods(goalId = goalId) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+        }
+
+        wait(3)
+
+        val testObserver = goals.fetchGoalPeriodWithRelation(goalPeriodId = 9000).test()
+
+        testObserver.awaitValue()
+        val model = testObserver.value().data
+        assertNotNull(model)
+        assertEquals(9000L, model?.goalPeriod?.goalPeriodId)
+        assertEquals(model?.goalPeriod?.goalId, model?.goal?.goal?.goalId)
+
+        tearDown()
     }
 
     @Test
     fun testLinkingRemoveCachedCascade() {
-        // TODO: to be implemented
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.goals_valid)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == GoalsAPI.URL_GOALS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        database.goals().insert(testGoalResponseData(goalId = 123).toGoal())
+        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 456, goalId = 123).toGoalPeriod())
+        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 457, goalId = 123).toGoalPeriod())
+
+        goals.fetchGoal(goalId = 123).test().apply {
+            awaitValue()
+
+            assertEquals(123L, value().data?.goalId)
+        }
+
+        goals.fetchGoalPeriods(goalId = 123).test().apply {
+            awaitValue()
+
+            assertEquals(2, value().data?.size)
+            assertEquals(456L, value().data?.get(0)?.goalPeriodId)
+            assertEquals(457L, value().data?.get(1)?.goalPeriodId)
+        }
+
+        goals.refreshGoals { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            goals.fetchGoals().test().apply {
+                awaitValue()
+
+                assertNotNull(value().data)
+                assertEquals(3, value().data?.size)
+            }
+
+            goals.fetchGoal(goalId = 123).test().apply {
+                awaitValue()
+
+                assertNull(value().data)
+            }
+
+            goals.fetchGoalPeriod(goalPeriodId = 456).test().apply {
+                awaitValue()
+
+                assertNull(value().data)
+            }
+
+            goals.fetchGoalPeriod(goalPeriodId = 457).test().apply {
+                awaitValue()
+
+                assertNull(value().data)
+            }
+        }
+
+        wait(3)
+
+        tearDown()
     }
 }

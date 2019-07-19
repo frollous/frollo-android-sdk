@@ -778,6 +778,63 @@ class GoalsTest : BaseAndroidTest() {
     }
 
     @Test
+    fun testRefreshGoalPeriodById() {
+        initSetup()
+
+        val goalId: Long = 123
+        val goalPeriodId: Long = 897
+        val requestPath = "goals/$goalId/periods/$goalPeriodId"
+
+        val body = readStringFromJson(app, R.raw.goal_period_id_897)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        goals.refreshGoalPeriod(goalId = goalId, goalPeriodId = goalPeriodId) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = goals.fetchGoalPeriod(goalPeriodId = goalPeriodId).test()
+
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
+            assertEquals(897L, testObserver.value().data?.goalPeriodId)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshGoalPeriodByIdFailsIfLoggedOut() {
+        initSetup()
+
+        preferences.loggedIn = false
+
+        goals.refreshGoalPeriod(goalId = 123, goalPeriodId = 897) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testGoalPeriodsLinkToGoals() {
         // TODO: to be implemented
     }

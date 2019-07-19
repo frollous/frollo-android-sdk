@@ -145,6 +145,9 @@ data class Account(
     @ColumnInfo(name = "end_date") val endDate: String?, // yyyy-MM-dd
 
     /** Balance details (optional) */
-    @Embedded(prefix = "b_details_") val balanceDetails: BalanceDetails?
+    @Embedded(prefix = "b_details_") val balanceDetails: BalanceDetails?,
+
+    /** Goal IDs that are associated to this account */
+    @ColumnInfo(name = "goal_ids") val goalIds: List<Long>?
 
 ) : IAdapterModel

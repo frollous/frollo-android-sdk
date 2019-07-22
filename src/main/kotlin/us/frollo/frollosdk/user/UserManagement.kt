@@ -23,6 +23,8 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.AuthenticationCallback
+import us.frollo.frollosdk.authentication.AuthenticationType
+import us.frollo.frollosdk.authentication.OAuth2Authentication
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.ACTION
@@ -147,7 +149,8 @@ class UserManagement(
                 password = password,
                 currentAddress = if (postcode?.isNotBlank() == true) Address(postcode = postcode) else null,
                 mobileNumber = mobileNumber,
-                dateOfBirth = dateOfBirth?.toString("yyyy-MM"))
+                dateOfBirth = dateOfBirth?.toString("yyyy-MM"),
+                clientId = ((authentication as OAuth2Authentication).oAuth2Helper.config.authenticationType as AuthenticationType.OAuth2).clientId)
 
         userAPI.register(request).enqueue { userResource ->
             when (userResource.status) {
@@ -287,7 +290,10 @@ class UserManagement(
      * @param completion A completion handler once the API has returned and the cache has been updated. Returns any error that occurred during the process.
      */
     fun resetPassword(email: String, completion: OnFrolloSDKCompletionListener<Result>) {
-        userAPI.resetPassword(UserResetPasswordRequest(email)).enqueue { resource ->
+        userAPI.resetPassword(UserResetPasswordRequest(
+                email = email,
+                clientId = ((authentication as OAuth2Authentication).oAuth2Helper.config.authenticationType as AuthenticationType.OAuth2).clientId
+        )).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#resetPassword", resource.error?.localizedDescription)

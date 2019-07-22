@@ -6,6 +6,11 @@
 #### Features
 - TBD
 
+### 1.4.4
+
+#### Changes
+- Bug Fix - Revert back to use Frollo Host API v2.2. Will update to Frollo Host API v2.4 in a future version.
+
 ### 1.4.3
 
 #### Changes

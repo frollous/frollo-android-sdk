@@ -12,7 +12,7 @@ android {
         minSdkVersion 23 // Android 6.0 (Marshmallow)
         targetSdkVersion 28
         versionCode 1
-        versionName "1.4.3"
+        versionName "1.4.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 'appAuthRedirectScheme': 'frollo-sdk-test'

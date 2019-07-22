@@ -24,6 +24,7 @@ import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.error.DataError
@@ -54,6 +55,7 @@ import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
 import us.frollo.frollosdk.network.api.GoalsAPI
 import java.math.BigDecimal
 
+/** Manages user goals and tracking */
 class Goals(network: NetworkService, private val db: SDKDatabase, private val authentication: Authentication) {
 
     companion object {
@@ -64,16 +66,40 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
 
     // Goal
 
+    /**
+     * Fetch goal by ID from the cache
+     *
+     * @param goalId Unique goal ID to fetch
+     *
+     * @return LiveData object of Resource<Goal> which can be observed using an Observer for future changes as well.
+     */
     fun fetchGoal(goalId: Long): LiveData<Resource<Goal>> =
             Transformations.map(db.goals().load(goalId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch goal by ID from the cache along with other associated data.
+     *
+     * @param goalId Unique goal ID to fetch
+     *
+     * @return LiveData object of Resource<GoalRelation> which can be observed using an Observer for future changes as well.
+     */
     fun fetchGoalWithRelation(goalId: Long): LiveData<Resource<GoalRelation>> =
             Transformations.map(db.goals().loadWithRelation(goalId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch goals from the cache
+     *
+     * @param frequency Filter by frequency of the goal (optional)
+     * @param status Filter by the status of the goal (optional)
+     * @param trackingStatus Filter by the tracking status of the goal (optional)
+     * @param accountId Filter by the accountId with which the goals are associated with (optional)
+     *
+     * @return LiveData object of Resource<List<Goal> which can be observed using an Observer for future changes as well.
+     */
     fun fetchGoals(
         frequency: GoalFrequency? = null,
         status: GoalStatus? = null,
@@ -84,11 +110,30 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
                 Resource.success(models)
             }
 
+    /**
+     * Advanced method to fetch goals by SQL query from the cache
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches goals from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<Goal>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchGoals(query: SimpleSQLiteQuery): LiveData<Resource<List<Goal>>> =
             Transformations.map(db.goals().loadByQuery(query)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch goals from the cache with associated data
+     *
+     * @param frequency Filter by frequency of the goal (optional)
+     * @param status Filter by the status of the goal (optional)
+     * @param trackingStatus Filter by the tracking status of the goal (optional)
+     * @param accountId Filter by the accountId with which the goals are associated with (optional)
+     *
+     * @return LiveData object of Resource<List<GoalRelation> which can be observed using an Observer for future changes as well.
+     */
     fun fetchGoalsWithRelation(
         frequency: GoalFrequency? = null,
         status: GoalStatus? = null,
@@ -99,11 +144,26 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
                 Resource.success(models)
             }
 
+    /**
+     * Advanced method to fetch goals by SQL query from the cache with associated data
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches goals from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<GoalRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchGoalsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<GoalRelation>>> =
             Transformations.map(db.goals().loadByQueryWithRelation(query)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Refresh a specific goal by ID from the host
+     *
+     * @param goalId ID of the goal to fetch
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshGoal(goalId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (!authentication.loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
@@ -125,6 +185,13 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
         }
     }
 
+    /**
+     * Refresh all available goals from the host.
+     *
+     * @param status Filter by the status of the goal (optional)
+     * @param trackingStatus Filter by the tracking status of the goal (optional)
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshGoals(
         status: GoalStatus? = null,
         trackingStatus: GoalTrackingStatus? = null,
@@ -154,6 +221,25 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
         }
     }
 
+    /**
+     * Create a new goal on the host
+     *
+     * @param name Name of the goal
+     * @param description Additional description of the goal for the user (Optional)
+     * @param imageUrl Image URL of an icon/picture associated with the goal (Optional)
+     * @param type Type of the goal (Optional)
+     * @param subType Sub type of the goal (Optional)
+     * @param target Target of the goal
+     * @param trackingType Tracking method the goal uses
+     * @param frequency Frequency of contributions to the goal
+     * @param startDate Start date of the goal. Defaults to today (Optional)
+     * @param endDate End date of the goal. Required for open ended and date based goals
+     * @param periodAmount Amount to be saved each period. Required for open ended and amount based goals
+     * @param startAmount Amount already contributed to a goal. Defaults to zero (Optional)
+     * @param targetAmount Target amount to reach for the goal. Required for amount and date based goals
+     * @param accountId ID of the Account with which the Goal is associated with
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun createGoal(
         name: String,
         description: String? = null,
@@ -213,6 +299,12 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
         }
     }
 
+    /**
+     * Update a goal on the host
+     *
+     * @param goal Updated goal data model
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun updateGoal(goal: Goal, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (!authentication.loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
@@ -239,6 +331,12 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
         }
     }
 
+    /**
+     * Delete a specific goal by ID from the host
+     *
+     * @param goalId ID of the goal to be deleted
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun deleteGoal(goalId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (!authentication.loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
@@ -263,11 +361,26 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
 
     // Goal Period
 
+    /**
+     * Fetch goal period by ID from the cache
+     *
+     * @param goalPeriodId Unique goal period ID to fetch
+     *
+     * @return LiveData object of Resource<GoalPeriod> which can be observed using an Observer for future changes as well.
+     */
     fun fetchGoalPeriod(goalPeriodId: Long): LiveData<Resource<GoalPeriod>> =
             Transformations.map(db.goalPeriods().load(goalPeriodId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch goal periods by goal ID from the cache
+     *
+     * @param goalId Goal ID of the goal periods to fetch (optional)
+     * @param trackingStatus Filter by the tracking status (optional)
+     *
+     * @return LiveData object of Resource<List<GoalPeriod>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchGoalPeriods(
         goalId: Long? = null,
         trackingStatus: GoalTrackingStatus? = null
@@ -276,16 +389,40 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
                 Resource.success(models)
             }
 
+    /**
+     * Advanced method to fetch goal periods by SQL query from the cache
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches goal periods from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<GoalPeriod>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchGoalPeriods(query: SimpleSQLiteQuery): LiveData<Resource<List<GoalPeriod>>> =
             Transformations.map(db.goalPeriods().loadByQuery(query)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch goal period by ID from the cache with associated data
+     *
+     * @param goalPeriodId Unique goal period ID to fetch
+     *
+     * @return LiveData object of Resource<GoalPeriodRelation> which can be observed using an Observer for future changes as well.
+     */
     fun fetchGoalPeriodWithRelation(goalPeriodId: Long): LiveData<Resource<GoalPeriodRelation>> =
             Transformations.map(db.goalPeriods().loadWithRelation(goalPeriodId)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Fetch goal periods by goal ID from the cache with associated data
+     *
+     * @param goalId Goal ID of the goal periods to fetch (optional)
+     * @param trackingStatus Filter by the tracking status (optional)
+     *
+     * @return LiveData object of Resource<List<GoalPeriodRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchGoalPeriodsWithRelation(
         goalId: Long? = null,
         trackingStatus: GoalTrackingStatus? = null
@@ -294,11 +431,27 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
                 Resource.success(models)
             }
 
+    /**
+     * Advanced method to fetch goal periods by SQL query from the cache with associated data
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches goal periods from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<GoalPeriodRelation>> which can be observed using an Observer for future changes as well.
+     */
     fun fetchGoalPeriodsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<GoalPeriodRelation>>> =
             Transformations.map(db.goalPeriods().loadByQueryWithRelation(query)) { model ->
                 Resource.success(model)
             }
 
+    /**
+     * Refresh goal period by ID from the host
+     *
+     * @param goalId Goal ID of the goal period to refresh
+     * @param goalPeriodId Unique goal period ID to refresh
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshGoalPeriod(goalId: Long, goalPeriodId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (!authentication.loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
@@ -320,6 +473,12 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
         }
     }
 
+    /**
+     * Refresh goal periods by goal ID from the host
+     *
+     * @param goalId Goal ID of the goal periods to refresh
+     * @param completion Optional completion handler with optional error if the request fails
+     */
     fun refreshGoalPeriods(goalId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (!authentication.loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)

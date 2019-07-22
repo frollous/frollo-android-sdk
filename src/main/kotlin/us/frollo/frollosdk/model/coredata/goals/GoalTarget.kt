@@ -19,12 +19,16 @@ package us.frollo.frollosdk.model.coredata.goals
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
+/** Target of the goal to be reached */
 enum class GoalTarget {
 
+    /** Open Ended - target is not set but a regular contribution amount and end date is */
     @SerializedName("open_ended") OPEN_ENDED,
 
+    /** Date - target to be reached by a certain date */
     @SerializedName("date") DATE,
 
+    /** Amount - target amount to be reached */
     @SerializedName("amount") AMOUNT;
 
     /** Enum to serialized string */

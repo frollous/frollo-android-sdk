@@ -19,22 +19,31 @@ package us.frollo.frollosdk.model.coredata.goals
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
+/** How often the [GoalPeriod]s occur */
 enum class GoalFrequency {
 
+    /** Annually */
     @SerializedName("annually") ANNUALLY,
 
+    /** Biannually - twice in a year */
     @SerializedName("biannually") BIANNUALLY,
 
+    /** Fortnightly */
     @SerializedName("fortnightly") FORTNIGHTLY,
 
+    /** Every four weeks */
     @SerializedName("four_weekly") FOUR_WEEKLY,
 
+    /** Monthly */
     @SerializedName("monthly") MONTHLY,
 
+    /** Quarterly */
     @SerializedName("quarterly") QUARTERLY,
 
+    /** Singular */
     @SerializedName("singular") SINGULAR,
 
+    /** Weekly */
     @SerializedName("weekly") WEEKLY;
 
     /** Enum to serialized string */

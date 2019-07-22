@@ -20,7 +20,7 @@ import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
 import java.math.BigDecimal
 
-data class GoalPeriodResponse(
+internal data class GoalPeriodResponse(
     @SerializedName("id") val goalPeriodId: Long,
     @SerializedName("goal_id") val goalId: Long,
     @SerializedName("start_date") val startDate: String, // yyyy-MM-dd

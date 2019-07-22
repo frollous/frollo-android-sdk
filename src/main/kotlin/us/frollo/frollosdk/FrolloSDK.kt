@@ -132,6 +132,9 @@ object FrolloSDK : AuthenticationCallback {
     val bills: Bills
         get() = _bills ?: throw IllegalAccessException("SDK not setup")
 
+    /**
+     * Goals - Tracking and managing goals. See [Goals] for details
+     */
     val goals: Goals
         get() = _goals ?: throw IllegalAccessException("SDK not setup")
 

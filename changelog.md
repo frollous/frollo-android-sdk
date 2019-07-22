@@ -1,5 +1,13 @@
 ## Changelog
 
+### 2.1.0
+
+#### Changes
+- Goals
+
+#### Features
+- Goals
+
 ### 2.0.1
 
 #### Changes

@@ -19,18 +19,25 @@ package us.frollo.frollosdk.model.coredata.goals
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
+/** Status of the goal */
 enum class GoalStatus {
 
+    /** Unstarted - goal is pending and not started yet */
     @SerializedName("unstarted") UNSTARTED,
 
+    /** Active - goal is currently being tracked */
     @SerializedName("active") ACTIVE,
 
+    /** Completed - successfully completed */
     @SerializedName("completed") COMPLETED,
 
+    /** Failed - user failed to successfully complete the goal */
     @SerializedName("failed") FAILED,
 
+    /** Finalising - goal is finished but some transactions may move from pending to posted which could affect the goal (usually within 2 business days) */
     @SerializedName("finalising") FINALISING,
 
+    /** Cancelled - user cancelled the goal */
     @SerializedName("cancelled") CANCELLED;
 
     /** Enum to serialized string */

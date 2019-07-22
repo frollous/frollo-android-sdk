@@ -19,12 +19,16 @@ package us.frollo.frollosdk.model.coredata.goals
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
+/** How the goal is being tracked */
 enum class GoalTrackingType {
 
+    /** Debit - only debits are counted towards the goal */
     @SerializedName("debit") DEBIT,
 
+    /** Credit - only credits are counted towards the goal */
     @SerializedName("credit") CREDIT,
 
+    /** Debit and Credit - Both debits and credits will affect the goal. E.g. withdrawing after a deposit will reduce the saved amount */
     @SerializedName("debit_credit") DEBIT_CREDIT;
 
     /** Enum to serialized string */

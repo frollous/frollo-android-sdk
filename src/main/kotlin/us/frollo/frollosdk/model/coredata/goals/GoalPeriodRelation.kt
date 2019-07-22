@@ -20,16 +20,23 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import us.frollo.frollosdk.model.IAdapterModel
 
+/** Goal Period with associated data */
 data class GoalPeriodRelation(
 
+    /** Goal Period */
     @Embedded
     var goalPeriod: GoalPeriod? = null,
 
+    /** Associated Goal
+     *
+     * Even though its a list this will have only one element. It is requirement of Room database for this to be a list.
+     */
     @Relation(parentColumn = "goal_id", entityColumn = "goal_id", entity = Goal::class)
     var goals: List<GoalRelation>? = null
 
 ) : IAdapterModel {
 
+    /** Associated Goal */
     val goal: GoalRelation?
         get() {
             val models = goals

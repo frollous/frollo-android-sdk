@@ -19,12 +19,16 @@ package us.frollo.frollosdk.model.coredata.goals
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
+/** How the user is tracking against an in progress goal */
 enum class GoalTrackingStatus {
 
+    /** Ahead - user is ahead on contributions */
     @SerializedName("ahead") AHEAD,
 
+    /** On Track - user in on track on contributions */
     @SerializedName("on_track") ON_TRACK,
 
+    /** Behind - user is behind on contributions */
     @SerializedName("behind") BEHIND;
 
     /** Enum to serialized string */

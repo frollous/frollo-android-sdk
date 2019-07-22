@@ -188,8 +188,8 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
     /**
      * Refresh all available goals from the host.
      *
-     * @param status Filter by the status of the goal (optional)
-     * @param trackingStatus Filter by the tracking status of the goal (optional)
+     * @param status Filter goals by their current status (optional)
+     * @param trackingStatus Filter goals by their current tracking status (optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshGoals(
@@ -332,9 +332,9 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
     }
 
     /**
-     * Delete a specific goal by ID from the host
+     * Cancel a specific goal by ID from the host
      *
-     * @param goalId ID of the goal to be deleted
+     * @param goalId ID of the goal to be abandoned
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun deleteGoal(goalId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {

@@ -26,6 +26,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import us.frollo.frollosdk.database.dao.AccountDao
 import us.frollo.frollosdk.database.dao.BillDao
 import us.frollo.frollosdk.database.dao.BillPaymentDao
+import us.frollo.frollosdk.database.dao.GoalDao
+import us.frollo.frollosdk.database.dao.GoalPeriodDao
 import us.frollo.frollosdk.database.dao.MerchantDao
 import us.frollo.frollosdk.database.dao.MessageDao
 import us.frollo.frollosdk.database.dao.ProviderAccountDao
@@ -53,6 +55,8 @@ import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
 import us.frollo.frollosdk.model.coredata.user.User
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
+import us.frollo.frollosdk.model.coredata.goals.Goal
+import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
 
 @Database(entities = [
     User::class,
@@ -69,8 +73,10 @@ import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
     ReportAccountBalance::class,
     Bill::class,
     BillPayment::class,
-    TransactionTag::class
-], version = 4, exportSchema = true)
+    TransactionTag::class,
+    Goal::class,
+    GoalPeriod::class
+], version = 5, exportSchema = true)
 
 @TypeConverters(Converters::class)
 abstract class SDKDatabase : RoomDatabase() {
@@ -90,6 +96,8 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun bills(): BillDao
     internal abstract fun billPayments(): BillPaymentDao
     internal abstract fun userTags(): TransactionUserTagsDao
+    internal abstract fun goals(): GoalDao
+    internal abstract fun goalPeriods(): GoalPeriodDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"
@@ -107,7 +115,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
                         .allowMainThreadQueries() // Needed for some tests
                         // .fallbackToDestructiveMigration()
-                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                         .build()
 
         // Copy-paste of auto-generated SQLs from room schema json file
@@ -176,6 +184,23 @@ abstract class SDKDatabase : RoomDatabase() {
                 database.execSQL("CREATE TABLE IF NOT EXISTS transaction_user_tags (name TEXT NOT NULL, count INTEGER DEFAULT 0, last_used_at TEXT, created_at TEXT, PRIMARY KEY(name))")
                 database.execSQL("CREATE  INDEX index_transaction_user_tags_name ON transaction_user_tags (name)")
                 database.execSQL("ALTER TABLE transaction_model ADD COLUMN `user_tags` TEXT")
+            }
+        }
+
+        private val MIGRATION_4_5: Migration = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // New changes in this migration:
+                // 1) Add new table/entity goal and create indexes
+                // 2) Add new table/entity goal_period and create indexes
+                // 3) Alter table/entity account - add column: "goal_ids"
+
+                database.execSQL("CREATE TABLE IF NOT EXISTS `goal` (`goal_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `image_url` TEXT, `account_id` INTEGER, `type` TEXT, `sub_type` TEXT, `tracking_status` TEXT NOT NULL, `tracking_type` TEXT NOT NULL, `status` TEXT NOT NULL, `frequency` TEXT NOT NULL, `target` TEXT NOT NULL, `currency` TEXT NOT NULL, `current_amount` TEXT NOT NULL, `period_amount` TEXT NOT NULL, `start_amount` TEXT NOT NULL, `target_amount` TEXT NOT NULL, `start_date` TEXT NOT NULL, `end_date` TEXT NOT NULL, `estimated_end_date` TEXT, `estimated_target_amount` TEXT, `periods_count` INTEGER NOT NULL, `c_period_goal_period_id` INTEGER NOT NULL, `c_period_goal_id` INTEGER NOT NULL, `c_period_start_date` TEXT NOT NULL, `c_period_end_date` TEXT NOT NULL, `c_period_tracking_status` TEXT NOT NULL, `c_period_current_amount` TEXT NOT NULL, `c_period_target_amount` TEXT NOT NULL, `c_period_required_amount` TEXT NOT NULL, PRIMARY KEY(`goal_id`))")
+                database.execSQL("CREATE  INDEX `index_goal_goal_id` ON `goal` (`goal_id`)")
+                database.execSQL("CREATE  INDEX `index_goal_account_id` ON `goal` (`account_id`)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `goal_period` (`goal_period_id` INTEGER NOT NULL, `goal_id` INTEGER NOT NULL, `start_date` TEXT NOT NULL, `end_date` TEXT NOT NULL, `tracking_status` TEXT NOT NULL, `current_amount` TEXT NOT NULL, `target_amount` TEXT NOT NULL, `required_amount` TEXT NOT NULL, PRIMARY KEY(`goal_period_id`))")
+                database.execSQL("CREATE  INDEX `index_goal_period_goal_period_id` ON `goal_period` (`goal_period_id`)")
+                database.execSQL("CREATE  INDEX `index_goal_period_goal_id` ON `goal_period` (`goal_id`)")
+                database.execSQL("ALTER TABLE `account` ADD COLUMN `goal_ids` TEXT")
             }
         }
     }

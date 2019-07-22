@@ -90,7 +90,8 @@ internal fun testAccountResponseData(accountId: Long? = null, providerAccountId:
             aggregatorId = randomNumber().toLong(),
             bsb = randomUUID(),
             interestTotal = Balance(amount = randomNumber().toBigDecimal(), currency = "AUD"),
-            endDate = randomUUID())
+            endDate = randomUUID(),
+            goalIds = null)
 }
 
 internal fun testUpdateRequestData(hidden: Boolean = false, included: Boolean = true): AccountUpdateRequest {

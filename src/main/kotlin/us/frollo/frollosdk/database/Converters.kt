@@ -43,6 +43,11 @@ import us.frollo.frollosdk.model.coredata.bills.BillFrequency
 import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.model.coredata.bills.BillStatus
 import us.frollo.frollosdk.model.coredata.bills.BillType
+import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
+import us.frollo.frollosdk.model.coredata.goals.GoalStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTarget
+import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
@@ -305,6 +310,38 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromBillPaymentStatus(value: BillPaymentStatus?): String? = value?.name ?: BillPaymentStatus.DUE.name
+
+    // Goal
+
+    @TypeConverter
+    fun stringToGoalTrackingType(value: String?): GoalTrackingType? = if (value == null) GoalTrackingType.DEBIT_CREDIT else GoalTrackingType.valueOf(value)
+
+    @TypeConverter
+    fun stringFromGoalTrackingType(value: GoalTrackingType?): String? = value?.name ?: GoalTrackingType.DEBIT_CREDIT.name
+
+    @TypeConverter
+    fun stringToGoalTrackingStatus(value: String?): GoalTrackingStatus? = if (value == null) GoalTrackingStatus.ON_TRACK else GoalTrackingStatus.valueOf(value)
+
+    @TypeConverter
+    fun stringFromGoalTrackingStatus(value: GoalTrackingStatus?): String? = value?.name ?: GoalTrackingStatus.ON_TRACK.name
+
+    @TypeConverter
+    fun stringToGoalTarget(value: String?): GoalTarget? = if (value == null) GoalTarget.OPEN_ENDED else GoalTarget.valueOf(value)
+
+    @TypeConverter
+    fun stringFromGoalTarget(value: GoalTarget?): String? = value?.name ?: GoalTarget.OPEN_ENDED.name
+
+    @TypeConverter
+    fun stringToGoalStatus(value: String?): GoalStatus? = if (value == null) GoalStatus.UNSTARTED else GoalStatus.valueOf(value)
+
+    @TypeConverter
+    fun stringFromGoalStatus(value: GoalStatus?): String? = value?.name ?: GoalStatus.UNSTARTED.name
+
+    @TypeConverter
+    fun stringToGoalFrequency(value: String?): GoalFrequency? = if (value == null) GoalFrequency.SINGULAR else GoalFrequency.valueOf(value)
+
+    @TypeConverter
+    fun stringFromGoalFrequency(value: GoalFrequency?): String? = value?.name ?: GoalFrequency.SINGULAR.name
 
     // Shared
 

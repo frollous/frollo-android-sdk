@@ -31,10 +31,12 @@ import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.mapping.toAccount
+import us.frollo.frollosdk.mapping.toGoal
 import us.frollo.frollosdk.mapping.toProvider
 import us.frollo.frollosdk.mapping.toProviderAccount
 import us.frollo.frollosdk.mapping.toTransaction
 import us.frollo.frollosdk.model.testAccountResponseData
+import us.frollo.frollosdk.model.testGoalResponseData
 import us.frollo.frollosdk.model.testProviderAccountResponseData
 import us.frollo.frollosdk.model.testProviderResponseData
 import us.frollo.frollosdk.model.testTransactionResponseData
@@ -238,6 +240,8 @@ class AccountDaoTest {
         db.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
         db.transactions().insert(testTransactionResponseData(transactionId = 456, accountId = 345).toTransaction())
         db.transactions().insert(testTransactionResponseData(transactionId = 457, accountId = 345).toTransaction())
+        db.goals().insert(testGoalResponseData(goalId = 789, accountId = 345).toGoal())
+        db.goals().insert(testGoalResponseData(goalId = 790, accountId = 345).toGoal())
 
         val testObserver = db.accounts().loadWithRelation().test()
         testObserver.awaitValue()
@@ -251,6 +255,8 @@ class AccountDaoTest {
         assertEquals(2, model.transactions?.size)
         assertEquals(456L, model.transactions?.get(0)?.transactionId)
         assertEquals(457L, model.transactions?.get(1)?.transactionId)
+        assertEquals(789L, model.goals?.get(0)?.goalId)
+        assertEquals(790L, model.goals?.get(1)?.goalId)
     }
 
     @Test

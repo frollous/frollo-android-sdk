@@ -23,15 +23,19 @@ import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.api.bills.BillPaymentResponse
+import us.frollo.frollosdk.model.api.goals.GoalResponse
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
+import us.frollo.frollosdk.model.coredata.goals.GoalStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.surveys.Survey
 import us.frollo.frollosdk.network.api.BillsAPI
+import us.frollo.frollosdk.network.api.GoalsAPI
 import us.frollo.frollosdk.network.api.ReportsAPI
 import us.frollo.frollosdk.network.api.SurveysAPI
 
@@ -185,4 +189,13 @@ internal fun SurveysAPI.fetchSurvey(surveyKey: String, latest: Boolean? = null):
     val queryMap = mutableMapOf<String, String>()
     latest?.let { queryMap.put("latest", latest.toString()) }
     return fetchSurvey(surveyKey, queryMap)
+}
+
+// Goals
+
+internal fun GoalsAPI.fetchGoals(status: GoalStatus? = null, trackingStatus: GoalTrackingStatus? = null): Call<List<GoalResponse>> {
+    val queryMap = mutableMapOf<String, String>()
+    status?.let { queryMap.put("status", status.toString()) }
+    trackingStatus?.let { queryMap.put("tracking_status", trackingStatus.toString()) }
+    return fetchGoals(queryMap)
 }

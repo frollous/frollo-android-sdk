@@ -22,6 +22,7 @@ import us.frollo.frollosdk.model.IAdapterModel
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccountRelation
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
+import us.frollo.frollosdk.model.coredata.goals.Goal
 
 /** Account with associated data */
 data class AccountRelation(
@@ -39,7 +40,11 @@ data class AccountRelation(
 
     /** Associated Transactions */
     @Relation(parentColumn = "account_id", entityColumn = "account_id", entity = Transaction::class)
-    var transactions: List<Transaction>? = null
+    var transactions: List<Transaction>? = null,
+
+    /** Associated Goals */
+    @Relation(parentColumn = "account_id", entityColumn = "account_id", entity = Goal::class)
+    var goals: List<Goal>? = null
 
 ) : IAdapterModel {
 

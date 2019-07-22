@@ -34,6 +34,9 @@ import us.frollo.frollosdk.model.coredata.bills.BillFrequency
 import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.model.coredata.bills.BillStatus
 import us.frollo.frollosdk.model.coredata.bills.BillType
+import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
+import us.frollo.frollosdk.model.coredata.goals.GoalStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
@@ -220,6 +223,33 @@ class ModelExtensionTest {
 
         query = sqlForMerchants()
         assertEquals("SELECT  *  FROM merchant", query.sql)
+    }
+
+    @Test
+    fun testSQLForGoals() {
+        var query = sqlForGoals(frequency = GoalFrequency.MONTHLY, trackingStatus = GoalTrackingStatus.ON_TRACK, status = GoalStatus.ACTIVE, accountId = 12345)
+        assertEquals("SELECT  *  FROM goal WHERE frequency = 'MONTHLY' AND status = 'ACTIVE' AND tracking_status = 'ON_TRACK' AND account_id = 12345 ", query.sql)
+
+        query = sqlForGoals()
+        assertEquals("SELECT  *  FROM goal", query.sql)
+    }
+
+    @Test
+    fun testSQLForGoalIds() {
+        var query = sqlForGoalIds(trackingStatus = GoalTrackingStatus.ON_TRACK, status = GoalStatus.ACTIVE)
+        assertEquals("SELECT goal_id  FROM goal WHERE status = 'ACTIVE' AND tracking_status = 'ON_TRACK' ", query.sql)
+
+        query = sqlForGoalIds()
+        assertEquals("SELECT goal_id  FROM goal", query.sql)
+    }
+
+    @Test
+    fun testSQLForGoalPeriods() {
+        var query = sqlForGoalPeriods(goalId = 12345, trackingStatus = GoalTrackingStatus.ON_TRACK)
+        assertEquals("SELECT  *  FROM goal_period WHERE goal_id = 12345 AND tracking_status = 'ON_TRACK' ", query.sql)
+
+        query = sqlForGoalPeriods()
+        assertEquals("SELECT  *  FROM goal_period", query.sql)
     }
 
     @Test

@@ -47,6 +47,11 @@ import us.frollo.frollosdk.model.coredata.bills.BillFrequency
 import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.model.coredata.bills.BillStatus
 import us.frollo.frollosdk.model.coredata.bills.BillType
+import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
+import us.frollo.frollosdk.model.coredata.goals.GoalStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTarget
+import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
@@ -724,5 +729,85 @@ class ConvertersTest {
         assertEquals("FUTURE", str)
 
         assertEquals("DUE", Converters.instance.stringFromBillPaymentStatus(null))
+    }
+
+    @Test
+    fun testStringToGoalTrackingType() {
+        val status = Converters.instance.stringToGoalTrackingType("CREDIT")
+        assertEquals(GoalTrackingType.CREDIT, status)
+
+        assertEquals(GoalTrackingType.DEBIT_CREDIT, Converters.instance.stringToGoalTrackingType(null))
+    }
+
+    @Test
+    fun testStringFromGoalTrackingType() {
+        val str = Converters.instance.stringFromGoalTrackingType(GoalTrackingType.CREDIT)
+        assertEquals("CREDIT", str)
+
+        assertEquals("DEBIT_CREDIT", Converters.instance.stringFromGoalTrackingType(null))
+    }
+
+    @Test
+    fun testStringToGoalTrackingStatus() {
+        val status = Converters.instance.stringToGoalTrackingStatus("AHEAD")
+        assertEquals(GoalTrackingStatus.AHEAD, status)
+
+        assertEquals(GoalTrackingStatus.ON_TRACK, Converters.instance.stringToGoalTrackingStatus(null))
+    }
+
+    @Test
+    fun testStringFromGoalTrackingStatus() {
+        val str = Converters.instance.stringFromGoalTrackingStatus(GoalTrackingStatus.AHEAD)
+        assertEquals("AHEAD", str)
+
+        assertEquals("ON_TRACK", Converters.instance.stringFromGoalTrackingStatus(null))
+    }
+
+    @Test
+    fun testStringToGoalTarget() {
+        val status = Converters.instance.stringToGoalTarget("AMOUNT")
+        assertEquals(GoalTarget.AMOUNT, status)
+
+        assertEquals(GoalTarget.OPEN_ENDED, Converters.instance.stringToGoalTarget(null))
+    }
+
+    @Test
+    fun testStringFromGoalTarget() {
+        val str = Converters.instance.stringFromGoalTarget(GoalTarget.AMOUNT)
+        assertEquals("AMOUNT", str)
+
+        assertEquals("OPEN_ENDED", Converters.instance.stringFromGoalTarget(null))
+    }
+
+    @Test
+    fun testStringToGoalStatus() {
+        val status = Converters.instance.stringToGoalStatus("ACTIVE")
+        assertEquals(GoalStatus.ACTIVE, status)
+
+        assertEquals(GoalStatus.UNSTARTED, Converters.instance.stringToGoalStatus(null))
+    }
+
+    @Test
+    fun testStringFromGoalStatus() {
+        val str = Converters.instance.stringFromGoalStatus(GoalStatus.ACTIVE)
+        assertEquals("ACTIVE", str)
+
+        assertEquals("UNSTARTED", Converters.instance.stringFromGoalStatus(null))
+    }
+
+    @Test
+    fun testStringToGoalFrequency() {
+        val status = Converters.instance.stringToGoalFrequency("ANNUALLY")
+        assertEquals(GoalFrequency.ANNUALLY, status)
+
+        assertEquals(GoalFrequency.SINGULAR, Converters.instance.stringToGoalFrequency(null))
+    }
+
+    @Test
+    fun testStringFromGoalFrequency() {
+        val str = Converters.instance.stringFromGoalFrequency(GoalFrequency.ANNUALLY)
+        assertEquals("ANNUALLY", str)
+
+        assertEquals("SINGULAR", Converters.instance.stringFromGoalFrequency(null))
     }
 }

@@ -37,6 +37,8 @@ import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.mapping.toAccount
+import us.frollo.frollosdk.mapping.toGoal
+import us.frollo.frollosdk.mapping.toGoalPeriod
 import us.frollo.frollosdk.mapping.toMerchant
 import us.frollo.frollosdk.mapping.toProvider
 import us.frollo.frollosdk.mapping.toProviderAccount
@@ -49,6 +51,8 @@ import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
 import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.model.loginFormFilledData
 import us.frollo.frollosdk.model.testAccountResponseData
+import us.frollo.frollosdk.model.testGoalPeriodResponseData
+import us.frollo.frollosdk.model.testGoalResponseData
 import us.frollo.frollosdk.model.testMerchantResponseData
 import us.frollo.frollosdk.model.testProviderAccountResponseData
 import us.frollo.frollosdk.model.testProviderResponseData
@@ -2692,6 +2696,8 @@ class AggregationTest : BaseAndroidTest() {
         database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
         database.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
         database.transactions().insert(testTransactionResponseData(transactionId = 456, accountId = 345).toTransaction())
+        database.goals().insert(testGoalResponseData(goalId = 789, accountId = 345).toGoal())
+        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 1012, goalId = 789).toGoalPeriod())
 
         val testObserver1 = aggregation.fetchProvider(providerId = 123).test()
         testObserver1.awaitValue()
@@ -2708,6 +2714,14 @@ class AggregationTest : BaseAndroidTest() {
         val testObserver4 = aggregation.fetchTransaction(transactionId = 456).test()
         testObserver4.awaitValue()
         assertEquals(456L, testObserver4.value().data?.transactionId)
+
+        val testObserver10 = goals.fetchGoal(goalId = 789).test()
+        testObserver10.awaitValue()
+        assertEquals(789L, testObserver10.value().data?.goalId)
+
+        val testObserver11 = goals.fetchGoalPeriod(goalPeriodId = 1012).test()
+        testObserver11.awaitValue()
+        assertEquals(1012L, testObserver11.value().data?.goalPeriodId)
 
         aggregation.refreshProviders { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
@@ -2734,6 +2748,14 @@ class AggregationTest : BaseAndroidTest() {
             val testObserver9 = aggregation.fetchTransaction(transactionId = 456).test()
             testObserver9.awaitValue()
             assertNull(testObserver9.value().data)
+
+            val testObserver12 = goals.fetchGoal(goalId = 789).test()
+            testObserver12.awaitValue()
+            assertNull(testObserver12.value().data)
+
+            val testObserver13 = goals.fetchGoalPeriod(goalPeriodId = 1012).test()
+            testObserver13.awaitValue()
+            assertNull(testObserver13.value().data)
         }
 
         val request = mockServer.takeRequest()

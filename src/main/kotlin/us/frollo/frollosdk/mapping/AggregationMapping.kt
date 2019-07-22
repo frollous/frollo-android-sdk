@@ -97,7 +97,8 @@ internal fun AccountResponse.toAccount(): Account =
                 lastPaymentDate = lastPaymentDate,
                 dueDate = dueDate,
                 endDate = endDate,
-                balanceDetails = balanceDetails)
+                balanceDetails = balanceDetails,
+                goalIds = goalIds)
 
 internal fun TransactionResponse.toTransaction(): Transaction =
         Transaction(

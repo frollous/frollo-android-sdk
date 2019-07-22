@@ -261,6 +261,7 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
                 }
                 Resource.Status.SUCCESS -> {
                     removeCachedBills(longArrayOf(billId))
+                    completion?.invoke(Result.success())
                 }
             }
         }
@@ -477,6 +478,7 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
                 }
                 Resource.Status.SUCCESS -> {
                     removeCachedBillPayments(longArrayOf(billPaymentId))
+                    completion?.invoke(Result.success())
                 }
             }
         }
@@ -631,17 +633,21 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
 
     // WARNING: Do not call this method on the main thread
     private fun removeCachedBills(billIds: LongArray) {
-        db.bills().deleteMany(billIds)
+        if (billIds.isNotEmpty()) {
+            db.bills().deleteMany(billIds)
 
-        // Manually delete bill payments associated to this bill
-        // as we are not using ForeignKeys because ForeignKey constraints
-        // do not allow to insert data into child table prior to parent table
-        val billPaymentIds = db.billPayments().getIdsByBillIds(billIds)
-        removeCachedBillPayments(billPaymentIds)
+            // Manually delete bill payments associated to this bill
+            // as we are not using ForeignKeys because ForeignKey constraints
+            // do not allow to insert data into child table prior to parent table
+            val billPaymentIds = db.billPayments().getIdsByBillIds(billIds)
+            removeCachedBillPayments(billPaymentIds)
+        }
     }
 
     // WARNING: Do not call this method on the main thread
     private fun removeCachedBillPayments(billPaymentIds: LongArray) {
-        db.billPayments().deleteMany(billPaymentIds)
+        if (billPaymentIds.isNotEmpty()) {
+            db.billPayments().deleteMany(billPaymentIds)
+        }
     }
 }

@@ -32,6 +32,10 @@ Types of Frollo SDK errors
 
 Handles events and allows triggering of events on the host.
 
+# Package us.frollo.frollosdk.goals
+
+Tracking and managing goals
+
 # Package us.frollo.frollosdk.logging
 
 Frollo SDK logging
@@ -79,6 +83,10 @@ Frollo SDK transaction models
 # Package us.frollo.frollosdk.model.coredata.bills
 
 Frollo SDK bill and bill payment models
+
+# Package us.frollo.frollosdk.model.coredata.goals
+
+Frollo SDK goal models
 
 # Package us.frollo.frollosdk.model.coredata.messages
 

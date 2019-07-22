@@ -47,6 +47,7 @@ import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.events.Events
 import us.frollo.frollosdk.extensions.notify
 import us.frollo.frollosdk.extensions.toString
+import us.frollo.frollosdk.goals.Goals
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.messages.Messages
@@ -132,6 +133,12 @@ object FrolloSDK : AuthenticationCallback {
         get() = _bills ?: throw IllegalAccessException("SDK not setup")
 
     /**
+     * Goals - Tracking and managing goals. See [Goals] for details
+     */
+    val goals: Goals
+        get() = _goals ?: throw IllegalAccessException("SDK not setup")
+
+    /**
      * User - User management. See [UserManagement] for details
      */
     val userManagement: UserManagement
@@ -146,6 +153,7 @@ object FrolloSDK : AuthenticationCallback {
     private var _surveys: Surveys? = null
     private var _reports: Reports? = null
     private var _bills: Bills? = null
+    private var _goals: Goals? = null
     private var _userManagement: UserManagement? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
@@ -247,10 +255,13 @@ object FrolloSDK : AuthenticationCallback {
             // 14. Setup Bills
             _bills = Bills(network, database, aggregation, authentication)
 
-            // 15. Setup User Management
+            // 15. Setup Goals
+            _goals = Goals(network, database, authentication)
+
+            // 16. Setup User Management
             _userManagement = UserManagement(deviceInfo, network, database, preferences, authentication, authenticationCallback = this)
 
-            // 16. Setup Notifications
+            // 17. Setup Notifications
             _notifications = Notifications(userManagement, events, messages)
 
             if (version.migrationNeeded()) {
@@ -394,6 +405,7 @@ object FrolloSDK : AuthenticationCallback {
         aggregation.refreshProviders()
         aggregation.refreshTransactionCategories()
         bills.refreshBills()
+        goals.refreshGoals()
         userManagement.updateDevice()
     }
 

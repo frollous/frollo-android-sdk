@@ -37,7 +37,9 @@ import us.frollo.frollosdk.model.coredata.bills.BillStatus
 import us.frollo.frollosdk.model.coredata.bills.BillType
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTarget
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
@@ -303,14 +305,18 @@ internal fun sqlForMerchants(type: MerchantType? = null): SimpleSQLiteQuery {
 internal fun sqlForGoals(
     frequency: GoalFrequency? = null,
     status: GoalStatus? = null,
+    target: GoalTarget? = null,
     trackingStatus: GoalTrackingStatus? = null,
+    trackingType: GoalTrackingType? = null,
     accountId: Long? = null
 ): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("goal")
 
     frequency?.let { sqlQueryBuilder.appendSelection(selection = "frequency = '${ it.name }'") }
     status?.let { sqlQueryBuilder.appendSelection(selection = "status = '${ it.name }'") }
+    target?.let { sqlQueryBuilder.appendSelection(selection = "target = '${ it.name }'") }
     trackingStatus?.let { sqlQueryBuilder.appendSelection(selection = "tracking_status = '${ it.name }'") }
+    trackingType?.let { sqlQueryBuilder.appendSelection(selection = "tracking_type = '${ it.name }'") }
     accountId?.let { sqlQueryBuilder.appendSelection(selection = "account_id = $it") }
 
     return sqlQueryBuilder.create()

@@ -95,7 +95,9 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
      *
      * @param frequency Filter by frequency of the goal (optional)
      * @param status Filter by the status of the goal (optional)
+     * @param target Filter by target type of the goal (optional)
      * @param trackingStatus Filter by the tracking status of the goal (optional)
+     * @param trackingType Filter by tracking type of the goal (optional)
      * @param accountId Filter by the accountId with which the goals are associated with (optional)
      *
      * @return LiveData object of Resource<List<Goal> which can be observed using an Observer for future changes as well.
@@ -103,10 +105,20 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
     fun fetchGoals(
         frequency: GoalFrequency? = null,
         status: GoalStatus? = null,
+        target: GoalTarget? = null,
         trackingStatus: GoalTrackingStatus? = null,
+        trackingType: GoalTrackingType? = null,
         accountId: Long? = null
     ): LiveData<Resource<List<Goal>>> =
-            Transformations.map(db.goals().loadByQuery(sqlForGoals(frequency, status, trackingStatus, accountId))) { models ->
+            Transformations.map(db.goals().loadByQuery(
+                    sqlForGoals(
+                            frequency = frequency,
+                            status = status,
+                            target = target,
+                            trackingStatus = trackingStatus,
+                            trackingType = trackingType,
+                            accountId = accountId))
+            ) { models ->
                 Resource.success(models)
             }
 
@@ -129,7 +141,9 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
      *
      * @param frequency Filter by frequency of the goal (optional)
      * @param status Filter by the status of the goal (optional)
+     * @param target Filter by target type of the goal (optional)
      * @param trackingStatus Filter by the tracking status of the goal (optional)
+     * @param trackingType Filter by tracking type of the goal (optional)
      * @param accountId Filter by the accountId with which the goals are associated with (optional)
      *
      * @return LiveData object of Resource<List<GoalRelation> which can be observed using an Observer for future changes as well.
@@ -137,10 +151,20 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
     fun fetchGoalsWithRelation(
         frequency: GoalFrequency? = null,
         status: GoalStatus? = null,
+        target: GoalTarget? = null,
         trackingStatus: GoalTrackingStatus? = null,
+        trackingType: GoalTrackingType? = null,
         accountId: Long? = null
     ): LiveData<Resource<List<GoalRelation>>> =
-            Transformations.map(db.goals().loadByQueryWithRelation(sqlForGoals(frequency, status, trackingStatus, accountId))) { models ->
+            Transformations.map(db.goals().loadByQueryWithRelation(
+                    sqlForGoals(
+                            frequency = frequency,
+                            status = status,
+                            target = target,
+                            trackingStatus = trackingStatus,
+                            trackingType = trackingType,
+                            accountId = accountId))
+            ) { models ->
                 Resource.success(models)
             }
 

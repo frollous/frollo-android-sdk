@@ -36,7 +36,9 @@ import us.frollo.frollosdk.model.coredata.bills.BillStatus
 import us.frollo.frollosdk.model.coredata.bills.BillType
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTarget
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
+import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
@@ -227,8 +229,8 @@ class ModelExtensionTest {
 
     @Test
     fun testSQLForGoals() {
-        var query = sqlForGoals(frequency = GoalFrequency.MONTHLY, trackingStatus = GoalTrackingStatus.ON_TRACK, status = GoalStatus.ACTIVE, accountId = 12345)
-        assertEquals("SELECT  *  FROM goal WHERE frequency = 'MONTHLY' AND status = 'ACTIVE' AND tracking_status = 'ON_TRACK' AND account_id = 12345 ", query.sql)
+        var query = sqlForGoals(frequency = GoalFrequency.MONTHLY, trackingStatus = GoalTrackingStatus.ON_TRACK, status = GoalStatus.ACTIVE, accountId = 12345, trackingType = GoalTrackingType.CREDIT, target = GoalTarget.OPEN_ENDED)
+        assertEquals("SELECT  *  FROM goal WHERE frequency = 'MONTHLY' AND status = 'ACTIVE' AND target = 'OPEN_ENDED' AND tracking_status = 'ON_TRACK' AND tracking_type = 'CREDIT' AND account_id = 12345 ", query.sql)
 
         query = sqlForGoals()
         assertEquals("SELECT  *  FROM goal", query.sql)

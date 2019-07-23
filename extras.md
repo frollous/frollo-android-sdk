@@ -12,16 +12,17 @@ Import the FrolloSDK and ensure you run setup with your tenant URL provided by u
             // OAuth2 Config
             val configuration = FrolloSDKConfiguration(
                                       authenticationType = OAuth2(
-                                              clientId = "<APPLICATION_CLIENT_ID>",
                                               redirectUri = "<REDIRECT_URI>",
                                               authorizationUrl = "https://id.frollo.us/oauth/authorize",
                                               tokenUrl = "https://id.frollo.us/oauth/token"),
+                                      clientId = "<APPLICATION_CLIENT_ID>",
                                       serverUrl = "https://<API_TENANT>.frollo.us/api/v2/")
 
             // Custom Authentication Config
             val customAuthentication = CustomAuthentication()
             val configuration = FrolloSDKConfiguration(
                                       authenticationType = Custom(authentication = CustomAuthentication()),
+                                      clientId = "<APPLICATION_CLIENT_ID>",
                                       serverUrl = "https://<API_TENANT>.frollo.us/api/v2/")
 
             FrolloSDK.setup(application, configuration = configuration) { result ->

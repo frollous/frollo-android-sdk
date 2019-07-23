@@ -102,7 +102,7 @@ abstract class BaseAndroidTest {
                 authToken = network.authToken
             }
         network.authentication = authentication
-        userManagement = UserManagement(DeviceInfo(app), network, database, preferences, authentication, authenticationCallback = FrolloSDK)
+        userManagement = UserManagement(DeviceInfo(app), network, config.clientId, database, preferences, authentication, authenticationCallback = FrolloSDK)
         aggregation = Aggregation(network, database, LocalBroadcastManager.getInstance(app), authentication)
         bills = Bills(network, database, aggregation, authentication)
         events = Events(network, authentication)

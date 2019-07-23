@@ -41,14 +41,14 @@ class OAuth2Helper(val config: FrolloSDKConfiguration) {
     internal fun getRefreshTokensRequest(refreshToken: String?) =
             OAuthTokenRequest(
                 grantType = OAuthGrantType.REFRESH_TOKEN,
-                clientId = oAuth2.clientId,
+                clientId = config.clientId,
                 domain = domain,
                 refreshToken = refreshToken)
 
     internal fun getLoginRequest(username: String, password: String, scopes: List<String>) =
             OAuthTokenRequest(
                     grantType = OAuthGrantType.PASSWORD,
-                    clientId = oAuth2.clientId,
+                    clientId = config.clientId,
                     domain = domain,
                     username = username,
                     password = password,
@@ -58,7 +58,7 @@ class OAuth2Helper(val config: FrolloSDKConfiguration) {
     internal fun getRegisterRequest(username: String, password: String, scopes: List<String>) =
             OAuthTokenRequest(
                     grantType = OAuthGrantType.PASSWORD,
-                    clientId = oAuth2.clientId,
+                    clientId = config.clientId,
                     domain = domain,
                     username = username,
                     password = password,
@@ -68,7 +68,7 @@ class OAuth2Helper(val config: FrolloSDKConfiguration) {
     internal fun getExchangeAuthorizationCodeRequest(scopes: List<String>, code: String, codeVerifier: String? = null) =
             OAuthTokenRequest(
                     grantType = OAuthGrantType.AUTHORIZATION_CODE,
-                    clientId = oAuth2.clientId,
+                    clientId = config.clientId,
                     domain = domain,
                     code = code,
                     codeVerifier = codeVerifier,
@@ -79,7 +79,7 @@ class OAuth2Helper(val config: FrolloSDKConfiguration) {
     internal fun getExchangeTokenRequest(legacyToken: String, scopes: List<String>) =
             OAuthTokenRequest(
                     grantType = OAuthGrantType.PASSWORD,
-                    clientId = oAuth2.clientId,
+                    clientId = config.clientId,
                     domain = domain,
                     legacyToken = legacyToken,
                     audience = config.serverUrl,
@@ -92,7 +92,7 @@ class OAuth2Helper(val config: FrolloSDKConfiguration) {
 
         val authRequestBuilder = AuthorizationRequest.Builder(
                 serviceConfig,
-                oAuth2.clientId,
+                config.clientId,
                 ResponseTypeValues.CODE,
                 oAuth2.redirectUri)
 

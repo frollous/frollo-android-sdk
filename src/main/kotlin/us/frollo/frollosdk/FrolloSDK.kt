@@ -248,7 +248,7 @@ object FrolloSDK : AuthenticationCallback {
             _bills = Bills(network, database, aggregation, authentication)
 
             // 15. Setup User Management
-            _userManagement = UserManagement(deviceInfo, network, database, preferences, authentication, authenticationCallback = this)
+            _userManagement = UserManagement(deviceInfo, network, configuration.clientId, database, preferences, authentication, authenticationCallback = this)
 
             // 16. Setup Notifications
             _notifications = Notifications(userManagement, events, messages)

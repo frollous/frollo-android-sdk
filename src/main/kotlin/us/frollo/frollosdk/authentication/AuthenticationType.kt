@@ -32,14 +32,12 @@ sealed class AuthenticationType {
     /**
      * OAuth2 - generic OAuth2 based authentication
      *
-     * @param clientId OAuth2 Client identifier. The unique identifier of the application implementing the SDK
      * @param redirectUrl OAuth2 Redirection URL. URL to redirect to after the authorization flow is complete. This should be a deep or universal link to the host app
      * @param authorizationUrl URL of the OAuth2 authorization endpoint for web based login
      * @param tokenUrl URL of the OAuth2 token endpoint for getting tokens and native login
      * @param revokeTokenURL OAuth2 token endpoint to revoke refresh token on logout (if supported)
      */
     class OAuth2(
-        val clientId: String,
         val redirectUrl: String,
         val authorizationUrl: String,
         val tokenUrl: String,

@@ -357,7 +357,7 @@ class OAuth2Authentication(
     override fun logout() {
         // Revoke the refresh token if possible
         authToken?.getRefreshToken()?.let { refreshToken ->
-            val request = OAuthTokenRevokeRequest(clientId = oAuth2Helper.oAuth2.clientId, token = refreshToken)
+            val request = OAuthTokenRevokeRequest(clientId = oAuth2Helper.config.clientId, token = refreshToken)
 
             revokeTokenAPI?.revokeToken(request)?.enqueue { resource ->
                 if (resource.status == Resource.Status.ERROR) {

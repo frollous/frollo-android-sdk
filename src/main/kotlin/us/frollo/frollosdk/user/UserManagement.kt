@@ -23,8 +23,6 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.AuthenticationCallback
-import us.frollo.frollosdk.authentication.AuthenticationType
-import us.frollo.frollosdk.authentication.OAuth2Authentication
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.ACTION
@@ -63,6 +61,7 @@ import java.util.TimeZone
 class UserManagement(
     private val di: DeviceInfo,
     private val network: NetworkService,
+    private val clientId: String,
     private val db: SDKDatabase,
     private val pref: Preferences,
     private val authentication: Authentication,
@@ -150,7 +149,7 @@ class UserManagement(
                 currentAddress = if (postcode?.isNotBlank() == true) Address(postcode = postcode) else null,
                 mobileNumber = mobileNumber,
                 dateOfBirth = dateOfBirth?.toString("yyyy-MM"),
-                clientId = ((authentication as OAuth2Authentication).oAuth2Helper.config.authenticationType as AuthenticationType.OAuth2).clientId)
+                clientId = clientId)
 
         userAPI.register(request).enqueue { userResource ->
             when (userResource.status) {
@@ -292,7 +291,7 @@ class UserManagement(
     fun resetPassword(email: String, completion: OnFrolloSDKCompletionListener<Result>) {
         userAPI.resetPassword(UserResetPasswordRequest(
                 email = email,
-                clientId = ((authentication as OAuth2Authentication).oAuth2Helper.config.authenticationType as AuthenticationType.OAuth2).clientId
+                clientId = clientId
         )).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {

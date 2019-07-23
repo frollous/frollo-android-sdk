@@ -28,18 +28,20 @@ import us.frollo.frollosdk.logging.LogLevel
  * Optional preferences can be set before running FrolloSDK.setup()
  *
  * @param authenticationType Type of authentication to be used. Valid options are [Custom] and [OAuth2]
+ * @param clientId OAuth2 Client identifier. The unique identifier of the application implementing the SDK
  * @param serverUrl Base URL of the Frollo API this SDK should point to
  * @param logLevel Level of logging for debug and error messages. Default is [LogLevel.ERROR]
  */
 data class FrolloSDKConfiguration(
     val authenticationType: AuthenticationType,
+    val clientId: String,
     val serverUrl: String,
     val logLevel: LogLevel = LogLevel.ERROR
 ) {
 
     internal fun validForROPC(): Boolean {
         if (authenticationType is OAuth2) {
-            return authenticationType.clientId.isNotBlank() &&
+            return clientId.isNotBlank() &&
                     authenticationType.tokenUrl.isNotBlank() &&
                     serverUrl.isNotBlank()
         }
@@ -48,7 +50,7 @@ data class FrolloSDKConfiguration(
 
     internal fun validForAuthorizationCodeFlow(): Boolean {
         if (authenticationType is OAuth2) {
-            return authenticationType.clientId.isNotBlank() &&
+            return clientId.isNotBlank() &&
                     authenticationType.tokenUrl.isNotBlank() &&
                     authenticationType.redirectUrl.isNotBlank() &&
                     authenticationType.authorizationUrl.isNotBlank() &&

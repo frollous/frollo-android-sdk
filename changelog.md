@@ -8,6 +8,11 @@
 #### Features
 - Goals
 
+### 2.0.2
+
+#### Changes
+- Add Client ID to User Register & User (Password) Reset API requests
+
 ### 2.0.1
 
 #### Changes
@@ -19,6 +24,11 @@
 
 #### Features
 - Custom Authentication
+
+### 1.4.4
+
+#### Changes
+- Bug Fix - Revert back to use Frollo Host API v2.2. Will update to Frollo Host API v2.4 in a future version.
 
 ### 1.4.3
 

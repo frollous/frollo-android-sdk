@@ -61,6 +61,7 @@ import java.util.TimeZone
 class UserManagement(
     private val di: DeviceInfo,
     private val network: NetworkService,
+    private val clientId: String,
     private val db: SDKDatabase,
     private val pref: Preferences,
     private val authentication: Authentication,
@@ -147,7 +148,8 @@ class UserManagement(
                 password = password,
                 currentAddress = if (postcode?.isNotBlank() == true) Address(postcode = postcode) else null,
                 mobileNumber = mobileNumber,
-                dateOfBirth = dateOfBirth?.toString("yyyy-MM"))
+                dateOfBirth = dateOfBirth?.toString("yyyy-MM"),
+                clientId = clientId)
 
         userAPI.register(request).enqueue { userResource ->
             when (userResource.status) {
@@ -287,7 +289,10 @@ class UserManagement(
      * @param completion A completion handler once the API has returned and the cache has been updated. Returns any error that occurred during the process.
      */
     fun resetPassword(email: String, completion: OnFrolloSDKCompletionListener<Result>) {
-        userAPI.resetPassword(UserResetPasswordRequest(email)).enqueue { resource ->
+        userAPI.resetPassword(UserResetPasswordRequest(
+                email = email,
+                clientId = clientId
+        )).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#resetPassword", resource.error?.localizedDescription)

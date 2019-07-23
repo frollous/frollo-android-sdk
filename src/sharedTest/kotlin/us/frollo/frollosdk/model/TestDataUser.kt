@@ -97,9 +97,11 @@ internal fun testValidRegisterData(): UserRegisterRequest {
             currentAddress = Address(postcode = "2060"),
             dateOfBirth = "1990-01",
             email = "$name@frollo.us",
-            password = randomString(8)
-    )
+            password = randomString(8),
+            clientId = randomString(50))
 }
 
 internal fun testResetPasswordData() =
-        UserResetPasswordRequest(email = "${randomUUID()}@frollo.us")
+        UserResetPasswordRequest(
+                email = "${randomUUID()}@frollo.us",
+                clientId = randomString(50))

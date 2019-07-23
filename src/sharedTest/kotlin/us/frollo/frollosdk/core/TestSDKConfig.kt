@@ -29,15 +29,20 @@ internal fun testSDKConfig(
 ) =
         FrolloSDKConfiguration(
                 authenticationType = AuthenticationType.OAuth2(
-                        clientId = clientId ?: "abc123",
                         redirectUrl = redirectUrl ?: "app://redirect",
                         authorizationUrl = authorizationUrl ?: "https://id.example.com/oauth/authorize/",
                         tokenUrl = tokenUrl ?: "https://id.example.com/oauth/token/",
                         revokeTokenURL = revokeTokenURL ?: "https://id.example.com/oauth/revoke/"
                 ),
+                clientId = clientId ?: "abc123",
                 serverUrl = serverUrl ?: "https://api.example.com/")
 
-internal fun testSDKCustomConfig(authentication: Authentication, serverUrl: String? = null) =
+internal fun testSDKCustomConfig(
+    authentication: Authentication,
+    clientId: String? = null,
+    serverUrl: String? = null
+) =
         FrolloSDKConfiguration(
                 authenticationType = AuthenticationType.Custom(authentication = authentication),
+                clientId = clientId ?: "abc123",
                 serverUrl = serverUrl ?: "https://api.example.com/")

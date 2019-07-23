@@ -6,16 +6,16 @@ The Frollo Android SDK is designed to simplify integration of the Frollo APIs by
 
 The Frollo Android SDK is broken down into multiple components that reflect the features on our APIs. At a high level the features are broken down as follows:
 
-- [Authentication](#authentication) - Login of the user and refreshing of access tokens to use the APIs
-- [User](#user) - Manages the user profile and creating user accounts (if supported)
-- [Aggregation](#aggregation) - Everything to do with accounts and transactions is managed here including categorisation, tagging, merchants and linking accounts. Accounts can be aggregated from direct integration or aggregation partners
-- [Bills](#bills) - Tracking and detection of bills from the user's aggregated accounts
-- [Budget and Pay Day](#budget-and-pay-day) - Tracking of budgets against merchants, categories and buckets against a user's pay cycle
-- [Reports](#reports) - Reporting of spend (against budget if available) broken down into merchants, categories and buckets in various periods
-- [Goals and Challenges](#goals-and-challenges) - Savings and debt repayment goals with challenges to reduce spend and reach these goals quicker
-- [Events](#events) - Triggering of events and sequences from user actions
-- [Messages](#messages) - Nudges and other customisable messaging to inform the user and keep them on track
-- [Surveys](#surveys) - Questions and feedback from the user
+* [Authentication](#authentication) - Login of the user and refreshing of access tokens to use the APIs
+* [User](#user) - Manages the user profile and creating user accounts (if supported)
+* [Aggregation](#aggregation) - Everything to do with accounts and transactions is managed here including categorisation, tagging, merchants and linking accounts. Accounts can be aggregated from direct integration or aggregation partners
+* [Bills](#bills) - Tracking and detection of bills from the user's aggregated accounts
+* [Budget and Pay Day](#budget-and-pay-day) - Tracking of budgets against merchants, categories and buckets against a user's pay cycle
+* [Reports](#reports) - Reporting of spend (against budget if available) broken down into merchants, categories and buckets in various periods
+* [Goals](#goals) - Savings and debt repayment goals with automatic tracking of payments
+* [Events](#events) - Triggering of events and sequences from user actions
+* [Messages](#messages) - Nudges and other customisable messaging to inform the user and keep them on track
+* [Surveys](#surveys) - Questions and feedback from the user
 
 ### Authentication
 
@@ -133,22 +133,18 @@ The following features are part of reports:
 
 See [Reports](us.frollo.frollosdk.auth/-reports/index.html) for more details.
 
-### Goals and Challenges
+### Goals
 
-Goals and challenges help the user set savings or debt repayment goals and meet them. Goals allow the user to set a target amount and how much they can afford each month and their target date is calculated from this. Users can then meet this goal quicker by taking challenges which compare the user's spend for a certain category or merchant and encourage them to reduce it to allow extra money to be saved. 
-
-Goals and challenges can be defined by the host tenant to suggest to users or custom ones can be created. These define things like the name, images and target category/merchant. User goals and user challenges reflect the active goal or challenge itself and how the user is tracking against it.
+Goals help the user set savings or debt repayment goals and meet them. Goals allow the user to set a target amount and/or date and/or how much they can afford each month and their target date/repayment/total is calculated from this. Savings towards this goal are automatically tracked from deposits to an associated bank or savings account.
 
 The following features are part of goals and challenges:
 
-* Track a goal against a savings, loan or debt repayment target
-* Manually adding savings to track a goal progress
-* Suggest challenges to the user where the most savings can be made
-* Automatically track challenge progress
-* Create custom goals and challenges
-* Project goal completion date and track if on course
-
-*Coming Soon to SDK*
+* Track credits, debits or credits and debits towards a goal's progress automatically
+* Project goal progress and track if on course
+* Save towards a date, amount or open-ended target
+* See a breakdown of each period's progress towards a goal and calculate how to get back on track
+ 
+See [Goals](goals.html) for more details.
 
 ### Events
 
@@ -162,10 +158,10 @@ Messages allow feedback to be provided to the user in the form of nudges and oth
 
 The following features are supported as part of messages:
 
-- Text, Video, Image and HTML content
-- Tracking reading of and interaction with the message
-- Driving the user to deep linked content in a consuming app
-- Chaining and trumping of messages to ensure the user doesn't get bombarded with duplicates and only has relevant content at the right time
+* Text, Video, Image and HTML content
+* Tracking reading of and interaction with the message
+* Driving the user to deep linked content in a consuming app
+* Chaining and trumping of messages to ensure the user doesn't get bombarded with duplicates and only has relevant content at the right time
 
 See [Messages](us.frollo.frollosdk.auth/-messages/index.html) for more details
 
@@ -175,11 +171,11 @@ Surveys allow you to collect feedback and conduct surveys from the user. This ca
 
 The following features are supported as part of surveys:
 
-- Multiple questions
-- Multiple choice answers
-- Dynamic image based answers (choose an emoji that represents how you feel)
-- Custom input (freeform) answers
-- Triggering events based on answers
+* Multiple questions
+* Multiple choice answers
+* Dynamic image based answers (choose an emoji that represents how you feel)
+* Custom input (freeform) answers
+* Triggering events based on answers
 
 See [Surveys](us.frollo.frollosdk.auth/-surveys/index.html) for more details
 

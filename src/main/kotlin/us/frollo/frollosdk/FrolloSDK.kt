@@ -396,6 +396,7 @@ object FrolloSDK : AuthenticationCallback {
         // From start of last month
         val fromDate = now.minusMonths(1).withDayOfMonth(1).toString(BillPayment.DATE_FORMAT_PATTERN)
         bills.refreshBillPayments(fromDate = fromDate, toDate = toDate)
+        goals.refreshGoals()
     }
 
     /**
@@ -405,7 +406,6 @@ object FrolloSDK : AuthenticationCallback {
         aggregation.refreshProviders()
         aggregation.refreshTransactionCategories()
         bills.refreshBills()
-        goals.refreshGoals()
         userManagement.updateDevice()
     }
 

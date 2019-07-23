@@ -102,7 +102,7 @@ data class Goal(
     /** Amount of periods until the goal is completed */
     @ColumnInfo(name = "periods_count") val periodsCount: Int,
 
-    /** Current goal period */
+    /** Current active goal period */
     @Embedded(prefix = "c_period_") val currentPeriod: GoalPeriod
 
 ) : IAdapterModel {

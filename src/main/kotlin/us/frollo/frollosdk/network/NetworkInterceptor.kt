@@ -138,6 +138,7 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
             builder.addHeader(HEADER_AUTHORIZATION, it)
         } ?: run {
             Log.e("$TAG#validateAndAppendRefreshToken", "No valid refresh token when trying to migrate user to Auth0.")
+            network.triggerForcedLogout()
             throw DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_REFRESH_TOKEN)
         }
     }

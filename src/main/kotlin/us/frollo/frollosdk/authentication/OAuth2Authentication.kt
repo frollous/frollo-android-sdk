@@ -325,6 +325,9 @@ class OAuth2Authentication(
             val error = DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_REFRESH_TOKEN)
             completion?.invoke(Result.error(error))
             Log.e("$TAG#refreshTokens", error.localizedMessage)
+
+            reset()
+
             return
         }
 

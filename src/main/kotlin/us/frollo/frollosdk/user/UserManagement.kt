@@ -368,8 +368,8 @@ class UserManagement(
 
         if (refreshToken == null) {
             val error = DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_REFRESH_TOKEN)
-            completion.invoke(Result.error(error))
             Log.e("$TAG#migrateUser", error.localizedMessage)
+            completion.invoke(Result.error(error))
 
             reset()
 

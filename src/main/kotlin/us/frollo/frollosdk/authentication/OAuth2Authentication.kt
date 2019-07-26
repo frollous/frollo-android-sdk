@@ -354,8 +354,7 @@ class OAuth2Authentication(
     }
 
     /**
-     * Logout the currently authenticated user. Resets all caches, preferences and databases.
-     * This resets the token storage.
+     * Logout the user by revoking the refresh token if possible followed by local cleanup by calling reset
      */
     override fun logout() {
         // Revoke the refresh token if possible
@@ -402,6 +401,8 @@ class OAuth2Authentication(
      * Reset the authentication state. Resets the user to a logged out state and clears any tokens cached
      */
     override fun reset() {
+        // WARNING: It is important to reset loggedIn flag before calling authenticationReset()
+        // else the authenticationReset() call goes to infinite loop.
         loggedIn = false
 
         authToken?.clearTokens()

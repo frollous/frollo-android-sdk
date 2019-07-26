@@ -283,7 +283,21 @@ object FrolloSDK : AuthenticationCallback {
             tokenInjector ?: throw IllegalAccessException("SDK not setup")
 
     /**
-     * Reset the SDK. Clears all caches, databases and preferences. Called automatically from logout.
+     * Logout and reset the SDK.
+     *
+     * Calls [Authentication.logout] to logout the user remotely if possible then resets the SDK
+     *
+     * @param completion Completion handler with option error if something goes wrong (optional)
+     *
+     * See also [FrolloSDK.reset]
+     */
+    fun logout(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        authentication.logout()
+        internalReset(completion)
+    }
+
+    /**
+     * Reset the SDK. Clears all caches, databases, tokens, keystore and preferences.
      *
      * @param completion Completion handler with option error if something goes wrong (optional)
      *
@@ -291,18 +305,8 @@ object FrolloSDK : AuthenticationCallback {
      */
     @Throws(IllegalAccessException::class)
     fun reset(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!_setup) throw IllegalAccessException("SDK not setup")
-
-        pauseScheduledRefreshing()
-        authentication.reset()
-        // NOTE: Keystore reset is not required as we do not store any data in there. Just keys.
-        network.reset()
-        preferences.reset()
-        database.clearAllTables()
-        completion?.invoke(Result.success())
-
-        notify(ACTION_AUTHENTICATION_CHANGED,
-                bundleOf(Pair(ARG_AUTHENTICATION_STATUS, AuthenticationStatus.LOGGED_OUT)))
+        authentication.reset() // WARNING: Do not put this inside internalReset() as the reset() call goes to infinite loop if put inside.
+        internalReset(completion)
     }
 
     /**
@@ -317,9 +321,28 @@ object FrolloSDK : AuthenticationCallback {
      * @param completion Completion handler with option error if something goes wrong (optional)
      */
     override fun authenticationReset(completion: OnFrolloSDKCompletionListener<Result>?) {
-        if (authentication.loggedIn) { // This check is important. Without this the logout call goes to infinite loop.
+        if (authentication.loggedIn) { // WARNING: This check is important. Without this the authentication.reset() call goes to infinite loop.
             reset(completion)
         }
+    }
+
+    /**
+     * Internal SDK reset
+     *
+     * Triggers the internal cleanup of the SDK. Called from public logout/reset methods and also forced logout
+     */
+    private fun internalReset(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        if (!_setup) throw IllegalAccessException("SDK not setup")
+
+        pauseScheduledRefreshing()
+        // NOTE: Keystore reset is not required as we do not store any data in there. Just keys.
+        network.reset()
+        preferences.reset()
+        database.clearAllTables()
+        completion?.invoke(Result.success())
+
+        notify(ACTION_AUTHENTICATION_CHANGED,
+                bundleOf(Pair(ARG_AUTHENTICATION_STATUS, AuthenticationStatus.LOGGED_OUT)))
     }
 
     private fun initializeThreeTenABP() {
@@ -434,8 +457,6 @@ object FrolloSDK : AuthenticationCallback {
     }
 
     internal fun forcedLogout() {
-        if (authentication.loggedIn) {
-            reset()
-        }
+        authenticationReset()
     }
 }

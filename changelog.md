@@ -7,6 +7,12 @@
 
 #### Features
 - Goals
+- Update Frollo Host API version to 2.4
+
+### 2.0.3
+
+#### Changes
+- Bug Fix - Revert back to use Frollo Host API v2.2. Will update to Frollo Host API v2.4 in a future version.
 
 ### 2.0.2
 

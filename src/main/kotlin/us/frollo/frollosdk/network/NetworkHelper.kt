@@ -34,7 +34,7 @@ internal class NetworkHelper(private val authToken: AuthToken) {
         internal const val HEADER_DEVICE_VERSION = "X-Device-Version"
         internal const val HEADER_API_VERSION = "X-Api-Version"
         internal const val HEADER_BACKGROUND = "X-Background"
-        internal const val API_VERSION = "2.4"
+        internal const val API_VERSION = "2.2"
     }
 
     internal val authAccessToken: String?

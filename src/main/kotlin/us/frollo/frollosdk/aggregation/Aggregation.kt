@@ -278,8 +278,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 db.providers().insertAll(*models.toTypedArray())
 
                 val apiIds = response.map { it.providerId }.toHashSet()
-                val allProviderIds = db.providers().getIds().toHashSet()
-                val staleIds = allProviderIds.minus(apiIds)
+                val betaAndSupportedProviderIds = db.providers().getIdsByStatus().toHashSet()
+                val staleIds = betaAndSupportedProviderIds.minus(apiIds)
 
                 if (staleIds.isNotEmpty()) {
                     removeCachedProviders(staleIds.toLongArray())

@@ -9,6 +9,11 @@
 - Goals
 - Update Frollo Host API version to 2.4
 
+### 2.0.4
+
+#### Changes
+- Bug Fix - Do not delete DISABLED & UNSUPPORTED providers from database while saving response from refresh providers API
+
 ### 2.0.3
 
 #### Changes

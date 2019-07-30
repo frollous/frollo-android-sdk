@@ -117,9 +117,9 @@ class ProviderDaoTest {
 
         db.providers().insertAll(*list.map { it.toProvider() }.toList().toTypedArray())
 
-        val staleIds = db.providers().getIds().sorted()
-        assertEquals(4, staleIds.size)
-        assertTrue(staleIds.containsAll(mutableListOf<Long>(100, 101, 102, 103)))
+        val ids = db.providers().getIds().sorted()
+        assertEquals(4, ids.size)
+        assertTrue(ids.containsAll(mutableListOf<Long>(100, 101, 102, 103)))
     }
 
     @Test

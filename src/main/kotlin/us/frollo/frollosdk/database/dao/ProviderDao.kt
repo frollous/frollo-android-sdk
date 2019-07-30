@@ -48,8 +48,8 @@ internal interface ProviderDao {
     @Query("SELECT provider_id FROM provider")
     fun getIds(): List<Long>
 
-    @Query("SELECT provider_id FROM provider WHERE provider_id NOT IN (:apiIds) AND provider_status NOT IN ('DISABLED','UNSUPPORTED')")
-    fun getStaleIds(apiIds: LongArray): List<Long>
+    @Query("SELECT provider_id FROM provider WHERE provider_status NOT IN ('DISABLED','UNSUPPORTED')")
+    fun getIdsByStatus(): List<Long>
 
     @Query("DELETE FROM provider WHERE provider_id IN (:providerIds)")
     fun deleteMany(providerIds: LongArray)

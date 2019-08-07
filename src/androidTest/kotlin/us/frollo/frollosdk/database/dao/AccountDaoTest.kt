@@ -30,6 +30,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.extensions.sqlForUpdateAccount
 import us.frollo.frollosdk.mapping.toAccount
 import us.frollo.frollosdk.mapping.toGoal
 import us.frollo.frollosdk.mapping.toProvider
@@ -231,6 +232,29 @@ class AccountDaoTest {
         val testObserver = db.accounts().load().test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isEmpty())
+    }
+
+    @Test
+    fun testUpdateByQuery() {
+        val data1 = testAccountResponseData(accountId = 100)
+        val data2 = testAccountResponseData(accountId = 101)
+        val list = mutableListOf(data1, data2)
+
+        db.accounts().insertAll(*list.map { it.toAccount() }.toList().toTypedArray())
+
+        var testObserver = db.accounts().load().test()
+        testObserver.awaitValue()
+        var models = testObserver.value()
+        assertEquals(2, models.size)
+        assertEquals(0, models.filter { it.hidden && !it.included && !it.favourite }.size)
+
+        db.accounts().updateByQuery(sqlForUpdateAccount(accountId = 100, hidden = true, included = false, favourite = false))
+
+        testObserver = db.accounts().load().test()
+        testObserver.awaitValue()
+        models = testObserver.value()
+        assertEquals(2, models.size)
+        assertEquals(1, models.filter { it.hidden && !it.included && !it.favourite }.size)
     }
 
     @Test

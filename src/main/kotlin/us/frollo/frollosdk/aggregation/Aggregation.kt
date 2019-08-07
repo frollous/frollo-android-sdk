@@ -57,6 +57,7 @@ import us.frollo.frollosdk.extensions.sqlForProviders
 import us.frollo.frollosdk.extensions.sqlForTransactionCategories
 import us.frollo.frollosdk.extensions.sqlForTransactionStaleIds
 import us.frollo.frollosdk.extensions.sqlForTransactions
+import us.frollo.frollosdk.extensions.sqlForUpdateAccount
 import us.frollo.frollosdk.extensions.sqlForUserTags
 import us.frollo.frollosdk.extensions.transactionSearch
 import us.frollo.frollosdk.logging.Log
@@ -761,6 +762,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     /**
      * Update an account on the host
      *
+     * This method updates the cache immediately so the UI can be updated
+     * and triggers a request in the background to update on the host.
+     * Host may return error, in which case it is the responsibility
+     * of the client app to handle it in the UI
+     *
      * @param accountId ID of the account to be updated
      * @param hidden Used to hide the account in the UI
      * @param included Used to exclude accounts from counting towards the user's budgets
@@ -784,6 +790,15 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
             completion?.invoke(Result.error(error))
             return
         }
+
+        // Updating account cache immediately to update the UI
+        updateAccountCache(
+                accountId = accountId,
+                hidden = hidden,
+                included = included,
+                favourite = favourite,
+                accountSubType = accountSubType,
+                nickName = nickName)
 
         val request = AccountUpdateRequest(
                 hidden = hidden,
@@ -838,6 +853,25 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 uiThread { completion?.invoke(Result.success()) }
             }
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    private fun updateAccountCache(
+        accountId: Long,
+        hidden: Boolean,
+        included: Boolean,
+        favourite: Boolean? = null,
+        accountSubType: AccountSubType? = null,
+        nickName: String? = null
+    ) {
+        doAsync {
+            db.accounts().updateByQuery(sqlForUpdateAccount(
+                    accountId = accountId,
+                    hidden = hidden,
+                    included = included,
+                    favourite = favourite,
+                    accountSubType = accountSubType,
+                    nickName = nickName))
+        }
     }
 
     private fun mapAccountResponse(models: List<AccountResponse>): List<Account> =

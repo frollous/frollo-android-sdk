@@ -193,6 +193,24 @@ class ModelExtensionTest {
     }
 
     @Test
+    fun testSQLForUpdateAccount() {
+        var query = sqlForUpdateAccount(
+                accountId = 123,
+                hidden = false,
+                included = true,
+                favourite = true,
+                accountSubType = AccountSubType.BANK_ACCOUNT,
+                nickName = "CBA")
+        assertEquals("UPDATE account SET hidden = 0 , included = 1 , favourite = 1 , attr_account_sub_type = 'BANK_ACCOUNT' , nick_name = 'CBA' WHERE account_id = 123 ", query.sql)
+
+        query = sqlForUpdateAccount(
+                accountId = 123,
+                hidden = false,
+                included = true)
+        assertEquals("UPDATE account SET hidden = 0 , included = 1 WHERE account_id = 123 ", query.sql)
+    }
+
+    @Test
     fun testSQLForTransactions() {
         var query = sqlForTransactions(
                 accountId = 123,

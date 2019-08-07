@@ -65,6 +65,12 @@ internal interface AccountDao {
     @Query("DELETE FROM account")
     fun clear()
 
+    /**
+     * Use this method to update ONLY one row at a time as return type in Int not IntArray
+     */
+    @RawQuery
+    fun updateByQuery(queryStr: SupportSQLiteQuery): Int
+
     // Relation methods
 
     @androidx.room.Transaction

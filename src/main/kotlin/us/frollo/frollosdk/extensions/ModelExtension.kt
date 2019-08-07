@@ -248,6 +248,27 @@ internal fun sqlForAccounts(
     return sqlQueryBuilder.create()
 }
 
+internal fun sqlForUpdateAccount(
+    accountId: Long,
+    hidden: Boolean,
+    included: Boolean,
+    favourite: Boolean? = null,
+    accountSubType: AccountSubType? = null,
+    nickName: String? = null
+): SimpleSQLiteQuery {
+    val sb = StringBuffer()
+    sb.append("UPDATE account SET ")
+
+    sb.append("hidden = ${ hidden.toInt() } , ")
+    sb.append("included = ${ included.toInt() } ")
+    favourite?.let { sb.append(", favourite = ${ it.toInt() } ") }
+    accountSubType?.let { sb.append(", attr_account_sub_type = '${ it.name }' ") }
+    nickName?.let { sb.append(", nick_name = '$it' ") }
+    sb.append("WHERE account_id = $accountId ")
+
+    return SimpleSQLiteQuery(sb.toString())
+}
+
 internal fun sqlForTransactions(
     accountId: Long? = null,
     userTags: List<String>? = null,

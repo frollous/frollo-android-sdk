@@ -1,5 +1,10 @@
 ## Changelog
 
+### 2.0.5
+
+#### Changes
+- Update Account - Update cache before firing the network request
+
 ### 2.0.4
 
 #### Changes

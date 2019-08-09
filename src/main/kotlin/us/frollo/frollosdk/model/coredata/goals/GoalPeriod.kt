@@ -44,13 +44,17 @@ data class GoalPeriod(
     /** Date the goal period starts. See [GoalPeriod.DATE_FORMAT_PATTERN] for the date format pattern */
     @ColumnInfo(name = "start_date") val startDate: String, // yyyy-MM-dd
 
-    /** End date the goal period. See [GoalPeriod.DATE_FORMAT_PATTERN] for the date format pattern */
+    /** End date of the goal period. See [GoalPeriod.DATE_FORMAT_PATTERN] for the date format pattern */
     @ColumnInfo(name = "end_date") val endDate: String, // yyyy-MM-dd
 
-    /** Tracking Status */
-    @ColumnInfo(name = "tracking_status") val trackingStatus: GoalTrackingStatus,
+    /**
+     * Tracking Status of the goal period (Optional)
+     *
+     * This will have a value for past & current goal periods. But, null for future goal periods.
+     */
+    @ColumnInfo(name = "tracking_status") val trackingStatus: GoalTrackingStatus?,
 
-    /** Current amount progressed against the goal period. Depending on `trackingType` of the goal this will include credits and/or debits towards the goal */
+    /** Current amount progressed against the goal period. Depending on [Goal.trackingType] of the goal this will include credits and/or debits towards the goal */
     @ColumnInfo(name = "current_amount") val currentAmount: BigDecimal,
 
     /** Target amount to reach for the goal period */

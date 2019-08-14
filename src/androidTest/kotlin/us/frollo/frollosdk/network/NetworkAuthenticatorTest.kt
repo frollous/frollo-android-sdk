@@ -246,7 +246,7 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             assertEquals(0, network.invalidTokenRetries)
         }
 
-        wait(120)
+        wait(8)
 
         tearDown()
     }
@@ -327,10 +327,6 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             assertNull(resource.error)
 
             assertNotNull(resource.data)
-
-            assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
-            assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
-            assertEquals(2550794799, preferences.accessTokenExpiry)
         }
 
         userAPI.fetchUser().enqueue { resource ->
@@ -348,6 +344,10 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
         }
 
         wait(8)
+
+        assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
+        assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
+        assertEquals(2550794799, preferences.accessTokenExpiry)
 
         tearDown()
     }

@@ -5,6 +5,7 @@
 #### Changes
 - Goals
 - Handle requests on token expiry and cancel queued requests on reset
+- Add method for initializing authentication callbacks for custom authentication
 
 #### Features
 - Goals

@@ -277,6 +277,14 @@ object FrolloSDK : AuthenticationCallback {
     }
 
     /**
+     * Initialize authentication callback and token callback when using Custom Authentication
+     */
+    fun initializeAuthenticationCallbacks(authentication: Authentication) {
+        authentication.authenticationCallback = this
+        authentication.tokenCallback = network
+    }
+
+    /**
      * Get Token Injector. See [TokenInjector] for details
      */
     fun getTokenInjector(): TokenInjector =

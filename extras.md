@@ -204,6 +204,24 @@ The next step is to pass the intent received by the Completion Activity to the S
 
 Custom authentication can be provided by extending the [Authentication](us.frollo.frollosdk.authentication/-authentication/index.html) abstract class and ensuring [refreshTokens(completion:)](us.frollo.frollosdk.authentication/-authentication/refresh-tokens.html) and calls to the tokenCallback are implemented appropriately.
 
+Also you have to add below code to initialize the authentication callbacks to SDK in your Application class.
+
+```kotlin
+    class MyApplication : Application(), LifecycleObserver {
+
+        override fun onCreate() {
+            super.onCreate()
+
+            ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        }
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+        fun onAppResumed() {
+            FrolloSDK.initializeAuthenticationCallbacks(yourCustomAuthentication)
+        }
+    }
+```
+
 #### Refreshing Data
 
 After logging in, your cache will be empty in the SDK. Refresh important data such as [Messages](us.frollo.frollosdk.messages/-messages/index.html) immediately after login.

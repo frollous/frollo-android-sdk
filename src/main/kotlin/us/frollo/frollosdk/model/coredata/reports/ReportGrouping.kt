@@ -27,13 +27,13 @@ enum class ReportGrouping {
     /** Budget category */
     @SerializedName("by_budget_category") BUDGET_CATEGORY,
 
-    /** Merchant */
+    /** Transaction Category */
     @SerializedName("by_transaction_category") TRANSACTION_CATEGORY,
 
-    /** Transaction Category */
+    /** Transaction Category Parent Group */
     @SerializedName("by_transaction_category_group") TRANSACTION_CATEGORY_GROUP,
 
-    /** Transaction Category Parent Group */
+    /** Merchant */
     @SerializedName("by_merchant") MERCHANT;
 
     /** Enum to serialized string */

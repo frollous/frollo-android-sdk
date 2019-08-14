@@ -72,6 +72,7 @@ class OAuth2Authentication(
     internal var authToken: AuthToken? = null
 
     private var codeVerifier: String? = null
+    private var isRefreshingToken = false
 
     init {
         this.authenticationCallback = authenticationCallback
@@ -319,6 +320,11 @@ class OAuth2Authentication(
      * @param completion Completion handler with any error that occurred (Optional)
      */
     override fun refreshTokens(completion: OnFrolloSDKCompletionListener<Result>?) {
+        if (isRefreshingToken)
+            return
+
+        isRefreshingToken = true
+
         val refreshToken = authToken?.getRefreshToken()
 
         if (refreshToken == null) {
@@ -351,6 +357,8 @@ class OAuth2Authentication(
 
             completion?.invoke(Result.error(error))
         }
+
+        isRefreshingToken = false
     }
 
     /**
@@ -404,6 +412,8 @@ class OAuth2Authentication(
         // WARNING: It is important to reset loggedIn flag before calling authenticationReset()
         // else the authenticationReset() call goes to infinite loop.
         loggedIn = false
+
+        isRefreshingToken = false
 
         authToken?.clearTokens()
 

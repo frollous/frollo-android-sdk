@@ -26,6 +26,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import us.frollo.frollosdk.base.LiveDataCallAdapterFactory
 import us.frollo.frollosdk.keystore.Keystore
 import okhttp3.CertificatePinner
+import okhttp3.Dispatcher
 import us.frollo.frollosdk.BuildConfig
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.AuthToken
@@ -50,26 +51,27 @@ class NetworkService internal constructor(
     private val helper = NetworkHelper(authToken)
     private val serverInterceptor = NetworkInterceptor(this, helper)
     private val tokenInterceptor = TokenInterceptor(helper)
-    private val apiRetrofit = createRetrofit(oAuth2Helper.config.serverUrl)
+    private val apiRetrofit = createRetrofit(baseUrl = oAuth2Helper.config.serverUrl, isTokenEndpoint = false)
     private val authRetrofit: Retrofit?
         get() {
             return if (oAuth2Helper.config.authenticationType is OAuth2)
-                createRetrofit(oAuth2Helper.oAuth2.tokenUrl)
+                createRetrofit(baseUrl = oAuth2Helper.oAuth2.tokenUrl, isTokenEndpoint = true)
             else null
         }
     private var revokeTokenRetrofit: Retrofit? = null
     internal var authentication: Authentication? = null
     internal var invalidTokenRetries: Int = 0
+    private var dispatcher: Dispatcher? = null
 
     init {
         if (oAuth2Helper.config.authenticationType is OAuth2) {
             oAuth2Helper.oAuth2.revokeTokenURL?.let { revokeTokenUrl ->
-                revokeTokenRetrofit = createRetrofit(revokeTokenUrl)
+                revokeTokenRetrofit = createRetrofit(baseUrl = revokeTokenUrl, isTokenEndpoint = true)
             }
         }
     }
 
-    private fun createRetrofit(baseUrl: String): Retrofit {
+    private fun createRetrofit(baseUrl: String, isTokenEndpoint: Boolean): Retrofit {
         val gson = GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .enableComplexMapKeySerialization()
@@ -77,14 +79,12 @@ class NetworkService internal constructor(
 
         val httpClientBuilder = OkHttpClient.Builder()
                 .addInterceptor(
-                        if (oAuth2Helper.config.authenticationType is OAuth2 &&
-                                (baseUrl == oAuth2Helper.oAuth2.tokenUrl || baseUrl == oAuth2Helper.oAuth2.revokeTokenURL))
+                        if (isTokenEndpoint)
                             tokenInterceptor
                         else
                             serverInterceptor)
                 .authenticator(
-                        if (oAuth2Helper.config.authenticationType is OAuth2 &&
-                                (baseUrl == oAuth2Helper.oAuth2.tokenUrl || baseUrl == oAuth2Helper.oAuth2.revokeTokenURL))
+                        if (isTokenEndpoint)
                             TokenAuthenticator(this)
                         else
                             NetworkAuthenticator(this, helper))
@@ -97,6 +97,10 @@ class NetworkService internal constructor(
             httpClientBuilder.certificatePinner(certPinner)
         }
         val httpClient = httpClientBuilder.build()
+
+        // Keep a reference to the dispatcher for host service so we can remove requests on reset
+        if (!isTokenEndpoint)
+            dispatcher = httpClient.dispatcher()
 
         val builder = Retrofit.Builder()
                 .client(httpClient)
@@ -122,6 +126,7 @@ class NetworkService internal constructor(
 
     internal fun reset() {
         invalidTokenRetries = 0
+        dispatcher?.queuedCalls()?.forEach { it.cancel() }
         authToken.clearTokens()
     }
 

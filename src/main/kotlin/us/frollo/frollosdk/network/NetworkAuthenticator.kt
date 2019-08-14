@@ -49,7 +49,14 @@ internal class NetworkAuthenticator(private val network: NetworkService, private
             when (apiError.type) {
                 APIErrorType.INVALID_ACCESS_TOKEN -> {
                     if (network.invalidTokenRetries < 5) {
-                        network.authentication?.refreshTokens()
+                        // Check if the request is using updated access token.
+                        // If yes run refresh token flow
+                        // Otherwise just run it once again with updated access token.
+                        val bearerAuth = response.request().header(HEADER_AUTHORIZATION)
+                        if (bearerAuth == helper.authAccessToken) {
+                            network.authentication?.refreshTokens()
+                        }
+
                         val newBearerAuth = helper.authAccessToken
                         if (newBearerAuth != null) {
                             newRequest = response.request().newBuilder()

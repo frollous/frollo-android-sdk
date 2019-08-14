@@ -4,6 +4,7 @@
 
 #### Changes
 - Goals
+- Handle requests on token expiry and cancel queued requests on reset
 
 #### Features
 - Goals

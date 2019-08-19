@@ -28,6 +28,9 @@ enum class GoalFrequency {
     /** Biannually - twice in a year */
     @SerializedName("biannually") BIANNUALLY,
 
+    /** Daily */
+    @SerializedName("daily") DAILY,
+
     /** Fortnightly */
     @SerializedName("fortnightly") FORTNIGHTLY,
 

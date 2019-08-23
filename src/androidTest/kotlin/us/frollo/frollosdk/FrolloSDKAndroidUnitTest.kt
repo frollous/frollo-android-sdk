@@ -120,7 +120,7 @@ class FrolloSDKAndroidUnitTest {
         try {
             FrolloSDK.authentication
         } catch (e: IllegalAccessException) {
-            assertEquals("SDK not setup", e.localizedMessage)
+            assertEquals(FrolloSDK.SDK_NOT_SETUP, e.localizedMessage)
         }
     }
 
@@ -131,7 +131,7 @@ class FrolloSDKAndroidUnitTest {
         try {
             FrolloSDK.aggregation
         } catch (e: IllegalAccessException) {
-            assertEquals("SDK not setup", e.localizedMessage)
+            assertEquals(FrolloSDK.SDK_NOT_SETUP, e.localizedMessage)
         }
     }
 
@@ -142,7 +142,7 @@ class FrolloSDKAndroidUnitTest {
         try {
             FrolloSDK.messages
         } catch (e: IllegalAccessException) {
-            assertEquals("SDK not setup", e.localizedMessage)
+            assertEquals(FrolloSDK.SDK_NOT_SETUP, e.localizedMessage)
         }
     }
 
@@ -153,7 +153,7 @@ class FrolloSDKAndroidUnitTest {
         try {
             FrolloSDK.events
         } catch (e: IllegalAccessException) {
-            assertEquals("SDK not setup", e.localizedMessage)
+            assertEquals(FrolloSDK.SDK_NOT_SETUP, e.localizedMessage)
         }
     }
 
@@ -164,7 +164,7 @@ class FrolloSDKAndroidUnitTest {
         try {
             FrolloSDK.notifications
         } catch (e: IllegalAccessException) {
-            assertEquals("SDK not setup", e.localizedMessage)
+            assertEquals(FrolloSDK.SDK_NOT_SETUP, e.localizedMessage)
         }
     }
 
@@ -175,7 +175,7 @@ class FrolloSDKAndroidUnitTest {
         try {
             FrolloSDK.surveys
         } catch (e: IllegalAccessException) {
-            assertEquals("SDK not setup", e.localizedMessage)
+            assertEquals(FrolloSDK.SDK_NOT_SETUP, e.localizedMessage)
         }
     }
 
@@ -186,7 +186,7 @@ class FrolloSDKAndroidUnitTest {
         try {
             FrolloSDK.reports
         } catch (e: IllegalAccessException) {
-            assertEquals("SDK not setup", e.localizedMessage)
+            assertEquals(FrolloSDK.SDK_NOT_SETUP, e.localizedMessage)
         }
     }
 
@@ -197,7 +197,7 @@ class FrolloSDKAndroidUnitTest {
         try {
             FrolloSDK.bills
         } catch (e: IllegalAccessException) {
-            assertEquals("SDK not setup", e.localizedMessage)
+            assertEquals(FrolloSDK.SDK_NOT_SETUP, e.localizedMessage)
         }
     }
 
@@ -208,7 +208,7 @@ class FrolloSDKAndroidUnitTest {
         try {
             FrolloSDK.userManagement
         } catch (e: IllegalAccessException) {
-            assertEquals("SDK not setup", e.localizedMessage)
+            assertEquals(FrolloSDK.SDK_NOT_SETUP, e.localizedMessage)
         }
     }
 
@@ -219,7 +219,7 @@ class FrolloSDKAndroidUnitTest {
         try {
             FrolloSDK.goals
         } catch (e: IllegalAccessException) {
-            assertEquals("SDK not setup", e.localizedMessage)
+            assertEquals(FrolloSDK.SDK_NOT_SETUP, e.localizedMessage)
         }
     }
 

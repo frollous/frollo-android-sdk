@@ -71,6 +71,7 @@ object FrolloSDK : AuthenticationCallback {
 
     private const val TAG = "FrolloSDK"
     private const val CACHE_EXPIRY = 120000L // 2 minutes
+    internal const val SDK_NOT_SETUP = "SDK not setup. Reason: Either the client app crashed due to some error or SDK has not been initialized properly by the app."
 
     /**
      * Indicates if the SDK has completed setup or not
@@ -82,7 +83,7 @@ object FrolloSDK : AuthenticationCallback {
      * Authentication - All authentication and user related data see [Authentication] for details
      */
     val authentication: Authentication
-        get() = _authentication ?: throw IllegalAccessException("SDK not setup")
+        get() = _authentication ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     /**
      * Default OAuth2 Authentication - Returns the default OAuth2 based authentication if no custom one has been applied
@@ -94,55 +95,55 @@ object FrolloSDK : AuthenticationCallback {
      * Aggregation - All account and transaction related data see [Aggregation] for details
      */
     val aggregation: Aggregation
-        get() = _aggregation ?: throw IllegalAccessException("SDK not setup")
+        get() = _aggregation ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     /**
      * Messages - All messages management. See [Messages] for details
      */
     val messages: Messages
-        get() = _messages ?: throw IllegalAccessException("SDK not setup")
+        get() = _messages ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     /**
      * Events - Triggering and handling of events. See [Events] for details
      */
     val events: Events
-        get() = _events ?: throw IllegalAccessException("SDK not setup")
+        get() = _events ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     /**
      * Notifications - Registering and handling of push notifications. See [Notifications] for details
      */
     val notifications: Notifications
-        get() = _notifications ?: throw IllegalAccessException("SDK not setup")
+        get() = _notifications ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     /**
      * Surveys - Surveys management. See [Surveys] for details
      */
     val surveys: Surveys
-        get() = _surveys ?: throw IllegalAccessException("SDK not setup")
+        get() = _surveys ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     /**
      * Reports - Aggregation data reports. See [Reports] for details
      */
     val reports: Reports
-        get() = _reports ?: throw IllegalAccessException("SDK not setup")
+        get() = _reports ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     /**
      * Bills - All bills and bill payments. See [Bills] for details
      */
     val bills: Bills
-        get() = _bills ?: throw IllegalAccessException("SDK not setup")
+        get() = _bills ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     /**
      * Goals - Tracking and managing goals. See [Goals] for details
      */
     val goals: Goals
-        get() = _goals ?: throw IllegalAccessException("SDK not setup")
+        get() = _goals ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     /**
      * User - User management. See [UserManagement] for details
      */
     val userManagement: UserManagement
-        get() = _userManagement ?: throw IllegalAccessException("SDK not setup")
+        get() = _userManagement ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     private var _setup = false
     private var _authentication: Authentication? = null
@@ -288,7 +289,7 @@ object FrolloSDK : AuthenticationCallback {
      * Get Token Injector. See [TokenInjector] for details
      */
     fun getTokenInjector(): TokenInjector =
-            tokenInjector ?: throw IllegalAccessException("SDK not setup")
+            tokenInjector ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     /**
      * Logout and reset the SDK.
@@ -340,7 +341,7 @@ object FrolloSDK : AuthenticationCallback {
      * Triggers the internal cleanup of the SDK. Called from public logout/reset methods and also forced logout
      */
     private fun internalReset(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!_setup) throw IllegalAccessException("SDK not setup")
+        if (!_setup) throw IllegalAccessException(SDK_NOT_SETUP)
 
         pauseScheduledRefreshing()
         // NOTE: Keystore reset is not required as we do not store any data in there. Just keys.

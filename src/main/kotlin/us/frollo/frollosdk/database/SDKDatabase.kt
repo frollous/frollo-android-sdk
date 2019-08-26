@@ -76,7 +76,7 @@ import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
     TransactionTag::class,
     Goal::class,
     GoalPeriod::class
-], version = 5, exportSchema = true)
+], version = 6, exportSchema = true)
 
 @TypeConverters(Converters::class)
 abstract class SDKDatabase : RoomDatabase() {
@@ -115,7 +115,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
                         .allowMainThreadQueries() // Needed for some tests
                         // .fallbackToDestructiveMigration()
-                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                         .build()
 
         // Copy-paste of auto-generated SQLs from room schema json file
@@ -201,6 +201,19 @@ abstract class SDKDatabase : RoomDatabase() {
                 database.execSQL("CREATE  INDEX `index_goal_period_goal_period_id` ON `goal_period` (`goal_period_id`)")
                 database.execSQL("CREATE  INDEX `index_goal_period_goal_id` ON `goal_period` (`goal_id`)")
                 database.execSQL("ALTER TABLE `account` ADD COLUMN `goal_ids` TEXT")
+            }
+        }
+
+        private val MIGRATION_5_6: Migration = object : Migration(5, 6) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // New changes in this migration:
+                // 1) Alter provider_account table - add column external_id
+                // 2) Alter account table - add column external_id
+                // 3) Alter transaction_model table - add column external_id
+
+                database.execSQL("ALTER TABLE `provider_account` ADD COLUMN `external_id` TEXT NOT NULL DEFAULT ''")
+                database.execSQL("ALTER TABLE `account` ADD COLUMN `external_id` TEXT NOT NULL DEFAULT ''")
+                database.execSQL("ALTER TABLE `transaction_model` ADD COLUMN `external_id` TEXT NOT NULL DEFAULT ''")
             }
         }
     }

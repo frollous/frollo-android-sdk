@@ -58,5 +58,6 @@ internal data class AccountResponse(
     @SerializedName("due_date") val dueDate: String?, // ISO8601 format Eg: 2011-12-03T10:15:30+01:00
     @SerializedName("end_date") val endDate: String?, // yyyy-MM-dd
     @SerializedName("balance_details") val balanceDetails: BalanceDetails?,
-    @SerializedName("goal_ids") val goalIds: List<Long>?
+    @SerializedName("goal_ids") val goalIds: List<Long>?,
+    @SerializedName("external_id") val externalId: String
 )

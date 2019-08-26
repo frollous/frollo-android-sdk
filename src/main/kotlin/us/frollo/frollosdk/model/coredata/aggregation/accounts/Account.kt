@@ -61,6 +61,7 @@ data class Account(
     @ColumnInfo(name = "aggregator") val aggregator: String?,
 
     /** ID of the aggregator */
+    @Deprecated("Please use externalId")
     @ColumnInfo(name = "aggregator_id") val aggregatorId: Long,
 
     /** Account holder profile */
@@ -148,6 +149,9 @@ data class Account(
     @Embedded(prefix = "b_details_") val balanceDetails: BalanceDetails?,
 
     /** Goal IDs that are associated to this account */
-    @ColumnInfo(name = "goal_ids") val goalIds: List<Long>?
+    @ColumnInfo(name = "goal_ids") val goalIds: List<Long>?,
+
+    /** External ID of the aggregator */
+    @ColumnInfo(name = "external_id") val externalId: String
 
 ) : IAdapterModel

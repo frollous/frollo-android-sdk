@@ -325,11 +325,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      *
      * @param providerId Provider ID of the provider accounts to fetch (Optional)
      * @param refreshStatus Filter by the current refresh status of the provider account (Optional)
+     * @param externalId External aggregator ID of the provider accounts to fetch (Optional)
      *
      * @return LiveData object of Resource<List<ProviderAccount>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchProviderAccounts(providerId: Long? = null, refreshStatus: AccountRefreshStatus? = null): LiveData<Resource<List<ProviderAccount>>> =
-            Transformations.map(db.providerAccounts().loadByQuery(sqlForProviderAccounts(providerId, refreshStatus))) { models ->
+    fun fetchProviderAccounts(providerId: Long? = null, refreshStatus: AccountRefreshStatus? = null, externalId: String? = null): LiveData<Resource<List<ProviderAccount>>> =
+            Transformations.map(db.providerAccounts().loadByQuery(sqlForProviderAccounts(providerId, refreshStatus, externalId))) { models ->
                 Resource.success(models)
             }
 
@@ -364,11 +365,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      *
      * @param providerId Provider ID of the provider accounts to fetch (Optional)
      * @param refreshStatus Filter by the current refresh status of the provider account (Optional)
+     * @param externalId External aggregator ID of the provider accounts to fetch (Optional)
      *
      * @return LiveData object of Resource<List<ProviderAccountRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchProviderAccountsWithRelation(providerId: Long? = null, refreshStatus: AccountRefreshStatus? = null): LiveData<Resource<List<ProviderAccountRelation>>> =
-            Transformations.map(db.providerAccounts().loadByQueryWithRelation(sqlForProviderAccounts(providerId, refreshStatus))) { models ->
+    fun fetchProviderAccountsWithRelation(providerId: Long? = null, refreshStatus: AccountRefreshStatus? = null, externalId: String? = null): LiveData<Resource<List<ProviderAccountRelation>>> =
+            Transformations.map(db.providerAccounts().loadByQueryWithRelation(sqlForProviderAccounts(providerId, refreshStatus, externalId))) { models ->
                 Resource.success(models)
             }
 
@@ -598,6 +600,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param hidden Filter by hidden accounts (Optional)
      * @param included Filter by accounts included in the budget (Optional)
      * @param refreshStatus Filter by the current refresh status of the provider account (Optional)
+     * @param externalId External aggregator ID of the accounts to fetch (Optional)
      *
      * @return LiveData object of Resource<List<Account>> which can be observed using an Observer for future changes as well.
      */
@@ -610,7 +613,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         favourite: Boolean? = null,
         hidden: Boolean? = null,
         included: Boolean? = null,
-        refreshStatus: AccountRefreshStatus? = null
+        refreshStatus: AccountRefreshStatus? = null,
+        externalId: String? = null
     ): LiveData<Resource<List<Account>>> =
             Transformations.map(db.accounts().loadByQuery(sqlForAccounts(
                     providerAccountId = providerAccountId,
@@ -621,7 +625,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     favourite = favourite,
                     hidden = hidden,
                     included = included,
-                    refreshStatus = refreshStatus
+                    refreshStatus = refreshStatus,
+                    externalId = externalId
             ))) { models ->
                 Resource.success(models)
             }
@@ -664,6 +669,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param hidden Filter by hidden accounts (Optional)
      * @param included Filter by accounts included in the budget (Optional)
      * @param refreshStatus Filter by the current refresh status of the provider account (Optional)
+     * @param externalId External aggregator ID of the accounts to fetch (Optional)
      *
      * @return LiveData object of Resource<List<AccountRelation>> which can be observed using an Observer for future changes as well.
      */
@@ -676,7 +682,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         favourite: Boolean? = null,
         hidden: Boolean? = null,
         included: Boolean? = null,
-        refreshStatus: AccountRefreshStatus? = null
+        refreshStatus: AccountRefreshStatus? = null,
+        externalId: String? = null
     ): LiveData<Resource<List<AccountRelation>>> =
             Transformations.map(db.accounts().loadByQueryWithRelation(sqlForAccounts(
                     providerAccountId = providerAccountId,
@@ -687,7 +694,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     favourite = favourite,
                     hidden = hidden,
                     included = included,
-                    refreshStatus = refreshStatus
+                    refreshStatus = refreshStatus,
+                    externalId = externalId
             ))) { models ->
                 Resource.success(models)
             }
@@ -914,6 +922,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param included Filter by transactions included in the budget (Optional)
      * @param fromDate Start date to fetch transactions from (inclusive) (Optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
      * @param toDate End date to fetch transactions up to (inclusive) (Optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param externalId External aggregator ID of the transactions to fetch (Optional)
      *
      * @return LiveData object of Resource<List<Transaction>> which can be observed using an Observer for future changes as well.
      */
@@ -925,7 +934,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         status: TransactionStatus? = null,
         included: Boolean? = null,
         fromDate: String? = null,
-        toDate: String? = null
+        toDate: String? = null,
+        externalId: String? = null
     ): LiveData<Resource<List<Transaction>>> =
             Transformations.map(db.transactions().loadByQuery(sqlForTransactions(
                     accountId = accountId,
@@ -935,7 +945,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     status = status,
                     included = included,
                     fromDate = fromDate,
-                    toDate = toDate
+                    toDate = toDate,
+                    externalId = externalId
             ))) { models ->
                 Resource.success(models)
             }
@@ -993,6 +1004,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param included Filter by transactions included in the budget (Optional)
      * @param fromDate Start date to fetch transactions from (inclusive) (Optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
      * @param toDate End date to fetch transactions up to (inclusive) (Optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param externalId External aggregator ID of the transactions to fetch (Optional)
      *
      * @return LiveData object of Resource<List<TransactionRelation>> which can be observed using an Observer for future changes as well.
      */
@@ -1004,7 +1016,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         status: TransactionStatus? = null,
         included: Boolean? = null,
         fromDate: String? = null,
-        toDate: String? = null
+        toDate: String? = null,
+        externalId: String? = null
     ): LiveData<Resource<List<TransactionRelation>>> =
             Transformations.map(db.transactions().loadByQueryWithRelation(sqlForTransactions(
                     accountId = accountId,
@@ -1014,7 +1027,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     status = status,
                     included = included,
                     fromDate = fromDate,
-                    toDate = toDate
+                    toDate = toDate,
+                    externalId = externalId
             ))) { models ->
                 Resource.success(models)
             }

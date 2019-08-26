@@ -58,7 +58,8 @@ internal fun testTransactionResponseData(
             postDate = "2019-01-01",
             status = TransactionStatus.values()[Random.nextInt(TransactionStatus.values().size)],
             transactionDate = transactionDate ?: "2019-01-01",
-            userTags = userTags)
+            userTags = userTags,
+            externalId = randomString(8))
 }
 
 internal fun testMerchantDetails(merchantId: Long? = null): MerchantDetails =

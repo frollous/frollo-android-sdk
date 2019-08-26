@@ -86,7 +86,10 @@ data class Transaction(
     @ColumnInfo(name = "bill_payment_id") var billPaymentId: Long?,
 
     /** All tags applied to this transaction */
-    @ColumnInfo(name = "user_tags") var userTags: List<String>?
+    @ColumnInfo(name = "user_tags") var userTags: List<String>?,
+
+    /** External ID of the aggregator */
+    @ColumnInfo(name = "external_id") val externalId: String
 
 ) : IAdapterModel {
 

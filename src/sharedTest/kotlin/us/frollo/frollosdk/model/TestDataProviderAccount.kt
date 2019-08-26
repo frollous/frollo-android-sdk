@@ -22,6 +22,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRe
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.RefreshStatus
 import us.frollo.frollosdk.testutils.randomNumber
+import us.frollo.frollosdk.testutils.randomString
 
 internal fun testProviderAccountResponseData(providerAccountId: Long? = null, providerId: Long? = null, accountRefreshStatus: AccountRefreshStatus? = null): ProviderAccountResponse {
 
@@ -37,5 +38,6 @@ internal fun testProviderAccountResponseData(providerAccountId: Long? = null, pr
             providerId = providerId ?: randomNumber().toLong(),
             editable = true,
             refreshStatus = refreshStatus,
-            loginForm = null)
+            loginForm = null,
+            externalId = randomString(8))
 }

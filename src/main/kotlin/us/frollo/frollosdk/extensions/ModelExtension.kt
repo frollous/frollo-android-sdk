@@ -218,11 +218,12 @@ internal fun sqlForProviders(status: ProviderStatus? = null): SimpleSQLiteQuery 
     return sqlQueryBuilder.create()
 }
 
-internal fun sqlForProviderAccounts(providerId: Long? = null, refreshStatus: AccountRefreshStatus? = null): SimpleSQLiteQuery {
+internal fun sqlForProviderAccounts(providerId: Long? = null, refreshStatus: AccountRefreshStatus? = null, externalId: String? = null): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("provider_account")
 
     providerId?.let { sqlQueryBuilder.appendSelection(selection = "provider_id = $it") }
     refreshStatus?.let { sqlQueryBuilder.appendSelection(selection = "r_status_status = '${ it.name }'") }
+    externalId?.let { sqlQueryBuilder.appendSelection(selection = "external_id = '$it'") }
 
     return sqlQueryBuilder.create()
 }
@@ -236,7 +237,8 @@ internal fun sqlForAccounts(
     favourite: Boolean? = null,
     hidden: Boolean? = null,
     included: Boolean? = null,
-    refreshStatus: AccountRefreshStatus? = null
+    refreshStatus: AccountRefreshStatus? = null,
+    externalId: String? = null
 ): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("account")
 
@@ -249,6 +251,7 @@ internal fun sqlForAccounts(
     hidden?.let { sqlQueryBuilder.appendSelection(selection = "hidden = ${ it.toInt() }") }
     included?.let { sqlQueryBuilder.appendSelection(selection = "included = ${ it.toInt() }") }
     refreshStatus?.let { sqlQueryBuilder.appendSelection(selection = "r_status_status = '${ it.name }'") }
+    externalId?.let { sqlQueryBuilder.appendSelection(selection = "external_id = '$it'") }
 
     return sqlQueryBuilder.create()
 }
@@ -282,7 +285,8 @@ internal fun sqlForTransactions(
     status: TransactionStatus? = null,
     included: Boolean? = null,
     fromDate: String? = null,
-    toDate: String? = null
+    toDate: String? = null,
+    externalId: String? = null
 ): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("transaction_model")
 
@@ -301,6 +305,7 @@ internal fun sqlForTransactions(
     budgetCategory?.let { sqlQueryBuilder.appendSelection(selection = "budget_category = '${ it.name }'") }
     status?.let { sqlQueryBuilder.appendSelection(selection = "status = '${ it.name }'") }
     included?.let { sqlQueryBuilder.appendSelection(selection = "included = ${ it.toInt() }") }
+    externalId?.let { sqlQueryBuilder.appendSelection(selection = "external_id = '$it'") }
     ifNotNull(fromDate, toDate) { from, to -> sqlQueryBuilder.appendSelection(selection = "(transaction_date BETWEEN Date('$from') AND Date('$to'))") }
 
     return sqlQueryBuilder.create()

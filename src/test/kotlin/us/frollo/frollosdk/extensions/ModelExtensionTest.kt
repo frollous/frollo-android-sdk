@@ -167,8 +167,8 @@ class ModelExtensionTest {
 
     @Test
     fun testSQLForProviderAccounts() {
-        var query = sqlForProviderAccounts(providerId = 123, refreshStatus = AccountRefreshStatus.ADDING)
-        assertEquals("SELECT  *  FROM provider_account WHERE provider_id = 123 AND r_status_status = 'ADDING' ", query.sql)
+        var query = sqlForProviderAccounts(providerId = 123, refreshStatus = AccountRefreshStatus.ADDING, externalId = "208")
+        assertEquals("SELECT  *  FROM provider_account WHERE provider_id = 123 AND r_status_status = 'ADDING' AND external_id = '208' ", query.sql)
 
         query = sqlForProviderAccounts()
         assertEquals("SELECT  *  FROM provider_account", query.sql)
@@ -185,8 +185,9 @@ class ModelExtensionTest {
                 favourite = true,
                 hidden = false,
                 included = true,
-                refreshStatus = AccountRefreshStatus.NEEDS_ACTION)
-        assertEquals("SELECT  *  FROM account WHERE provider_account_id = 123 AND account_status = 'ACTIVE' AND attr_account_sub_type = 'BANK_ACCOUNT' AND attr_account_type = 'BANK' AND attr_account_classification = 'CORPORATE' AND favourite = 1 AND hidden = 0 AND included = 1 AND r_status_status = 'NEEDS_ACTION' ", query.sql)
+                refreshStatus = AccountRefreshStatus.NEEDS_ACTION,
+                externalId = "208")
+        assertEquals("SELECT  *  FROM account WHERE provider_account_id = 123 AND account_status = 'ACTIVE' AND attr_account_sub_type = 'BANK_ACCOUNT' AND attr_account_type = 'BANK' AND attr_account_classification = 'CORPORATE' AND favourite = 1 AND hidden = 0 AND included = 1 AND r_status_status = 'NEEDS_ACTION' AND external_id = '208' ", query.sql)
 
         query = sqlForAccounts()
         assertEquals("SELECT  *  FROM account", query.sql)
@@ -220,8 +221,9 @@ class ModelExtensionTest {
                 status = TransactionStatus.PENDING,
                 included = false,
                 fromDate = "2019-03-01",
-                toDate = "2019-03-31")
-        assertEquals("SELECT  *  FROM transaction_model WHERE account_id = 123 AND ((user_tags LIKE '%|pub|%') AND (user_tags LIKE '%|holiday|%') AND (user_tags LIKE '%|shopping|%')) AND base_type = 'CREDIT' AND budget_category = 'INCOME' AND status = 'PENDING' AND included = 0 AND (transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
+                toDate = "2019-03-31",
+                externalId = "208")
+        assertEquals("SELECT  *  FROM transaction_model WHERE account_id = 123 AND ((user_tags LIKE '%|pub|%') AND (user_tags LIKE '%|holiday|%') AND (user_tags LIKE '%|shopping|%')) AND base_type = 'CREDIT' AND budget_category = 'INCOME' AND status = 'PENDING' AND included = 0 AND external_id = '208' AND (transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
 
         query = sqlForTransactions()
         assertEquals("SELECT  *  FROM transaction_model", query.sql)

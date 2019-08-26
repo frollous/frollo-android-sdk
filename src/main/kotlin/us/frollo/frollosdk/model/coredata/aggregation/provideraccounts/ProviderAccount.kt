@@ -49,6 +49,9 @@ data class ProviderAccount(
     @Embedded(prefix = "r_status_") val refreshStatus: RefreshStatus?,
 
     /** Login Form for MFA etc (optional) */
-    @ColumnInfo(name = "login_form") val loginForm: ProviderLoginForm?
+    @ColumnInfo(name = "login_form") val loginForm: ProviderLoginForm?,
+
+    /** External ID of the aggregator */
+    @ColumnInfo(name = "external_id") val externalId: String
 
 ) : IAdapterModel

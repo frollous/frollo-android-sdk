@@ -62,7 +62,8 @@ internal fun ProviderAccountResponse.toProviderAccount(): ProviderAccount =
                 providerId = providerId,
                 editable = editable,
                 refreshStatus = refreshStatus,
-                loginForm = loginForm)
+                loginForm = loginForm,
+                externalId = externalId ?: "")
 
 internal fun AccountResponse.toAccount(): Account =
         Account(
@@ -98,7 +99,8 @@ internal fun AccountResponse.toAccount(): Account =
                 dueDate = dueDate,
                 endDate = endDate,
                 balanceDetails = balanceDetails,
-                goalIds = goalIds)
+                goalIds = goalIds,
+                externalId = externalId ?: "")
 
 internal fun TransactionResponse.toTransaction(): Transaction =
         Transaction(
@@ -117,7 +119,8 @@ internal fun TransactionResponse.toTransaction(): Transaction =
                 postDate = postDate,
                 status = status,
                 transactionDate = transactionDate,
-                userTags = userTags)
+                userTags = userTags,
+                externalId = externalId ?: "")
 
 internal fun TransactionsSummaryResponse.toTransactionsSummary(): TransactionsSummary =
         TransactionsSummary(

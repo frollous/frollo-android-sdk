@@ -25,5 +25,6 @@ internal data class ProviderAccountResponse(
     @SerializedName("provider_id") val providerId: Long,
     @SerializedName("editable") val editable: Boolean,
     @SerializedName("refresh_status") val refreshStatus: RefreshStatus?,
-    @SerializedName("login_form") val loginForm: ProviderLoginForm?
+    @SerializedName("login_form") val loginForm: ProviderLoginForm?,
+    @SerializedName("external_id") val externalId: String
 )

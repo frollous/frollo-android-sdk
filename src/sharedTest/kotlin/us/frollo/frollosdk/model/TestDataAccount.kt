@@ -33,6 +33,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRe
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.RefreshStatus
 import us.frollo.frollosdk.testutils.randomNumber
+import us.frollo.frollosdk.testutils.randomString
 import us.frollo.frollosdk.testutils.randomUUID
 import java.math.BigDecimal
 import kotlin.random.Random
@@ -91,7 +92,8 @@ internal fun testAccountResponseData(accountId: Long? = null, providerAccountId:
             bsb = randomUUID(),
             interestTotal = Balance(amount = randomNumber().toBigDecimal(), currency = "AUD"),
             endDate = randomUUID(),
-            goalIds = null)
+            goalIds = null,
+            externalId = randomString(8))
 }
 
 internal fun testUpdateRequestData(hidden: Boolean = false, included: Boolean = true): AccountUpdateRequest {

@@ -22,15 +22,11 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.aggregation.Aggregation
-import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.error.DataError
-import us.frollo.frollosdk.error.DataErrorSubType
-import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchBillPayments
 import us.frollo.frollosdk.extensions.sqlForBillPayments
@@ -58,7 +54,7 @@ import us.frollo.frollosdk.network.api.BillsAPI
 import java.math.BigDecimal
 
 /** Manages bills and bill payments */
-class Bills(network: NetworkService, private val db: SDKDatabase, private val aggregation: Aggregation, private val authentication: Authentication) {
+class Bills(network: NetworkService, private val db: SDKDatabase, private val aggregation: Aggregation) {
 
     companion object {
         private const val TAG = "Bills"
@@ -219,13 +215,6 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
     }
 
     private fun createBill(request: BillCreateRequest, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#createBill", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         billsAPI.createBill(request).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -246,13 +235,6 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun deleteBill(billId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#deleteBill", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         billsAPI.deleteBill(billId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -275,13 +257,6 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshBills(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshBills", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         billsAPI.fetchBills().enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -302,13 +277,6 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshBill(billId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshBill", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         billsAPI.fetchBill(billId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -329,13 +297,6 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun updateBill(bill: Bill, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#updateBill", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         val request = BillUpdateRequest(
                 name = bill.name,
                 billType = bill.billType,
@@ -463,13 +424,6 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun deleteBillPayment(billPaymentId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#deleteBillPayment", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         billsAPI.deleteBillPayment(billPaymentId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -492,13 +446,6 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshBillPayments(fromDate: String, toDate: String, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshBillPayments", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         billsAPI.fetchBillPayments(fromDate = fromDate, toDate = toDate).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -521,13 +468,6 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun updateBillPayment(billPaymentId: Long, date: String? = null, paid: Boolean? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#updateBillPayment", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         val status = paid?.let {
             if (paid) BillPaymentRequestStatus.PAID else BillPaymentRequestStatus.UNPAID
         }

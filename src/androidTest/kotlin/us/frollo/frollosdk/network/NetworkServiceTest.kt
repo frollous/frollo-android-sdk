@@ -19,30 +19,13 @@ package us.frollo.frollosdk.network
 import okhttp3.Request
 import org.junit.Test
 
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
 
 class NetworkServiceTest : BaseAndroidTest() {
-
-    @Test
-    fun testSaveAccessTokens() {
-        initSetup()
-
-        assertNull(preferences.encryptedAccessToken)
-        assertEquals(-1, preferences.accessTokenExpiry)
-
-        network.saveAccessTokens(accessToken = "MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", expiry = 2550794799)
-
-        assertNotNull(preferences.encryptedAccessToken)
-        assertEquals(2550794799, preferences.accessTokenExpiry)
-
-        tearDown()
-    }
 
     @Test
     fun testAuthenticateRequest() {
@@ -66,19 +49,12 @@ class NetworkServiceTest : BaseAndroidTest() {
         initSetup()
 
         network.invalidTokenRetries = 6
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        preferences.accessTokenExpiry = 14529375950
-        assertNotNull(preferences.encryptedAccessToken)
-        assertNotNull(preferences.encryptedRefreshToken)
-        assertNotEquals(-1, preferences.accessTokenExpiry)
 
         network.reset()
 
         assertEquals(0, network.invalidTokenRetries)
-        assertNull(preferences.encryptedAccessToken)
-        assertNull(preferences.encryptedRefreshToken)
-        assertEquals(-1, preferences.accessTokenExpiry)
+
+        // TODO: check queued calls are cancelled
 
         tearDown()
     }

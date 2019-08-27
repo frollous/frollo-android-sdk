@@ -17,15 +17,11 @@
 package us.frollo.frollosdk.events
 
 import androidx.core.os.bundleOf
-import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.ACTION.ACTION_REFRESH_TRANSACTIONS
 import us.frollo.frollosdk.core.ARGUMENT.ARG_TRANSACTION_IDS
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
-import us.frollo.frollosdk.error.DataError
-import us.frollo.frollosdk.error.DataErrorSubType
-import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.EventsAPI
 import us.frollo.frollosdk.error.FrolloSDKError
@@ -38,7 +34,7 @@ import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
 /**
  * Manages triggering and handling of events from the host
  */
-class Events(network: NetworkService, private val authentication: Authentication) {
+class Events(network: NetworkService) {
 
     companion object {
         private const val TAG = "Events"
@@ -54,13 +50,6 @@ class Events(network: NetworkService, private val authentication: Authentication
      * @param completion Completion handler with option error if something occurs (optional)
      */
     fun triggerEvent(eventName: String, delayMinutes: Long? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#triggerEvent", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         eventsAPI.createEvent(EventCreateRequest(event = eventName, delayMinutes = delayMinutes ?: 0)).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {

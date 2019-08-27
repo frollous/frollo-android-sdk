@@ -99,8 +99,7 @@ class FrolloSDKAndroidUnitTest {
             assertNull(result.error)
 
             assertTrue(FrolloSDK.isSetup)
-            assertNotNull(FrolloSDK.authentication)
-            assertNotNull(FrolloSDK.defaultAuthentication)
+            assertNotNull(FrolloSDK.oAuth2Authentication)
             assertNotNull(FrolloSDK.aggregation)
             assertNotNull(FrolloSDK.messages)
             assertNotNull(FrolloSDK.events)
@@ -110,17 +109,6 @@ class FrolloSDKAndroidUnitTest {
             assertNotNull(FrolloSDK.bills)
             assertNotNull(FrolloSDK.userManagement)
             assertNotNull(FrolloSDK.goals)
-        }
-    }
-
-    @Test
-    fun testSDKAuthenticationThrowsErrorBeforeSetup() {
-        assertFalse(FrolloSDK.isSetup)
-
-        try {
-            FrolloSDK.authentication
-        } catch (e: IllegalAccessException) {
-            assertEquals(FrolloSDK.SDK_NOT_SETUP, e.localizedMessage)
         }
     }
 
@@ -292,37 +280,6 @@ class FrolloSDKAndroidUnitTest {
         wait(8)
 
         tearDown()*/
-    }
-
-    @Test
-    fun testForcedLogout() {
-        initSetup()
-
-        database.users().insert(testUserResponseData().toUser())
-
-        val testObserver = database.users().load().test()
-        testObserver.awaitValue()
-        assertNotNull(testObserver.value())
-
-        FrolloSDK.setup(app, testSDKConfig()) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            FrolloSDK.forcedLogout()
-
-            wait(3)
-
-            assertFalse(preferences.loggedIn)
-            assertNull(preferences.encryptedAccessToken)
-            assertNull(preferences.encryptedRefreshToken)
-            assertEquals(-1, preferences.accessTokenExpiry)
-
-            val testObserver2 = database.users().load().test()
-            testObserver2.awaitValue()
-            assertNull(testObserver2.value())
-        }
-
-        tearDown()
     }
 
     @Test

@@ -156,13 +156,13 @@ class GoalsTest : BaseAndroidTest() {
     fun testRefreshGoalByIdFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         goals.refreshGoal(goalId = 3211) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -261,13 +261,13 @@ class GoalsTest : BaseAndroidTest() {
     fun testRefreshGoalsFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         goals.refreshGoals { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -432,7 +432,7 @@ class GoalsTest : BaseAndroidTest() {
     fun testCreateGoalFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         goals.createGoal(
                 name = "My test goal",
@@ -453,7 +453,7 @@ class GoalsTest : BaseAndroidTest() {
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -541,14 +541,14 @@ class GoalsTest : BaseAndroidTest() {
     fun testUpdateGoalFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         val goal = testGoalResponseData(goalId = 3211).toGoal()
         goals.updateGoal(goal) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -605,13 +605,13 @@ class GoalsTest : BaseAndroidTest() {
     fun testDeleteGoalFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         goals.deleteGoal(3211) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -763,13 +763,13 @@ class GoalsTest : BaseAndroidTest() {
     fun testRefreshGoalPeriodsFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         goals.refreshGoalPeriods(goalId = 123) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -820,13 +820,13 @@ class GoalsTest : BaseAndroidTest() {
     fun testRefreshGoalPeriodByIdFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         goals.refreshGoalPeriod(goalId = 123, goalPeriodId = 897) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)

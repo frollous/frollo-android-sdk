@@ -81,7 +81,7 @@ internal fun handleOAuth2Failure(error: OAuth2Error) {
         OAuth2ErrorType.UNAUTHORIZED_CLIENT,
         OAuth2ErrorType.UNSUPPORTED_GRANT_TYPE,
         OAuth2ErrorType.SERVER_ERROR -> {
-            if (FrolloSDK.isSetup) FrolloSDK.forcedLogout()
+            if (FrolloSDK.isSetup) FrolloSDK.network.tokenInvalidated()
         }
 
         else -> {

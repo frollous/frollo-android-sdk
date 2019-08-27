@@ -24,7 +24,6 @@ import com.jakewharton.threetenabp.AndroidThreeTen
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Rule
 import us.frollo.frollosdk.aggregation.Aggregation
-import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.authentication.OAuth2Authentication
 import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.bills.Bills
@@ -62,7 +61,7 @@ abstract class BaseAndroidTest {
     lateinit var preferences: Preferences
     lateinit var keystore: Keystore
     lateinit var database: SDKDatabase
-    lateinit var authentication: Authentication
+    lateinit var oAuth2Authentication: OAuth2Authentication
     lateinit var aggregation: Aggregation
     lateinit var userManagement: UserManagement
     lateinit var bills: Bills
@@ -98,21 +97,23 @@ abstract class BaseAndroidTest {
         val oAuth = OAuth2Helper(config = config)
         network = NetworkService(oAuth2Helper = oAuth, keystore = keystore, pref = preferences)
 
-        authentication = OAuth2Authentication(oAuth, preferences, authenticationCallback = FrolloSDK, tokenCallback = network).apply {
-                tokenAPI = network.createAuth(TokenAPI::class.java)
-                revokeTokenAPI = network.createRevoke(TokenAPI::class.java)
-                authToken = network.authToken
-            }
-        network.authentication = authentication
-        userManagement = UserManagement(DeviceInfo(app), network, config.clientId, database, preferences, authentication, authenticationCallback = FrolloSDK)
-        aggregation = Aggregation(network, database, LocalBroadcastManager.getInstance(app), authentication)
-        bills = Bills(network, database, aggregation, authentication)
-        events = Events(network, authentication)
-        messages = Messages(network, database, authentication)
+        oAuth2Authentication = OAuth2Authentication(oAuth, preferences).apply {
+            tokenAPI = network.createAuth(TokenAPI::class.java)
+            revokeTokenAPI = network.createRevoke(TokenAPI::class.java)
+            authToken = network.authToken
+        }
+        network.accessTokenProvider = oAuth2Authentication
+        network.authenticationCallback = oAuth2Authentication
+
+        userManagement = UserManagement(DeviceInfo(app), network, config.clientId, database, preferences)
+        aggregation = Aggregation(network, database, LocalBroadcastManager.getInstance(app))
+        bills = Bills(network, database, aggregation)
+        events = Events(network)
+        messages = Messages(network, database)
         notifications = Notifications(userManagement, events, messages)
-        reports = Reports(network, database, aggregation, authentication)
-        surveys = Surveys(network, authentication)
-        goals = Goals(network, database, authentication)
+        reports = Reports(network, database, aggregation)
+        surveys = Surveys(network)
+        goals = Goals(network, database)
 
         AndroidThreeTen.init(app)
     }
@@ -122,8 +123,15 @@ abstract class BaseAndroidTest {
         mockTokenServer.shutdown()
         mockRevokeTokenServer.shutdown()
         network.reset()
-        authentication.reset()
+        oAuth2Authentication.reset()
         preferences.resetAll()
         database.clearAllTables()
+    }
+
+    fun clearLoggedInPreferences() {
+        preferences.resetLoggedIn()
+        preferences.resetEncryptedAccessToken()
+        preferences.resetEncryptedRefreshToken()
+        preferences.resetAccessTokenExpiry()
     }
 }

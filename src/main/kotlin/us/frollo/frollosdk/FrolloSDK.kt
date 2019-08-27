@@ -26,8 +26,6 @@ import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.temporal.TemporalAdjusters
 import us.frollo.frollosdk.aggregation.Aggregation
-import us.frollo.frollosdk.authentication.Authentication
-import us.frollo.frollosdk.authentication.AuthenticationCallback
 import us.frollo.frollosdk.authentication.AuthenticationStatus
 import us.frollo.frollosdk.authentication.AuthenticationType.Custom
 import us.frollo.frollosdk.authentication.AuthenticationType.OAuth2
@@ -67,7 +65,7 @@ import java.util.TimerTask
 /**
  * Frollo SDK manager and main instantiation. Responsible for managing the lifecycle and coordination of the SDK
  */
-object FrolloSDK : AuthenticationCallback {
+object FrolloSDK {
 
     private const val TAG = "FrolloSDK"
     private const val CACHE_EXPIRY = 120000L // 2 minutes
@@ -80,16 +78,10 @@ object FrolloSDK : AuthenticationCallback {
         get() = _setup
 
     /**
-     * Authentication - All authentication and user related data see [Authentication] for details
-     */
-    val authentication: Authentication
-        get() = _authentication ?: throw IllegalAccessException(SDK_NOT_SETUP)
-
-    /**
      * Default OAuth2 Authentication - Returns the default OAuth2 based authentication if no custom one has been applied
      */
-    val defaultAuthentication: OAuth2Authentication?
-        get() = _authentication as? OAuth2Authentication
+    var oAuth2Authentication: OAuth2Authentication? = null
+        private set
 
     /**
      * Aggregation - All account and transaction related data see [Aggregation] for details
@@ -146,7 +138,6 @@ object FrolloSDK : AuthenticationCallback {
         get() = _userManagement ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     private var _setup = false
-    private var _authentication: Authentication? = null
     private var _aggregation: Aggregation? = null
     private var _messages: Messages? = null
     private var _events: Events? = null
@@ -159,7 +150,7 @@ object FrolloSDK : AuthenticationCallback {
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
-    private lateinit var network: NetworkService
+    internal lateinit var network: NetworkService
     private lateinit var database: SDKDatabase
     private var tokenInjector: TokenInjector? = null
     internal var refreshTimer: Timer? = null
@@ -224,43 +215,43 @@ object FrolloSDK : AuthenticationCallback {
             // 8. Setup authentication stack
             when (configuration.authenticationType) {
                 is Custom -> {
-                    configuration.authenticationType.authentication.authenticationCallback = this
-                    configuration.authenticationType.authentication.tokenCallback = network
-                    _authentication = configuration.authenticationType.authentication
+                    network.accessTokenProvider = configuration.authenticationType.accessTokenProvider
+                    network.authenticationCallback = configuration.authenticationType.authenticationCallback
                 }
                 is OAuth2 -> {
-                    _authentication = OAuth2Authentication(oAuth, preferences, authenticationCallback = this, tokenCallback = network).apply {
+                    oAuth2Authentication = OAuth2Authentication(oAuth, preferences).apply {
                         tokenAPI = network.createAuth(TokenAPI::class.java)
                         revokeTokenAPI = network.createRevoke(TokenAPI::class.java)
                         authToken = network.authToken
                     }
+                    network.accessTokenProvider = oAuth2Authentication
+                    network.authenticationCallback = oAuth2Authentication
                 }
             }
-            network.authentication = _authentication
 
             // 9. Setup Aggregation
-            _aggregation = Aggregation(network, database, localBroadcastManager, authentication)
+            _aggregation = Aggregation(network, database, localBroadcastManager)
 
             // 10. Setup Messages
-            _messages = Messages(network, database, authentication)
+            _messages = Messages(network, database)
 
             // 11. Setup Events
-            _events = Events(network, authentication)
+            _events = Events(network)
 
             // 12. Setup Surveys
-            _surveys = Surveys(network, authentication)
+            _surveys = Surveys(network)
 
             // 13. Setup Reports
-            _reports = Reports(network, database, aggregation, authentication)
+            _reports = Reports(network, database, aggregation)
 
             // 14. Setup Bills
-            _bills = Bills(network, database, aggregation, authentication)
+            _bills = Bills(network, database, aggregation)
 
             // 15. Setup Goals
-            _goals = Goals(network, database, authentication)
+            _goals = Goals(network, database)
 
             // 16. Setup User Management
-            _userManagement = UserManagement(deviceInfo, network, configuration.clientId, database, preferences, authentication, authenticationCallback = this)
+            _userManagement = UserManagement(deviceInfo, network, configuration.clientId, database, preferences)
 
             // 17. Setup Notifications
             _notifications = Notifications(userManagement, events, messages)
@@ -278,32 +269,10 @@ object FrolloSDK : AuthenticationCallback {
     }
 
     /**
-     * Initialize authentication callback and token callback when using Custom Authentication
-     */
-    fun initializeAuthenticationCallbacks(authentication: Authentication) {
-        authentication.authenticationCallback = this
-        authentication.tokenCallback = network
-    }
-
-    /**
      * Get Token Injector. See [TokenInjector] for details
      */
     fun getTokenInjector(): TokenInjector =
             tokenInjector ?: throw IllegalAccessException(SDK_NOT_SETUP)
-
-    /**
-     * Logout and reset the SDK.
-     *
-     * Calls [Authentication.logout] to logout the user remotely if possible then resets the SDK
-     *
-     * @param completion Completion handler with option error if something goes wrong (optional)
-     *
-     * See also [FrolloSDK.reset]
-     */
-    fun logout(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        authentication.logout()
-        internalReset(completion)
-    }
 
     /**
      * Reset the SDK. Clears all caches, databases, tokens, keystore and preferences.
@@ -314,25 +283,7 @@ object FrolloSDK : AuthenticationCallback {
      */
     @Throws(IllegalAccessException::class)
     fun reset(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        authentication.reset() // WARNING: Do not put this inside internalReset() as the reset() call goes to infinite loop if put inside.
         internalReset(completion)
-    }
-
-    /**
-     * Notifies the SDK that authentication of the user is no longer valid and to reset itself
-     *
-     * This should not be called directly. Instead use [FrolloSDK.reset]
-     *
-     * This should be called when the user's authentication is no longer valid and no possible automated
-     * re-authentication can be performed. For example when a refresh token has been revoked so no more
-     * access tokens can be obtained.
-     *
-     * @param completion Completion handler with option error if something goes wrong (optional)
-     */
-    override fun authenticationReset(completion: OnFrolloSDKCompletionListener<Result>?) {
-        if (authentication.loggedIn) { // WARNING: This check is important. Without this the authentication.reset() call goes to infinite loop.
-            reset(completion)
-        }
     }
 
     /**
@@ -345,6 +296,7 @@ object FrolloSDK : AuthenticationCallback {
 
         pauseScheduledRefreshing()
         // NOTE: Keystore reset is not required as we do not store any data in there. Just keys.
+        oAuth2Authentication?.reset()
         network.reset()
         preferences.reset()
         database.clearAllTables()
@@ -373,6 +325,9 @@ object FrolloSDK : AuthenticationCallback {
      * Notify the SDK of an app lifecycle change. Call this to ensure proper refreshing of cache data occurs when the app enters background or resumes.
      */
     fun onAppForegrounded() {
+        if (!isSetup || network.accessTokenProvider?.accessToken?.token != null)
+            return
+
         resumeScheduledRefreshing()
 
         // Update device timezone, name and IDs regularly
@@ -463,9 +418,5 @@ object FrolloSDK : AuthenticationCallback {
     private fun cancelRefreshTimer() {
         refreshTimer?.cancel()
         refreshTimer = null
-    }
-
-    internal fun forcedLogout() {
-        authenticationReset()
     }
 }

@@ -31,7 +31,7 @@ internal class NetworkLogger(
     private val deviceAPI: DeviceAPI? = network?.create(DeviceAPI::class.java)
 
     override fun writeMessage(message: String, logLevel: LogLevel) {
-        val hasTokens = network?.authToken?.getAccessToken() != null ?: false
+        val hasTokens = network?.accessTokenProvider?.accessToken?.token != null
         if (!hasTokens || deviceId == null || deviceType == null || deviceName == null) {
             return
         }

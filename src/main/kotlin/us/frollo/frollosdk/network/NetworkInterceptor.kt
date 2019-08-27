@@ -39,7 +39,6 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
         private const val TAG = "NetworkInterceptor"
 
         private const val MAX_RATE_LIMIT_COUNT = 10
-        private const val TIME_INTERVAL_5_MINUTES = 300L // seconds
     }
 
     private var rateLimitCount = 0
@@ -82,7 +81,7 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
             }
         } catch (error: DataError) {
             if (error.type == DataErrorType.AUTHENTICATION && error.subType == DataErrorSubType.MISSING_REFRESH_TOKEN)
-                network.triggerForcedLogout()
+                network.tokenInvalidated()
             throw IOException(error.toJson())
         }
 
@@ -112,21 +111,29 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
     @Throws(DataError::class)
     private fun validateAndAppendAccessToken(builder: Request.Builder) {
         if (!validAccessToken())
-            network.authentication?.refreshTokens()
+            network.authenticationCallback?.accessTokenExpired()
 
-        helper.authAccessToken?.let {
-            builder.addHeader(HEADER_AUTHORIZATION, it)
+        network.accessTokenProvider?.accessToken?.token?.let {
+            builder.addHeader(HEADER_AUTHORIZATION, "Bearer $it")
         } ?: run {
             throw DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_ACCESS_TOKEN)
         }
     }
 
     private fun validAccessToken(): Boolean {
-        if (helper.accessTokenExpiry == -1L)
+        // Check we have an access token
+        if (network.accessTokenProvider?.accessToken == null)
             return false
 
-        val expiryDate = LocalDateTime.ofEpochSecond(helper.accessTokenExpiry, 0, ZoneOffset.UTC)
-        val adjustedExpiryDate = expiryDate.plusSeconds(-TIME_INTERVAL_5_MINUTES)
+        // Check if we have an expiry date otherwise assume it's still good
+        val expiry = network.accessTokenProvider?.accessToken?.expiry
+        if (expiry == null || expiry < 0L)
+            return true
+
+        val preemptiveRefreshTime = if (network.oAuth2Helper.config.preemptiveRefreshTime < 0L) 0
+        else network.oAuth2Helper.config.preemptiveRefreshTime
+        val expiryDate = LocalDateTime.ofEpochSecond(expiry, 0, ZoneOffset.UTC)
+        val adjustedExpiryDate = expiryDate.plusSeconds(-preemptiveRefreshTime)
         val nowDate = LocalDateTime.now(ZoneOffset.UTC)
 
         return nowDate.isBefore(adjustedExpiryDate)
@@ -134,11 +141,12 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
 
     @Throws(DataError::class)
     private fun appendRefreshToken(builder: Request.Builder) {
-        helper.authRefreshToken?.let {
-            builder.addHeader(HEADER_AUTHORIZATION, it)
+        val refreshToken = network.authToken.getRefreshToken()
+        refreshToken?.let {
+            builder.addHeader(HEADER_AUTHORIZATION, "Bearer $it")
         } ?: run {
             Log.e("$TAG#validateAndAppendRefreshToken", "No valid refresh token when trying to migrate user to Auth0.")
-            network.triggerForcedLogout()
+            network.tokenInvalidated()
             throw DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_REFRESH_TOKEN)
         }
     }

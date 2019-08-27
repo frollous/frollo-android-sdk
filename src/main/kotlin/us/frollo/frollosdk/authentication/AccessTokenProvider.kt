@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,23 +17,13 @@
 package us.frollo.frollosdk.authentication
 
 /**
- * Authentication Callback
- *
- * Called by the authentication class to notify the implementing app issues with authentication.
+ * Data source for the authentication class to retrieve access tokens from.
  * This must be implemented by custom authentication implementations.
  */
-interface AuthenticationCallback {
-    /**
-     * Access Token Expired
-     *
-     * Alerts the authentication handler to an expired access token that needs refreshing
-     */
-    fun accessTokenExpired()
+interface AccessTokenProvider {
 
     /**
-     * Access Token Invalid
-     *
-     * The host has rejected the access token and the user should be re-authenticated
+     * Access token to use for authorization if available. If this is not available network requests will not proceed
      */
-    fun tokenInvalidated()
+    val accessToken: AccessToken?
 }

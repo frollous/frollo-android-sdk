@@ -21,27 +21,23 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import okhttp3.mockwebserver.MockWebServer
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
+import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 
 import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.authentication.Authentication
+import us.frollo.frollosdk.authentication.AccessToken
+import us.frollo.frollosdk.authentication.AccessTokenProvider
+import us.frollo.frollosdk.authentication.AuthenticationCallback
 import us.frollo.frollosdk.authentication.OAuth2Helper
-import us.frollo.frollosdk.base.Result
-import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.core.testSDKCustomConfig
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.preferences.Preferences
-import us.frollo.frollosdk.testutils.wait
+import us.frollo.frollosdk.testutils.randomUUID
 
 /**
  * NOTE: Named this ZAuthentication on purpose as the tests run in alphabetical order
@@ -76,7 +72,10 @@ class ZAuthenticationTest {
         val baseUrl = mockServer.url("/")
 
         authentication = TestCustomAuthentication()
-        val config = testSDKCustomConfig(authentication = authentication, serverUrl = baseUrl.toString())
+        val config = testSDKCustomConfig(
+                accessTokenProvider = authentication,
+                authenticationCallback = authentication,
+                serverUrl = baseUrl.toString())
         if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
 
         keystore = Keystore()
@@ -85,7 +84,8 @@ class ZAuthenticationTest {
         database = SDKDatabase.getInstance(app)
         val oAuth = OAuth2Helper(config = config)
         network = NetworkService(oAuth2Helper = oAuth, keystore = keystore, pref = preferences)
-        network.authentication = authentication
+        network.accessTokenProvider = authentication
+        network.authenticationCallback = authentication
 
         AndroidThreeTen.init(app)
     }
@@ -94,7 +94,6 @@ class ZAuthenticationTest {
         resetSingletonByReflection()
         mockServer.shutdown()
         network.reset()
-        authentication.reset()
         preferences.resetAll()
         database.clearAllTables()
     }
@@ -103,67 +102,44 @@ class ZAuthenticationTest {
     fun testCustomAuthentication() {
         initSetup()
 
-        assertEquals(authentication, FrolloSDK.authentication)
-        assertFalse(FrolloSDK.authentication.loggedIn)
+        Assert.assertEquals(authentication, network.accessTokenProvider)
+        Assert.assertEquals(authentication, network.authenticationCallback)
 
-        authentication.login()
+        Assert.assertNotNull(authentication.accessToken)
 
-        assertTrue(FrolloSDK.authentication.loggedIn)
-        assertEquals("AccessToken001", keystore.decrypt(preferences.encryptedAccessToken))
-        assertNull(preferences.encryptedRefreshToken)
-        assertNotNull(preferences.accessTokenExpiry)
+        val oldToken = authentication.accessToken?.token
 
-        FrolloSDK.authentication.refreshTokens { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        network.authenticationCallback?.accessTokenExpired()
 
-            assertEquals("AccessToken002", keystore.decrypt(preferences.encryptedAccessToken))
-            assertNull(preferences.encryptedRefreshToken)
-            assertNotNull(preferences.accessTokenExpiry)
-        }
+        Assert.assertNotEquals(oldToken, authentication.accessToken?.token)
 
-        wait(3)
+        Assert.assertNull(preferences.encryptedAccessToken)
+        Assert.assertNull(preferences.encryptedRefreshToken)
+        Assert.assertNotNull(preferences.accessTokenExpiry)
 
         tearDown()
     }
 }
 
-class TestCustomAuthentication : Authentication() {
+class TestCustomAuthentication : AccessTokenProvider, AuthenticationCallback {
 
-    private var tokenIndex = 0
-    private val validTokens = arrayOf("AccessToken001", "AccessToken002", "AccessToken003")
+    override var accessToken: AccessToken? = null
 
-    override var loggedIn: Boolean = false
+    init {
+        refreshToken()
+    }
 
-    fun login() {
-        loggedIn = true
+    override fun accessTokenExpired() {
+        refreshToken()
+    }
 
-        tokenCallback?.saveAccessTokens(
-                accessToken = validTokens[tokenIndex],
+    override fun tokenInvalidated() {
+        accessToken = null
+    }
+
+    private fun refreshToken() {
+        accessToken = AccessToken(
+                token = randomUUID(),
                 expiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 3600)
-    }
-
-    override fun refreshTokens(completion: OnFrolloSDKCompletionListener<Result>?) {
-        if (tokenIndex < 2) {
-            tokenIndex ++
-        } else {
-            tokenIndex = 0
-        }
-
-        tokenCallback?.saveAccessTokens(
-                accessToken = validTokens[tokenIndex],
-                expiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 3600)
-
-        completion?.invoke(Result.success())
-    }
-
-    override fun logout() {
-        reset()
-    }
-
-    override fun reset() {
-        loggedIn = false
-
-        tokenIndex = 0
     }
 }

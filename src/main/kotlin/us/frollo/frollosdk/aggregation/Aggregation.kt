@@ -26,7 +26,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.sqlite.db.SimpleSQLiteQuery
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
@@ -114,7 +113,7 @@ import kotlin.collections.ArrayList
 /**
  * Manages all aggregation data including accounts, transactions, categories and merchants.
  */
-class Aggregation(network: NetworkService, private val db: SDKDatabase, localBroadcastManager: LocalBroadcastManager, private val authentication: Authentication) {
+class Aggregation(network: NetworkService, private val db: SDKDatabase, localBroadcastManager: LocalBroadcastManager) {
 
     companion object {
         private const val TAG = "Aggregation"
@@ -224,13 +223,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshProvider(providerId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshProvider", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         aggregationAPI.fetchProvider(providerId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -252,13 +244,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshProviders(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshProviders", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         aggregationAPI.fetchProviders().enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -395,13 +380,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshProviderAccount(providerAccountId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshProviderAccount", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         aggregationAPI.fetchProviderAccount(providerAccountId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -421,13 +399,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshProviderAccounts(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshProviderAccounts", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         aggregationAPI.fetchProviderAccounts().enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -449,13 +420,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails else ID of the ProviderAccount created if success
      */
     fun createProviderAccount(providerId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#createProviderAccount", error.localizedDescription)
-            completion?.invoke(Resource.error(error))
-            return
-        }
-
         val request = ProviderAccountCreateRequest(loginForm = loginForm, providerID = providerId)
 
         aggregationAPI.createProviderAccount(request).enqueue { resource ->
@@ -478,13 +442,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun deleteProviderAccount(providerAccountId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#deleteProviderAccount", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         aggregationAPI.deleteProviderAccount(providerAccountId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -507,13 +464,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun updateProviderAccount(providerAccountId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#updateProviderAccount", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         val request = ProviderAccountUpdateRequest(loginForm = loginForm)
 
         aggregationAPI.updateProviderAccount(providerAccountId, request).enqueue { resource ->
@@ -721,13 +671,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshAccount(accountId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshAccount", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         aggregationAPI.fetchAccount(accountId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -747,13 +690,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshAccounts(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshAccounts", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         aggregationAPI.fetchAccounts().enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -792,13 +728,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         nickName: String? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#updateAccount", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         // Updating account cache immediately to update the UI
         updateAccountCache(
                 accountId = accountId,
@@ -1054,13 +983,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshTransaction(transactionId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshTransaction", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         aggregationAPI.fetchTransaction(transactionId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -1090,13 +1012,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         transactionIncluded: Boolean? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshTransactions", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         doAsync {
             refreshNextTransactions(fromDate, toDate, accountIds, transactionIncluded, 0, longArrayOf(), longArrayOf(), completion)
         }
@@ -1148,13 +1063,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshTransactions(transactionIds: LongArray, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshTransactionsByIds", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         aggregationAPI.fetchTransactionsByIDs(transactionIds).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -1182,13 +1090,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         applyToAll: Boolean,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#excludeTransaction", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         doAsync {
 
             val transaction = db.transactions().loadTransaction(transactionId)
@@ -1232,13 +1133,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         applyToAll: Boolean,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#recategoriseTransaction", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         doAsync {
 
             val transaction = db.transactions().loadTransaction(transactionId)
@@ -1284,13 +1178,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         includeApplyAll: Boolean? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#updateTransaction", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         val request = TransactionUpdateRequest(
                 budgetCategory = transaction.budgetCategory,
                 categoryId = transaction.categoryId,
@@ -1358,13 +1245,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         accountIncluded: Boolean? = null,
         completion: OnFrolloSDKCompletionListener<Resource<LongArray>>
     ) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#transactionSearch", error.localizedDescription)
-            completion.invoke(Resource.error(error))
-            return
-        }
-
         if (searchTerm.isBlank()) {
             Log.d("$TAG#transactionSearch", "Search term is empty")
             val error = DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)
@@ -1423,13 +1303,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         onlyIncludedAccounts: Boolean? = null,
         completion: OnFrolloSDKCompletionListener<Resource<TransactionsSummary>>
     ) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#fetchTransactionsSummary", error.localizedDescription)
-            completion.invoke(Resource.error(error))
-            return
-        }
-
         aggregationAPI.fetchTransactionsSummaryByQuery(
                 fromDate = fromDate, toDate = toDate,
                 accountIds = accountIds, transactionIncluded = onlyIncludedTransactions,
@@ -1449,13 +1322,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails or the transactions summary model if succeeds
      */
     fun fetchTransactionsSummary(transactionIds: LongArray, completion: OnFrolloSDKCompletionListener<Resource<TransactionsSummary>>) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#fetchTransactionsSummaryByIDs", error.localizedDescription)
-            completion.invoke(Resource.error(error))
-            return
-        }
-
         aggregationAPI.fetchTransactionsSummaryByIDs(transactionIds).enqueue { resource ->
             if (resource.status == Resource.Status.ERROR)
                 Log.e("$TAG#fetchTransactionsSummaryByIDs", resource.error?.localizedDescription)
@@ -1536,13 +1402,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails or the list of tags if succeeds
      */
     fun fetchTagsForTransaction(transactionId: Long, completion: OnFrolloSDKCompletionListener<Resource<List<String>>>) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#fetchTagsForTransaction", error.localizedDescription)
-            completion.invoke(Resource.error(error))
-            return
-        }
-
         aggregationAPI.fetchTags(transactionId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -1565,13 +1424,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun addTagsToTransaction(transactionId: Long, tagApplyAllPairs: Array<TagApplyAllPair>, completion: OnFrolloSDKCompletionListener<Result>) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#addTagsToTransaction", error.localizedDescription)
-            completion.invoke(Result.error(error))
-            return
-        }
-
         if (tagApplyAllPairs.isEmpty()) {
             val error = DataError(type = DataErrorType.API, subType = DataErrorSubType.INVALID_DATA)
             Log.e("$TAG#addTagsToTransaction", "Empty Tags List")
@@ -1607,13 +1459,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun removeTagsFromTransaction(transactionId: Long, tagApplyAllPairs: Array<TagApplyAllPair>, completion: OnFrolloSDKCompletionListener<Result>) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#removeTagsFromTransaction", error.localizedDescription)
-            completion.invoke(Result.error(error))
-            return
-        }
-
         if (tagApplyAllPairs.isEmpty()) {
             val error = DataError(type = DataErrorType.API, subType = DataErrorSubType.INVALID_DATA)
             Log.e("$TAG#removeTagsFromTransaction", "Empty Tags List")
@@ -1699,13 +1544,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshTransactionUserTags(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshTransactionUserTags", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         aggregationAPI.fetchUserTags().enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -1735,13 +1573,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         orderBy: OrderType? = OrderType.ASC,
         completion: OnFrolloSDKCompletionListener<Resource<List<TransactionTag>>>
     ) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#fetchTransactionSuggestedTags", error.localizedDescription)
-            completion.invoke(Resource.error(error))
-            return
-        }
-
         aggregationAPI.fetchSuggestedTags(searchTerm, sortBy.toString(), orderBy.toString()).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -1818,13 +1649,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshTransactionCategories(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshTransactionCategories", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         aggregationAPI.fetchTransactionCategories().enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -1906,13 +1730,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshMerchant(merchantId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshMerchant", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         aggregationAPI.fetchMerchant(merchantId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -1933,13 +1750,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshMerchants(merchantIds: LongArray, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshMerchantsByIDs", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         aggregationAPI.fetchMerchantsByIDs(merchantIds).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -1959,13 +1769,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param completion Optional completion handler with optional error if the request fails
      */
     internal fun refreshMerchants(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshMerchants", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         aggregationAPI.fetchMerchants().enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {

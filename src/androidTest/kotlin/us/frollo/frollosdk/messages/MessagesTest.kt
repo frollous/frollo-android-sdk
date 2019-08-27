@@ -219,13 +219,13 @@ class MessagesTest : BaseAndroidTest() {
     fun testRefreshMessagesFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         messages.refreshMessages { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -315,13 +315,13 @@ class MessagesTest : BaseAndroidTest() {
     fun testRefreshMessageByIDFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         messages.refreshMessage(12345L) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -376,13 +376,13 @@ class MessagesTest : BaseAndroidTest() {
     fun testRefreshUnreadMessagesFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         messages.refreshUnreadMessages { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -429,13 +429,13 @@ class MessagesTest : BaseAndroidTest() {
     fun testUpdateMessageFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         messages.updateMessage(12345L, true, true) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)

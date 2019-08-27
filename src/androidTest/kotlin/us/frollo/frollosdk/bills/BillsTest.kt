@@ -210,7 +210,7 @@ class BillsTest : BaseAndroidTest() {
     fun testCreateBillFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         val date = LocalDate.now().plusDays(1).toString(Bill.DATE_FORMAT_PATTERN)
 
@@ -218,7 +218,7 @@ class BillsTest : BaseAndroidTest() {
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -314,13 +314,13 @@ class BillsTest : BaseAndroidTest() {
     fun testDeleteBillFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         bills.deleteBill(12345) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -367,13 +367,13 @@ class BillsTest : BaseAndroidTest() {
     fun testRefreshBillsFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         bills.refreshBills { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -426,13 +426,13 @@ class BillsTest : BaseAndroidTest() {
     fun testRefreshBillByIdFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         bills.refreshBill(12345) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -489,13 +489,13 @@ class BillsTest : BaseAndroidTest() {
     fun testUpdateBillByIdFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         bills.updateBill(testBillResponseData(billId = 12345).toBill()) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -842,13 +842,13 @@ class BillsTest : BaseAndroidTest() {
     fun testDeleteBillPaymentFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         bills.deleteBillPayment(12345) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -899,13 +899,13 @@ class BillsTest : BaseAndroidTest() {
     fun testRefreshBillPaymentsFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         bills.refreshBillPayments(fromDate = "2018-12-01", toDate = "2021-12-02") { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -962,13 +962,13 @@ class BillsTest : BaseAndroidTest() {
     fun testUpdateBillPaymentFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         bills.updateBillPayment(billPaymentId = 12345, paid = true) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)

@@ -25,6 +25,7 @@ import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
+import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.ACTION
@@ -51,10 +52,8 @@ import us.frollo.frollosdk.preferences.Preferences
  */
 class OAuth2Authentication(
     internal val oAuth2Helper: OAuth2Helper,
-    private val pref: Preferences,
-    authenticationCallback: AuthenticationCallback,
-    tokenCallback: AuthenticationTokenCallback
-) : Authentication() {
+    private val pref: Preferences
+) : AccessTokenProvider, AuthenticationCallback {
 
     companion object {
         private const val TAG = "OAuth2Authentication"
@@ -63,7 +62,10 @@ class OAuth2Authentication(
         const val RC_AUTH = 100
     }
 
-    override var loggedIn: Boolean
+    /**
+     * Indicates if the user is currently authorised with Frollo
+     */
+    var loggedIn: Boolean
         get() = pref.loggedIn
         private set(value) { pref.loggedIn = value }
 
@@ -74,10 +76,11 @@ class OAuth2Authentication(
     private var codeVerifier: String? = null
     private var isRefreshingToken = false
 
-    init {
-        this.authenticationCallback = authenticationCallback
-        this.tokenCallback = tokenCallback
-    }
+    /**
+     * Access Token
+     */
+    override val accessToken: AccessToken?
+        get() = authToken?.getAccessToken()?.let { AccessToken(token = it, expiry = authToken?.getAccessTokenExpiry()) } ?: run { null }
 
     /**
      * Login a user via WebView
@@ -319,7 +322,7 @@ class OAuth2Authentication(
      *
      * @param completion Completion handler with any error that occurred (Optional)
      */
-    override fun refreshTokens(completion: OnFrolloSDKCompletionListener<Result>?) {
+    fun refreshTokens(completion: OnFrolloSDKCompletionListener<Result>?) {
         if (isRefreshingToken)
             return
 
@@ -332,7 +335,7 @@ class OAuth2Authentication(
             completion?.invoke(Result.error(error))
             Log.e("$TAG#refreshTokens", error.localizedMessage)
 
-            reset()
+            forcedReset()
 
             return
         }
@@ -362,9 +365,15 @@ class OAuth2Authentication(
     }
 
     /**
+     * Logout and reset the SDK
+     *
      * Logout the user by revoking the refresh token if possible followed by local cleanup by calling reset
+     *
+     * @param completion Completion handler with option error if something goes wrong (optional)
+     *
+     * See also [FrolloSDK.reset]
      */
-    override fun logout() {
+    fun logout(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         // Revoke the refresh token if possible
         authToken?.getRefreshToken()?.let { refreshToken ->
             val request = OAuthTokenRevokeRequest(clientId = oAuth2Helper.config.clientId, token = refreshToken)
@@ -376,7 +385,15 @@ class OAuth2Authentication(
             }
         }
 
-        reset()
+        forcedReset(completion)
+    }
+
+    override fun accessTokenExpired() {
+        refreshTokens(null)
+    }
+
+    override fun tokenInvalidated() {
+        forcedReset()
     }
 
     private fun handleTokens(tokenResponse: OAuthTokenResponse) {
@@ -393,7 +410,8 @@ class OAuth2Authentication(
             LocalDateTime.now(ZoneOffset.UTC)
         val tokenExpiry = createdAt.plusSeconds(tokenResponse.expiresIn).toEpochSecond(ZoneOffset.UTC)
 
-        tokenCallback?.saveAccessTokens(tokenResponse.accessToken, tokenExpiry)
+        authToken?.saveAccessToken(tokenResponse.accessToken)
+        authToken?.saveTokenExpiry(tokenExpiry)
     }
 
     private fun setLoggedIn() {
@@ -405,18 +423,24 @@ class OAuth2Authentication(
         }
     }
 
+    private fun clearTokens() {
+        authToken?.clearTokens()
+    }
+
     /**
      * Reset the authentication state. Resets the user to a logged out state and clears any tokens cached
      */
-    override fun reset() {
-        // WARNING: It is important to reset loggedIn flag before calling authenticationReset()
-        // else the authenticationReset() call goes to infinite loop.
+    fun reset() {
         loggedIn = false
 
         isRefreshingToken = false
 
-        authToken?.clearTokens()
+        clearTokens()
+    }
 
-        authenticationCallback?.authenticationReset()
+    private fun forcedReset(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        reset()
+
+        if (FrolloSDK.isSetup) FrolloSDK.reset(completion)
     }
 }

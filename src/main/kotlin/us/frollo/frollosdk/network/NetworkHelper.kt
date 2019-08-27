@@ -19,12 +19,11 @@ package us.frollo.frollosdk.network
 import android.os.Build
 import okhttp3.Request
 import us.frollo.frollosdk.BuildConfig
-import us.frollo.frollosdk.authentication.AuthToken
 
 /**
  * This class wraps the rules for interacting with the Frollo API such as the headers used, API version and so on
  */
-internal class NetworkHelper(private val authToken: AuthToken) {
+internal class NetworkHelper {
 
     companion object {
         internal const val HEADER_AUTHORIZATION = "Authorization"
@@ -36,21 +35,6 @@ internal class NetworkHelper(private val authToken: AuthToken) {
         internal const val HEADER_BACKGROUND = "X-Background"
         internal const val API_VERSION = "2.4"
     }
-
-    internal val authAccessToken: String?
-        get() {
-            val token = authToken.getAccessToken()
-            return if (token == null) null else "Bearer $token"
-        }
-
-    internal val authRefreshToken: String?
-        get() {
-            val token = authToken.getRefreshToken()
-            return if (token == null) null else "Bearer $token"
-        }
-
-    internal val accessTokenExpiry: Long
-        get() = authToken.getAccessTokenExpiry()
 
     internal val bundleId: String
         get() = BuildConfig.APPLICATION_ID

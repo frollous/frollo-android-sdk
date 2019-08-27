@@ -22,9 +22,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertEquals
 import us.frollo.frollosdk.authentication.AuthToken
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.preferences.Preferences
@@ -53,50 +51,26 @@ class NetworkHelperTest {
     }
 
     @Test
-    fun testAccessToken() {
-        val networkHelper = NetworkHelper(authToken)
-        assertNull(networkHelper.authAccessToken)
-        preferences.encryptedAccessToken = keystore.encrypt("DummyAccessToken")
-        assertEquals("Bearer DummyAccessToken", networkHelper.authAccessToken)
-    }
-
-    @Test
-    fun testRefreshToken() {
-        val networkHelper = NetworkHelper(authToken)
-        assertNull(networkHelper.authRefreshToken)
-        preferences.encryptedRefreshToken = keystore.encrypt("DummyRefreshToken")
-        assertEquals("Bearer DummyRefreshToken", networkHelper.authRefreshToken)
-    }
-
-    @Test
-    fun testAccessTokenExpiry() {
-        val networkHelper = NetworkHelper(authToken)
-        assertEquals(-1, networkHelper.accessTokenExpiry)
-        preferences.accessTokenExpiry = 14529375950
-        assertEquals(14529375950, networkHelper.accessTokenExpiry)
-    }
-
-    @Test
     fun testBundleId() {
-        val networkHelper = NetworkHelper(authToken)
+        val networkHelper = NetworkHelper()
         assertNotNull(networkHelper.bundleId)
     }
 
     @Test
     fun testSoftwareVersion() {
-        val networkHelper = NetworkHelper(authToken)
+        val networkHelper = NetworkHelper()
         assertNotNull(networkHelper.softwareVersion)
     }
 
     @Test
     fun testDeviceVersion() {
-        val networkHelper = NetworkHelper(authToken)
+        val networkHelper = NetworkHelper()
         assertNotNull(networkHelper.deviceVersion)
     }
 
     @Test
     fun testUserAgent() {
-        val networkHelper = NetworkHelper(authToken)
+        val networkHelper = NetworkHelper()
         assertNotNull(networkHelper.userAgent)
     }
 }

@@ -28,10 +28,9 @@ import us.frollo.frollosdk.keystore.Keystore
 import okhttp3.CertificatePinner
 import okhttp3.Dispatcher
 import us.frollo.frollosdk.BuildConfig
-import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.authentication.AccessTokenProvider
 import us.frollo.frollosdk.authentication.AuthToken
-import us.frollo.frollosdk.authentication.Authentication
-import us.frollo.frollosdk.authentication.AuthenticationTokenCallback
+import us.frollo.frollosdk.authentication.AuthenticationCallback
 import us.frollo.frollosdk.authentication.AuthenticationType.OAuth2
 import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.preferences.Preferences
@@ -40,7 +39,7 @@ class NetworkService internal constructor(
     internal val oAuth2Helper: OAuth2Helper,
     keystore: Keystore,
     pref: Preferences
-) : IApiProvider, AuthenticationTokenCallback {
+) : IApiProvider {
 
     companion object {
         private const val TAG = "NetworkService"
@@ -48,9 +47,10 @@ class NetworkService internal constructor(
     }
 
     internal val authToken = AuthToken(keystore, pref)
-    private val helper = NetworkHelper(authToken)
+    private val helper = NetworkHelper()
     private val serverInterceptor = NetworkInterceptor(this, helper)
     private val tokenInterceptor = TokenInterceptor(helper)
+
     private val apiRetrofit = createRetrofit(baseUrl = oAuth2Helper.config.serverUrl, isTokenEndpoint = false)
     private val authRetrofit: Retrofit?
         get() {
@@ -59,7 +59,10 @@ class NetworkService internal constructor(
             else null
         }
     private var revokeTokenRetrofit: Retrofit? = null
-    internal var authentication: Authentication? = null
+
+    internal var accessTokenProvider: AccessTokenProvider? = null
+    internal var authenticationCallback: AuthenticationCallback? = null
+
     internal var invalidTokenRetries: Int = 0
     private var dispatcher: Dispatcher? = null
 
@@ -87,7 +90,7 @@ class NetworkService internal constructor(
                         if (isTokenEndpoint)
                             TokenAuthenticator(this)
                         else
-                            NetworkAuthenticator(this, helper))
+                            NetworkAuthenticator(this))
 
         if (!BuildConfig.DEBUG && Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             val certPinner = CertificatePinner.Builder()
@@ -115,11 +118,6 @@ class NetworkService internal constructor(
     override fun <T> createAuth(service: Class<T>): T? = authRetrofit?.create(service)
     override fun <T> createRevoke(service: Class<T>): T? = revokeTokenRetrofit?.create(service)
 
-    override fun saveAccessTokens(accessToken: String, expiry: Long) {
-        authToken.saveAccessToken(accessToken)
-        authToken.saveTokenExpiry(expiry)
-    }
-
     internal fun authenticateRequest(request: Request): Request {
         return serverInterceptor.authenticateRequest(request)
     }
@@ -127,11 +125,11 @@ class NetworkService internal constructor(
     internal fun reset() {
         invalidTokenRetries = 0
         dispatcher?.queuedCalls()?.forEach { it.cancel() }
-        authToken.clearTokens()
     }
 
-    internal fun triggerForcedLogout() {
+    internal fun tokenInvalidated() {
         reset()
-        if (FrolloSDK.isSetup) FrolloSDK.forcedLogout()
+
+        authenticationCallback?.tokenInvalidated()
     }
 }

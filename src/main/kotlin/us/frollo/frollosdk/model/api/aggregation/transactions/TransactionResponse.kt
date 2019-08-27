@@ -41,5 +41,5 @@ internal data class TransactionResponse(
     @SerializedName("bill_id") var billId: Long?,
     @SerializedName("bill_payment_id") var billPaymentId: Long?,
     @SerializedName("user_tags") val userTags: List<String>?,
-    @SerializedName("external_id") val externalId: String
+    @SerializedName("external_id") val externalId: String?
 )

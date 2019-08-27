@@ -21,7 +21,6 @@ import androidx.lifecycle.Transformations
 import androidx.sqlite.db.SimpleSQLiteQuery
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import us.frollo.frollosdk.authentication.Authentication
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
@@ -56,7 +55,7 @@ import us.frollo.frollosdk.network.api.GoalsAPI
 import java.math.BigDecimal
 
 /** Manages user goals and tracking */
-class Goals(network: NetworkService, private val db: SDKDatabase, private val authentication: Authentication) {
+class Goals(network: NetworkService, private val db: SDKDatabase) {
 
     companion object {
         private const val TAG = "Goals"
@@ -189,13 +188,6 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshGoal(goalId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshGoal", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         goalsAPI.fetchGoal(goalId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -221,13 +213,6 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
         trackingStatus: GoalTrackingStatus? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshGoals", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         goalsAPI.fetchGoals(status, trackingStatus).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -281,13 +266,6 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
         accountId: Long,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#createGoal", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         val request = GoalCreateRequest(
                 name = name,
                 description = description,
@@ -330,13 +308,6 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun updateGoal(goal: Goal, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#updateGoal", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         val request = GoalUpdateRequest(
                 name = goal.name,
                 description = goal.description,
@@ -362,13 +333,6 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun deleteGoal(goalId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#deleteGoal", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         goalsAPI.deleteGoal(goalId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -477,13 +441,6 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshGoalPeriod(goalId: Long, goalPeriodId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshGoalPeriod", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         goalsAPI.fetchGoalPeriod(goalId = goalId, periodId = goalPeriodId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -504,13 +461,6 @@ class Goals(network: NetworkService, private val db: SDKDatabase, private val au
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshGoalPeriods(goalId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshGoalPeriods", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         goalsAPI.fetchGoalPeriods(goalId = goalId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {

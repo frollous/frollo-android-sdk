@@ -103,13 +103,13 @@ class ReportsTest : BaseAndroidTest() {
     fun testFetchingAccountBalanceReportsFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         reports.refreshAccountBalanceReports(period = ReportPeriod.DAY, fromDate = "2018-10-28", toDate = "2019-01-29") { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -600,13 +600,13 @@ class ReportsTest : BaseAndroidTest() {
     fun testFetchingCurrentReportsFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         reports.refreshTransactionCurrentReports(grouping = ReportGrouping.BUDGET_CATEGORY) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -1344,7 +1344,7 @@ class ReportsTest : BaseAndroidTest() {
     fun testFetchingHistoryReportsFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         reports.refreshTransactionHistoryReports(
                 grouping = ReportGrouping.BUDGET_CATEGORY,
@@ -1355,7 +1355,7 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)

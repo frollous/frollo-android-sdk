@@ -38,7 +38,7 @@ internal class TokenAuthenticator(private val network: NetworkService) : Authent
     override fun authenticate(route: Route?, response: Response?): Request? {
 
         // ForceLogout on any 401 from Authorization Server
-        network.triggerForcedLogout()
+        network.tokenInvalidated()
 
         return null
     }

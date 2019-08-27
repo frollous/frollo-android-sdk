@@ -25,9 +25,13 @@ sealed class AuthenticationType {
     /**
      * Custom - provide a custom authentication class managed externally from the SDK
      *
-     * @param authentication: Custom authentication method. See [OAuth2Authentication] for a default implementation.
+     * @param accessTokenProvider: Custom authentication data source to provide access token. See [OAuth2Authentication] for a default implementation.
+     * @param authenticationCallback: Custom authentication delegate to handle refreshing of access token. See [OAuth2Authentication] for a default implementation.
      */
-    class Custom(val authentication: Authentication) : AuthenticationType()
+    class Custom(
+        val accessTokenProvider: AccessTokenProvider,
+        val authenticationCallback: AuthenticationCallback
+    ) : AuthenticationType()
 
     /**
      * OAuth2 - generic OAuth2 based authentication

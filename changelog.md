@@ -1,5 +1,11 @@
 ## Changelog
 
+### 3.0.0
+
+#### Changes
+- Improved custom authentication making it easier to implement
+- Add externalId for mapping external aggregator ID for ProviderAccounts, Accounts & Transactions
+
 ### 2.1.0
 
 #### Changes

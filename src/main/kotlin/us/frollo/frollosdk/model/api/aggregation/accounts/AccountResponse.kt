@@ -59,5 +59,5 @@ internal data class AccountResponse(
     @SerializedName("end_date") val endDate: String?, // yyyy-MM-dd
     @SerializedName("balance_details") val balanceDetails: BalanceDetails?,
     @SerializedName("goal_ids") val goalIds: List<Long>?,
-    @SerializedName("external_id") val externalId: String
+    @SerializedName("external_id") val externalId: String?
 )

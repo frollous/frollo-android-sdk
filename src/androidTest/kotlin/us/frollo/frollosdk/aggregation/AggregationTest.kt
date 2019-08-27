@@ -202,13 +202,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshProvidersFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.refreshProviders { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -255,13 +255,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshProviderByIdFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.refreshProvider(12345L) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -450,13 +450,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshProviderAccountsByIdFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.refreshProviderAccounts { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -503,13 +503,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshProviderAccountByIdFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.refreshProviderAccount(123L) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -558,13 +558,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testCreateProviderAccountFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.createProviderAccount(providerId = 4078, loginForm = loginFormFilledData()) { resource ->
             assertEquals(Resource.Status.ERROR, resource.status)
             assertNotNull(resource.error)
             assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (resource.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
         }
 
         wait(3)
@@ -613,13 +613,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testDeleteProviderAccountFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.deleteProviderAccount(12345) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -667,13 +667,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testUpdateProviderAccountFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.updateProviderAccount(loginForm = loginFormFilledData(), providerAccountId = 123) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -907,13 +907,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshAccountsFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.refreshAccounts { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -960,13 +960,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshAccountByIdFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.refreshAccount(542) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -1022,7 +1022,7 @@ class AggregationTest : BaseAndroidTest() {
     fun testUpdateAccountFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.updateAccount(
                 accountId = 542,
@@ -1034,7 +1034,7 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -1444,13 +1444,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshTransactionsFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.refreshTransactions(fromDate = "2018-06-01", toDate = "2018-08-08") { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -1532,13 +1532,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshTransactionByIdFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.refreshTransaction(194630L) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -1585,13 +1585,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshTransactionByIdsFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.refreshTransactions(longArrayOf(1, 2, 3, 4, 5)) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -1643,13 +1643,16 @@ class AggregationTest : BaseAndroidTest() {
     fun testExcludeTransactionFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
+
+        val data = testTransactionResponseData(transactionId = 194630)
+        database.transactions().insert(data.toTransaction())
 
         aggregation.excludeTransaction(transactionId = 194630, excluded = true, applyToAll = true) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -1701,13 +1704,16 @@ class AggregationTest : BaseAndroidTest() {
     fun testRecategoriseTransactionFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
+
+        val data = testTransactionResponseData(transactionId = 194630)
+        database.transactions().insert(data.toTransaction())
 
         aggregation.recategoriseTransaction(transactionId = 194630, transactionCategoryId = 77, applyToAll = true) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -1758,13 +1764,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testUpdateTransactionFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.updateTransaction(194630, testTransactionResponseData().toTransaction()) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -1817,13 +1823,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testTransactionSearchFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.transactionSearch(searchTerm = "Travel") { result ->
             assertEquals(Resource.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -1972,13 +1978,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testFetchTransactionsSummaryFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.fetchTransactionsSummary(fromDate = "2018-06-01", toDate = "2018-08-08") { result ->
             assertEquals(Resource.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -2023,13 +2029,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testFetchTransactionsSummaryByIDsFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.fetchTransactionsSummary(transactionIds = longArrayOf(1, 2, 3, 4, 5)) { result ->
             assertEquals(Resource.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -2075,13 +2081,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testFetchTagsForTransactionFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.fetchTagsForTransaction(transactionId = 12345) { resource ->
             assertEquals(Resource.Status.ERROR, resource.status)
             assertNotNull(resource.error)
             assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (resource.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
         }
 
         wait(3)
@@ -2135,13 +2141,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testAddTagsToTransactionFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.addTagsToTransaction(transactionId = 12345, tagApplyAllPairs = arrayOf(TagApplyAllPair("tag1", true))) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -2211,13 +2217,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testRemoveTagsFromTransactionFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.removeTagsFromTransaction(transactionId = 12345, tagApplyAllPairs = arrayOf(TagApplyAllPair("tag1", true))) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -2329,13 +2335,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshTransactionUserTagsFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.refreshTransactionUserTags { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -2374,13 +2380,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testFetchSuggestedTransactionTagsFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.fetchTransactionSuggestedTags("ca") { result ->
             assertEquals(Resource.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -2465,13 +2471,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshTransactionCategoriesFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.refreshTransactionCategories { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -2556,13 +2562,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshMerchantsFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.refreshMerchants { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -2609,13 +2615,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshMerchantByIDFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.refreshMerchant(197L) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -2662,13 +2668,13 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshMerchantsByIdsFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         aggregation.refreshMerchants(longArrayOf(22, 30, 31, 106, 691)) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)

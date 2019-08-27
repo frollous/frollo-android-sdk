@@ -37,7 +37,7 @@ import us.frollo.frollosdk.extensions.clonedBodyString
  * When authentication is requested by an origin server, the response code is 401 and the
  * implementation should respond with a new request that sets the "Authorization" header.
  */
-internal class NetworkAuthenticator(private val network: NetworkService, private val helper: NetworkHelper) : Authenticator {
+internal class NetworkAuthenticator(private val network: NetworkService) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response?): Request? {
 
@@ -49,18 +49,20 @@ internal class NetworkAuthenticator(private val network: NetworkService, private
             when (apiError.type) {
                 APIErrorType.INVALID_ACCESS_TOKEN -> {
                     if (network.invalidTokenRetries < 5) {
+                        val accessToken = network.accessTokenProvider?.accessToken?.token
+
                         // Check if the request is using updated access token.
                         // If yes run refresh token flow
                         // Otherwise just run it once again with updated access token.
-                        val bearerAuth = response.request().header(HEADER_AUTHORIZATION)
-                        if (bearerAuth == helper.authAccessToken) {
-                            network.authentication?.refreshTokens()
+                        val authorization = response.request().header(HEADER_AUTHORIZATION)
+                        if (accessToken != null && authorization == "Bearer $accessToken") {
+                            network.authenticationCallback?.accessTokenExpired()
                         }
 
-                        val newBearerAuth = helper.authAccessToken
-                        if (newBearerAuth != null) {
+                        val newAccessToken = network.accessTokenProvider?.accessToken?.token
+                        if (newAccessToken != null) {
                             newRequest = response.request().newBuilder()
-                                    .header(HEADER_AUTHORIZATION, newBearerAuth)
+                                    .header(HEADER_AUTHORIZATION, "Bearer $newAccessToken")
                                     .build()
                         }
 
@@ -77,12 +79,12 @@ internal class NetworkAuthenticator(private val network: NetworkService, private
                 APIErrorType.SUSPENDED_USER,
                 APIErrorType.ACCOUNT_LOCKED,
                 APIErrorType.OTHER_AUTHORISATION -> {
-                    network.triggerForcedLogout()
+                    network.tokenInvalidated()
                 }
 
                 else -> {
                     // Any other 401
-                    network.triggerForcedLogout()
+                    network.tokenInvalidated()
                 }
             }
         }

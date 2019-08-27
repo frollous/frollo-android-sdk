@@ -16,7 +16,8 @@
 
 package us.frollo.frollosdk.core
 
-import us.frollo.frollosdk.authentication.Authentication
+import us.frollo.frollosdk.authentication.AccessTokenProvider
+import us.frollo.frollosdk.authentication.AuthenticationCallback
 import us.frollo.frollosdk.authentication.AuthenticationType
 
 internal fun testSDKConfig(
@@ -38,11 +39,12 @@ internal fun testSDKConfig(
                 serverUrl = serverUrl ?: "https://api.example.com/")
 
 internal fun testSDKCustomConfig(
-    authentication: Authentication,
+    accessTokenProvider: AccessTokenProvider,
+    authenticationCallback: AuthenticationCallback,
     clientId: String? = null,
     serverUrl: String? = null
 ) =
         FrolloSDKConfiguration(
-                authenticationType = AuthenticationType.Custom(authentication = authentication),
+                authenticationType = AuthenticationType.Custom(accessTokenProvider, authenticationCallback),
                 clientId = clientId ?: "abc123",
                 serverUrl = serverUrl ?: "https://api.example.com/")

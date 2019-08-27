@@ -96,13 +96,13 @@ class EventsTest : BaseAndroidTest() {
     fun testTriggerEventFailsIfLoggedOut() {
         initSetup()
 
-        preferences.loggedIn = false
+        clearLoggedInPreferences()
 
         events.triggerEvent("TEST_EVENT", 15) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             Assert.assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.LOGGED_OUT, (result.error as DataError).subType)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)

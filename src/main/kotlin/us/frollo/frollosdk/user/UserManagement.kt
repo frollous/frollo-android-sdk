@@ -21,8 +21,7 @@ import androidx.lifecycle.Transformations
 import okhttp3.Request
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import us.frollo.frollosdk.authentication.Authentication
-import us.frollo.frollosdk.authentication.AuthenticationCallback
+import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.ACTION
@@ -63,9 +62,7 @@ class UserManagement(
     private val network: NetworkService,
     private val clientId: String,
     private val db: SDKDatabase,
-    private val pref: Preferences,
-    private val authentication: Authentication,
-    private val authenticationCallback: AuthenticationCallback
+    private val pref: Preferences
 ) {
 
     companion object {
@@ -91,13 +88,6 @@ class UserManagement(
      * @param completion A completion handler once the API has returned and the cache has been updated. Returns any error that occurred during the process. (Optional)
      */
     fun refreshUser(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#refreshUser", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         userAPI.fetchUser().enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -133,13 +123,6 @@ class UserManagement(
         password: String,
         completion: OnFrolloSDKCompletionListener<Result>
     ) {
-        if (authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
-            Log.e("$TAG#registerUser", error.localizedDescription)
-            completion.invoke(Result.error(error))
-            return
-        }
-
         // Create the user on the server and at the authorization endpoint
         val request = UserRegisterRequest(
                 firstName = firstName,
@@ -171,13 +154,6 @@ class UserManagement(
      * @param completion A completion handler once the API has returned and the cache has been updated. Returns any error that occurred during the process.
      */
     fun updateUser(user: User, completion: OnFrolloSDKCompletionListener<Result>) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#updateUser", error.localizedDescription)
-            completion.invoke(Result.error(error))
-            return
-        }
-
         userAPI.updateUser(user.updateRequest()).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -197,13 +173,6 @@ class UserManagement(
      * @param completion A completion handler once the API has returned and the cache has been updated. Returns any error that occurred during the process.
      */
     fun updateAttribution(attribution: Attribution, completion: OnFrolloSDKCompletionListener<Result>) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#updateAttribution", error.localizedDescription)
-            completion.invoke(Result.error(error))
-            return
-        }
-
         userAPI.updateUser(UserUpdateRequest(attribution = attribution)).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -223,13 +192,6 @@ class UserManagement(
      * @param completion Completion handler with any error that occurred
      */
     fun deleteUser(completion: OnFrolloSDKCompletionListener<Result>) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#deleteUser", error.localizedDescription)
-            completion.invoke(Result.error(error))
-            return
-        }
-
         userAPI.deleteUser().enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -251,13 +213,6 @@ class UserManagement(
      * @param completion Completion handler with any error that occurred
      */
     fun changePassword(currentPassword: String?, newPassword: String, completion: OnFrolloSDKCompletionListener<Result>) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#changePassword", error.localizedDescription)
-            completion.invoke(Result.error(error))
-            return
-        }
-
         val request = UserChangePasswordRequest(
                 currentPassword = currentPassword, // currentPassword can be for Facebook login only
                 newPassword = newPassword)
@@ -323,13 +278,6 @@ class UserManagement(
      * @param completion Completion handler with any error that occurred (optional)
      */
     internal fun updateDevice(compliant: Boolean? = null, notificationToken: String? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            Log.e("$TAG#updateDevice", error.localizedDescription)
-            completion?.invoke(Result.error(error))
-            return
-        }
-
         val request = DeviceUpdateRequest(
                 deviceId = di.deviceId,
                 deviceType = di.deviceType,
@@ -358,12 +306,6 @@ class UserManagement(
      * @param completion: Completion handler with any error that occurred
      */
     fun migrateUser(password: String, completion: OnFrolloSDKCompletionListener<Result>) {
-        if (!authentication.loggedIn) {
-            val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.LOGGED_OUT)
-            completion.invoke(Result.error(error))
-            return
-        }
-
         val refreshToken = network.authToken.getRefreshToken()
 
         if (refreshToken == null) {
@@ -423,6 +365,6 @@ class UserManagement(
     }
 
     internal fun reset(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        authenticationCallback.authenticationReset(completion)
+        if (FrolloSDK.isSetup) FrolloSDK.reset(completion)
     }
 }

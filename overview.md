@@ -28,7 +28,7 @@ Authentication is supported using the following OAuth2 flows:
 
 Authentication provides the access token needed to access Frollo APIs and manages refreshing the access token if it expires.
 
-See [Authentication](us.frollo.frollosdk.authentication/-authentication/index.html) for more details.
+See [OAuth2Authentication](us.frollo.frollosdk.authentication/-o-auth2-authentication/index.html) for more details.
 
 ### User
 
@@ -46,7 +46,7 @@ The following are available depending on how authentication and users are config
 * Changing the user's password
 * Reset password
 
-See [Authentication](us.frollo.frollosdk.authentication/-authentication/index.html) for more details.
+See [UserManagement](us.frollo.frollosdk.user/-user-management/index.html) for more details.
 
 ### Aggregation
 

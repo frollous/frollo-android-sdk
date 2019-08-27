@@ -5,7 +5,7 @@
 Import the FrolloSDK and ensure you run setup with your tenant URL provided by us. Do not attempt to use any APIs before the setup completion handler returns. You will also need to pass in your custom authentication handler or use the default OAuth2 implementation.
 
 ```kotlin
-    class StartupActivity : AppCompatActivity() {
+    class MyApplication : Application() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
 
@@ -21,7 +21,9 @@ Import the FrolloSDK and ensure you run setup with your tenant URL provided by u
             // Custom Authentication Config
             val customAuthentication = CustomAuthentication()
             val configuration = FrolloSDKConfiguration(
-                                      authenticationType = Custom(authentication = CustomAuthentication()),
+                                      authenticationType = Custom(
+                                              accessTokenProvider = customAuthentication,
+                                              authenticationCallback = customAuthentication),
                                       clientId = "<APPLICATION_CLIENT_ID>",
                                       serverUrl = "https://<API_TENANT>.frollo.us/api/v2/")
 
@@ -37,21 +39,21 @@ Import the FrolloSDK and ensure you run setup with your tenant URL provided by u
 
 ### Authentication
 
-Before any data can be refreshed for a user they must be authenticated first. You can check the logged in status of the user on the [Authentication](us.frollo.frollosdk.authentication/-authentication/index.html) class.
+Before any data can be refreshed for a user they must be authenticated first. If using OAuth2 authentication you can check the logged in status of the user on the [OAuth2Authentication](us.frollo.frollosdk.authentication/-o-auth2-authentication/index.html) class.
 
 ```kotlin
-    if (FrolloSDK.authentication.loggedIn) {
+    if (FrolloSDK.oAuth2Authentication.loggedIn) {
         showMainActivity()
     } else {
         showLoginActivity()
     }
 ```
 
-If the user is not authenticated then the user must login or an access token must be provided by the Authentication class. Authentication can be done using OAuth2 or a custom implementation can be provided if you wish to manage the user's access token manually or share it with other APIs.
+If the user is not authenticated then the user must login or an access token must be provided by the custom Authentication access token provider. Authentication can be done using OAuth2 or a custom implementation can be provided if you wish to manage the user's access token manually or share it with other APIs.
 
 #### OAuth2 Authentication
 
-Using OAuth2 based authentication Resource Owner Password Credential flow and Authorization Code with PKCE flow are supported. Identity Providers must be OpenID Connect compliant to use the in-built [OAuth2Authentication](us.frollo.frollosdk.authentication/-o-auth2-authentication/index.html) authentication class. If using OAuth2 authentication you can use [defaultAuthentication](us.frollo.frollosdk/-frollo-s-d-k/default-authentication.html)
+Using OAuth2 based authentication Resource Owner Password Credential flow and Authorization Code with PKCE flow are supported. Identity Providers must be OpenID Connect compliant to use the in-built [OAuth2Authentication](us.frollo.frollosdk.authentication/-o-auth2-authentication/index.html) authentication class. If using OAuth2 authentication you can use [oAuth2Authentication](us.frollo.frollosdk/-frollo-s-d-k/o-auth2-authentication.html)
 
 ##### ROPC Flow
 
@@ -61,7 +63,7 @@ See [loginUser(email:password:completion:)](us.frollo.frollosdk.authentication/-
 
 
 ```kotlin
-    FrolloSDK.defaultAuthentication.loginUser(email = "jacob@example.com", password = "$uPer5ecr@t") { result ->
+    FrolloSDK.oAuth2Authentication.loginUser(email = "jacob@example.com", password = "$uPer5ecr@t") { result ->
         when (result.status) {
             Result.Status.ERROR -> displayError(result.error?.localizedDescription, "Login Failed")
             Result.Status.SUCCESS -> completeLogin()
@@ -128,7 +130,7 @@ Completion intent and Cancelled intent should be provided to the SDK to support 
             cancelIntent.putExtra(EXTRA_FAILED, true)
             cancelIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
 
-            FrolloSDK.defaultAuthentication.loginUserUsingWeb(
+            FrolloSDK.oAuth2Authentication.loginUserUsingWeb(
                     activity = this,
                     scopes = listOf(OAuth2Scope.OFFLINE_ACCESS, OAuth2Scope.EMAIL, OAuth2Scope.OPENID),
                     completedIntent = PendingIntent.getActivity(this, 0, completionIntent, 0),
@@ -145,7 +147,7 @@ The next step is to pass the intent received by the Completion Activity to the S
 
         override fun onCreate(savedInstanceState: Bundle?) {
             //...
-            FrolloSDK.defaultAuthentication.handleWebLoginResponse(intent) { result ->
+            FrolloSDK.oAuth2Authentication.handleWebLoginResponse(intent) { result ->
                 when (result.status) {
                     Result.Status.SUCCESS -> {
                         startActivity<MainActivity>()
@@ -202,25 +204,7 @@ The next step is to pass the intent received by the Completion Activity to the S
 
 #### Custom Authentication
 
-Custom authentication can be provided by extending the [Authentication](us.frollo.frollosdk.authentication/-authentication/index.html) abstract class and ensuring [refreshTokens(completion:)](us.frollo.frollosdk.authentication/-authentication/refresh-tokens.html) and calls to the tokenCallback are implemented appropriately.
-
-Also you have to add below code to initialize the authentication callbacks to SDK in your Application class.
-
-```kotlin
-    class MyApplication : Application(), LifecycleObserver {
-
-        override fun onCreate() {
-            super.onCreate()
-
-            ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        }
-
-        @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-        fun onAppResumed() {
-            FrolloSDK.initializeAuthenticationCallbacks(yourCustomAuthentication)
-        }
-    }
-```
+Custom authentication can be provided by conforming to the [AccessTokenProvider](us.frollo.frollosdk.authentication/-access-token-provider/index.html) interface and [AuthenticationCallback](us.frollo.frollosdk.authentication/-authentication-callback/index.html) interface ensuring all interface functions are implemented appropriately.
 
 #### Refreshing Data
 
@@ -263,21 +247,17 @@ Optionally implement the lifecycle handlers by extending Application class to en
 
         override fun onCreate() {
             super.onCreate()
-
             ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         }
 
         @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
         fun onAppBackgrounded() {
-
             FrolloSDK.onAppBackgrounded()
         }
 
         @OnLifecycleEvent(Lifecycle.Event.ON_START)
         fun onAppForegrounded() {
-
-            if (FrolloSDK.authentication.loggedIn)
-                FrolloSDK.onAppForegrounded()
+            FrolloSDK.onAppForegrounded()
         }
     }
 ```

@@ -49,23 +49,15 @@ import us.frollo.frollosdk.testutils.wait
 
 class OAuth2AuthenticationTest : BaseAndroidTest() {
 
-    private lateinit var localAuthentication: OAuth2Authentication
-
-    override fun initSetup() {
-        super.initSetup()
-
-        localAuthentication = authentication as OAuth2Authentication
-    }
-
     @Test
     fun testGetLoggedIn() {
         initSetup()
 
-        assertFalse(authentication.loggedIn)
+        assertFalse(oAuth2Authentication.loggedIn)
 
         preferences.loggedIn = true
 
-        assertTrue(authentication.loggedIn)
+        assertTrue(oAuth2Authentication.loggedIn)
 
         tearDown()
     }
@@ -85,11 +77,11 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             }
         })
 
-        localAuthentication.loginUser("user@frollo.us", "password", scopes) { result ->
+        oAuth2Authentication.loginUser("user@frollo.us", "password", scopes) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            assertTrue(authentication.loggedIn)
+            assertTrue(oAuth2Authentication.loggedIn)
             assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
             assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
             assertEquals(2550794799, preferences.accessTokenExpiry)
@@ -118,7 +110,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             }
         })
 
-        localAuthentication.loginUser("user@frollo.us", "wrong_password", scopes) { result ->
+        oAuth2Authentication.loginUser("user@frollo.us", "wrong_password", scopes) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
@@ -127,7 +119,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             assertNull(testObserver.value().data)
 
             assertEquals(OAuth2ErrorType.INVALID_CLIENT, (result.error as OAuth2Error).type)
-            assertFalse(authentication.loggedIn)
+            assertFalse(oAuth2Authentication.loggedIn)
 
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
@@ -159,8 +151,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
 
         preferences.loggedIn = true
 
-        localAuthentication.loginUser("user@frollo.us", "password", scopes) { result ->
-            assertTrue(authentication.loggedIn)
+        oAuth2Authentication.loginUser("user@frollo.us", "password", scopes) { result ->
+            assertTrue(oAuth2Authentication.loggedIn)
 
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
@@ -204,11 +196,11 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
         val json = readStringFromJson(app, R.raw.authorization_code_valid)
         val intent = Intent().putExtra("net.openid.appauth.AuthorizationResponse", json)
 
-        localAuthentication.handleWebLoginResponse(intent, scopes) { result ->
+        oAuth2Authentication.handleWebLoginResponse(intent, scopes) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            assertTrue(authentication.loggedIn)
+            assertTrue(oAuth2Authentication.loggedIn)
             assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
             assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
             assertEquals(2550794799, preferences.accessTokenExpiry)
@@ -228,13 +220,13 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
 
         val intent = AuthorizationException.AuthorizationRequestErrors.ACCESS_DENIED.toIntent()
 
-        localAuthentication.handleWebLoginResponse(intent, scopes) { result ->
+        oAuth2Authentication.handleWebLoginResponse(intent, scopes) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
             assertEquals(OAuth2ErrorType.ACCESS_DENIED, (result.error as OAuth2Error).type)
 
-            assertFalse(authentication.loggedIn)
+            assertFalse(oAuth2Authentication.loggedIn)
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1L, preferences.accessTokenExpiry)
@@ -265,11 +257,11 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             }
         })
 
-        authentication.logout()
+        oAuth2Authentication.logout()
 
         wait(2)
 
-        assertFalse(authentication.loggedIn)
+        assertFalse(oAuth2Authentication.loggedIn)
         assertNull(preferences.encryptedAccessToken)
         assertNull(preferences.encryptedRefreshToken)
         assertEquals(-1, preferences.accessTokenExpiry)
@@ -306,7 +298,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             assertTrue(result.error is APIError)
             assertEquals(APIErrorType.SUSPENDED_DEVICE, (result.error as APIError).type)
 
-            assertFalse(authentication.loggedIn)
+            assertFalse(oAuth2Authentication.loggedIn)
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1, preferences.accessTokenExpiry)
@@ -337,7 +329,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             }
         })
 
-        authentication.refreshTokens { result ->
+        oAuth2Authentication.refreshTokens { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
@@ -366,11 +358,11 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             }
         })
 
-        localAuthentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32), scopes = scopes) { result ->
+        oAuth2Authentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32), scopes = scopes) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            assertTrue(authentication.loggedIn)
+            assertTrue(oAuth2Authentication.loggedIn)
             assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
             assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
             assertEquals(2550794799, preferences.accessTokenExpiry)
@@ -399,13 +391,13 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             }
         })
 
-        localAuthentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32), scopes = scopes) { result ->
+        oAuth2Authentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32), scopes = scopes) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
             assertEquals(OAuth2ErrorType.INVALID_CLIENT, (result.error as OAuth2Error).type)
 
-            assertFalse(authentication.loggedIn)
+            assertFalse(oAuth2Authentication.loggedIn)
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1L, preferences.accessTokenExpiry)
@@ -436,7 +428,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
 
         preferences.loggedIn = true
 
-        localAuthentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32), scopes = scopes) { result ->
+        oAuth2Authentication.exchangeAuthorizationCode(code = randomString(32), codeVerifier = randomString(32), scopes = scopes) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
@@ -468,11 +460,11 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
 
         val legacyToken = randomString(32)
 
-        localAuthentication.exchangeLegacyToken(legacyToken = legacyToken) { result ->
+        oAuth2Authentication.exchangeLegacyToken(legacyToken = legacyToken) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            assertTrue(authentication.loggedIn)
+            assertTrue(oAuth2Authentication.loggedIn)
             assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
             assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
             assertEquals(2550794799, preferences.accessTokenExpiry)
@@ -503,13 +495,13 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
 
         val legacyToken = randomString(32)
 
-        localAuthentication.exchangeLegacyToken(legacyToken = legacyToken) { result ->
+        oAuth2Authentication.exchangeLegacyToken(legacyToken = legacyToken) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
 
             assertEquals(OAuth2ErrorType.INVALID_GRANT, (result.error as OAuth2Error).type)
 
-            assertFalse(authentication.loggedIn)
+            assertFalse(oAuth2Authentication.loggedIn)
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1L, preferences.accessTokenExpiry)
@@ -532,11 +524,11 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        assertTrue(authentication.loggedIn)
+        assertTrue(oAuth2Authentication.loggedIn)
 
-        authentication.reset()
+        oAuth2Authentication.reset()
 
-        assertFalse(authentication.loggedIn)
+        assertFalse(oAuth2Authentication.loggedIn)
         assertNull(preferences.encryptedAccessToken)
         assertNull(preferences.encryptedRefreshToken)
         assertEquals(-1, preferences.accessTokenExpiry)

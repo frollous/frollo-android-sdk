@@ -31,14 +31,12 @@ import us.frollo.frollosdk.logging.LogLevel
  * @param clientId OAuth2 Client identifier. The unique identifier of the application implementing the SDK
  * @param serverUrl Base URL of the Frollo API this SDK should point to
  * @param logLevel Level of logging for debug and error messages. Default is [LogLevel.ERROR]
- * @param preemptiveRefreshTime Time before expiry to refresh an access token. Defaults to 3 minutes. Set to 0 to disable
  */
 data class FrolloSDKConfiguration(
     val authenticationType: AuthenticationType,
     val clientId: String,
     val serverUrl: String,
-    val logLevel: LogLevel = LogLevel.ERROR,
-    val preemptiveRefreshTime: Long = 180 // 3 minutes
+    val logLevel: LogLevel = LogLevel.ERROR
 ) {
 
     internal fun validForROPC(): Boolean {

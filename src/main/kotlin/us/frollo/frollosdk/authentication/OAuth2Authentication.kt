@@ -77,10 +77,15 @@ class OAuth2Authentication(
     private var isRefreshingToken = false
 
     /**
-     * Access Token
+     * Access token to use for authorization
      */
     override val accessToken: AccessToken?
         get() = authToken?.getAccessToken()?.let { AccessToken(token = it, expiry = authToken?.getAccessTokenExpiry()) } ?: run { null }
+
+    /**
+     * Time in seconds the access token should pre-emptively be refreshed before it expires
+     */
+    override val preemptiveRefreshTime: Long = 180 // 3 minutes
 
     /**
      * Login a user via WebView

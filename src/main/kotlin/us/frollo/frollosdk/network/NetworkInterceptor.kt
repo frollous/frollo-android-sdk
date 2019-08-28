@@ -121,17 +121,18 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
     }
 
     private fun validAccessToken(): Boolean {
+        val accessTokenProvider = network.accessTokenProvider
+
         // Check we have an access token
-        if (network.accessTokenProvider?.accessToken == null)
+        if (accessTokenProvider?.accessToken == null)
             return false
 
         // Check if we have an expiry date otherwise assume it's still good
-        val expiry = network.accessTokenProvider?.accessToken?.expiry
+        val expiry = accessTokenProvider.accessToken?.expiry
         if (expiry == null || expiry < 0L)
             return true
 
-        val preemptiveRefreshTime = if (network.oAuth2Helper.config.preemptiveRefreshTime < 0L) 0
-        else network.oAuth2Helper.config.preemptiveRefreshTime
+        val preemptiveRefreshTime = if (accessTokenProvider.preemptiveRefreshTime < 0L) 0 else accessTokenProvider.preemptiveRefreshTime
         val expiryDate = LocalDateTime.ofEpochSecond(expiry, 0, ZoneOffset.UTC)
         val adjustedExpiryDate = expiryDate.plusSeconds(-preemptiveRefreshTime)
         val nowDate = LocalDateTime.now(ZoneOffset.UTC)

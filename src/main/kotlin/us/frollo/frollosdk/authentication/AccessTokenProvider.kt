@@ -26,4 +26,10 @@ interface AccessTokenProvider {
      * Access token to use for authorization if available. If this is not available network requests will not proceed
      */
     val accessToken: AccessToken?
+
+    /**
+     * Time in seconds the access token should pre-emptively be refreshed before it expires. Optional, otherwise token will be refreshed on a 401
+     */
+    val preemptiveRefreshTime: Long
+        get() = 0
 }

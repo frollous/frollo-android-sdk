@@ -16,8 +16,6 @@
 
 package us.frollo.frollosdk.authentication
 
-import us.frollo.frollosdk.core.FrolloSDKConfiguration
-
 /**
  * Represents an access token and the corresponding expiry date if possible
  */
@@ -28,7 +26,7 @@ data class AccessToken(
     /**
      * Indicates the number of seconds since the Unix Epoch (UTC) when the access token expires so SDK can pre-emptively request a new one
      *
-     * See also [FrolloSDKConfiguration.preemptiveRefreshTime]
+     * See also [AccessTokenProvider.preemptiveRefreshTime]
      */
     val expiry: Long? = null
 )

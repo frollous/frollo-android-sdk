@@ -5,41 +5,72 @@
 - Android Studio 3.5+
 - Kotlin version 1.3.41+
 - Gradle tools plugin version 3.5.0+ - In your project level **build.gradle**
-    ```    
-        dependencies {    
-            classpath "com.android.tools.build:gradle:3.5.0"
-            //..    
-        }    
+    ```
+    dependencies {
+        classpath "com.android.tools.build:gradle:3.5.0"
+        //..
+    }
     ```
 - Gradle version must be 5.4.1+
 
     Modify Gradle version in your **gradle_wrapper.properties** as below
 
     ```
-        distributionUrl=https\://services.gradle.org/distributions/gradle-5.4.1-all.zip
+    distributionUrl=https\://services.gradle.org/distributions/gradle-5.4.1-all.zip
     ```
-- You need to define a **appAuthRedirectScheme** in your module level **build.gradle**. This should be unique redirect uri for your app.    
-
-    Example: If your redirect url is `frollo-sdk-example://authorize`, then you would do as below
-
-    ```
-        defaultConfig {
-            //..
-            manifestPlaceholders = [
-                'appAuthRedirectScheme': 'frollo-sdk-example'
-            ]
-            //..
-        }
-    ```
-    For more details see **Integration Requirements** under **OAuth2 Authentication using Authorization Code**
     
 - **minSdkVersion** in your gradle file must be **23** or above. Frollo SDK does not support Android versions below Marshmallow (6.0).
-- Frollo SDK disables auto-backup by default to ensure no data persists between installs. You might run into conflicts during integration if your app has defined **android:allowBackup="true"** in its manifest. Either you can disable auto-backup for your app or override by adding **tools:replace="android:allowBackup"** to **`<application>`** element in your **AndroidManifest.xml**.
+    ```
+    defaultConfig {
+        //..
+        minSdkVersion 23
+        //..
+    }
+    ```
+
 - Use AndroidX for your project instead of legacy support libraries. You can either enable "**Use AndroidX**" checkbox while creating a new Android project in Android Studio or migrate your existing project to AndroidX - [Migrating to AndroidX](https://developer.android.com/jetpack/androidx/migrate)
 
 ### Integration instructions
 
 To integrate Frollo Android SDK to your Android app use the following steps:
+
+#### Integration using AAR file
+
+1. Goto File > New > New Module > Import JAR/AAR Package
+2. Select the file frollo-android-sdk-release-3.0.0.aar and Finish
+3. Add below line to the dependencies in your **app/build.gradle** file
+    ```
+    dependencies {
+        //..
+        implementation project(":frollo-android-sdk-release-3.0.0")
+    }
+    ```
+4. Copy the provided frollosdk.gradle file to your project's root directory
+5. Add this line just below your apply plugins in your **app/build.gradle** file
+    ```
+    apply from: '../frollosdk.gradle'
+    ```
+4. Define a **appAuthRedirectScheme** in your module level **build.gradle**. This should be unique redirect uri for your app.
+
+   Example: If your redirect url is `frollo-sdk-example://authorize`, then you would do as below
+   ```
+   defaultConfig {
+       //..
+       manifestPlaceholders = ['appAuthRedirectScheme': 'frollo-sdk-example']
+       //..
+   }
+   ```
+   For more details see **Integration Requirements** under **OAuth2 Authentication using Authorization Code**
+5. Frollo SDK disables auto-backup by default to ensure no data persists between installs. You might run into conflicts during integration if your app has defined **android:allowBackup="true"** in its manifest. Either you can disable auto-backup for your app or override by adding **tools:replace="android:allowBackup"** to **`<application>`** element in your **AndroidManifest.xml**.
+6. If you have enabled progaurd please add below lines to your progaurd rules file
+   ```
+   # KEEP FROM OBFUCATION - Frollo SDK
+   -keep class us.frollo.frollosdk.** {*;}
+   -keepclassmembers  class us.frollo.frollosdk.** {*;}
+   ```
+7. Build!
+
+#### Integration by cloning SDK code base
 
 1. Pull the Frollo SDK code base    
 
@@ -63,17 +94,36 @@ To integrate Frollo Android SDK to your Android app use the following steps:
     
       `git fetch`    
             
-      `git checkout release/2.1.0` (replace the version number with the most stable version number)    
+      `git checkout release/3.0.0` (replace the version number with the most stable version number)
 
 2. Add _frollo-android-sdk_ module to your **settings.gradle** file
 
     `include ':app', ':frollo-android-sdk'`
 
 3. Add below line to the dependencies in your **app/build.gradle** file    
-    ```    
-        dependencies {    
-            //..    
-            implementation project(":frollo-android-sdk")    
-        }    
     ```
-4. Build! 👷‍♂️
+    dependencies {
+        //..
+        implementation project(":frollo-android-sdk")
+    }
+    ```
+4. Define a **appAuthRedirectScheme** in your module level **build.gradle**. This should be unique redirect uri for your app.
+
+   Example: If your redirect url is `frollo-sdk-example://authorize`, then you would do as below
+
+   ```
+   defaultConfig {
+       //..
+       manifestPlaceholders = ['appAuthRedirectScheme': 'frollo-sdk-example']
+       //..
+   }
+   ```
+   For more details see **Integration Requirements** under **OAuth2 Authentication using Authorization Code**
+5. Frollo SDK disables auto-backup by default to ensure no data persists between installs. You might run into conflicts during integration if your app has defined **android:allowBackup="true"** in its manifest. Either you can disable auto-backup for your app or override by adding **tools:replace="android:allowBackup"** to **`<application>`** element in your **AndroidManifest.xml**.
+6. If you have enabled progaurd please add below lines to your progaurd rules file
+   ```
+   # KEEP FROM OBFUCATION - Frollo SDK
+   -keep class us.frollo.frollosdk.** {*;}
+   -keepclassmembers  class us.frollo.frollosdk.** {*;}
+   ```
+7. Build! 👷‍♂️

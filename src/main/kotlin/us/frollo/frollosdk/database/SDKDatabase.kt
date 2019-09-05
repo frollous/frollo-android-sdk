@@ -210,10 +210,22 @@ abstract class SDKDatabase : RoomDatabase() {
                 // 1) Alter provider_account table - add column external_id
                 // 2) Alter account table - add column external_id
                 // 3) Alter transaction_model table - add column external_id
+                // 4) Alter table/entity merchant - make smallLogoUrl nullable
 
                 database.execSQL("ALTER TABLE `provider_account` ADD COLUMN `external_id` TEXT NOT NULL DEFAULT ''")
                 database.execSQL("ALTER TABLE `account` ADD COLUMN `external_id` TEXT NOT NULL DEFAULT ''")
                 database.execSQL("ALTER TABLE `transaction_model` ADD COLUMN `external_id` TEXT NOT NULL DEFAULT ''")
+
+                // START - Alter column smallLogoUrl
+                database.execSQL("BEGIN TRANSACTION")
+                database.execSQL("DROP INDEX IF EXISTS index_merchant_merchant_id")
+                database.execSQL("ALTER TABLE merchant RENAME TO orig_merchant")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `merchant` (`merchant_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `merchant_type` TEXT NOT NULL, `small_logo_url` TEXT, PRIMARY KEY(`merchant_id`))")
+                database.execSQL("CREATE INDEX `index_merchant_merchant_id` ON `merchant` (`merchant_id`)")
+                database.execSQL("INSERT INTO merchant(merchant_id, name, merchant_type, small_logo_url) SELECT merchant_id, name, merchant_type, small_logo_url FROM orig_merchant")
+                database.execSQL("DROP TABLE orig_merchant")
+                database.execSQL("COMMIT")
+                // END - Alter column smallLogoUrl
             }
         }
     }

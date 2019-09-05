@@ -41,6 +41,6 @@ data class Merchant(
     @ColumnInfo(name = "merchant_type") val merchantType: MerchantType,
 
     /** URL of the merchant's small logo image */
-    @ColumnInfo(name = "small_logo_url") val smallLogoUrl: String
+    @ColumnInfo(name = "small_logo_url") val smallLogoUrl: String?
 
 ) : IAdapterModel

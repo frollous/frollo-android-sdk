@@ -5,6 +5,7 @@
 #### Changes
 - Improved custom authentication making it easier to implement
 - Add externalId for mapping external aggregator ID for ProviderAccounts, Accounts & Transactions
+- Allow merchant image to be optional
 
 ### 2.1.0
 

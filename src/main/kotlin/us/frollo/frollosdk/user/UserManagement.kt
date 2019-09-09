@@ -141,7 +141,6 @@ class UserManagement(
                     completion.invoke(Result.error(userResource.error))
                 }
                 Resource.Status.SUCCESS -> {
-                    updateDevice()
                     handleUserResponse(userResource.data, completion)
                 }
             }

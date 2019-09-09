@@ -37,7 +37,7 @@ internal class NetworkHelper {
     }
 
     internal val bundleId: String
-        get() = BuildConfig.APPLICATION_ID
+        get() = BuildConfig.LIBRARY_PACKAGE_NAME
 
     internal val softwareVersion: String
         get() = "SDK${BuildConfig.VERSION_NAME}-B${BuildConfig.VERSION_CODE}"
@@ -47,7 +47,7 @@ internal class NetworkHelper {
 
     // "us.frollo.frollosdk|SDK1.0.0|B777|Android8.1.0|API2.0"
     internal val userAgent: String
-        get() = "${BuildConfig.APPLICATION_ID}|SDK${BuildConfig.VERSION_NAME}|B${BuildConfig.VERSION_CODE}|Android${Build.VERSION.RELEASE}|API$API_VERSION"
+        get() = "${BuildConfig.LIBRARY_PACKAGE_NAME}|SDK${BuildConfig.VERSION_NAME}|B${BuildConfig.VERSION_CODE}|Android${Build.VERSION.RELEASE}|API$API_VERSION"
 
     internal fun addAdditionalHeaders(builder: Request.Builder) {
         builder.removeHeader(HEADER_API_VERSION).addHeader(HEADER_API_VERSION, API_VERSION)

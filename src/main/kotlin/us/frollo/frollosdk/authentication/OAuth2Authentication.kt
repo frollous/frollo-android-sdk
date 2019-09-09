@@ -40,6 +40,7 @@ import us.frollo.frollosdk.extensions.handleOAuth2Failure
 import us.frollo.frollosdk.extensions.notify
 import us.frollo.frollosdk.model.oauth.OAuth2Scope
 import us.frollo.frollosdk.logging.Log
+import us.frollo.frollosdk.model.oauth.OAuthTokenRequest
 import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
 import us.frollo.frollosdk.model.oauth.OAuthTokenRevokeRequest
 import us.frollo.frollosdk.network.ApiResponse
@@ -214,27 +215,7 @@ class OAuth2Authentication(
         }
 
         // Authorize the user
-        tokenAPI?.refreshTokens(request)?.enqueue(ErrorResponseType.OAUTH2) { resource ->
-            when (resource.status) {
-                Resource.Status.ERROR -> {
-                    Log.e("$TAG#loginUser.refreshTokens", resource.error?.localizedDescription)
-
-                    completion.invoke(Result.error(resource.error))
-                }
-
-                Resource.Status.SUCCESS -> {
-                    resource.data?.let { response ->
-                        handleTokens(response)
-
-                        setLoggedIn()
-
-                        completion.invoke(Result.success())
-                    } ?: run {
-                        completion.invoke(Result.error(DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_ACCESS_TOKEN)))
-                    }
-                }
-            }
-        }
+        authorizeUser(request, completion, "loginUser")
     }
 
     /**
@@ -260,27 +241,7 @@ class OAuth2Authentication(
         }
 
         // Authorize the user
-        tokenAPI?.refreshTokens(request)?.enqueue(ErrorResponseType.OAUTH2) { resource ->
-            when (resource.status) {
-                Resource.Status.ERROR -> {
-                    Log.e("$TAG#exchangeAuthorizationCode.refreshTokens", resource.error?.localizedDescription)
-
-                    completion.invoke(Result.error(resource.error))
-                }
-
-                Resource.Status.SUCCESS -> {
-                    resource.data?.let { response ->
-                        handleTokens(response)
-
-                        setLoggedIn()
-
-                        completion.invoke(Result.success())
-                    } ?: run {
-                        completion.invoke(Result.error(DataError(DataErrorType.AUTHENTICATION, DataErrorSubType.MISSING_ACCESS_TOKEN)))
-                    }
-                }
-            }
-        }
+        authorizeUser(request, completion, "exchangeAuthorizationCode")
     }
 
     /**
@@ -297,10 +258,15 @@ class OAuth2Authentication(
             return
         }
 
+        // Authorize the user
+        authorizeUser(request, completion, "exchangeLegacyToken")
+    }
+
+    private fun authorizeUser(request: OAuthTokenRequest, completion: OnFrolloSDKCompletionListener<Result>, tagRef: String) {
         tokenAPI?.refreshTokens(request)?.enqueue(ErrorResponseType.OAUTH2) { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#exchangeToken.refreshTokens", resource.error?.localizedDescription)
+                    Log.e("$TAG#$tagRef.refreshTokens", resource.error?.localizedDescription)
 
                     completion.invoke(Result.error(resource.error))
                 }
@@ -310,6 +276,8 @@ class OAuth2Authentication(
                         handleTokens(response)
 
                         setLoggedIn()
+
+                        updateDevice()
 
                         completion.invoke(Result.success())
                     } ?: run {
@@ -426,6 +394,10 @@ class OAuth2Authentication(
             notify(ACTION.ACTION_AUTHENTICATION_CHANGED,
                     bundleOf(Pair(ARGUMENT.ARG_AUTHENTICATION_STATUS, AuthenticationStatus.AUTHENTICATED)))
         }
+    }
+
+    private fun updateDevice() {
+        if (FrolloSDK.isSetup) FrolloSDK.userManagement.updateDevice()
     }
 
     private fun clearTokens() {

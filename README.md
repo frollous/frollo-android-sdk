@@ -50,7 +50,7 @@ To integrate Frollo Android SDK to your Android app use the following steps:
     ```
     apply from: '../frollosdk.gradle'
     ```
-4. Define a **appAuthRedirectScheme** in your module level **build.gradle**. This should be unique redirect uri for your app.
+6. Define a **appAuthRedirectScheme** in your module level **build.gradle**. This should be unique redirect uri for your app.
 
    Example: If your redirect url is `frollo-sdk-example://authorize`, then you would do as below
    ```
@@ -61,14 +61,14 @@ To integrate Frollo Android SDK to your Android app use the following steps:
    }
    ```
    For more details see **Integration Requirements** under **OAuth2 Authentication using Authorization Code**
-5. Frollo SDK disables auto-backup by default to ensure no data persists between installs. You might run into conflicts during integration if your app has defined **android:allowBackup="true"** in its manifest. Either you can disable auto-backup for your app or override by adding **tools:replace="android:allowBackup"** to **`<application>`** element in your **AndroidManifest.xml**.
-6. If you have enabled progaurd please add below lines to your progaurd rules file
+7. Frollo SDK disables auto-backup by default to ensure no data persists between installs. You might run into conflicts during integration if your app has defined **android:allowBackup="true"** in its manifest. Either you can disable auto-backup for your app or override by adding **tools:replace="android:allowBackup"** to **`<application>`** element in your **AndroidManifest.xml**.
+8. If you have enabled progaurd please add below lines to your progaurd rules file
    ```
    # KEEP FROM OBFUCATION - Frollo SDK
    -keep class us.frollo.frollosdk.** {*;}
    -keepclassmembers  class us.frollo.frollosdk.** {*;}
    ```
-7. Build!
+9. Build!
 
 #### Integration by cloning SDK code base
 
@@ -127,3 +127,50 @@ To integrate Frollo Android SDK to your Android app use the following steps:
    -keepclassmembers  class us.frollo.frollosdk.** {*;}
    ```
 7. Build! 👷‍♂️
+
+#### Integration using AAR file inside 'libs' folder of another library module
+
+1. Place the Frollo SDK AAR file inside the 'libs' folder in the desried library module
+2. Add below line to the dependencies in your **<_library module name_>/build.gradle** file
+    ```
+    dependencies {
+        //..
+        implementation(name: 'frollo-android-sdk-release-3.0.0', ext: 'aar')
+    }
+    ```
+3. Add below to your project level **build.gradle** file
+    ```
+    allprojects {
+        //..
+        repositories {
+            //..
+            flatDir {
+                dirs project(':<library module name>').file('libs')
+            }
+        }
+    }
+    ```
+4. Copy the provided frollosdk.gradle file to your library module's directory
+5. Add this line just below your apply plugins in your **<_library module name_>/build.gradle** file
+    ```
+    apply from: 'frollosdk.gradle'
+    ```
+6. Define a **appAuthRedirectScheme** in your **app** and **module** level **build.gradle** files. This should be unique redirect uri for your app.
+
+   Example: If your redirect url is `frollo-sdk-example://authorize`, then you would do as below
+   ```
+   defaultConfig {
+       //..
+       manifestPlaceholders = ['appAuthRedirectScheme': 'frollo-sdk-example']
+       //..
+   }
+   ```
+   For more details see **Integration Requirements** under **OAuth2 Authentication using Authorization Code**
+7. Frollo SDK disables auto-backup by default to ensure no data persists between installs. You might run into conflicts during integration if your app has defined **android:allowBackup="true"** in its manifest. Either you can disable auto-backup for your app or override by adding **tools:replace="android:allowBackup"** to **`<application>`** element in your **AndroidManifest.xml**.
+8. If you have enabled progaurd please add below lines to your progaurd rules file
+   ```
+   # KEEP FROM OBFUCATION - Frollo SDK
+   -keep class us.frollo.frollosdk.** {*;}
+   -keepclassmembers  class us.frollo.frollosdk.** {*;}
+   ```
+9. Build!

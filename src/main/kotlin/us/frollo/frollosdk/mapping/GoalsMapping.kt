@@ -45,7 +45,7 @@ internal fun GoalResponse.toGoal(): Goal =
                 estimatedEndDate = estimatedEndDate,
                 estimatedTargetAmount = estimatedTargetAmount,
                 periodsCount = periodsCount,
-                currentPeriod = currentPeriod.toGoalPeriod())
+                currentPeriod = currentPeriod?.toGoalPeriod())
 
 internal fun GoalPeriodResponse.toGoalPeriod(): GoalPeriod =
         GoalPeriod(

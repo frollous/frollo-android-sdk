@@ -47,5 +47,5 @@ internal data class GoalResponse(
     @SerializedName("estimated_end_date") val estimatedEndDate: String?, // yyyy-MM-dd
     @SerializedName("estimated_target_amount") val estimatedTargetAmount: BigDecimal?,
     @SerializedName("periods_count") val periodsCount: Int,
-    @SerializedName("current_period") val currentPeriod: GoalPeriodResponse
+    @SerializedName("current_period") val currentPeriod: GoalPeriodResponse?
 )

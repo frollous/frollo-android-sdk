@@ -27,7 +27,8 @@ internal data class TransactionHistoryReportResponse(
         @SerializedName("date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
         @SerializedName("value") val value: BigDecimal,
         @SerializedName("budget") val budget: BigDecimal?,
-        @SerializedName("groups") val groups: List<GroupReport>
+        @SerializedName("groups") val groups: List<GroupReport>,
+        @SerializedName("transaction_tags") val tags: List<String>?
     ) {
 
         internal data class GroupReport(
@@ -35,7 +36,8 @@ internal data class TransactionHistoryReportResponse(
             @SerializedName("name") val name: String,
             @SerializedName("budget") val budget: BigDecimal?,
             @SerializedName("value") val value: BigDecimal,
-            @SerializedName("transaction_ids") val transactionIds: List<Long>
+            @SerializedName("transaction_ids") val transactionIds: List<Long>,
+            @SerializedName("transaction_tags") val tags: List<String>?
         )
     }
 }

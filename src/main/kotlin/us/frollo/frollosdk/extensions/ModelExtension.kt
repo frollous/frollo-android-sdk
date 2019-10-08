@@ -42,6 +42,7 @@ import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
+import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.shared.OrderType
@@ -116,6 +117,43 @@ internal fun sqlForMessagesCount(messageTypes: List<String>? = null, read: Boole
     return sqlQueryBuilder.create()
 }
 
+internal fun sqlForFindReportsTransactionHistory(
+    fromDate: String,
+    toDate: String,
+    grouping: ReportGrouping,
+    period: ReportPeriod,
+    dates: Array<String>,
+    budgetCategory: BudgetCategory? = null,
+    transactionTags: List<String>? = null
+): SimpleSQLiteQuery {
+    val sb = StringBuilder()
+    sb.append("SELECT * FROM report_transaction_history WHERE (date BETWEEN $fromDate AND $toDate) AND report_grouping = $grouping AND period = $period AND date IN ($dates) ")
+    sb.append(" AND filtered_budget_category IS $budgetCategory")
+    sb.append(" AND transaction_tags IS $transactionTags")
+
+    return SimpleSQLiteQuery(sb.toString())
+}
+
+internal fun sqlForFindStaleIdsReportsTransactionHistory(
+    fromDate: String,
+    toDate: String,
+    grouping: ReportGrouping,
+    period: ReportPeriod,
+    dates: Array<String>,
+    budgetCategory: BudgetCategory? = null,
+    transactionTags: List<String>? = null
+): SimpleSQLiteQuery {
+    val sb = StringBuilder()
+    sb.append("SELECT report_id FROM report_transaction_history WHERE (date BETWEEN $fromDate AND $toDate) AND report_grouping = $grouping AND period = $period AND date IN ($dates) ")
+    budgetCategory?.let {
+        sb.append(" AND filtered_budget_category IS $budgetCategory")
+    }
+    transactionTags?.let {
+        sb.append(" AND transaction_tags IS $transactionTags")
+    }
+    return SimpleSQLiteQuery(sb.toString())
+}
+
 internal fun sqlForTransactionStaleIds(fromDate: String, toDate: String, accountIds: LongArray? = null, transactionIncluded: Boolean? = null): SimpleSQLiteQuery {
     val sb = StringBuilder()
 
@@ -124,9 +162,35 @@ internal fun sqlForTransactionStaleIds(fromDate: String, toDate: String, account
     transactionIncluded?.let { sb.append(" AND included = ${ it.toInt() } ") }
 
     val query = "SELECT transaction_id FROM transaction_model " +
-                "WHERE ((transaction_date BETWEEN Date('$fromDate') AND Date('$toDate')) $sb)"
+            "WHERE ((transaction_date BETWEEN Date('$fromDate') AND Date('$toDate')) $sb)"
 
     return SimpleSQLiteQuery(query)
+}
+
+internal fun sqlForFindReportsGroupTransactionHistory(
+    reportId: Long,
+    linkedIds: LongArray,
+    transactionTags: List<String>? = null
+): SimpleSQLiteQuery {
+    val sb = StringBuilder()
+    sb.append("SELECT * FROM report_group_transaction_history WHERE report_id = $reportId AND linked_id IN ($linkedIds) ")
+    transactionTags?.let {
+        sb.append(" AND transaction_tags IS $transactionTags")
+    }
+    return SimpleSQLiteQuery(sb.toString())
+}
+
+internal fun sqlForFindStaleIdsReportsGroupTransactionHistory(
+    reportId: Long,
+    linkedIds: LongArray,
+    transactionTags: List<String>? = null
+): SimpleSQLiteQuery {
+    val sb = StringBuilder()
+    sb.append("SELECT report_group_id FROM report_group_transaction_history WHERE report_id = $reportId AND linked_id IN ($linkedIds) ")
+    transactionTags?.let {
+        sb.append(" AND transaction_tags IS $transactionTags")
+    }
+    return SimpleSQLiteQuery(sb.toString())
 }
 
 internal fun sqlForExistingAccountBalanceReports(date: String, period: ReportPeriod, reportAccountIds: LongArray, accountId: Long? = null, accountType: AccountType? = null): SimpleSQLiteQuery {

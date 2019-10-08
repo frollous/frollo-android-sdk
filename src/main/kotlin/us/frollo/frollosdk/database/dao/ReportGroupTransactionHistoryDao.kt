@@ -20,7 +20,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.room.Transaction
 import androidx.room.Update
+import androidx.sqlite.db.SupportSQLiteQuery
 import us.frollo.frollosdk.model.coredata.reports.ReportGroupTransactionHistory
 
 @Dao
@@ -34,6 +37,14 @@ internal interface ReportGroupTransactionHistoryDao {
 
     @Query("SELECT report_group_id FROM report_group_transaction_history WHERE report_id = :reportId AND linked_id NOT IN (:linkedIds)")
     fun findStaleIds(reportId: Long, linkedIds: LongArray): LongArray
+
+    @Transaction
+    @RawQuery(observedEntities = [ReportGroupTransactionHistory::class])
+    fun find(queryStr: SupportSQLiteQuery): MutableList<ReportGroupTransactionHistory>
+
+    @Transaction
+    @RawQuery
+    fun findStaleIds(queryStr: SupportSQLiteQuery): LongArray
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: ReportGroupTransactionHistory): LongArray

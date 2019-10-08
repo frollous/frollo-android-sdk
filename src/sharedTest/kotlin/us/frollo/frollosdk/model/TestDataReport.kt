@@ -74,13 +74,15 @@ internal fun testTransactionHistoryReportResponseData(): TransactionHistoryRepor
                     name = "living",
                     value = randomNumber().toBigDecimal(),
                     budget = randomNumber().toBigDecimal(),
-                    transactionIds = listOf(1093435, 2959945)))
+                    transactionIds = listOf(1093435, 2959945),
+                    tags = listOf()))
 
     val data = listOf(TransactionHistoryReportResponse.Report(
             date = "2019-03",
             value = randomNumber().toBigDecimal(),
             budget = randomNumber().toBigDecimal(),
-            groups = groups))
+            groups = groups,
+            tags = null))
 
     return TransactionHistoryReportResponse(data = data)
 }
@@ -143,6 +145,7 @@ internal fun testReportTransactionHistoryData(
             budget = BigDecimal(30.00),
             period = period,
             filteredBudgetCategory = budgetCategory,
+            transactionTags = null,
             grouping = grouping ?: ReportGrouping.values()[Random.nextInt(ReportGrouping.values().size)])
 
     id?.let { report.reportId = it }
@@ -170,6 +173,7 @@ internal fun testReportGroupTransactionHistoryData(
             transactionIds = null,
             period = period,
             filteredBudgetCategory = budgetCategory,
+            transactionTags = null,
             grouping = grouping ?: ReportGrouping.values()[Random.nextInt(ReportGrouping.values().size)],
             reportId = reportId)
 

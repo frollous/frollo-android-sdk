@@ -54,6 +54,7 @@ internal fun TransactionHistoryReportResponse.Report.toReportTransactionHistory(
                 budget = budget,
                 period = period,
                 filteredBudgetCategory = budgetCategory,
+                transactionTags = tags,
                 grouping = grouping)
 
 internal fun TransactionHistoryReportResponse.Report.GroupReport.toReportGroupTransactionHistory(grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory? = null, date: String, reportId: Long) =
@@ -63,6 +64,7 @@ internal fun TransactionHistoryReportResponse.Report.GroupReport.toReportGroupTr
                 value = value,
                 budget = budget,
                 transactionIds = transactionIds,
+                transactionTags = tags,
                 period = period,
                 date = date,
                 filteredBudgetCategory = budgetCategory,

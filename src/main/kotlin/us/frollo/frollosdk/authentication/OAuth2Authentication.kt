@@ -295,7 +295,7 @@ class OAuth2Authentication(
      *
      * @param completion Completion handler with any error that occurred (Optional)
      */
-    fun refreshTokens(completion: OnFrolloSDKCompletionListener<Result>?) {
+    fun refreshTokens(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (isRefreshingToken)
             return
 

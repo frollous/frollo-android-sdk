@@ -56,7 +56,7 @@ class Resource<out T> private constructor(
     fun <Y> map(function: (T?) -> Y?): Resource<Y> = Resource(status, function(data), error)
 
     companion object {
-        internal fun <T> success(data: T?): Resource<T> = Resource(Status.SUCCESS, data, null)
-        internal fun <T> error(error: FrolloSDKError?, data: T? = null): Resource<T> = Resource(Status.ERROR, data, error)
+        fun <T> success(data: T?): Resource<T> = Resource(Status.SUCCESS, data, null)
+        fun <T> error(error: FrolloSDKError?, data: T? = null): Resource<T> = Resource(Status.ERROR, data, error)
     }
 }

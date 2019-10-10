@@ -1169,6 +1169,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @param transaction Updated transaction data model
      * @param recategoriseAll Apply recategorisation to all similar transactions (Optional)
      * @param includeApplyAll Apply included flag to all similar transactions (Optional)
+     * @param budgetCategory New budget category for the transaction (Optional)
+     * @param budgetCategoryApplyAll Apply budget category to all similar transactions (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun updateTransaction(
@@ -1176,15 +1178,18 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         transaction: Transaction,
         recategoriseAll: Boolean? = null,
         includeApplyAll: Boolean? = null,
+        budgetCategory: BudgetCategory = transaction.budgetCategory,
+        budgetCategoryApplyAll: Boolean? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
         val request = TransactionUpdateRequest(
-                budgetCategory = transaction.budgetCategory,
+                budgetCategory = budgetCategory,
                 categoryId = transaction.categoryId,
                 included = transaction.included,
                 memo = transaction.memo,
                 userDescription = transaction.description?.user,
                 recategoriseAll = recategoriseAll,
+                budgetCategoryApplyAll = budgetCategoryApplyAll,
                 includeApplyAll = includeApplyAll)
 
         aggregationAPI.updateTransaction(transactionId, request).enqueue { resource ->

@@ -1,5 +1,10 @@
 ## Changelog
 
+### 3.1.0
+
+#### Changes
+- Added support to change a transactions budget category and to apply it to all similar transactions
+
 ### 3.0.0
 
 #### Changes

@@ -57,13 +57,17 @@ class Resource<out T> private constructor(
 
     companion object {
         /**
-         * Instantiate Result with status Success
+         * Instantiate Resource with status Success
+         *
+         * @param data Associated data (Optional)
          */
         fun <T> success(data: T?): Resource<T> = Resource(Status.SUCCESS, data, null)
+
         /**
-         * Instantiate Result with status Error
+         * Instantiate Resource with status Error
          *
-         * @param error Associated error conforming [FrolloSDKError]
+         * @param error Associated error conforming [FrolloSDKError] (Optional)
+         * @param data Associated data (Optional)
          */
         fun <T> error(error: FrolloSDKError?, data: T? = null): Resource<T> = Resource(Status.ERROR, data, error)
     }

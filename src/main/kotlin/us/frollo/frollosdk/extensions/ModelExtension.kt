@@ -124,12 +124,15 @@ internal fun sqlForFindReportsTransactionHistory(
     period: ReportPeriod,
     dates: Array<String>,
     budgetCategory: BudgetCategory? = null,
-    transactionTags: List<String>? = null
+    // transactionTags: List<String>? = null
+    transactionTags: String? = null
 ): SimpleSQLiteQuery {
     val sb = StringBuilder()
     sb.append("SELECT * FROM report_transaction_history WHERE (date BETWEEN $fromDate AND $toDate) AND report_grouping = $grouping AND period = $period AND date IN ($dates) ")
     sb.append(" AND filtered_budget_category IS $budgetCategory")
-    sb.append(" AND transaction_tags IS $transactionTags")
+    transactionTags?.let {
+        sb.append(" AND transaction_tags IS $transactionTags")
+    }
 
     return SimpleSQLiteQuery(sb.toString())
 }
@@ -141,7 +144,8 @@ internal fun sqlForFindStaleIdsReportsTransactionHistory(
     period: ReportPeriod,
     dates: Array<String>,
     budgetCategory: BudgetCategory? = null,
-    transactionTags: List<String>? = null
+    // transactionTags: List<String>? = null
+    transactionTags: String? = null
 ): SimpleSQLiteQuery {
     val sb = StringBuilder()
     sb.append("SELECT report_id FROM report_transaction_history WHERE (date BETWEEN $fromDate AND $toDate) AND report_grouping = $grouping AND period = $period AND date IN ($dates) ")

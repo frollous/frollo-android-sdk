@@ -267,6 +267,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      * @param toDate End date in the format yyyy-MM-dd to fetch reports up to (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
      * @param grouping Grouping that reports should be broken down into
      * @param period Period that reports should be broken down by
+     * @param tagsList Tags that reports should be filtered by
      * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
@@ -276,7 +277,8 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         grouping: ReportGrouping,
         period: ReportPeriod,
         budgetCategory: BudgetCategory? = null,
-        tagsList: List<String>? = null,
+        // tagsList: List<String>? = null,
+        tagsList: String? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
         reportsAPI.fetchTransactionHistoryReports(grouping, period, fromDate, toDate, budgetCategory, tagsList).enqueue { resource ->
@@ -494,7 +496,8 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         grouping: ReportGrouping,
         period: ReportPeriod,
         budgetCategory: BudgetCategory?,
-        tagsList: List<String>? = null,
+        // tagsList: List<String>? = null,
+        tagsList: String? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
         reportsResponse?.let {

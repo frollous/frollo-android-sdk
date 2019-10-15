@@ -128,7 +128,10 @@ internal fun sqlForFindReportsTransactionHistory(
     transactionTags: String? = null
 ): SimpleSQLiteQuery {
     val sb = StringBuilder()
-    sb.append("SELECT * FROM report_transaction_history WHERE (date BETWEEN $fromDate AND $toDate) AND report_grouping = $grouping AND period = $period AND date IN ($dates) ")
+    sb.append("SELECT * FROM report_transaction_history WHERE (date BETWEEN $fromDate AND $toDate) AND report_grouping = '$grouping' AND period = '$period' ")
+    if (dates.isNotEmpty()) {
+        sb.append(" AND date IN (${dates.joinToString(", ")})")
+    }
     sb.append(" AND filtered_budget_category IS $budgetCategory")
     transactionTags?.let {
         sb.append(" AND transaction_tags IS $transactionTags")
@@ -148,9 +151,10 @@ internal fun sqlForFindStaleIdsReportsTransactionHistory(
     transactionTags: String? = null
 ): SimpleSQLiteQuery {
     val sb = StringBuilder()
-    sb.append("SELECT report_id FROM report_transaction_history WHERE (date BETWEEN $fromDate AND $toDate) AND report_grouping = $grouping AND period = $period AND date IN ($dates) ")
-    budgetCategory?.let {
-        sb.append(" AND filtered_budget_category IS $budgetCategory")
+    sb.append("SELECT report_id FROM report_transaction_history WHERE (date BETWEEN $fromDate AND $toDate) AND report_grouping = '$grouping' AND period = '$period'  ")
+    sb.append(" AND filtered_budget_category IS $budgetCategory")
+    if (dates.isNotEmpty()) {
+        sb.append(" AND date IN (${dates.joinToString(", ")})")
     }
     transactionTags?.let {
         sb.append(" AND transaction_tags IS $transactionTags")
@@ -177,7 +181,7 @@ internal fun sqlForFindReportsGroupTransactionHistory(
     transactionTags: List<String>? = null
 ): SimpleSQLiteQuery {
     val sb = StringBuilder()
-    sb.append("SELECT * FROM report_group_transaction_history WHERE report_id = $reportId AND linked_id IN ($linkedIds) ")
+    sb.append("SELECT * FROM report_group_transaction_history WHERE report_id = $reportId AND linked_id IN (${linkedIds.joinToString(",")}) ")
     transactionTags?.let {
         sb.append(" AND transaction_tags IS $transactionTags")
     }
@@ -190,7 +194,7 @@ internal fun sqlForFindStaleIdsReportsGroupTransactionHistory(
     transactionTags: List<String>? = null
 ): SimpleSQLiteQuery {
     val sb = StringBuilder()
-    sb.append("SELECT report_group_id FROM report_group_transaction_history WHERE report_id = $reportId AND linked_id IN ($linkedIds) ")
+    sb.append("SELECT report_group_id FROM report_group_transaction_history WHERE report_id = $reportId AND linked_id IN (${linkedIds.joinToString(",")}) ")
     transactionTags?.let {
         sb.append(" AND transaction_tags IS $transactionTags")
     }

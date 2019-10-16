@@ -232,9 +232,14 @@ abstract class SDKDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // New changes in this migration:
                 // 1) Alter report_group_transaction_history table - add column transaction_tags
-                // 1) Alter report_transaction_history table - add column transaction_tags
-                database.execSQL("ALTER TABLE `report_transaction_history` ADD COLUMN `transaction_tags` TEXT ")
-                database.execSQL("ALTER TABLE `report_group_transaction_history` ADD COLUMN `transaction_tags` TEXT ")
+                // 2) Alter report_transaction_history table - add column transaction_tags
+                database.execSQL("DROP INDEX IF EXISTS `unique_report_transaction_history_columns`")
+                database.execSQL("ALTER TABLE `report_transaction_history` ADD COLUMN `transaction_tags` TEXT")
+                database.execSQL("CREATE UNIQUE INDEX `unique_report_transaction_history_columns` ON `report_transaction_history` (`date`, `period`, `filtered_budget_category`, `report_grouping`, `transaction_tags`)")
+
+                database.execSQL("DROP INDEX IF EXISTS `unique_report_group_transaction_history_columns`")
+                database.execSQL("ALTER TABLE `report_group_transaction_history` ADD COLUMN `transaction_tags` TEXT")
+                database.execSQL("CREATE UNIQUE INDEX `unique_report_group_transaction_history_columns` ON `report_group_transaction_history` (`linked_id`, `date`, `period`, `filtered_budget_category`, `report_grouping`, `transaction_tags`)")
             }
         }
     }

@@ -117,49 +117,52 @@ internal fun sqlForMessagesCount(messageTypes: List<String>? = null, read: Boole
     return sqlQueryBuilder.create()
 }
 
-internal fun sqlForFindReportsTransactionHistory(
+internal fun sqlForHistoryReports(
     fromDate: String,
     toDate: String,
     grouping: ReportGrouping,
     period: ReportPeriod,
-    dates: Array<String>,
     budgetCategory: BudgetCategory? = null,
-    // transactionTags: List<String>? = null
-    transactionTags: String? = null
+    dates: Array<String>? = null,
+    transactionTag: String? = null
 ): SimpleSQLiteQuery {
-    val sb = StringBuilder()
-    sb.append("SELECT * FROM report_transaction_history WHERE (date BETWEEN $fromDate AND $toDate) AND report_grouping = '$grouping' AND period = '$period' ")
-    if (dates.isNotEmpty()) {
-        sb.append(" AND date IN (${dates.joinToString(", ")})")
-    }
-    sb.append(" AND filtered_budget_category IS $budgetCategory")
-    transactionTags?.let {
-        sb.append(" AND transaction_tags IS $transactionTags")
-    }
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("report_transaction_history")
 
-    return SimpleSQLiteQuery(sb.toString())
+    sqlQueryBuilder.appendSelection(selection = "(date BETWEEN Date('$fromDate') AND Date('$toDate'))")
+    sqlQueryBuilder.appendSelection(selection = "report_grouping = '${ grouping.name }'")
+    sqlQueryBuilder.appendSelection(selection = "period = '${ period.name }'")
+    val budgetCategorySelection = budgetCategory?.let { "filtered_budget_category = '${ it.name }'" } ?: run { "filtered_budget_category IS NULL" }
+    sqlQueryBuilder.appendSelection(selection = budgetCategorySelection)
+    val tagsSelection = budgetCategory?.let { "transaction_tags = '$transactionTag'" } ?: run { "transaction_tags IS NULL" }
+    sqlQueryBuilder.appendSelection(selection = tagsSelection)
+    dates?.let { sqlQueryBuilder.appendSelection(selection = "date IN (${ it.joinToString(",") })") }
+
+    return sqlQueryBuilder.create()
 }
 
-internal fun sqlForFindStaleIdsReportsTransactionHistory(
+internal fun sqlForStaleHistoryReportIds(
     fromDate: String,
     toDate: String,
     grouping: ReportGrouping,
     period: ReportPeriod,
-    dates: Array<String>,
     budgetCategory: BudgetCategory? = null,
-    // transactionTags: List<String>? = null
-    transactionTags: String? = null
+    dates: Array<String>? = null,
+    transactionTag: String? = null
 ): SimpleSQLiteQuery {
-    val sb = StringBuilder()
-    sb.append("SELECT report_id FROM report_transaction_history WHERE (date BETWEEN $fromDate AND $toDate) AND report_grouping = '$grouping' AND period = '$period'  ")
-    sb.append(" AND filtered_budget_category IS $budgetCategory")
-    if (dates.isNotEmpty()) {
-        sb.append(" AND date IN (${dates.joinToString(", ")})")
-    }
-    transactionTags?.let {
-        sb.append(" AND transaction_tags IS $transactionTags")
-    }
-    return SimpleSQLiteQuery(sb.toString())
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("report_transaction_history")
+
+    sqlQueryBuilder.columns(arrayOf("report_id"))
+
+    sqlQueryBuilder.appendSelection(selection = "(date BETWEEN Date('$fromDate') AND Date('$toDate'))")
+    sqlQueryBuilder.appendSelection(selection = "report_grouping = '${ grouping.name }'")
+    sqlQueryBuilder.appendSelection(selection = "period = '${ period.name }'")
+    val budgetCategorySelection = budgetCategory?.let { "filtered_budget_category = '${ it.name }'" } ?: run { "filtered_budget_category IS NULL" }
+    sqlQueryBuilder.appendSelection(selection = budgetCategorySelection)
+    val tagsSelection = budgetCategory?.let { "transaction_tags = '$transactionTag'" } ?: run { "transaction_tags IS NULL" }
+    sqlQueryBuilder.appendSelection(selection = tagsSelection)
+    dates?.let { sqlQueryBuilder.appendSelection(selection = "date NOT IN (${ it.joinToString(",") })") }
+
+    return sqlQueryBuilder.create()
 }
 
 internal fun sqlForTransactionStaleIds(fromDate: String, toDate: String, accountIds: LongArray? = null, transactionIncluded: Boolean? = null): SimpleSQLiteQuery {
@@ -170,35 +173,9 @@ internal fun sqlForTransactionStaleIds(fromDate: String, toDate: String, account
     transactionIncluded?.let { sb.append(" AND included = ${ it.toInt() } ") }
 
     val query = "SELECT transaction_id FROM transaction_model " +
-            "WHERE ((transaction_date BETWEEN Date('$fromDate') AND Date('$toDate')) $sb)"
+                "WHERE ((transaction_date BETWEEN Date('$fromDate') AND Date('$toDate')) $sb)"
 
     return SimpleSQLiteQuery(query)
-}
-
-internal fun sqlForFindReportsGroupTransactionHistory(
-    reportId: Long,
-    linkedIds: LongArray,
-    transactionTags: List<String>? = null
-): SimpleSQLiteQuery {
-    val sb = StringBuilder()
-    sb.append("SELECT * FROM report_group_transaction_history WHERE report_id = $reportId AND linked_id IN (${linkedIds.joinToString(",")}) ")
-    transactionTags?.let {
-        sb.append(" AND transaction_tags IS $transactionTags")
-    }
-    return SimpleSQLiteQuery(sb.toString())
-}
-
-internal fun sqlForFindStaleIdsReportsGroupTransactionHistory(
-    reportId: Long,
-    linkedIds: LongArray,
-    transactionTags: List<String>? = null
-): SimpleSQLiteQuery {
-    val sb = StringBuilder()
-    sb.append("SELECT report_group_id FROM report_group_transaction_history WHERE report_id = $reportId AND linked_id IN (${linkedIds.joinToString(",")}) ")
-    transactionTags?.let {
-        sb.append(" AND transaction_tags IS $transactionTags")
-    }
-    return SimpleSQLiteQuery(sb.toString())
 }
 
 internal fun sqlForExistingAccountBalanceReports(date: String, period: ReportPeriod, reportAccountIds: LongArray, accountId: Long? = null, accountType: AccountType? = null): SimpleSQLiteQuery {

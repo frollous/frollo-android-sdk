@@ -74,15 +74,13 @@ internal fun testTransactionHistoryReportResponseData(): TransactionHistoryRepor
                     name = "living",
                     value = randomNumber().toBigDecimal(),
                     budget = randomNumber().toBigDecimal(),
-                    transactionIds = listOf(1093435, 2959945),
-                    tags = listOf()))
+                    transactionIds = listOf(1093435, 2959945)))
 
     val data = listOf(TransactionHistoryReportResponse.Report(
             date = "2019-03",
             value = randomNumber().toBigDecimal(),
             budget = randomNumber().toBigDecimal(),
-            groups = groups,
-            tags = null))
+            groups = groups))
 
     return TransactionHistoryReportResponse(data = data)
 }

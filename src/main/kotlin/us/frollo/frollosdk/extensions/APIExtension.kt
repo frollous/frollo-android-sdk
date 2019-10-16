@@ -161,12 +161,11 @@ internal fun ReportsAPI.fetchTransactionHistoryReports(
     fromDate: String,
     toDate: String,
     budgetCategory: BudgetCategory? = null,
-    // tagsList: List<String>? = null
-    tagsList: String? = null
+    transactionTag: String? = null
 ): Call<TransactionHistoryReportResponse> {
     val queryMap = mutableMapOf("grouping" to grouping.toString(), "period" to period.toString(), "from_date" to fromDate, "to_date" to toDate)
     budgetCategory?.let { queryMap.put("budget_category", it.toString()) }
-    tagsList?.let { queryMap.put("tags", it.toString()) }
+    transactionTag?.let { queryMap.put("tags", it.toString()) }
     return fetchTransactionHistoryReports(queryMap)
 }
 

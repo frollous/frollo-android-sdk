@@ -38,10 +38,8 @@ import us.frollo.frollosdk.extensions.fetchTransactionHistoryReports
 import us.frollo.frollosdk.extensions.isValidFormat
 import us.frollo.frollosdk.extensions.sqlForExistingAccountBalanceReports
 import us.frollo.frollosdk.extensions.sqlForFetchingAccountBalanceReports
-import us.frollo.frollosdk.extensions.sqlForFindReportsGroupTransactionHistory
-import us.frollo.frollosdk.extensions.sqlForFindReportsTransactionHistory
-import us.frollo.frollosdk.extensions.sqlForFindStaleIdsReportsGroupTransactionHistory
-import us.frollo.frollosdk.extensions.sqlForFindStaleIdsReportsTransactionHistory
+import us.frollo.frollosdk.extensions.sqlForHistoryReports
+import us.frollo.frollosdk.extensions.sqlForStaleHistoryReportIds
 import us.frollo.frollosdk.extensions.sqlForStaleIdsAccountBalanceReports
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.logging.Log
@@ -267,7 +265,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      * @param toDate End date in the format yyyy-MM-dd to fetch reports up to (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
      * @param grouping Grouping that reports should be broken down into
      * @param period Period that reports should be broken down by
-     * @param tagsList Tags that reports should be filtered by
+     * @param transactionTag Transaction tag that reports should be filtered by
      * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
@@ -277,11 +275,10 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         grouping: ReportGrouping,
         period: ReportPeriod,
         budgetCategory: BudgetCategory? = null,
-        // tagsList: List<String>? = null,
-        tagsList: String? = null,
+        transactionTag: String? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
-        reportsAPI.fetchTransactionHistoryReports(grouping, period, fromDate, toDate, budgetCategory, tagsList).enqueue { resource ->
+        reportsAPI.fetchTransactionHistoryReports(grouping, period, fromDate, toDate, budgetCategory, transactionTag).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshTransactionHistoryReports", resource.error?.localizedDescription)
@@ -298,7 +295,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                             grouping = grouping,
                             period = period,
                             budgetCategory = budgetCategory,
-                            tagsList = tagsList,
+                            transactionTag = transactionTag,
                             completion = completion)
                 }
             }
@@ -496,8 +493,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         grouping: ReportGrouping,
         period: ReportPeriod,
         budgetCategory: BudgetCategory?,
-        // tagsList: List<String>? = null,
-        tagsList: String? = null,
+        transactionTag: String?,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
         reportsResponse?.let {
@@ -508,8 +504,8 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
 
                     // Fetch existing reports for updating
                     val reportDates = reportsResponse.map { it.date }.toTypedArray()
-
-                    val existingReports = db.reportsTransactionHistory().find(sqlForFindReportsTransactionHistory(fromDate, toDate, grouping, period, reportDates, budgetCategory, tagsList))
+                    val sqLiteQuery = sqlForHistoryReports(fromDate, toDate, grouping, period, budgetCategory, reportDates, transactionTag)
+                    val existingReports = db.reportsTransactionHistory().find(sqLiteQuery)
 
                     // Sort by date
                     existingReports.sortBy { it.date }
@@ -534,9 +530,9 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                         handleTransactionHistoryGroupReportsResponse(response.groups.toMutableList(), report)
                     }
 
+                    val sql = sqlForStaleHistoryReportIds(fromDate, toDate, grouping, period, budgetCategory, reportDates, transactionTag)
                     // Fetch and delete any leftovers
-                    val staleReportIds = db.reportsTransactionHistory().findStaleIds(
-                            sqlForFindStaleIdsReportsTransactionHistory(fromDate, toDate, grouping, period, reportDates, budgetCategory, tagsList))
+                    val staleReportIds = db.reportsTransactionHistory().findStaleIds(sql)
 
                     db.reportsTransactionHistory().deleteMany(staleReportIds)
                     db.reportGroupsTransactionHistory().deleteByReportIds(staleReportIds)
@@ -558,7 +554,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         groupsResponse.sortBy { it.id }
         val categoryReportIds = groupsResponse.map { it.id }.toLongArray()
 
-        val existingReportGroups = db.reportGroupsTransactionHistory().find(sqlForFindReportsGroupTransactionHistory(report.reportId, categoryReportIds, report.transactionTags))
+        val existingReportGroups = db.reportGroupsTransactionHistory().find(report.reportId, categoryReportIds)
         // Sort by linked id
         existingReportGroups.sortBy { it.linkedId }
 
@@ -591,7 +587,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
             aggregation.fetchMissingMerchants(linkedIds.toSet())
 
         // Fetch and delete any leftovers
-        val staleIds = db.reportGroupsTransactionHistory().findStaleIds(sqlForFindStaleIdsReportsGroupTransactionHistory(report.reportId, categoryReportIds, report.transactionTags))
+        val staleIds = db.reportGroupsTransactionHistory().findStaleIds(report.reportId, categoryReportIds)
         db.reportGroupsTransactionHistory().deleteMany(staleIds)
     }
 

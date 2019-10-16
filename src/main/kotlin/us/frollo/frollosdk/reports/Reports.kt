@@ -504,8 +504,14 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
 
                     // Fetch existing reports for updating
                     val reportDates = reportsResponse.map { it.date }.toTypedArray()
-                    val sqLiteQuery = sqlForHistoryReports(fromDate, toDate, grouping, period, budgetCategory, reportDates, transactionTag)
-                    val existingReports = db.reportsTransactionHistory().find(sqLiteQuery)
+                    val existingReports = db.reportsTransactionHistory().find(sqlForHistoryReports(
+                            fromDate = fromDate,
+                            toDate = toDate,
+                            grouping = grouping,
+                            period = period,
+                            budgetCategory = budgetCategory,
+                            dates = reportDates,
+                            transactionTag = transactionTag))
 
                     // Sort by date
                     existingReports.sortBy { it.date }

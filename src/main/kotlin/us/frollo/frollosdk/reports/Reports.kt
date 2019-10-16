@@ -513,7 +513,11 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                     var index = 0
 
                     reportsResponse.forEach { response ->
-                        val report = response.toReportTransactionHistory(grouping = grouping, period = period, budgetCategory = budgetCategory)
+                        val report = response.toReportTransactionHistory(
+                                grouping = grouping,
+                                period = period,
+                                budgetCategory = budgetCategory,
+                                tags = transactionTag?.let { listOf(transactionTag) })
 
                         if (index < existingReports.size && existingReports[index].date == response.date) {
                             // Update
@@ -530,9 +534,15 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                         handleTransactionHistoryGroupReportsResponse(response.groups.toMutableList(), report)
                     }
 
-                    val sql = sqlForStaleHistoryReportIds(fromDate, toDate, grouping, period, budgetCategory, reportDates, transactionTag)
                     // Fetch and delete any leftovers
-                    val staleReportIds = db.reportsTransactionHistory().findStaleIds(sql)
+                    val staleReportIds = db.reportsTransactionHistory().findStaleIds(sqlForStaleHistoryReportIds(
+                            fromDate = fromDate,
+                            toDate = toDate,
+                            grouping = grouping,
+                            period = period,
+                            budgetCategory = budgetCategory,
+                            dates = reportDates,
+                            transactionTag = transactionTag))
 
                     db.reportsTransactionHistory().deleteMany(staleReportIds)
                     db.reportGroupsTransactionHistory().deleteByReportIds(staleReportIds)
@@ -555,10 +565,12 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         val categoryReportIds = groupsResponse.map { it.id }.toLongArray()
 
         val existingReportGroups = db.reportGroupsTransactionHistory().find(report.reportId, categoryReportIds)
+
         // Sort by linked id
         existingReportGroups.sortBy { it.linkedId }
 
         var index = 0
+
         groupsResponse.forEach { response ->
             linkedIds.add(response.id)
 
@@ -567,7 +579,8 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                     period = report.period,
                     budgetCategory = report.filteredBudgetCategory,
                     date = report.date,
-                    reportId = report.reportId)
+                    reportId = report.reportId,
+                    tags = report.transactionTags)
 
             if (index < existingReportGroups.size && existingReportGroups[index].linkedId == response.id) {
                 // Update

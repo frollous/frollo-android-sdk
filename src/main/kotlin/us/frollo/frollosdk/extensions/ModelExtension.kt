@@ -128,14 +128,14 @@ internal fun sqlForHistoryReports(
 ): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("report_transaction_history")
 
-    sqlQueryBuilder.appendSelection(selection = "(date BETWEEN Date('$fromDate') AND Date('$toDate'))")
+    sqlQueryBuilder.appendSelection(selection = "(date BETWEEN '$fromDate' AND '$toDate')")
     sqlQueryBuilder.appendSelection(selection = "report_grouping = '${ grouping.name }'")
     sqlQueryBuilder.appendSelection(selection = "period = '${ period.name }'")
     val budgetCategorySelection = budgetCategory?.let { "filtered_budget_category = '${ it.name }'" } ?: run { "filtered_budget_category IS NULL" }
     sqlQueryBuilder.appendSelection(selection = budgetCategorySelection)
-    val tagsSelection = budgetCategory?.let { "transaction_tags = '$transactionTag'" } ?: run { "transaction_tags IS NULL" }
+    val tagsSelection = transactionTag?.let { "transaction_tags = '$transactionTag'" } ?: run { "transaction_tags IS NULL" }
     sqlQueryBuilder.appendSelection(selection = tagsSelection)
-    dates?.let { sqlQueryBuilder.appendSelection(selection = "date IN (${ it.joinToString(",") })") }
+    dates?.let { sqlQueryBuilder.appendSelection(selection = "date IN (${ it.joinToString(",") { "'$it'" } })") }
 
     return sqlQueryBuilder.create()
 }
@@ -153,14 +153,14 @@ internal fun sqlForStaleHistoryReportIds(
 
     sqlQueryBuilder.columns(arrayOf("report_id"))
 
-    sqlQueryBuilder.appendSelection(selection = "(date BETWEEN Date('$fromDate') AND Date('$toDate'))")
+    sqlQueryBuilder.appendSelection(selection = "(date BETWEEN '$fromDate' AND '$toDate')")
     sqlQueryBuilder.appendSelection(selection = "report_grouping = '${ grouping.name }'")
     sqlQueryBuilder.appendSelection(selection = "period = '${ period.name }'")
     val budgetCategorySelection = budgetCategory?.let { "filtered_budget_category = '${ it.name }'" } ?: run { "filtered_budget_category IS NULL" }
     sqlQueryBuilder.appendSelection(selection = budgetCategorySelection)
-    val tagsSelection = budgetCategory?.let { "transaction_tags = '$transactionTag'" } ?: run { "transaction_tags IS NULL" }
+    val tagsSelection = transactionTag?.let { "transaction_tags = '$transactionTag'" } ?: run { "transaction_tags IS NULL" }
     sqlQueryBuilder.appendSelection(selection = tagsSelection)
-    dates?.let { sqlQueryBuilder.appendSelection(selection = "date NOT IN (${ it.joinToString(",") })") }
+    dates?.let { sqlQueryBuilder.appendSelection(selection = "date NOT IN (${ it.joinToString(",") { "'$it'" } })") }
 
     return sqlQueryBuilder.create()
 }

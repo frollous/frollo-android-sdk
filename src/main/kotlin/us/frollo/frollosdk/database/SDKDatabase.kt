@@ -228,7 +228,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 // END - Alter column smallLogoUrl
             }
         }
-        
+
         private val MIGRATION_6_7: Migration = object : Migration(6, 7) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // New changes in this migration:

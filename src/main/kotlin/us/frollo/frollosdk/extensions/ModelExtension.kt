@@ -133,7 +133,7 @@ internal fun sqlForHistoryReports(
     sqlQueryBuilder.appendSelection(selection = "period = '${ period.name }'")
     val budgetCategorySelection = budgetCategory?.let { "filtered_budget_category = '${ it.name }'" } ?: run { "filtered_budget_category IS NULL" }
     sqlQueryBuilder.appendSelection(selection = budgetCategorySelection)
-    val tagsSelection = transactionTag?.let { "transaction_tags = '$transactionTag'" } ?: run { "transaction_tags IS NULL" }
+    val tagsSelection = transactionTag?.let { "transaction_tags LIKE '%|$transactionTag|%'" } ?: run { "transaction_tags IS NULL" }
     sqlQueryBuilder.appendSelection(selection = tagsSelection)
     dates?.let { sqlQueryBuilder.appendSelection(selection = "date IN (${ it.joinToString(",") { "'$it'" } })") }
 
@@ -158,7 +158,7 @@ internal fun sqlForStaleHistoryReportIds(
     sqlQueryBuilder.appendSelection(selection = "period = '${ period.name }'")
     val budgetCategorySelection = budgetCategory?.let { "filtered_budget_category = '${ it.name }'" } ?: run { "filtered_budget_category IS NULL" }
     sqlQueryBuilder.appendSelection(selection = budgetCategorySelection)
-    val tagsSelection = transactionTag?.let { "transaction_tags = '$transactionTag'" } ?: run { "transaction_tags IS NULL" }
+    val tagsSelection = transactionTag?.let { "transaction_tags LIKE '%|$transactionTag|%'" } ?: run { "transaction_tags IS NULL" }
     sqlQueryBuilder.appendSelection(selection = tagsSelection)
     dates?.let { sqlQueryBuilder.appendSelection(selection = "date NOT IN (${ it.joinToString(",") { "'$it'" } })") }
 

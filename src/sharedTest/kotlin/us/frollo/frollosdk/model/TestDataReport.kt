@@ -135,7 +135,8 @@ internal fun testReportTransactionHistoryData(
     grouping: ReportGrouping? = null,
     budgetCategory: BudgetCategory? = null,
     id: Long? = null,
-    value: BigDecimal? = null
+    value: BigDecimal? = null,
+    transactionTags: List<String>? = null
 ): ReportTransactionHistory {
     val report = ReportTransactionHistory(
             date = date,
@@ -143,7 +144,7 @@ internal fun testReportTransactionHistoryData(
             budget = BigDecimal(30.00),
             period = period,
             filteredBudgetCategory = budgetCategory,
-            transactionTags = null,
+            transactionTags = transactionTags,
             grouping = grouping ?: ReportGrouping.values()[Random.nextInt(ReportGrouping.values().size)])
 
     id?.let { report.reportId = it }
@@ -160,6 +161,7 @@ internal fun testReportGroupTransactionHistoryData(
     budgetCategory: BudgetCategory? = null,
     id: Long? = null,
     value: BigDecimal? = null,
+    transactionTags: List<String>? = null,
     reportId: Long
 ): ReportGroupTransactionHistory {
     val report = ReportGroupTransactionHistory(
@@ -171,7 +173,7 @@ internal fun testReportGroupTransactionHistoryData(
             transactionIds = null,
             period = period,
             filteredBudgetCategory = budgetCategory,
-            transactionTags = null,
+            transactionTags = transactionTags,
             grouping = grouping ?: ReportGrouping.values()[Random.nextInt(ReportGrouping.values().size)],
             reportId = reportId)
 

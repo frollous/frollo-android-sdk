@@ -29,6 +29,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.extensions.sqlForHistoryReports
 import us.frollo.frollosdk.mapping.toMerchant
 import us.frollo.frollosdk.mapping.toTransactionCategory
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
@@ -78,7 +79,7 @@ class ReportTransactionHistoryDaoTest {
 
         db.reportsTransactionHistory().insertAll(*list.toTypedArray())
 
-        var testObserver = db.reportsTransactionHistory().load(fromDate = "2018-05", toDate = "2018-06", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null).test()
+        var testObserver = db.reportsTransactionHistory().loadByQuery(sqlForHistoryReports(fromDate = "2018-05", toDate = "2018-06", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null)).test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(1, testObserver.value().size)
@@ -87,7 +88,7 @@ class ReportTransactionHistoryDaoTest {
         assertEquals(201L, model.groups?.get(0)?.groupReport?.reportGroupId)
         assertEquals(678L, model.groups?.get(0)?.merchant?.merchantId)
 
-        testObserver = db.reportsTransactionHistory().load(fromDate = "2018-05-01", toDate = "2018-06-02", grouping = ReportGrouping.TRANSACTION_CATEGORY, period = ReportPeriod.DAY, budgetCategory = null).test()
+        testObserver = db.reportsTransactionHistory().loadByQuery(sqlForHistoryReports(fromDate = "2018-05-01", toDate = "2018-06-02", grouping = ReportGrouping.TRANSACTION_CATEGORY, period = ReportPeriod.DAY, budgetCategory = null)).test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(1, testObserver.value().size)
@@ -110,12 +111,12 @@ class ReportTransactionHistoryDaoTest {
 
         db.reportsTransactionHistory().insertAll(*list.toTypedArray())
 
-        var models = db.reportsTransactionHistory().find(fromDate = "2018-05", toDate = "2018-09", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null, dates = arrayOf("2018-06", "2018-07"))
+        var models = db.reportsTransactionHistory().find(sqlForHistoryReports(fromDate = "2018-05", toDate = "2018-09", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null, dates = arrayOf("2018-06", "2018-07")))
         assertTrue(models.isNotEmpty())
         assertEquals(2, models.size)
         assertTrue(models.map { it.reportId }.toList().containsAll(mutableListOf<Long>(101, 104)))
 
-        models = db.reportsTransactionHistory().find(fromDate = "2018-05-01", toDate = "2018-06-02", grouping = ReportGrouping.TRANSACTION_CATEGORY, period = ReportPeriod.DAY, budgetCategory = null, dates = arrayOf("2018-06-02"))
+        models = db.reportsTransactionHistory().find(sqlForHistoryReports(fromDate = "2018-05-01", toDate = "2018-06-02", grouping = ReportGrouping.TRANSACTION_CATEGORY, period = ReportPeriod.DAY, budgetCategory = null, dates = arrayOf("2018-06-02")))
         assertTrue(models.isNotEmpty())
         assertEquals(1, models.size)
         assertEquals(103L, models[0].reportId)
@@ -154,7 +155,7 @@ class ReportTransactionHistoryDaoTest {
 
         db.reportsTransactionHistory().insertAll(*list.toTypedArray())
 
-        val testObserver = db.reportsTransactionHistory().load(fromDate = "2018-05", toDate = "2018-07", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null).test()
+        val testObserver = db.reportsTransactionHistory().loadByQuery(sqlForHistoryReports(fromDate = "2018-05", toDate = "2018-07", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null)).test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(2, testObserver.value().size)
@@ -166,7 +167,7 @@ class ReportTransactionHistoryDaoTest {
 
         db.reportsTransactionHistory().insert(data1)
 
-        val testObserver = db.reportsTransactionHistory().load(fromDate = "2018-05", toDate = "2018-06", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null).test()
+        val testObserver = db.reportsTransactionHistory().loadByQuery(sqlForHistoryReports(fromDate = "2018-05", toDate = "2018-06", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null)).test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(1, testObserver.value().size)
@@ -178,7 +179,7 @@ class ReportTransactionHistoryDaoTest {
 
         db.reportsTransactionHistory().insert(data1)
 
-        var testObserver = db.reportsTransactionHistory().load(fromDate = "2018-05", toDate = "2018-06", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null).test()
+        var testObserver = db.reportsTransactionHistory().loadByQuery(sqlForHistoryReports(fromDate = "2018-05", toDate = "2018-06", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null)).test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         var models = testObserver.value()
@@ -189,7 +190,7 @@ class ReportTransactionHistoryDaoTest {
 
         db.reportsTransactionHistory().update(data1)
 
-        testObserver = db.reportsTransactionHistory().load(fromDate = "2018-05", toDate = "2018-06", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null).test()
+        testObserver = db.reportsTransactionHistory().loadByQuery(sqlForHistoryReports(fromDate = "2018-05", toDate = "2018-06", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null)).test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         models = testObserver.value()
@@ -208,14 +209,14 @@ class ReportTransactionHistoryDaoTest {
 
         db.reportsTransactionHistory().insertAll(*list.toTypedArray())
 
-        var testObserver = db.reportsTransactionHistory().load(fromDate = "2018-05", toDate = "2018-08", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null).test()
+        var testObserver = db.reportsTransactionHistory().loadByQuery(sqlForHistoryReports(fromDate = "2018-05", toDate = "2018-08", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null)).test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(3, testObserver.value().size)
 
         db.reportsTransactionHistory().deleteMany(longArrayOf(101, 102))
 
-        testObserver = db.reportsTransactionHistory().load(fromDate = "2018-05", toDate = "2018-08", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null).test()
+        testObserver = db.reportsTransactionHistory().loadByQuery(sqlForHistoryReports(fromDate = "2018-05", toDate = "2018-08", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null)).test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(1, testObserver.value().size)
@@ -232,14 +233,14 @@ class ReportTransactionHistoryDaoTest {
 
         db.reportsTransactionHistory().insertAll(*list.toTypedArray())
 
-        var testObserver = db.reportsTransactionHistory().load(fromDate = "2018-05", toDate = "2018-08", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null).test()
+        var testObserver = db.reportsTransactionHistory().loadByQuery(sqlForHistoryReports(fromDate = "2018-05", toDate = "2018-08", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null)).test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isNotEmpty())
         assertEquals(3, testObserver.value().size)
 
         db.reportsTransactionHistory().clear()
 
-        testObserver = db.reportsTransactionHistory().load(fromDate = "2018-05", toDate = "2018-08", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null).test()
+        testObserver = db.reportsTransactionHistory().loadByQuery(sqlForHistoryReports(fromDate = "2018-05", toDate = "2018-08", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, budgetCategory = null)).test()
         testObserver.awaitValue()
         assertTrue(testObserver.value().isEmpty())
     }

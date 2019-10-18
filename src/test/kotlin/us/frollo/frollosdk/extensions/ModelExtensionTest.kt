@@ -276,8 +276,7 @@ class ModelExtensionTest {
     }
 
     @Test
-    fun testSQLForTags() {
-
+    fun testSQLForHistoryReports() {
         var query = sqlForHistoryReports(toDate = "2018-06-04", fromDate = "2018-06-04", period = ReportPeriod.DAY, grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, transactionTag = "hi")
         assertEquals("SELECT  *  FROM report_transaction_history WHERE (date BETWEEN '2018-06-04' AND '2018-06-04') AND report_grouping = 'MERCHANT' AND period = 'DAY' AND filtered_budget_category = 'LIVING' AND transaction_tags LIKE '%|hi|%' ", query.sql)
 

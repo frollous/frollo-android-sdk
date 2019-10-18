@@ -32,7 +32,6 @@ import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.error.FrolloSDKError
-import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
@@ -82,7 +81,7 @@ class ReportsTest : BaseAndroidTest() {
     }
 
     @Test
-    fun testFetchingCurrentReportsByTags() {
+    fun testFetchingHistoryReportsByTags() {
         initSetup()
 
         val data1 = testReportTransactionHistoryData(id = 100, date = "2018-06", period = ReportPeriod.MONTH, grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, transactionTags = listOf("hi", "hello"))
@@ -108,7 +107,7 @@ class ReportsTest : BaseAndroidTest() {
     }
 
     @Test
-    fun testRefreshReportsTags() {
+    fun testRefreshHistoryReportsByTags() {
         initSetup()
 
         val grouping = ReportGrouping.BUDGET_CATEGORY
@@ -124,8 +123,6 @@ class ReportsTest : BaseAndroidTest() {
         val body = readStringFromJson(app, R.raw.transaction_reports_history_budget_category_monthly_2018_01_01_2018_12_31)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-
-                Log.e("path", request?.trimmedPath + " --- " + requestPath)
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
                             .setResponseCode(200)
@@ -146,9 +143,37 @@ class ReportsTest : BaseAndroidTest() {
 
             // Check for overall reports
             assertEquals(12, models?.size)
+
+            // Check for overall reports
+            val overallReports = models?.sortedBy { it.report?.date }
+            assertEquals(12, overallReports?.size)
+
+            val first = overallReports?.first()
+            assertEquals("2018-01", first?.report?.date)
+            assertEquals(BigDecimal("744.37"), first?.report?.value)
+            assertEquals(BigDecimal("11000.0"), first?.report?.budget)
+            assertEquals(first?.report?.filteredBudgetCategory, BudgetCategory.LIFESTYLE)
+            assertNotNull(first?.groups)
+            assertEquals(4, first?.groups?.size)
+
+            // Check for group reports
+            val groupReports = overallReports?.filter { it.report?.date == "2018-03" }?.get(0)?.groups?.sortedBy { it.groupReport?.linkedId }
+            assertEquals(4, groupReports?.size)
+
+            val gr = groupReports?.first()
+            assertEquals("2018-03", gr?.groupReport?.date)
+            assertEquals(BigDecimal("3250.0"), gr?.groupReport?.value)
+            assertEquals(BigDecimal("4050.0"), gr?.groupReport?.budget)
+            assertEquals(gr?.groupReport?.filteredBudgetCategory, BudgetCategory.LIFESTYLE)
+            assertNotNull(gr?.overall)
+            assertEquals("2018-03", gr?.overall?.date)
+            assertEquals(0L, gr?.groupReport?.linkedId)
+            assertEquals("income", gr?.groupReport?.name)
+            assertEquals(BudgetCategory.INCOME, gr?.budgetCategory)
         }
 
-        mockServer.takeRequest()
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
         wait(3)
         tearDown()
     }

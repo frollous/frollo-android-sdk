@@ -81,32 +81,6 @@ class ReportsTest : BaseAndroidTest() {
     }
 
     @Test
-    fun testFetchingHistoryReportsByTags() {
-        initSetup()
-
-        val data1 = testReportTransactionHistoryData(id = 100, date = "2018-06", period = ReportPeriod.MONTH, grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, transactionTags = listOf("hi", "hello"))
-        val data2 = testReportTransactionHistoryData(id = 101, date = "2018-06-03", period = ReportPeriod.DAY, grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, transactionTags = listOf("hi", "hello"))
-        val data3 = testReportTransactionHistoryData(id = 102, date = "2018-06-02", period = ReportPeriod.DAY, grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, transactionTags = listOf("hi"))
-        val data4 = testReportTransactionHistoryData(id = 103, date = "2018-06-01", period = ReportPeriod.DAY, grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, transactionTags = listOf("hi"))
-
-        val list = mutableListOf(data1, data2, data3, data4)
-
-        database.reportsTransactionHistory().insertAll(*list.toTypedArray())
-
-        var testObserver = reports.historyTransactionReports(fromDate = "2018-05-01", toDate = "2018-06-30", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, transactionTag = "hi", budgetCategory = BudgetCategory.LIVING).test()
-        testObserver.awaitValue()
-        assertNotNull(testObserver.value().data)
-        assertEquals(1, testObserver.value().data?.size)
-
-        testObserver = reports.historyTransactionReports(fromDate = "2018-05-01", toDate = "2018-06-30", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.DAY, transactionTag = "hi", budgetCategory = BudgetCategory.LIVING).test()
-        testObserver.awaitValue()
-        assertNotNull(testObserver.value().data)
-        assertEquals(3, testObserver.value().data?.size)
-
-        tearDown()
-    }
-
-    @Test
     fun testFetchingAccountBalanceReportsFailsDateFormat() {
         initSetup()
 
@@ -2335,6 +2309,32 @@ class ReportsTest : BaseAndroidTest() {
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
         wait(3)
+        tearDown()
+    }
+
+    @Test
+    fun testFetchingHistoryReportsByTags() {
+        initSetup()
+
+        val data1 = testReportTransactionHistoryData(id = 100, date = "2018-06", period = ReportPeriod.MONTH, grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, transactionTags = listOf("hi", "hello"))
+        val data2 = testReportTransactionHistoryData(id = 101, date = "2018-06-03", period = ReportPeriod.DAY, grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, transactionTags = listOf("hi", "hello"))
+        val data3 = testReportTransactionHistoryData(id = 102, date = "2018-06-02", period = ReportPeriod.DAY, grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, transactionTags = listOf("hi"))
+        val data4 = testReportTransactionHistoryData(id = 103, date = "2018-06-01", period = ReportPeriod.DAY, grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, transactionTags = listOf("hi"))
+
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        database.reportsTransactionHistory().insertAll(*list.toTypedArray())
+
+        var testObserver = reports.historyTransactionReports(fromDate = "2018-05-01", toDate = "2018-06-30", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, transactionTag = "hi", budgetCategory = BudgetCategory.LIVING).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(1, testObserver.value().data?.size)
+
+        testObserver = reports.historyTransactionReports(fromDate = "2018-05-01", toDate = "2018-06-30", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.DAY, transactionTag = "hi", budgetCategory = BudgetCategory.LIVING).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value().data)
+        assertEquals(3, testObserver.value().data?.size)
+
         tearDown()
     }
 }

@@ -1,5 +1,10 @@
 ## Changelog
 
+### 3.2.0
+
+#### Changes
+- Added support to show reports based on tag.
+
 ### 3.1.0
 
 #### Changes

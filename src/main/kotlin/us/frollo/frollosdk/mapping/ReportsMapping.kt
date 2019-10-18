@@ -47,22 +47,24 @@ internal fun TransactionCurrentReportResponse.Report.toReportTransactionCurrent(
                 filteredBudgetCategory = budgetCategory,
                 grouping = grouping)
 
-internal fun TransactionHistoryReportResponse.Report.toReportTransactionHistory(grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory? = null) =
+internal fun TransactionHistoryReportResponse.Report.toReportTransactionHistory(grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory? = null, tags: List<String>? = null) =
         ReportTransactionHistory(
                 date = date,
                 value = value,
                 budget = budget,
                 period = period,
                 filteredBudgetCategory = budgetCategory,
+                transactionTags = tags,
                 grouping = grouping)
 
-internal fun TransactionHistoryReportResponse.Report.GroupReport.toReportGroupTransactionHistory(grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory? = null, date: String, reportId: Long) =
+internal fun TransactionHistoryReportResponse.Report.GroupReport.toReportGroupTransactionHistory(grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory? = null, date: String, reportId: Long, tags: List<String>? = null) =
         ReportGroupTransactionHistory(
                 linkedId = id,
                 name = name,
                 value = value,
                 budget = budget,
                 transactionIds = transactionIds,
+                transactionTags = tags,
                 period = period,
                 date = date,
                 filteredBudgetCategory = budgetCategory,

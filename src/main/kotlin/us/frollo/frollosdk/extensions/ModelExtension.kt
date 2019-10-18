@@ -42,6 +42,7 @@ import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
+import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.shared.OrderType
@@ -112,6 +113,54 @@ internal fun sqlForMessagesCount(messageTypes: List<String>? = null, read: Boole
     contentType?.let { sqlQueryBuilder.appendSelection(selection = "content_type = '${ it.name }'") }
 
     sqlQueryBuilder.columns(columns = arrayOf("COUNT(msg_id)"))
+
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForHistoryReports(
+    fromDate: String,
+    toDate: String,
+    grouping: ReportGrouping,
+    period: ReportPeriod,
+    budgetCategory: BudgetCategory? = null,
+    dates: Array<String>? = null,
+    transactionTag: String? = null
+): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("report_transaction_history")
+
+    sqlQueryBuilder.appendSelection(selection = "(date BETWEEN '$fromDate' AND '$toDate')")
+    sqlQueryBuilder.appendSelection(selection = "report_grouping = '${ grouping.name }'")
+    sqlQueryBuilder.appendSelection(selection = "period = '${ period.name }'")
+    val budgetCategorySelection = budgetCategory?.let { "filtered_budget_category = '${ it.name }'" } ?: run { "filtered_budget_category IS NULL" }
+    sqlQueryBuilder.appendSelection(selection = budgetCategorySelection)
+    val tagsSelection = transactionTag?.let { "transaction_tags LIKE '%|$transactionTag|%'" } ?: run { "transaction_tags IS NULL" }
+    sqlQueryBuilder.appendSelection(selection = tagsSelection)
+    dates?.let { sqlQueryBuilder.appendSelection(selection = "date IN (${ it.joinToString(",") { "'$it'" } })") }
+
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForStaleHistoryReportIds(
+    fromDate: String,
+    toDate: String,
+    grouping: ReportGrouping,
+    period: ReportPeriod,
+    budgetCategory: BudgetCategory? = null,
+    dates: Array<String>? = null,
+    transactionTag: String? = null
+): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("report_transaction_history")
+
+    sqlQueryBuilder.columns(arrayOf("report_id"))
+
+    sqlQueryBuilder.appendSelection(selection = "(date BETWEEN '$fromDate' AND '$toDate')")
+    sqlQueryBuilder.appendSelection(selection = "report_grouping = '${ grouping.name }'")
+    sqlQueryBuilder.appendSelection(selection = "period = '${ period.name }'")
+    val budgetCategorySelection = budgetCategory?.let { "filtered_budget_category = '${ it.name }'" } ?: run { "filtered_budget_category IS NULL" }
+    sqlQueryBuilder.appendSelection(selection = budgetCategorySelection)
+    val tagsSelection = transactionTag?.let { "transaction_tags LIKE '%|$transactionTag|%'" } ?: run { "transaction_tags IS NULL" }
+    sqlQueryBuilder.appendSelection(selection = tagsSelection)
+    dates?.let { sqlQueryBuilder.appendSelection(selection = "date NOT IN (${ it.joinToString(",") { "'$it'" } })") }
 
     return sqlQueryBuilder.create()
 }

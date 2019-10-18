@@ -34,19 +34,18 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 @Dao
 internal interface ReportTransactionHistoryDao {
 
-    @androidx.room.Transaction
-    @Query("SELECT * FROM report_transaction_history WHERE (date BETWEEN :fromDate AND :toDate) AND report_grouping = :grouping AND period = :period AND filtered_budget_category IS :budgetCategory")
-    fun load(fromDate: String, toDate: String, grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory?): LiveData<List<ReportTransactionHistoryRelation>>
-
     @Transaction
     @RawQuery(observedEntities = [ReportTransactionHistory::class])
     fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<ReportTransactionHistoryRelation>>
 
-    @Query("SELECT * FROM report_transaction_history WHERE (date BETWEEN :fromDate AND :toDate) AND report_grouping = :grouping AND period = :period AND filtered_budget_category IS :budgetCategory AND date IN (:dates)")
-    fun find(fromDate: String, toDate: String, grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory?, dates: Array<String>): MutableList<ReportTransactionHistory>
+    @RawQuery
+    fun find(queryStr: SupportSQLiteQuery): MutableList<ReportTransactionHistory>
 
     @Query("SELECT report_id FROM report_transaction_history WHERE (date BETWEEN :fromDate AND :toDate) AND report_grouping = :grouping AND period = :period AND filtered_budget_category IS :budgetCategory AND date NOT IN (:dates)")
     fun findStaleIds(fromDate: String, toDate: String, grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory?, dates: Array<String>): LongArray
+
+    @RawQuery
+    fun findStaleIds(queryStr: SupportSQLiteQuery): LongArray
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: ReportTransactionHistory): LongArray

@@ -29,7 +29,7 @@ import java.math.BigDecimal
 
 @Entity(tableName = "report_transaction_history",
         indices = [Index("report_id"),
-            Index(value = ["date", "period", "filtered_budget_category", "report_grouping"], unique = true)])
+            Index(value = ["date", "period", "filtered_budget_category", "report_grouping", "transaction_tags"], unique = true)])
 
 /** Data representation of history transaction overall report */
 data class ReportTransactionHistory(
@@ -48,6 +48,9 @@ data class ReportTransactionHistory(
 
     /** Filter budget category if the report was filtered to a specific category */
     @ColumnInfo(name = "filtered_budget_category") val filteredBudgetCategory: BudgetCategory?,
+
+    /** Transaction tags related to the report */
+    @ColumnInfo(name = "transaction_tags") val transactionTags: List<String>?,
 
     /** Grouping - how the report response has been broken down */
     @ColumnInfo(name = "report_grouping") val grouping: ReportGrouping

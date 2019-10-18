@@ -38,6 +38,8 @@ import us.frollo.frollosdk.extensions.fetchTransactionHistoryReports
 import us.frollo.frollosdk.extensions.isValidFormat
 import us.frollo.frollosdk.extensions.sqlForExistingAccountBalanceReports
 import us.frollo.frollosdk.extensions.sqlForFetchingAccountBalanceReports
+import us.frollo.frollosdk.extensions.sqlForHistoryReports
+import us.frollo.frollosdk.extensions.sqlForStaleHistoryReportIds
 import us.frollo.frollosdk.extensions.sqlForStaleIdsAccountBalanceReports
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.logging.Log
@@ -224,6 +226,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      * @param grouping Grouping that reports should be broken down into
      * @param period Period that reports should be broken down by
      * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
+     * @param transactionTag Transaction tag that reports should be filtered by (Optional)
      *
      * @return LiveData object of Resource<List<ReportTransactionHistoryRelation>> which can be observed using an Observer for future changes as well.
      */
@@ -232,12 +235,19 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         toDate: String,
         grouping: ReportGrouping,
         period: ReportPeriod,
-        budgetCategory: BudgetCategory? = null
+        budgetCategory: BudgetCategory? = null,
+        transactionTag: String? = null
     ): LiveData<Resource<List<ReportTransactionHistoryRelation>>> {
         val from = fromDate.toReportDateFormat(period)
         val to = toDate.toReportDateFormat(period)
 
-        return Transformations.map(db.reportsTransactionHistory().load(from, to, grouping, period, budgetCategory)) { model ->
+        return Transformations.map(db.reportsTransactionHistory().loadByQuery(sqlForHistoryReports(
+                fromDate = from,
+                toDate = to,
+                grouping = grouping,
+                period = period,
+                budgetCategory = budgetCategory,
+                transactionTag = transactionTag))) { model ->
             Resource.success(model)
         }
     }
@@ -264,6 +274,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      * @param grouping Grouping that reports should be broken down into
      * @param period Period that reports should be broken down by
      * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
+     * @param transactionTag Transaction tag that reports should be filtered by (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun refreshTransactionHistoryReports(
@@ -272,9 +283,10 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         grouping: ReportGrouping,
         period: ReportPeriod,
         budgetCategory: BudgetCategory? = null,
+        transactionTag: String? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
-        reportsAPI.fetchTransactionHistoryReports(grouping, period, fromDate, toDate, budgetCategory).enqueue { resource ->
+        reportsAPI.fetchTransactionHistoryReports(grouping, period, fromDate, toDate, budgetCategory, transactionTag).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshTransactionHistoryReports", resource.error?.localizedDescription)
@@ -291,6 +303,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                             grouping = grouping,
                             period = period,
                             budgetCategory = budgetCategory,
+                            transactionTag = transactionTag,
                             completion = completion)
                 }
             }
@@ -488,6 +501,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         grouping: ReportGrouping,
         period: ReportPeriod,
         budgetCategory: BudgetCategory?,
+        transactionTag: String?,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
         reportsResponse?.let {
@@ -498,14 +512,14 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
 
                     // Fetch existing reports for updating
                     val reportDates = reportsResponse.map { it.date }.toTypedArray()
-
-                    val existingReports = db.reportsTransactionHistory().find(
+                    val existingReports = db.reportsTransactionHistory().find(sqlForHistoryReports(
                             fromDate = fromDate,
                             toDate = toDate,
                             grouping = grouping,
                             period = period,
                             budgetCategory = budgetCategory,
-                            dates = reportDates)
+                            dates = reportDates,
+                            transactionTag = transactionTag))
 
                     // Sort by date
                     existingReports.sortBy { it.date }
@@ -513,7 +527,11 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                     var index = 0
 
                     reportsResponse.forEach { response ->
-                        val report = response.toReportTransactionHistory(grouping = grouping, period = period, budgetCategory = budgetCategory)
+                        val report = response.toReportTransactionHistory(
+                                grouping = grouping,
+                                period = period,
+                                budgetCategory = budgetCategory,
+                                tags = transactionTag?.let { listOf(transactionTag) })
 
                         if (index < existingReports.size && existingReports[index].date == response.date) {
                             // Update
@@ -531,13 +549,14 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                     }
 
                     // Fetch and delete any leftovers
-                    val staleReportIds = db.reportsTransactionHistory().findStaleIds(
+                    val staleReportIds = db.reportsTransactionHistory().findStaleIds(sqlForStaleHistoryReportIds(
                             fromDate = fromDate,
                             toDate = toDate,
                             grouping = grouping,
                             period = period,
                             budgetCategory = budgetCategory,
-                            dates = reportDates)
+                            dates = reportDates,
+                            transactionTag = transactionTag))
 
                     db.reportsTransactionHistory().deleteMany(staleReportIds)
                     db.reportGroupsTransactionHistory().deleteByReportIds(staleReportIds)
@@ -574,7 +593,8 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                     period = report.period,
                     budgetCategory = report.filteredBudgetCategory,
                     date = report.date,
-                    reportId = report.reportId)
+                    reportId = report.reportId,
+                    tags = report.transactionTags)
 
             if (index < existingReportGroups.size && existingReportGroups[index].linkedId == response.id) {
                 // Update

@@ -242,7 +242,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 database.execSQL("ALTER TABLE `report_group_transaction_history` ADD COLUMN `transaction_tags` TEXT")
                 database.execSQL("CREATE UNIQUE INDEX `index_report_group_transaction_history_linked_id_date_period_filtered_budget_category_report_grouping_transaction_tags` ON `report_group_transaction_history` (`linked_id`, `date`, `period`, `filtered_budget_category`, `report_grouping`, `transaction_tags`)")
 
-                // START - Alter column smallLogoUrl
+                // START - Alter column causing not null issues for goal table
                 database.execSQL("BEGIN TRANSACTION")
                 database.execSQL("DROP INDEX IF EXISTS `index_goal_goal_id`")
                 database.execSQL("DROP INDEX IF EXISTS  `index_goal_account_id`")

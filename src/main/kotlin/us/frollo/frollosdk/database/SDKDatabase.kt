@@ -234,13 +234,26 @@ abstract class SDKDatabase : RoomDatabase() {
                 // New changes in this migration:
                 // 1) Alter report_transaction_history table - add column transaction_tags
                 // 2) Alter report_group_transaction_history table - add column transaction_tags
-                database.execSQL("DROP INDEX IF EXISTS `index_report_transaction_history_date_period_filtered_budget_category_report_grouping_transaction_tags`")
+                database.execSQL("DROP INDEX IF EXISTS `index_report_transaction_history_date_period_filtered_budget_category_report_grouping`")
                 database.execSQL("ALTER TABLE `report_transaction_history` ADD COLUMN `transaction_tags` TEXT")
                 database.execSQL("CREATE UNIQUE INDEX `index_report_transaction_history_date_period_filtered_budget_category_report_grouping_transaction_tags` ON `report_transaction_history` (`date`, `period`, `filtered_budget_category`, `report_grouping`, `transaction_tags`)")
 
-                database.execSQL("DROP INDEX IF EXISTS `index_report_group_transaction_history_linked_id_date_period_filtered_budget_category_report_grouping_transaction_tags`")
+                database.execSQL("DROP INDEX IF EXISTS `index_report_group_transaction_history_linked_id_date_period_filtered_budget_category_report_grouping`")
                 database.execSQL("ALTER TABLE `report_group_transaction_history` ADD COLUMN `transaction_tags` TEXT")
                 database.execSQL("CREATE UNIQUE INDEX `index_report_group_transaction_history_linked_id_date_period_filtered_budget_category_report_grouping_transaction_tags` ON `report_group_transaction_history` (`linked_id`, `date`, `period`, `filtered_budget_category`, `report_grouping`, `transaction_tags`)")
+
+                // START - Alter column current period columns to make them nullable
+                database.execSQL("BEGIN TRANSACTION")
+                database.execSQL("DROP INDEX IF EXISTS `index_goal_goal_id`")
+                database.execSQL("DROP INDEX IF EXISTS  `index_goal_account_id`")
+                database.execSQL("ALTER TABLE goal RENAME TO original_goal")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `goal` (`goal_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `image_url` TEXT, `account_id` INTEGER, `type` TEXT, `sub_type` TEXT, `tracking_status` TEXT NOT NULL, `tracking_type` TEXT NOT NULL, `status` TEXT NOT NULL, `frequency` TEXT NOT NULL, `target` TEXT NOT NULL, `currency` TEXT NOT NULL, `current_amount` TEXT NOT NULL, `period_amount` TEXT NOT NULL, `start_amount` TEXT NOT NULL, `target_amount` TEXT NOT NULL, `start_date` TEXT NOT NULL, `end_date` TEXT NOT NULL, `estimated_end_date` TEXT, `estimated_target_amount` TEXT, `periods_count` INTEGER NOT NULL, `c_period_goal_period_id` INTEGER, `c_period_goal_id` INTEGER, `c_period_start_date` TEXT, `c_period_end_date` TEXT, `c_period_tracking_status` TEXT, `c_period_current_amount` TEXT, `c_period_target_amount` TEXT, `c_period_required_amount` TEXT, PRIMARY KEY(`goal_id`))")
+                database.execSQL("INSERT INTO goal(goal_id, name, description, image_url, account_id,type,sub_type,tracking_status, tracking_type, status, frequency, target, currency, current_amount, period_amount, start_amount, target_amount, start_date, end_date, estimated_end_date, estimated_target_amount, periods_count, c_period_goal_period_id, c_period_goal_id, c_period_start_date , c_period_end_date, c_period_tracking_status, c_period_current_amount, c_period_target_amount, c_period_required_amount) SELECT goal_id, name, description, image_url,account_id,type,sub_type,tracking_status, tracking_type, status, frequency, target, currency, current_amount, period_amount, start_amount, target_amount, start_date, end_date, estimated_end_date, estimated_target_amount, periods_count, c_period_goal_period_id, c_period_goal_id, c_period_start_date , c_period_end_date, c_period_tracking_status, c_period_current_amount, c_period_target_amount, c_period_required_amount FROM original_goal")
+                database.execSQL("DROP TABLE original_goal")
+                database.execSQL("CREATE  INDEX `index_goal_goal_id` ON `goal` (`goal_id`)")
+                database.execSQL("CREATE  INDEX `index_goal_account_id` ON `goal` (`account_id`)")
+                database.execSQL("COMMIT")
+                // END - Alter column current period columns to make them nullable
             }
         }
     }

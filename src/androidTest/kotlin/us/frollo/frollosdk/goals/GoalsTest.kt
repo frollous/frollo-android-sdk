@@ -195,6 +195,11 @@ class GoalsTest : BaseAndroidTest() {
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
             assertEquals(3, testObserver.value().data?.size)
+            var metadata = testObserver.value().data?.first()?.metadata
+            assertEquals(true, metadata?.get("seen")?.asBoolean)
+
+            metadata = testObserver.value().data?.get(1)?.metadata
+            assertEquals("Holiday", metadata?.get("type")?.asString)
         }
 
         val request = mockServer.takeRequest()
@@ -295,8 +300,6 @@ class GoalsTest : BaseAndroidTest() {
                 name = "My test goal",
                 description = "The bestest test goal",
                 imageUrl = "https://example.com/image.png",
-                type = "Holiday",
-                subType = "Winter",
                 target = GoalTarget.AMOUNT,
                 trackingType = GoalTrackingType.CREDIT,
                 frequency = GoalFrequency.WEEKLY,
@@ -346,8 +349,6 @@ class GoalsTest : BaseAndroidTest() {
                 name = "My test goal",
                 description = "The bestest test goal",
                 imageUrl = "https://example.com/image.png",
-                type = "Holiday",
-                subType = "Winter",
                 target = GoalTarget.DATE,
                 trackingType = GoalTrackingType.CREDIT,
                 frequency = GoalFrequency.WEEKLY,
@@ -397,8 +398,6 @@ class GoalsTest : BaseAndroidTest() {
                 name = "My test goal",
                 description = "The bestest test goal",
                 imageUrl = "https://example.com/image.png",
-                type = "Holiday",
-                subType = "Winter",
                 target = GoalTarget.OPEN_ENDED,
                 trackingType = GoalTrackingType.CREDIT,
                 frequency = GoalFrequency.WEEKLY,
@@ -438,8 +437,6 @@ class GoalsTest : BaseAndroidTest() {
                 name = "My test goal",
                 description = "The bestest test goal",
                 imageUrl = "https://example.com/image.png",
-                type = "Holiday",
-                subType = "Winter",
                 target = GoalTarget.AMOUNT,
                 trackingType = GoalTrackingType.CREDIT,
                 frequency = GoalFrequency.WEEKLY,
@@ -469,8 +466,6 @@ class GoalsTest : BaseAndroidTest() {
                 name = "My test goal",
                 description = "The bestest test goal",
                 imageUrl = "https://example.com/image.png",
-                type = "Holiday",
-                subType = "Winter",
                 target = GoalTarget.AMOUNT,
                 trackingType = GoalTrackingType.CREDIT,
                 frequency = GoalFrequency.WEEKLY,

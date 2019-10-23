@@ -18,6 +18,7 @@ package us.frollo.frollosdk.database
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountGroup
@@ -350,4 +351,10 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromBudgetCategory(value: BudgetCategory?): String? = value?.name
+
+    @TypeConverter
+    fun stringToMetadata(value: String?): JsonObject? = if (value == null) null else gson.fromJson(value)
+
+    @TypeConverter
+    fun stringFromMetadata(value: JsonObject?): String? = if (value == null) null else gson.toJson(value)
 }

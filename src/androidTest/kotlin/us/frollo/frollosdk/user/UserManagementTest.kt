@@ -189,7 +189,7 @@ class UserManagementTest : BaseAndroidTest() {
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
 
-            val expectedResponse = Gson().fromJson<UserResponse>(body)
+            val expectedResponse = Gson().fromJson<UserResponse>(body)!!
             assertEquals(expectedResponse.toUser(), testObserver.value().data)
         }
 
@@ -230,7 +230,7 @@ class UserManagementTest : BaseAndroidTest() {
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
 
-            val expectedResponse = Gson().fromJson<UserResponse>(body)
+            val expectedResponse = Gson().fromJson<UserResponse>(body)!!
             assertEquals(expectedResponse.toUser(), testObserver.value().data)
         }
 
@@ -305,7 +305,7 @@ class UserManagementTest : BaseAndroidTest() {
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
 
-            val expectedResponse = Gson().fromJson<UserResponse>(body)
+            val expectedResponse = Gson().fromJson<UserResponse>(body)!!
             assertEquals(expectedResponse.toUser(), testObserver.value().data)
         }
 

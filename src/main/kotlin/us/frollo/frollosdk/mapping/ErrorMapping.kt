@@ -23,17 +23,11 @@ import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.OAuth2ErrorType
 import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
-import us.frollo.frollosdk.model.api.shared.APIErrorResponse
 import us.frollo.frollosdk.model.api.shared.APIErrorResponseWrapper
 import us.frollo.frollosdk.model.oauth.OAuth2ErrorResponse
 
-internal fun String.toAPIErrorResponse(): APIErrorResponse? {
-    return try {
-        Gson().fromJson<APIErrorResponseWrapper>(this).apiErrorResponse
-    } catch (e: Exception) {
-        null
-    }
-}
+internal fun String.toAPIErrorResponse()
+        = Gson().fromJson<APIErrorResponseWrapper>(this)?.apiErrorResponse
 
 internal fun Int.toAPIErrorType(errorCode: APIErrorCode?): APIErrorType {
     return when (this) {
@@ -70,9 +64,7 @@ internal fun Int.toAPIErrorType(errorCode: APIErrorCode?): APIErrorType {
 internal fun String.toDataError(): DataError? {
     return try {
         val error = Gson().fromJson<DataError>(this)
-        // I know it says "is always true", BUT, this "!= null" check is NEEDED
-        // because Gson().fromJson() can return object with null values for its members
-        if (error.type != null) error else null
+        if (error?.type != null) error else null
     } catch (e: Exception) {
         null
     }

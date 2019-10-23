@@ -16,6 +16,7 @@
 
 package us.frollo.frollosdk.model.api.goals
 
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
@@ -30,8 +31,6 @@ internal data class GoalResponse(
     @SerializedName("description") val description: String?,
     @SerializedName("image_url") val imageUrl: String?,
     @SerializedName("account_id") val accountId: Long?,
-    @SerializedName("type") var type: String,
-    @SerializedName("sub_type") var subType: String,
     @SerializedName("tracking_status") var trackingStatus: GoalTrackingStatus,
     @SerializedName("tracking_type") var trackingType: GoalTrackingType,
     @SerializedName("status") var status: GoalStatus,
@@ -47,5 +46,6 @@ internal data class GoalResponse(
     @SerializedName("estimated_end_date") val estimatedEndDate: String?, // yyyy-MM-dd
     @SerializedName("estimated_target_amount") val estimatedTargetAmount: BigDecimal?,
     @SerializedName("periods_count") val periodsCount: Int,
-    @SerializedName("current_period") val currentPeriod: GoalPeriodResponse?
+    @SerializedName("current_period") val currentPeriod: GoalPeriodResponse?,
+    @SerializedName("metadata") val metadata: JsonObject?
 )

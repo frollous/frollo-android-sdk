@@ -51,7 +51,7 @@ class ProviderLoginFormTest {
 
     @Test
     fun testParsingLoginForm() {
-        val form: ProviderLoginForm = Gson().fromJson(readStringFromJson(app, R.raw.provider_login_form_login))
+        val form: ProviderLoginForm = Gson().fromJson(readStringFromJson(app, R.raw.provider_login_form_login))!!
 
         assertEquals("13039", form.formId)
         assertEquals(ProviderFormType.LOGIN, form.formType)
@@ -103,7 +103,7 @@ class ProviderLoginFormTest {
 
     @Test
     fun testParsingCaptchaForm() {
-        val form: ProviderLoginForm = Gson().fromJson(readStringFromJson(app, R.raw.provider_login_form_captcha))
+        val form: ProviderLoginForm = Gson().fromJson(readStringFromJson(app, R.raw.provider_login_form_captcha))!!
 
         assertNull(form.formId)
         assertEquals(ProviderFormType.IMAGE, form.formType)
@@ -140,7 +140,7 @@ class ProviderLoginFormTest {
 
     @Test
     fun testParsingMultipleChoiceForm() {
-        val form: ProviderLoginForm = Gson().fromJson(readStringFromJson(app, R.raw.provider_login_form_multiple_choice))
+        val form: ProviderLoginForm = Gson().fromJson(readStringFromJson(app, R.raw.provider_login_form_multiple_choice))!!
 
         assertEquals("3326", form.formId)
         assertEquals(ProviderFormType.LOGIN, form.formType)
@@ -252,7 +252,7 @@ class ProviderLoginFormTest {
 
     @Test
     fun testParsingQuestionAnswerForm() {
-        val form: ProviderLoginForm = Gson().fromJson(readStringFromJson(app, R.raw.provider_login_form_question_answer))
+        val form: ProviderLoginForm = Gson().fromJson(readStringFromJson(app, R.raw.provider_login_form_question_answer))!!
 
         assertNull(form.formId)
         assertEquals(ProviderFormType.QUESTION_AND_ANSWER, form.formType)
@@ -309,7 +309,7 @@ class ProviderLoginFormTest {
 
     @Test
     fun testParsingTokenForm() {
-        val form: ProviderLoginForm = Gson().fromJson(readStringFromJson(app, R.raw.provider_login_form_token))
+        val form: ProviderLoginForm = Gson().fromJson(readStringFromJson(app, R.raw.provider_login_form_token))!!
 
         assertNull(form.formId)
         assertEquals(ProviderFormType.TOKEN, form.formType)
@@ -345,7 +345,7 @@ class ProviderLoginFormTest {
 
     @Test
     fun testParsingOptionsForm() {
-        val form: ProviderLoginForm = Gson().fromJson(readStringFromJson(app, R.raw.provider_login_form_options))
+        val form: ProviderLoginForm = Gson().fromJson(readStringFromJson(app, R.raw.provider_login_form_options))!!
 
         assertEquals("12525", form.formId)
         assertEquals(ProviderFormType.LOGIN, form.formType)
@@ -448,7 +448,7 @@ class ProviderLoginFormTest {
 
     @Test
     fun testParsingValidationForm() {
-        val form: ProviderLoginForm = Gson().fromJson(readStringFromJson(app, R.raw.provider_login_form_validation))
+        val form: ProviderLoginForm = Gson().fromJson(readStringFromJson(app, R.raw.provider_login_form_validation))!!
 
         assertEquals("3008", form.formId)
         assertEquals(ProviderFormType.LOGIN, form.formType)

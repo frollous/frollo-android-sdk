@@ -21,6 +21,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.google.gson.JsonObject
 import us.frollo.frollosdk.model.IAdapterModel
 import java.math.BigDecimal
 
@@ -50,12 +51,6 @@ data class Goal(
 
     /** Account ID the goal is associated with if tracking automatically (Optional) */
     @ColumnInfo(name = "account_id") val accountId: Long?,
-
-    /** Type of the goal (Optional) */
-    @ColumnInfo(name = "type") val type: String?,
-
-    /** Sub-type of the goal (Optional) */
-    @ColumnInfo(name = "sub_type") val subType: String?,
 
     /** Tracking Status */
     @ColumnInfo(name = "tracking_status") val trackingStatus: GoalTrackingStatus,
@@ -103,7 +98,10 @@ data class Goal(
     @ColumnInfo(name = "periods_count") val periodsCount: Int,
 
     /** Current active goal period (Optional) */
-    @Embedded(prefix = "c_period_") val currentPeriod: GoalPeriod?
+    @Embedded(prefix = "c_period_") val currentPeriod: GoalPeriod?,
+
+    /** Metadata - custom JSON to be stored with the goal (Optional) */
+    @ColumnInfo(name = "metadata") var metadata: JsonObject?
 
 ) : IAdapterModel {
 

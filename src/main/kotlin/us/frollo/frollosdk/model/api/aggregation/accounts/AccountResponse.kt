@@ -34,7 +34,6 @@ internal data class AccountResponse(
     @SerializedName("provider_account_id") val providerAccountId: Long,
     @SerializedName("provider_name") val providerName: String,
     @SerializedName("aggregator") val aggregator: String?,
-    @SerializedName("aggregator_id") val aggregatorId: Long,
     @SerializedName("holder_profile") val holderProfile: HolderProfile?,
     @SerializedName("account_status") val accountStatus: AccountStatus,
     @SerializedName("account_attributes") val attributes: AccountAttributes,

@@ -45,7 +45,13 @@ internal fun <T1, T2> ifNotNull(value1: T1?, value2: T2?, bothNotNull: (T1, T2) 
  * Converts a [json] to a given [T] object.
  * @return the converted object.
  */
-internal inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)
+internal inline fun <reified T> Gson.fromJson(json: String): T? {
+    return try {
+        this.fromJson<T>(json, object : TypeToken<T>() {}.type)
+    } catch (e: Exception) {
+        null
+    }
+}
 
 /**
  * Retrieves the value from the [SerializedName] annotation, if present

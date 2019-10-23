@@ -236,7 +236,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 // 2) Alter report_group_transaction_history table - add column transaction_tags
                 // 3) Alter goals table - make current period columns nullable
 
-                commonMigrationsBetween_6_8(database)
+                commonMigrationsReports6To8(database)
 
                 // START - Alter column current period columns to make them nullable
                 database.execSQL("BEGIN TRANSACTION")
@@ -253,7 +253,7 @@ abstract class SDKDatabase : RoomDatabase() {
             }
         }
 
-        private fun commonMigrationsBetween_6_8(database: SupportSQLiteDatabase) {
+        private fun commonMigrationsReports6To8(database: SupportSQLiteDatabase) {
             database.execSQL("DROP INDEX IF EXISTS `index_report_transaction_history_date_period_filtered_budget_category_report_grouping`")
             database.execSQL("ALTER TABLE `report_transaction_history` ADD COLUMN `transaction_tags` TEXT")
             database.execSQL("CREATE UNIQUE INDEX `index_report_transaction_history_date_period_filtered_budget_category_report_grouping_transaction_tags` ON `report_transaction_history` (`date`, `period`, `filtered_budget_category`, `report_grouping`, `transaction_tags`)")
@@ -268,23 +268,48 @@ abstract class SDKDatabase : RoomDatabase() {
                 // New changes in this migration:
                 // 1) Alter report_transaction_history table - add column transaction_tags
                 // 2) Alter report_group_transaction_history table - add column transaction_tags
-                // 4) Alter goals table - make current period columns nullable, delete columns type and sub_type, add column metadata
+                // 4) Alter goals table - make current period columns nullable, delete columns type and sub_type, add column metadata, add column c_period_period_index
                 // 3) Alter goal_period table - add column period_index
 
-                commonMigrationsBetween_6_8(database)
-
-                // TODO: to be implemented
+                commonMigrationsReports6To8(database)
+                commonMigrationsGoals7To8(database)
             }
         }
 
         private val MIGRATION_7_8: Migration = object : Migration(7, 8) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // New changes in this migration:
-                // 1) Alter goals table - delete columns type and sub_type, add column metadata
+                // 1) Alter goals table - delete columns type and sub_type, add column metadata, add column c_period_period_index
                 // 2) Alter goal_period table - add column period_index
 
-                // TODO: to be implemented
+                commonMigrationsGoals7To8(database)
             }
+        }
+
+        private fun commonMigrationsGoals7To8(database: SupportSQLiteDatabase) {
+            // START - Alter columns of goal & goal_period tables
+            database.execSQL("BEGIN TRANSACTION")
+
+            database.execSQL("DROP INDEX IF EXISTS `index_goal_goal_id`")
+            database.execSQL("DROP INDEX IF EXISTS  `index_goal_account_id`")
+            database.execSQL("ALTER TABLE goal RENAME TO original_goal")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `goal` (`goal_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `image_url` TEXT, `account_id` INTEGER, `tracking_status` TEXT NOT NULL, `tracking_type` TEXT NOT NULL, `status` TEXT NOT NULL, `frequency` TEXT NOT NULL, `target` TEXT NOT NULL, `currency` TEXT NOT NULL, `current_amount` TEXT NOT NULL, `period_amount` TEXT NOT NULL, `start_amount` TEXT NOT NULL, `target_amount` TEXT NOT NULL, `start_date` TEXT NOT NULL, `end_date` TEXT NOT NULL, `estimated_end_date` TEXT, `estimated_target_amount` TEXT, `periods_count` INTEGER NOT NULL, `metadata` TEXT, `c_period_goal_period_id` INTEGER, `c_period_goal_id` INTEGER, `c_period_start_date` TEXT, `c_period_end_date` TEXT, `c_period_tracking_status` TEXT, `c_period_current_amount` TEXT, `c_period_target_amount` TEXT, `c_period_required_amount` TEXT, `c_period_period_index` INTEGER, PRIMARY KEY(`goal_id`))")
+            database.execSQL("INSERT INTO goal(goal_id, name, description, image_url, account_id, tracking_status, tracking_type, status, frequency, target, currency, current_amount, period_amount, start_amount, target_amount, start_date, end_date, estimated_end_date, estimated_target_amount, periods_count, c_period_goal_period_id, c_period_goal_id, c_period_start_date , c_period_end_date, c_period_tracking_status, c_period_current_amount, c_period_target_amount, c_period_required_amount) SELECT goal_id, name, description, image_url, account_id, tracking_status, tracking_type, status, frequency, target, currency, current_amount, period_amount, start_amount, target_amount, start_date, end_date, estimated_end_date, estimated_target_amount, periods_count, c_period_goal_period_id, c_period_goal_id, c_period_start_date , c_period_end_date, c_period_tracking_status, c_period_current_amount, c_period_target_amount, c_period_required_amount FROM original_goal")
+            database.execSQL("DROP TABLE original_goal")
+            database.execSQL("CREATE  INDEX `index_goal_goal_id` ON `goal` (`goal_id`)")
+            database.execSQL("CREATE  INDEX `index_goal_account_id` ON `goal` (`account_id`)")
+
+            database.execSQL("DROP INDEX IF EXISTS `index_goal_period_goal_period_id`")
+            database.execSQL("DROP INDEX IF EXISTS  `index_goal_period_goal_id`")
+            database.execSQL("ALTER TABLE goal_period RENAME TO original_goal_period")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `goal_period` (`goal_period_id` INTEGER NOT NULL, `goal_id` INTEGER NOT NULL, `start_date` TEXT NOT NULL, `end_date` TEXT NOT NULL, `tracking_status` TEXT, `current_amount` TEXT NOT NULL, `target_amount` TEXT NOT NULL, `required_amount` TEXT NOT NULL, `period_index` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`goal_period_id`))")
+            database.execSQL("INSERT INTO goal_period(goal_period_id, goal_id, start_date, end_date, tracking_status, current_amount, target_amount, required_amount) SELECT goal_period_id, goal_id, start_date, end_date, tracking_status, current_amount, target_amount, required_amount FROM original_goal_period")
+            database.execSQL("DROP TABLE original_goal_period")
+            database.execSQL("CREATE  INDEX `index_goal_period_goal_period_id` ON `goal_period` (`goal_period_id`)")
+            database.execSQL("CREATE  INDEX `index_goal_period_goal_id` ON `goal_period` (`goal_id`)")
+
+            database.execSQL("COMMIT")
+            // END - Alter columns of goal & goal_period tables
         }
     }
 }

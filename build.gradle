@@ -11,7 +11,7 @@ android {
         minSdkVersion 23 // Android 6.0 (Marshmallow)
         targetSdkVersion 28
         versionCode 1
-        versionName "3.2.0"
+        versionName "3.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 'appAuthRedirectScheme': 'frollo-sdk-test'
@@ -83,7 +83,7 @@ android {
 }
 
 buildscript {
-    ext.kotlin_version_internal = '1.3.41'
+    ext.kotlin_version_internal = '1.3.50'
 
     repositories {
         google()
@@ -117,10 +117,10 @@ dependencies {
     androidTestImplementation "com.jraska.livedata:testing-ktx:0.6.0"
 
     // Android KTX
-    implementation "androidx.core:core-ktx:1.0.2"
+    implementation "androidx.core:core-ktx:1.1.0"
 
     // Android Arch Components
-    implementation "androidx.lifecycle:lifecycle-livedata:2.0.0"
+    implementation "androidx.lifecycle:lifecycle-livedata:2.0.0"  // ** WARNING ** DO NOT UPDATE THIS VERSION YET!! ReportsTest starts to FAIL. Need to debug and refactor the code before upgrading this version.
     implementation "androidx.room:room-runtime:2.0.0" // ** WARNING ** DO NOT UPDATE THIS VERSION YET!! ReportsTest starts to FAIL. Need to debug and refactor the code before upgrading this version.
     kapt "androidx.room:room-compiler:2.0.0" // ** WARNING ** DO NOT UPDATE THIS VERSION YET!! ReportsTest starts to FAIL. Need to debug and refactor the code before upgrading this version.
 

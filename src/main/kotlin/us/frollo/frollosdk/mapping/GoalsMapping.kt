@@ -56,4 +56,5 @@ internal fun GoalPeriodResponse.toGoalPeriod(): GoalPeriod =
                 trackingStatus = trackingStatus,
                 currentAmount = currentAmount,
                 targetAmount = targetAmount,
-                requiredAmount = requiredAmount)
+                requiredAmount = requiredAmount,
+                index = index)

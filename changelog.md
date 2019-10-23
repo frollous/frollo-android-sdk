@@ -1,5 +1,10 @@
 ## Changelog
 
+### 3.3.0
+
+#### Changes
+- Goals enhancements.
+
 ### 3.2.0
 
 #### Changes

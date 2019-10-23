@@ -28,5 +28,6 @@ internal data class GoalPeriodResponse(
     @SerializedName("tracking_status") var trackingStatus: GoalTrackingStatus,
     @SerializedName("current_amount") val currentAmount: BigDecimal,
     @SerializedName("target_amount") val targetAmount: BigDecimal,
-    @SerializedName("required_amount") val requiredAmount: BigDecimal
+    @SerializedName("required_amount") val requiredAmount: BigDecimal,
+    @SerializedName("index") val index: Int
 )

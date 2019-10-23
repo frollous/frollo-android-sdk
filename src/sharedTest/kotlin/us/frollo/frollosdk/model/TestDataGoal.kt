@@ -75,7 +75,8 @@ internal fun testGoalPeriodResponseData(
             trackingStatus = trackingStatus ?: GoalTrackingStatus.values().randomElement(),
             currentAmount = BigDecimal("243.11"),
             targetAmount = BigDecimal("300.0"),
-            requiredAmount = BigDecimal("355.0"))
+            requiredAmount = BigDecimal("355.0"),
+            index = 0)
 }
 
 internal fun testGoalRequestTargetData(

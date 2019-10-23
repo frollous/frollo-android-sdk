@@ -76,7 +76,7 @@ import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
     TransactionTag::class,
     Goal::class,
     GoalPeriod::class
-], version = 7, exportSchema = true)
+], version = 8, exportSchema = true)
 
 @TypeConverters(Converters::class)
 abstract class SDKDatabase : RoomDatabase() {
@@ -115,7 +115,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
                         .allowMainThreadQueries() // Needed for some tests
                         // .fallbackToDestructiveMigration()
-                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8)
                         .build()
 
         // Copy-paste of auto-generated SQLs from room schema json file
@@ -234,13 +234,9 @@ abstract class SDKDatabase : RoomDatabase() {
                 // New changes in this migration:
                 // 1) Alter report_transaction_history table - add column transaction_tags
                 // 2) Alter report_group_transaction_history table - add column transaction_tags
-                database.execSQL("DROP INDEX IF EXISTS `index_report_transaction_history_date_period_filtered_budget_category_report_grouping`")
-                database.execSQL("ALTER TABLE `report_transaction_history` ADD COLUMN `transaction_tags` TEXT")
-                database.execSQL("CREATE UNIQUE INDEX `index_report_transaction_history_date_period_filtered_budget_category_report_grouping_transaction_tags` ON `report_transaction_history` (`date`, `period`, `filtered_budget_category`, `report_grouping`, `transaction_tags`)")
+                // 3) Alter goals table - make current period columns nullable
 
-                database.execSQL("DROP INDEX IF EXISTS `index_report_group_transaction_history_linked_id_date_period_filtered_budget_category_report_grouping`")
-                database.execSQL("ALTER TABLE `report_group_transaction_history` ADD COLUMN `transaction_tags` TEXT")
-                database.execSQL("CREATE UNIQUE INDEX `index_report_group_transaction_history_linked_id_date_period_filtered_budget_category_report_grouping_transaction_tags` ON `report_group_transaction_history` (`linked_id`, `date`, `period`, `filtered_budget_category`, `report_grouping`, `transaction_tags`)")
+                commonMigrationsBetween_6_8(database)
 
                 // START - Alter column current period columns to make them nullable
                 database.execSQL("BEGIN TRANSACTION")
@@ -254,6 +250,40 @@ abstract class SDKDatabase : RoomDatabase() {
                 database.execSQL("CREATE  INDEX `index_goal_account_id` ON `goal` (`account_id`)")
                 database.execSQL("COMMIT")
                 // END - Alter column current period columns to make them nullable
+            }
+        }
+
+        private fun commonMigrationsBetween_6_8(database: SupportSQLiteDatabase) {
+            database.execSQL("DROP INDEX IF EXISTS `index_report_transaction_history_date_period_filtered_budget_category_report_grouping`")
+            database.execSQL("ALTER TABLE `report_transaction_history` ADD COLUMN `transaction_tags` TEXT")
+            database.execSQL("CREATE UNIQUE INDEX `index_report_transaction_history_date_period_filtered_budget_category_report_grouping_transaction_tags` ON `report_transaction_history` (`date`, `period`, `filtered_budget_category`, `report_grouping`, `transaction_tags`)")
+
+            database.execSQL("DROP INDEX IF EXISTS `index_report_group_transaction_history_linked_id_date_period_filtered_budget_category_report_grouping`")
+            database.execSQL("ALTER TABLE `report_group_transaction_history` ADD COLUMN `transaction_tags` TEXT")
+            database.execSQL("CREATE UNIQUE INDEX `index_report_group_transaction_history_linked_id_date_period_filtered_budget_category_report_grouping_transaction_tags` ON `report_group_transaction_history` (`linked_id`, `date`, `period`, `filtered_budget_category`, `report_grouping`, `transaction_tags`)")
+        }
+
+        private val MIGRATION_6_8: Migration = object : Migration(6, 8) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // New changes in this migration:
+                // 1) Alter report_transaction_history table - add column transaction_tags
+                // 2) Alter report_group_transaction_history table - add column transaction_tags
+                // 4) Alter goals table - make current period columns nullable, delete columns type and sub_type, add column metadata
+                // 3) Alter goal_period table - add column period_index
+
+                commonMigrationsBetween_6_8(database)
+
+                // TODO: to be implemented
+            }
+        }
+
+        private val MIGRATION_7_8: Migration = object : Migration(7, 8) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // New changes in this migration:
+                // 1) Alter goals table - delete columns type and sub_type, add column metadata
+                // 2) Alter goal_period table - add column period_index
+
+                // TODO: to be implemented
             }
         }
     }

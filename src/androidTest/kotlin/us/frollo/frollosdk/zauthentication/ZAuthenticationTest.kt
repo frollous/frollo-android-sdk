@@ -32,6 +32,7 @@ import us.frollo.frollosdk.authentication.AccessToken
 import us.frollo.frollosdk.authentication.AccessTokenProvider
 import us.frollo.frollosdk.authentication.AuthenticationCallback
 import us.frollo.frollosdk.authentication.OAuth2Helper
+import us.frollo.frollosdk.core.AppInfo
 import us.frollo.frollosdk.core.testSDKCustomConfig
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.keystore.Keystore
@@ -83,7 +84,7 @@ class ZAuthenticationTest {
         preferences = Preferences(app)
         database = SDKDatabase.getInstance(app)
         val oAuth = OAuth2Helper(config = config)
-        network = NetworkService(oAuth2Helper = oAuth, keystore = keystore, pref = preferences)
+        network = NetworkService(oAuth2Helper = oAuth, keystore = keystore, pref = preferences, appInfo = AppInfo(app))
         network.accessTokenProvider = authentication
         network.authenticationCallback = authentication
 

@@ -27,6 +27,7 @@ import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.authentication.OAuth2Authentication
 import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.bills.Bills
+import us.frollo.frollosdk.core.AppInfo
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
@@ -71,6 +72,7 @@ abstract class BaseAndroidTest {
     lateinit var reports: Reports
     lateinit var surveys: Surveys
     lateinit var goals: Goals
+    lateinit var appInfo: AppInfo
 
     val scopes = listOf("offline_access", "openid", "email")
 
@@ -90,12 +92,13 @@ abstract class BaseAndroidTest {
         val config = testSDKConfig(serverUrl = baseUrl.toString(), tokenUrl = baseTokenUrl.toString(), revokeTokenURL = baseRevokeTokenUrl.toString())
         if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
 
+        appInfo = AppInfo(app)
         keystore = Keystore()
         keystore.setup()
         preferences = Preferences(app)
         database = SDKDatabase.getInstance(app)
         val oAuth = OAuth2Helper(config = config)
-        network = NetworkService(oAuth2Helper = oAuth, keystore = keystore, pref = preferences)
+        network = NetworkService(oAuth2Helper = oAuth, keystore = keystore, pref = preferences, appInfo = appInfo)
 
         oAuth2Authentication = OAuth2Authentication(oAuth, preferences).apply {
             tokenAPI = network.createAuth(TokenAPI::class.java)

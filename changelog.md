@@ -3,7 +3,9 @@
 ### 3.3.0
 
 #### Changes
-- Goals enhancements.
+- Update Frollo Host API version to 2.5
+- Goals enhancements
+- Send application version in headers
 
 ### 3.2.0
 

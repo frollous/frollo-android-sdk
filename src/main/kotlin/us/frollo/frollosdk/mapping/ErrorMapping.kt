@@ -26,8 +26,8 @@ import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import us.frollo.frollosdk.model.api.shared.APIErrorResponseWrapper
 import us.frollo.frollosdk.model.oauth.OAuth2ErrorResponse
 
-internal fun String.toAPIErrorResponse()
-        = Gson().fromJson<APIErrorResponseWrapper>(this)?.apiErrorResponse
+internal fun String.toAPIErrorResponse() =
+        Gson().fromJson<APIErrorResponseWrapper>(this)?.apiErrorResponse
 
 internal fun Int.toAPIErrorType(errorCode: APIErrorCode?): APIErrorType {
     return when (this) {

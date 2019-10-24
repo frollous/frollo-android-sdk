@@ -36,6 +36,7 @@ import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.bills.Bills
 import us.frollo.frollosdk.core.ACTION.ACTION_AUTHENTICATION_CHANGED
 import us.frollo.frollosdk.core.ARGUMENT.ARG_AUTHENTICATION_STATUS
+import us.frollo.frollosdk.core.AppInfo
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.core.FrolloSDKConfiguration
@@ -201,7 +202,7 @@ object FrolloSDK {
 
             // 6. Setup Network Stack
             val oAuth = OAuth2Helper(config = configuration)
-            network = NetworkService(oAuth2Helper = oAuth, keystore = keyStore, pref = preferences)
+            network = NetworkService(oAuth2Helper = oAuth, keystore = keyStore, pref = preferences, appInfo = AppInfo(application))
 
             // 7. Setup Logger
             // Initialize Log.network, Log.deviceId, Log.deviceName and Log.deviceType

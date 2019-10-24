@@ -28,8 +28,6 @@ internal fun GoalResponse.toGoal(): Goal =
                 description = description,
                 imageUrl = imageUrl,
                 accountId = accountId,
-                type = type,
-                subType = subType,
                 trackingStatus = trackingStatus,
                 trackingType = trackingType,
                 status = status,
@@ -45,7 +43,8 @@ internal fun GoalResponse.toGoal(): Goal =
                 estimatedEndDate = estimatedEndDate,
                 estimatedTargetAmount = estimatedTargetAmount,
                 periodsCount = periodsCount,
-                currentPeriod = currentPeriod?.toGoalPeriod())
+                currentPeriod = currentPeriod?.toGoalPeriod(),
+                metadata = metadata)
 
 internal fun GoalPeriodResponse.toGoalPeriod(): GoalPeriod =
         GoalPeriod(
@@ -56,4 +55,5 @@ internal fun GoalPeriodResponse.toGoalPeriod(): GoalPeriod =
                 trackingStatus = trackingStatus,
                 currentAmount = currentAmount,
                 targetAmount = targetAmount,
-                requiredAmount = requiredAmount)
+                requiredAmount = requiredAmount,
+                index = index)

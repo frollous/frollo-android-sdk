@@ -88,7 +88,6 @@ internal fun testAccountResponseData(accountId: Long? = null, providerAccountId:
             totalCreditLine = Balance(amount = randomNumber().toBigDecimal(), currency = "AUD"),
             accountNumber = randomUUID(),
             aggregator = randomUUID(),
-            aggregatorId = randomNumber().toLong(),
             bsb = randomUUID(),
             interestTotal = Balance(amount = randomNumber().toBigDecimal(), currency = "AUD"),
             endDate = randomUUID(),

@@ -4,8 +4,6 @@
     "description": "New York",
     "image_url": "https://example.com/image.png",
     "account_id": 45,
-    "type": "Saving for a holiday",
-    "sub_type": "USA",
     "tracking_status": "ahead",
     "tracking_type": "debit",
     "status": "active",
@@ -29,6 +27,7 @@
       "target_amount": "400",
       "current_amount": "200",
       "required_amount": "347.54",
-      "tracking_status": "ahead"
+      "tracking_status": "ahead",
+      "index": 2
     }
 }

@@ -16,10 +16,12 @@
 
 package us.frollo.frollosdk.model.api.goals
 
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 
 internal data class GoalUpdateRequest(
     @SerializedName("name") val name: String? = null,
     @SerializedName("description") val description: String? = null,
-    @SerializedName("image_url") val imageUrl: String? = null
+    @SerializedName("image_url") val imageUrl: String? = null,
+    @SerializedName("metadata") val metadata: JsonObject? = null
 )

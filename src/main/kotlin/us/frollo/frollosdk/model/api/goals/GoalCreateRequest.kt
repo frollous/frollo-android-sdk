@@ -16,6 +16,7 @@
 
 package us.frollo.frollosdk.model.api.goals
 
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -27,8 +28,6 @@ internal data class GoalCreateRequest(
     @SerializedName("description") val description: String? = null,
     @SerializedName("image_url") val imageUrl: String? = null,
     @SerializedName("account_id") val accountId: Long,
-    @SerializedName("type") val type: String? = null,
-    @SerializedName("sub_type") val subType: String? = null,
     @SerializedName("tracking_type") val trackingType: GoalTrackingType,
     @SerializedName("frequency") val frequency: GoalFrequency,
     @SerializedName("target") val target: GoalTarget,
@@ -36,7 +35,8 @@ internal data class GoalCreateRequest(
     @SerializedName("period_amount") val periodAmount: BigDecimal? = null,
     @SerializedName("start_amount") val startAmount: BigDecimal? = null,
     @SerializedName("start_date") val startDate: String? = null, // yyyy-MM-dd
-    @SerializedName("end_date") val endDate: String? = null // yyyy-MM-dd
+    @SerializedName("end_date") val endDate: String? = null, // yyyy-MM-dd
+    @SerializedName("metadata") val metadata: JsonObject? = null
 ) {
     fun valid(): Boolean {
         return when (target) {

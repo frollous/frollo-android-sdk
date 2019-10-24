@@ -5,8 +5,6 @@
     "description": "New York",
     "image_url": "https://example.com/image.png",
     "account_id": 45,
-    "type": "Saving for a holiday",
-    "sub_type": "USA",
     "tracking_status": "ahead",
     "tracking_type": "debit",
     "status": "active",
@@ -21,6 +19,9 @@
     "end_date": "2019-07-15",
     "estimated_end_date": "2019-07-15",
     "estimated_target_amount": "5555.55",
+    "metadata": {
+      "seen": true
+    },
     "periods_count": 10,
     "current_period": {
       "goal_id": 3211,
@@ -30,14 +31,14 @@
       "target_amount": "400",
       "current_amount": "200",
       "required_amount": "347.54",
-      "tracking_status": "ahead"
+      "tracking_status": "ahead",
+      "index": 2
     }
   }, {
     "id": 4512,
     "name": "Renovations",
     "image_url": "https://example.com/image.png",
     "account_id": 46,
-    "type": "Home Improvement",
     "tracking_status": "behind",
     "tracking_type": "debit_credit",
     "status": "active",
@@ -52,6 +53,14 @@
     "end_date": "2020-07-15",
     "estimated_end_date": "2020-07-15",
     "estimated_target_amount": "27000",
+    "metadata": {
+      "type": "Holiday",
+      "sub_type": "Annual",
+      "author": {
+        "name": "John Smith",
+        "count": 45
+      }
+    },
     "periods_count": 67,
     "current_period": {
       "goal_id": 4512,
@@ -61,7 +70,8 @@
       "target_amount": "100",
       "current_amount": "0",
       "required_amount": "147.33",
-      "tracking_status": "behind"
+      "tracking_status": "behind",
+      "index": 4
     }
   }, {
     "id": 98777772,
@@ -92,7 +102,8 @@
       "target_amount": "250",
       "current_amount": "250",
       "required_amount": "250",
-      "tracking_status": "on_track"
+      "tracking_status": "on_track",
+      "index": 0
     }
   }
 ]

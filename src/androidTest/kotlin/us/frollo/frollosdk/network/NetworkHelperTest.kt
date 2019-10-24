@@ -24,6 +24,7 @@ import org.junit.Test
 
 import org.junit.Assert.assertNotNull
 import us.frollo.frollosdk.authentication.AuthToken
+import us.frollo.frollosdk.core.AppInfo
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.preferences.Preferences
 
@@ -34,6 +35,7 @@ class NetworkHelperTest {
     private lateinit var keystore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var authToken: AuthToken
+    private lateinit var appInfo: AppInfo
 
     @Before
     fun setUp() {
@@ -41,6 +43,7 @@ class NetworkHelperTest {
         keystore.setup()
         preferences = Preferences(app)
         authToken = AuthToken(keystore, preferences)
+        appInfo = AppInfo(app)
     }
 
     @After
@@ -52,25 +55,25 @@ class NetworkHelperTest {
 
     @Test
     fun testBundleId() {
-        val networkHelper = NetworkHelper()
+        val networkHelper = NetworkHelper(appInfo)
         assertNotNull(networkHelper.bundleId)
     }
 
     @Test
     fun testSoftwareVersion() {
-        val networkHelper = NetworkHelper()
+        val networkHelper = NetworkHelper(appInfo)
         assertNotNull(networkHelper.softwareVersion)
     }
 
     @Test
     fun testDeviceVersion() {
-        val networkHelper = NetworkHelper()
+        val networkHelper = NetworkHelper(appInfo)
         assertNotNull(networkHelper.deviceVersion)
     }
 
     @Test
     fun testUserAgent() {
-        val networkHelper = NetworkHelper()
+        val networkHelper = NetworkHelper(appInfo)
         assertNotNull(networkHelper.userAgent)
     }
 }

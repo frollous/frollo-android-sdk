@@ -19,11 +19,12 @@ package us.frollo.frollosdk.network
 import android.os.Build
 import okhttp3.Request
 import us.frollo.frollosdk.BuildConfig
+import us.frollo.frollosdk.core.AppInfo
 
 /**
  * This class wraps the rules for interacting with the Frollo API such as the headers used, API version and so on
  */
-internal class NetworkHelper {
+internal class NetworkHelper(private val appInfo: AppInfo) {
 
     companion object {
         internal const val HEADER_AUTHORIZATION = "Authorization"
@@ -33,19 +34,20 @@ internal class NetworkHelper {
         internal const val HEADER_DEVICE_VERSION = "X-Device-Version"
         internal const val HEADER_API_VERSION = "X-Api-Version"
         internal const val HEADER_BACKGROUND = "X-Background"
-        internal const val API_VERSION = "2.4"
+        internal const val API_VERSION = "2.5"
     }
 
     internal val bundleId: String
         get() = BuildConfig.LIBRARY_PACKAGE_NAME
 
     internal val softwareVersion: String
-        get() = "SDK${BuildConfig.VERSION_NAME}-B${BuildConfig.VERSION_CODE}"
+        get() = "SDK${BuildConfig.VERSION_NAME}-B${BuildConfig.VERSION_CODE}|APP${appInfo.versionNumber}-B${appInfo.versionCode}"
 
     internal val deviceVersion: String
         get() = "Android${Build.VERSION.RELEASE}"
 
     // "us.frollo.frollosdk|SDK1.0.0|B777|Android8.1.0|API2.0"
+    @Deprecated("Not needed anymore by the Host on v2 APIs")
     internal val userAgent: String
         get() = "${BuildConfig.LIBRARY_PACKAGE_NAME}|SDK${BuildConfig.VERSION_NAME}|B${BuildConfig.VERSION_CODE}|Android${Build.VERSION.RELEASE}|API$API_VERSION"
 

@@ -16,6 +16,7 @@
 
 package us.frollo.frollosdk.model
 
+import com.google.gson.JsonObject
 import us.frollo.frollosdk.model.api.goals.GoalCreateRequest
 import us.frollo.frollosdk.model.api.goals.GoalPeriodResponse
 import us.frollo.frollosdk.model.api.goals.GoalResponse
@@ -42,8 +43,6 @@ internal fun testGoalResponseData(
             description = randomString(100),
             imageUrl = "https://example.com/image.png",
             accountId = accountId ?: randomNumber().toLong(),
-            type = randomString(20),
-            subType = randomString(20),
             trackingStatus = trackingStatus ?: GoalTrackingStatus.values().randomElement(),
             trackingType = GoalTrackingType.values().randomElement(),
             status = status ?: GoalStatus.values().randomElement(),
@@ -59,7 +58,10 @@ internal fun testGoalResponseData(
             estimatedEndDate = "2019-12-02",
             estimatedTargetAmount = BigDecimal("20000.0"),
             periodsCount = 52,
-            currentPeriod = testGoalPeriodResponseData())
+            currentPeriod = testGoalPeriodResponseData(),
+            metadata = JsonObject().apply {
+                addProperty("seen", true)
+            })
 }
 
 internal fun testGoalPeriodResponseData(
@@ -75,7 +77,8 @@ internal fun testGoalPeriodResponseData(
             trackingStatus = trackingStatus ?: GoalTrackingStatus.values().randomElement(),
             currentAmount = BigDecimal("243.11"),
             targetAmount = BigDecimal("300.0"),
-            requiredAmount = BigDecimal("355.0"))
+            requiredAmount = BigDecimal("355.0"),
+            index = 0)
 }
 
 internal fun testGoalRequestTargetData(
@@ -94,9 +97,10 @@ internal fun testGoalRequestTargetData(
             periodAmount = periodAmount,
             startAmount = BigDecimal(0),
             startDate = "2018-10-01",
-            subType = randomString(20),
             target = target,
             targetAmount = targetAmount,
             trackingType = GoalTrackingType.values().randomElement(),
-            type = randomString(20))
+            metadata = JsonObject().apply {
+                addProperty("seen", true)
+            })
 }

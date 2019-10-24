@@ -16,6 +16,7 @@
 
 package us.frollo.frollosdk.database
 
+import com.google.gson.JsonObject
 import org.junit.Test
 
 import org.junit.Assert.assertTrue
@@ -809,5 +810,24 @@ class ConvertersTest {
         assertEquals("ANNUALLY", str)
 
         assertEquals("SINGULAR", Converters.instance.stringFromGoalFrequency(null))
+    }
+
+    @Test
+    fun testStringToMetadata() {
+        val json = "{\"seen\":true}"
+        val metadata = Converters.instance.stringToMetadata(json)
+        assertNotNull(metadata)
+        assertEquals(true, metadata?.get("seen")?.asBoolean)
+
+        assertNull(Converters.instance.stringToMetadata(null))
+    }
+
+    @Test
+    fun testStringFromMetadata() {
+        val metadata = JsonObject().apply {
+            addProperty("seen", true)
+        }
+        val json = Converters.instance.stringFromMetadata(metadata)
+        assertEquals("{\"seen\":true}", json)
     }
 }

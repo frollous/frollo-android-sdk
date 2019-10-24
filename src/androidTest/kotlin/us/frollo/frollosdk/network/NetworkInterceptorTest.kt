@@ -165,7 +165,7 @@ class NetworkInterceptorTest : BaseAndroidTest() {
     fun testNoHeaderAppendedToTokenRequest() {
         initSetup()
 
-        val interceptor = NetworkInterceptor(network, NetworkHelper())
+        val interceptor = NetworkInterceptor(network, NetworkHelper(appInfo))
 
         val originalRequest = Request.Builder()
                 .url("https://id.example.com/oauth/token/")

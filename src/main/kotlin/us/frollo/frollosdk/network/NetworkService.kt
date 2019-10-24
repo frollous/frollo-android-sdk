@@ -33,12 +33,14 @@ import us.frollo.frollosdk.authentication.AuthToken
 import us.frollo.frollosdk.authentication.AuthenticationCallback
 import us.frollo.frollosdk.authentication.AuthenticationType.OAuth2
 import us.frollo.frollosdk.authentication.OAuth2Helper
+import us.frollo.frollosdk.core.AppInfo
 import us.frollo.frollosdk.preferences.Preferences
 
 class NetworkService internal constructor(
     internal val oAuth2Helper: OAuth2Helper,
     keystore: Keystore,
-    pref: Preferences
+    pref: Preferences,
+    appInfo: AppInfo
 ) : IApiProvider {
 
     companion object {
@@ -47,7 +49,7 @@ class NetworkService internal constructor(
     }
 
     internal val authToken = AuthToken(keystore, pref)
-    private val helper = NetworkHelper()
+    private val helper = NetworkHelper(appInfo)
     private val serverInterceptor = NetworkInterceptor(this, helper)
     private val tokenInterceptor = TokenInterceptor(helper)
 

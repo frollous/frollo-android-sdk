@@ -19,6 +19,7 @@ package us.frollo.frollosdk.goals
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.sqlite.db.SimpleSQLiteQuery
+import com.google.gson.JsonObject
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.base.Resource
@@ -236,8 +237,6 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
      * @param name Name of the goal
      * @param description Additional description of the goal for the user (Optional)
      * @param imageUrl Image URL of an icon/picture associated with the goal (Optional)
-     * @param type Type of the goal (Optional)
-     * @param subType Sub type of the goal (Optional)
      * @param target Target of the goal
      * @param trackingType Tracking method the goal uses
      * @param frequency Frequency of contributions to the goal
@@ -247,14 +246,13 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
      * @param startAmount Amount already contributed to a goal. Defaults to zero (Optional)
      * @param targetAmount Target amount to reach for the goal. Required for amount and date based goals
      * @param accountId ID of the Account with which the Goal is associated with
+     * @param metadata Optional metadata payload (of data type org.json.JSONObject) to append to the goal
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun createGoal(
         name: String,
         description: String? = null,
         imageUrl: String? = null,
-        type: String? = null,
-        subType: String? = null,
         target: GoalTarget,
         trackingType: GoalTrackingType,
         frequency: GoalFrequency,
@@ -264,14 +262,13 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
         startAmount: BigDecimal = BigDecimal(0),
         targetAmount: BigDecimal?,
         accountId: Long,
+        metadata: JsonObject? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
         val request = GoalCreateRequest(
                 name = name,
                 description = description,
                 imageUrl = imageUrl,
-                type = type,
-                subType = subType,
                 target = target,
                 trackingType = trackingType,
                 frequency = frequency,
@@ -280,7 +277,8 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
                 periodAmount = periodAmount,
                 startAmount = startAmount,
                 targetAmount = targetAmount,
-                accountId = accountId)
+                accountId = accountId,
+                metadata = metadata)
 
         if (!request.valid()) {
             val error = DataError(type = DataErrorType.API, subType = DataErrorSubType.INVALID_DATA)
@@ -311,7 +309,8 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
         val request = GoalUpdateRequest(
                 name = goal.name,
                 description = goal.description,
-                imageUrl = goal.imageUrl)
+                imageUrl = goal.imageUrl,
+                metadata = goal.metadata)
 
         goalsAPI.updateGoal(goal.goalId, request).enqueue { resource ->
             when (resource.status) {

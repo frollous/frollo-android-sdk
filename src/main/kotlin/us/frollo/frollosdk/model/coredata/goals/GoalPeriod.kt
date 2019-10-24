@@ -61,7 +61,10 @@ data class GoalPeriod(
     @ColumnInfo(name = "target_amount") val targetAmount: BigDecimal,
 
     /** Required amount for the goal period to get back or stay on track with the goal */
-    @ColumnInfo(name = "required_amount") val requiredAmount: BigDecimal
+    @ColumnInfo(name = "required_amount") val requiredAmount: BigDecimal,
+
+    /** Index of the goal period */
+    @ColumnInfo(name = "period_index") val index: Int
 
 ) : IAdapterModel {
 

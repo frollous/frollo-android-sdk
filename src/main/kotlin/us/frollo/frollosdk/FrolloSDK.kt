@@ -393,6 +393,7 @@ object FrolloSDK {
     private fun refreshSystem() {
         aggregation.refreshProviders()
         aggregation.refreshTransactionCategories()
+        aggregation.refreshMerchantsFromApp()
         bills.refreshBills()
         userManagement.updateDevice()
     }

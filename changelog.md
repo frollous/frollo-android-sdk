@@ -1,5 +1,10 @@
 ## Changelog
 
+### 3.3.1
+
+#### Changes
+- Added API to refresh all merchants of app
+
 ### 3.3.0
 
 #### Changes

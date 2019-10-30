@@ -40,6 +40,7 @@ import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
+import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.extensions.compareToFindMissingItems
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchMerchantsByIDs
@@ -1818,6 +1819,42 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 uiThread { completion?.invoke(Result.success()) }
             }
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    private val numberOfItemsToFetch = 500
+    /**
+     * Refresh all merchants by IDs from the app
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    internal fun refreshMerchantsFromApp(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        val totalMerchantCount = db.merchants().getNoOfMerchants()
+        var iterations = totalMerchantCount / numberOfItemsToFetch
+        if (totalMerchantCount > 500 * iterations) {
+            iterations++
+        }
+        refreshMerchantsOfApp(iterations, 0, completion)
+    }
+
+    private fun refreshMerchantsOfApp(iterations: Int, start: Int, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        var startIndex = start
+        val offset = startIndex * numberOfItemsToFetch
+        val limit = numberOfItemsToFetch
+        val ids = db.merchants().getIdsByOffset(limit, offset)
+        refreshMerchants(ids.toLongArray()) {
+            when (it.status) {
+                Result.Status.SUCCESS -> {
+                    if (startIndex <iterations) {
+                        refreshMerchantsOfApp(iterations, ++startIndex, completion)
+                    } else {
+                        completion?.invoke(Result.success())
+                    }
+                }
+                Result.Status.ERROR -> {
+                    completion?.invoke(Result.error(FrolloSDKError(it.status.name)))
+                }
+            }
+        }
     }
 
     private fun mapMerchantResponse(models: List<MerchantResponse>): List<Merchant> =

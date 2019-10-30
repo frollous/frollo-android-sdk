@@ -34,6 +34,9 @@ internal interface MerchantDao {
     @Query("SELECT * FROM merchant WHERE merchant_id = :merchantId")
     fun load(merchantId: Long): LiveData<Merchant?>
 
+    @Query("SELECT COUNT ( merchant_id ) from merchant")
+    fun getNoOfMerchants(): Int
+
     @RawQuery(observedEntities = [Merchant::class])
     fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<Merchant>>
 
@@ -45,6 +48,9 @@ internal interface MerchantDao {
 
     @Query("SELECT merchant_id FROM merchant")
     fun getIds(): List<Long>
+
+    @Query("SELECT merchant_id FROM merchant limit :limit offset :offset")
+    fun getIdsByOffset(limit: Int, offset: Int): List<Long>
 
     @Query("DELETE FROM merchant WHERE merchant_id IN (:merchantIds)")
     fun deleteMany(merchantIds: LongArray)

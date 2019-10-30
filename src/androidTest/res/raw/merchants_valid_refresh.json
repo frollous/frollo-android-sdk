@@ -1,0 +1,25 @@
+[{
+	"id": 1,
+	"name": "Unknown",
+	"merchant_type": "unknown",
+	"small_logo_url": "https://frollo-sandbox.s3.amazonaws.com/merchants/1/original/Untitled-1.png?1519084540",
+	"small_logo_revision": 1
+}, {
+	"id": 2,
+	"name": "Woolworths",
+	"merchant_type": "retailer",
+	"small_logo_url": "https://frollo-sandbox.s3.amazonaws.com/merchants/2/original/Woolworths.png?1519084526",
+	"small_logo_revision": 3
+}, {
+	"id": 5,
+	"name": "TryBooking",
+	"merchant_type": "retailer",
+	"small_logo_url": "https://frollo-sandbox.s3.amazonaws.com/merchants/5/original/TB_logo_f7f7f7bg.png?1519084291",
+	"small_logo_revision": 1
+}, {
+	"id": 7,
+	"name": "Ezidebit Pty Ltd",
+	"merchant_type": "retailer",
+	"small_logo_url": "https://frollo-sandbox.s3.amazonaws.com/merchants/7/original/Screen_Shot_2017-02-17_at_12.43.07_pm.png?1519084550",
+	"small_logo_revision": 1
+}]

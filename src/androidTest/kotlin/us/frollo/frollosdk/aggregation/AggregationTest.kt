@@ -44,8 +44,10 @@ import us.frollo.frollosdk.mapping.toProvider
 import us.frollo.frollosdk.mapping.toProviderAccount
 import us.frollo.frollosdk.mapping.toTransaction
 import us.frollo.frollosdk.mapping.toTransactionCategory
+import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
 import us.frollo.frollosdk.model.coredata.shared.OrderType
@@ -65,6 +67,7 @@ import us.frollo.frollosdk.testutils.randomUUID
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
+import kotlin.random.Random
 
 class AggregationTest : BaseAndroidTest() {
 
@@ -2555,6 +2558,65 @@ class AggregationTest : BaseAndroidTest() {
 
         wait(3)
 
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshMerchantsForApp() {
+        initSetup()
+
+        val data1 = MerchantResponse(
+                merchantId = 1L,
+                name = randomUUID(),
+                merchantType = MerchantType.values()[Random.nextInt(MerchantType.values().size)],
+                smallLogoUrl = "https://example.com/category.png")
+        val data2 = MerchantResponse(
+                merchantId = 2L,
+                name = randomUUID(),
+                merchantType = MerchantType.values()[Random.nextInt(MerchantType.values().size)],
+                smallLogoUrl = "https://example.com/category.png")
+        val data3 = MerchantResponse(
+                merchantId = 5L,
+                name = randomUUID(),
+                merchantType = MerchantType.values()[Random.nextInt(MerchantType.values().size)],
+                smallLogoUrl = "https://example.com/category.png")
+        val data4 = MerchantResponse(
+                merchantId = 7L,
+                name = randomUUID(),
+                merchantType = MerchantType.values()[Random.nextInt(MerchantType.values().size)],
+                smallLogoUrl = "https://example.com/category.png")
+        val list = mutableListOf(data1, data2, data3, data4)
+        database.merchants().insertAll(*list.map { it.toMerchant() }.toList().toTypedArray())
+
+        val body = readStringFromJson(app, R.raw.merchants_valid_refresh)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath?.contains(AggregationAPI.URL_MERCHANTS) == true) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshMerchants { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchMerchants().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+
+            assertEquals(4, models?.size)
+
+            assertEquals("Unknown", models?.get(0)?.name)
+            assertEquals("Woolworths", models?.get(1)?.name)
+            assertEquals("TryBooking", models?.get(2)?.name)
+        }
+
+        wait(3)
         tearDown()
     }
 

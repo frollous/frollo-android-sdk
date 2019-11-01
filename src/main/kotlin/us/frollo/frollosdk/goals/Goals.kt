@@ -278,7 +278,7 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
                 startAmount = startAmount,
                 targetAmount = targetAmount,
                 accountId = accountId,
-                metadata = metadata)
+                metadata = metadata ?: JsonObject())
 
         if (!request.valid()) {
             val error = DataError(type = DataErrorType.API, subType = DataErrorSubType.INVALID_DATA)
@@ -310,7 +310,7 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
                 name = goal.name,
                 description = goal.description,
                 imageUrl = goal.imageUrl,
-                metadata = goal.metadata)
+                metadata = goal.metadata ?: JsonObject())
 
         goalsAPI.updateGoal(goal.goalId, request).enqueue { resource ->
             when (resource.status) {

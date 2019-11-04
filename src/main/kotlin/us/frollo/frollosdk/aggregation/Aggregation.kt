@@ -413,6 +413,25 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     /**
+     * Force a refresh of the account and transactions for one or more provider accounts
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun forceRefreshProviderAccounts(providerAccountIds: LongArray, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        aggregationAPI.updateProviderAccount(providerAccountIds).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.SUCCESS -> {
+                    handleProviderAccountsResponse(response = resource.data, completion = completion)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#forceRefreshProviderAccounts", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+            }
+        }
+    }
+
+    /**
      * Create a provider account
      *
      * @param providerId ID of the provider which an account should be created for

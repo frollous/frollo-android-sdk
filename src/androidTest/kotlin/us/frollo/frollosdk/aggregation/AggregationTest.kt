@@ -447,6 +447,39 @@ class AggregationTest : BaseAndroidTest() {
     }
 
     @Test
+    fun testForceRefreshProviderAccounts() {
+        initSetup()
+
+        val body = readStringFromJson(app, R.raw.provider_accounts_valid)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath?.contains(AggregationAPI.URL_PROVIDER_ACCOUNTS) == true) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val array = longArrayOf(623L, 624L, 625L, 864L)
+        aggregation.forceRefreshProviderAccounts(array) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchProviderAccounts().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(4, models?.size)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshProviderAccountsByIdFailsIfLoggedOut() {
         initSetup()
 

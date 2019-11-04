@@ -1,5 +1,10 @@
 ## Changelog
 
+### 3.3.2
+
+#### Changes
+- Update provider account with latest transactions & data.
+
 ### 3.3.0
 
 #### Changes

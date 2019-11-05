@@ -1,9 +1,5 @@
 ## Changelog
 
-### 3.3.2
-
-#### Changes
-- Update provider account with latest transactions & data.
 
 ### 3.3.0
 
@@ -11,6 +7,7 @@
 - Update Frollo Host API version to 2.5
 - Goals enhancements
 - Send application version in headers
+- Update provider account with latest transactions & data.
 
 ### 3.2.0
 

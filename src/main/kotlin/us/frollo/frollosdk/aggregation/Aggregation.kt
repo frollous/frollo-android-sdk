@@ -40,7 +40,6 @@ import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
-import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.extensions.compareToFindMissingItems
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchMerchantsByIDs
@@ -119,6 +118,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     companion object {
         private const val TAG = "Aggregation"
         private const val TRANSACTION_BATCH_SIZE = 200
+        private const val merchantBatchSize = 500
     }
 
     private val aggregationAPI: AggregationAPI = network.create(AggregationAPI::class.java)
@@ -1788,6 +1788,42 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Refresh merchant data for all cached merchants from the host
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun refreshCachedMerchants(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        val totalMerchantsCount = db.merchants().getMerchantsCount()
+        if (totalMerchantsCount == 0L) {
+            completion?.invoke(Result.success())
+            return
+        }
+
+        refreshCachedMerchants(totalMerchantsCount, 0, completion)
+    }
+
+    private fun refreshCachedMerchants(merchantsCount: Long, offset: Int, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        val ids = db.merchants().getIdsByOffset(limit = merchantBatchSize, offset = offset)
+
+        refreshMerchants(ids.toLongArray()) { result ->
+            when (result.status) {
+                Result.Status.SUCCESS -> {
+                    val nextOffset = offset + merchantBatchSize
+
+                    if (nextOffset < merchantsCount) {
+                        refreshCachedMerchants(merchantsCount, nextOffset, completion)
+                    } else {
+                        completion?.invoke(result)
+                    }
+                }
+                Result.Status.ERROR -> {
+                    completion?.invoke(result)
+                }
+            }
+        }
+    }
+
     private fun handleMerchantResponse(response: MerchantResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
@@ -1819,42 +1855,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 uiThread { completion?.invoke(Result.success()) }
             }
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
-    }
-
-    private val numberOfItemsToFetch = 500
-    /**
-     * Refresh all merchants by IDs from the app
-     *
-     * @param completion Optional completion handler with optional error if the request fails
-     */
-    internal fun refreshMerchantsFromApp(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        val totalMerchantCount = db.merchants().getNoOfMerchants()
-        var iterations = totalMerchantCount / numberOfItemsToFetch
-        if (totalMerchantCount > 500 * iterations) {
-            iterations++
-        }
-        refreshMerchantsOfApp(iterations, 0, completion)
-    }
-
-    private fun refreshMerchantsOfApp(iterations: Int, start: Int, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        var startIndex = start
-        val offset = startIndex * numberOfItemsToFetch
-        val limit = numberOfItemsToFetch
-        val ids = db.merchants().getIdsByOffset(limit, offset)
-        refreshMerchants(ids.toLongArray()) {
-            when (it.status) {
-                Result.Status.SUCCESS -> {
-                    if (startIndex <iterations) {
-                        refreshMerchantsOfApp(iterations, ++startIndex, completion)
-                    } else {
-                        completion?.invoke(Result.success())
-                    }
-                }
-                Result.Status.ERROR -> {
-                    completion?.invoke(Result.error(FrolloSDKError(it.status.name)))
-                }
-            }
-        }
     }
 
     private fun mapMerchantResponse(models: List<MerchantResponse>): List<Merchant> =

@@ -44,7 +44,6 @@ import us.frollo.frollosdk.mapping.toProvider
 import us.frollo.frollosdk.mapping.toProviderAccount
 import us.frollo.frollosdk.mapping.toTransaction
 import us.frollo.frollosdk.mapping.toTransactionCategory
-import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
@@ -67,7 +66,6 @@ import us.frollo.frollosdk.testutils.randomUUID
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
-import kotlin.random.Random
 
 class AggregationTest : BaseAndroidTest() {
 
@@ -2562,36 +2560,19 @@ class AggregationTest : BaseAndroidTest() {
     }
 
     @Test
-    fun testRefreshMerchantsForApp() {
+    fun testRefreshCachedMerchants() {
+
         initSetup()
 
-        val data1 = MerchantResponse(
-                merchantId = 1L,
-                name = randomUUID(),
-                merchantType = MerchantType.values()[Random.nextInt(MerchantType.values().size)],
-                smallLogoUrl = "https://example.com/category.png")
-        val data2 = MerchantResponse(
-                merchantId = 2L,
-                name = randomUUID(),
-                merchantType = MerchantType.values()[Random.nextInt(MerchantType.values().size)],
-                smallLogoUrl = "https://example.com/category.png")
-        val data3 = MerchantResponse(
-                merchantId = 5L,
-                name = randomUUID(),
-                merchantType = MerchantType.values()[Random.nextInt(MerchantType.values().size)],
-                smallLogoUrl = "https://example.com/category.png")
-        val data4 = MerchantResponse(
-                merchantId = 7L,
-                name = randomUUID(),
-                merchantType = MerchantType.values()[Random.nextInt(MerchantType.values().size)],
-                smallLogoUrl = "https://example.com/category.png")
-        val list = mutableListOf(data1, data2, data3, data4)
+        val data1 = testMerchantResponseData(merchantId = 238)
+        val data2 = testMerchantResponseData(merchantId = 686)
+        val list = mutableListOf(data1, data2)
         database.merchants().insertAll(*list.map { it.toMerchant() }.toList().toTypedArray())
 
-        val body = readStringFromJson(app, R.raw.merchants_valid_refresh)
+        val body = readStringFromJson(app, R.raw.merchants_by_id)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath?.contains(AggregationAPI.URL_MERCHANTS) == true) {
+                if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?merchant_ids=238%2C686") {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
@@ -2600,7 +2581,7 @@ class AggregationTest : BaseAndroidTest() {
             }
         })
 
-        aggregation.refreshMerchants { result ->
+        aggregation.refreshCachedMerchants { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -2608,15 +2589,16 @@ class AggregationTest : BaseAndroidTest() {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
+            assertEquals(2, models?.size)
 
-            assertEquals(4, models?.size)
-
-            assertEquals("Unknown", models?.get(0)?.name)
-            assertEquals("Woolworths", models?.get(1)?.name)
-            assertEquals("TryBooking", models?.get(2)?.name)
+            val merchant = models?.last()
+            assertEquals(686L, merchant?.merchantId)
+            assertEquals("Rent", merchant?.name)
+            assertEquals(MerchantType.RETAILER, merchant?.merchantType)
         }
 
         wait(3)
+
         tearDown()
     }
 

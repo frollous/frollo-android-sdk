@@ -1,16 +1,12 @@
 ## Changelog
 
-### 3.3.1
-
-#### Changes
-- Added API to refresh all merchants of app
-
 ### 3.3.0
 
 #### Changes
 - Update Frollo Host API version to 2.5
 - Goals enhancements
 - Send application version in headers
+- Added API to refresh all merchants of app
 
 ### 3.2.0
 

@@ -6,7 +6,7 @@
 - Update Frollo Host API version to 2.5
 - Goals enhancements
 - Send application version in headers
-- Added API to refresh all merchants of app
+- Added a method to refresh all cached merchants
 
 ### 3.2.0
 

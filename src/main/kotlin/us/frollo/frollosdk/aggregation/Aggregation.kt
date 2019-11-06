@@ -118,7 +118,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     companion object {
         private const val TAG = "Aggregation"
         private const val TRANSACTION_BATCH_SIZE = 200
-        private const val merchantBatchSize = 500
+        private const val MERCHANT_BATCH_SIZE = 500
     }
 
     private val aggregationAPI: AggregationAPI = network.create(AggregationAPI::class.java)
@@ -1804,12 +1804,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     private fun refreshCachedMerchants(merchantsCount: Long, offset: Int, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        val ids = db.merchants().getIdsByOffset(limit = merchantBatchSize, offset = offset)
+        val ids = db.merchants().getIdsByOffset(limit = MERCHANT_BATCH_SIZE, offset = offset)
 
         refreshMerchants(ids.toLongArray()) { result ->
             when (result.status) {
                 Result.Status.SUCCESS -> {
-                    val nextOffset = offset + merchantBatchSize
+                    val nextOffset = offset + MERCHANT_BATCH_SIZE
 
                     if (nextOffset < merchantsCount) {
                         refreshCachedMerchants(merchantsCount, nextOffset, completion)

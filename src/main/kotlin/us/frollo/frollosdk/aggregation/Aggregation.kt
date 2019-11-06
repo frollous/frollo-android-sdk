@@ -118,6 +118,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     companion object {
         private const val TAG = "Aggregation"
         private const val TRANSACTION_BATCH_SIZE = 200
+        private const val MERCHANT_BATCH_SIZE = 500
     }
 
     private val aggregationAPI: AggregationAPI = network.create(AggregationAPI::class.java)
@@ -1782,6 +1783,42 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshMerchants", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
+                }
+            }
+        }
+    }
+
+    /**
+     * Refresh merchant data for all cached merchants from the host
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun refreshCachedMerchants(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        val totalMerchantsCount = db.merchants().getMerchantsCount()
+        if (totalMerchantsCount == 0L) {
+            completion?.invoke(Result.success())
+            return
+        }
+
+        refreshCachedMerchants(totalMerchantsCount, 0, completion)
+    }
+
+    private fun refreshCachedMerchants(merchantsCount: Long, offset: Int, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        val ids = db.merchants().getIdsByOffset(limit = MERCHANT_BATCH_SIZE, offset = offset)
+
+        refreshMerchants(ids.toLongArray()) { result ->
+            when (result.status) {
+                Result.Status.SUCCESS -> {
+                    val nextOffset = offset + MERCHANT_BATCH_SIZE
+
+                    if (nextOffset < merchantsCount) {
+                        refreshCachedMerchants(merchantsCount, nextOffset, completion)
+                    } else {
+                        completion?.invoke(result)
+                    }
+                }
+                Result.Status.ERROR -> {
+                    completion?.invoke(result)
                 }
             }
         }

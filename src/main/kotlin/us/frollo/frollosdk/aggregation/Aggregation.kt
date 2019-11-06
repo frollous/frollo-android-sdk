@@ -414,6 +414,30 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     /**
+     * Fetches the latest account data from the aggregation partner.
+     *
+     * @param providerAccountIds Array of IDs of the provider accounts to be synced
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun syncProviderAccounts(providerAccountIds: LongArray, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        if (providerAccountIds.isEmpty()) {
+            completion?.invoke(Result.success())
+            return
+        }
+        aggregationAPI.refreshProviderAccounts(providerAccountIds).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.SUCCESS -> {
+                    handleProviderAccountsResponse(response = resource.data, providerAccountIds = providerAccountIds, completion = completion)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#syncProviderAccounts", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+            }
+        }
+    }
+
+    /**
      * Create a provider account
      *
      * @param providerId ID of the provider which an account should be created for
@@ -480,7 +504,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
-    private fun handleProviderAccountsResponse(response: List<ProviderAccountResponse>?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    private fun handleProviderAccountsResponse(
+        response: List<ProviderAccountResponse>?,
+        providerAccountIds: LongArray? = null,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         response?.let {
             doAsync {
                 fetchMissingProviders(response.map { it.providerId }.toSet())
@@ -488,11 +516,13 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 val models = mapProviderAccountResponse(response)
                 db.providerAccounts().insertAll(*models.toTypedArray())
 
-                val apiIds = response.map { it.providerAccountId }.toList()
-                val staleIds = db.providerAccounts().getStaleIds(apiIds.toLongArray())
+                if (providerAccountIds == null) {
+                    val apiIds = response.map { it.providerAccountId }.toList()
+                    val staleIds = db.providerAccounts().getStaleIds(apiIds.toLongArray())
 
-                if (staleIds.isNotEmpty()) {
-                    removeCachedProviderAccounts(staleIds.toLongArray())
+                    if (staleIds.isNotEmpty()) {
+                        removeCachedProviderAccounts(staleIds.toLongArray())
+                    }
                 }
 
                 uiThread { completion?.invoke(Result.success()) }

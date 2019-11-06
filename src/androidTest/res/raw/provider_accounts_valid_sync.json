@@ -1,0 +1,18 @@
+[{
+  "id": 623,
+  "provider_id": 11582,
+  "editable": true,
+  "refresh_status": {
+    "status": "failed",
+    "sub_status": "temporary_failure",
+    "last_refreshed": "2018-08-02T01:40:26.000+00:00"
+  }
+}, {
+  "id": 624,
+  "provider_id": 11583,
+  "editable": true,
+  "refresh_status": {
+    "status": "updating",
+    "last_refreshed": "2018-08-02T07:12:49.696+10:00"
+  }
+}]

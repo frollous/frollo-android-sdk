@@ -24,6 +24,7 @@ import retrofit2.http.HTTP
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 import retrofit2.http.QueryMap
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountUpdateRequest
@@ -87,6 +88,9 @@ internal interface AggregationAPI {
 
     @GET(URL_PROVIDER_ACCOUNT)
     fun fetchProviderAccount(@Path("provider_account_id") providerAccId: Long): Call<ProviderAccountResponse>
+
+    @PUT(URL_PROVIDER_ACCOUNTS)
+    fun refreshProviderAccounts(@Query("provideraccount_ids") providerAccIds: LongArray): Call<List<ProviderAccountResponse>>
 
     @POST(URL_PROVIDER_ACCOUNTS)
     fun createProviderAccount(@Body request: ProviderAccountCreateRequest): Call<ProviderAccountResponse>

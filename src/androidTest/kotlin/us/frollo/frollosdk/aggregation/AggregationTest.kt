@@ -448,6 +448,47 @@ class AggregationTest : BaseAndroidTest() {
     }
 
     @Test
+    fun testSyncProviderAccounts() {
+        initSetup()
+
+        val refreshBody = readStringFromJson(app, R.raw.provider_accounts_valid)
+        val syncBody = readStringFromJson(app, R.raw.provider_accounts_valid_sync)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath?.contains(AggregationAPI.URL_PROVIDER_ACCOUNTS) == true) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(if (request.method == "PUT") syncBody else refreshBody)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshProviderAccounts {
+            assertEquals(Result.Status.SUCCESS, it.status)
+            assertNull(it.error)
+
+            val array = longArrayOf(623L, 624L)
+            aggregation.syncProviderAccounts(array) { result ->
+                assertEquals(Result.Status.SUCCESS, result.status)
+                assertNull(result.error)
+
+                val testObserver = aggregation.fetchProviderAccounts().test()
+                testObserver.awaitValue()
+                val models = testObserver.value().data
+                assertNotNull(models)
+                assertEquals(4, models?.size)
+                assertEquals(AccountRefreshStatus.FAILED, models?.get(0)?.refreshStatus?.status)
+                assertEquals(AccountRefreshStatus.UPDATING, models?.get(1)?.refreshStatus?.status)
+            }
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
     fun testRefreshProviderAccountsByIdFailsIfLoggedOut() {
         initSetup()
 

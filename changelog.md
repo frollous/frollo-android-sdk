@@ -1,6 +1,5 @@
 ## Changelog
 
-
 ### 3.3.0
 
 #### Changes
@@ -8,6 +7,7 @@
 - Goals enhancements
 - Send application version in headers
 - Update provider account with latest transactions & data.
+- Added a method to refresh all cached merchants
 
 ### 3.2.0
 

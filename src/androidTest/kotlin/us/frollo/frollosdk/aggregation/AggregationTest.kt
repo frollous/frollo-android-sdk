@@ -46,6 +46,7 @@ import us.frollo.frollosdk.mapping.toTransaction
 import us.frollo.frollosdk.mapping.toTransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
 import us.frollo.frollosdk.model.coredata.shared.OrderType
@@ -2585,6 +2586,49 @@ class AggregationTest : BaseAndroidTest() {
 
         val request = mockServer.takeRequest()
         assertEquals(AggregationAPI.URL_MERCHANTS, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshCachedMerchants() {
+
+        initSetup()
+
+        val data1 = testMerchantResponseData(merchantId = 238)
+        val data2 = testMerchantResponseData(merchantId = 686)
+        val list = mutableListOf(data1, data2)
+        database.merchants().insertAll(*list.map { it.toMerchant() }.toList().toTypedArray())
+
+        val body = readStringFromJson(app, R.raw.merchants_by_id)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?merchant_ids=238%2C686") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshCachedMerchants { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchMerchants().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(2, models?.size)
+
+            val merchant = models?.last()
+            assertEquals(686L, merchant?.merchantId)
+            assertEquals("Rent", merchant?.name)
+            assertEquals(MerchantType.RETAILER, merchant?.merchantType)
+        }
 
         wait(3)
 

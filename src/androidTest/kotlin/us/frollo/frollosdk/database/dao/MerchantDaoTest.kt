@@ -172,4 +172,30 @@ class MerchantDaoTest {
         testObserver.awaitValue()
         assertTrue(testObserver.value().isEmpty())
     }
+
+    @Test
+    fun testCount() {
+        val data1 = testMerchantResponseData(merchantId = 100)
+        val data2 = testMerchantResponseData(merchantId = 101)
+        val data3 = testMerchantResponseData(merchantId = 102)
+        val data4 = testMerchantResponseData(merchantId = 103)
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        db.merchants().insertAll(*list.map { it.toMerchant() }.toList().toTypedArray())
+        assertEquals(db.merchants().getMerchantsCount(), 4L)
+    }
+
+    @Test
+    fun testGetIdsByOffset() {
+        val data1 = testMerchantResponseData(merchantId = 100)
+        val data2 = testMerchantResponseData(merchantId = 101)
+        val data3 = testMerchantResponseData(merchantId = 102)
+        val data4 = testMerchantResponseData(merchantId = 103)
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        db.merchants().insertAll(*list.map { it.toMerchant() }.toList().toTypedArray())
+        val data = db.merchants().getIdsByOffset(2, 2)
+        assertEquals(data[0], 102L)
+        assertEquals(data[1], 103L)
+    }
 }

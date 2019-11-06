@@ -6,7 +6,7 @@
 - Update Frollo Host API version to 2.5
 - Goals enhancements
 - Send application version in headers
-- Update provider account with latest transactions & data.
+- Add method to refresh Provider Accounts to fetch the latest account data from the aggregation partner.
 - Added a method to refresh all cached merchants
 
 ### 3.2.0

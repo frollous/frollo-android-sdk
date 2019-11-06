@@ -90,7 +90,7 @@ internal interface AggregationAPI {
     fun fetchProviderAccount(@Path("provider_account_id") providerAccId: Long): Call<ProviderAccountResponse>
 
     @PUT(URL_PROVIDER_ACCOUNTS)
-    fun updateProviderAccount(@Query("provideraccount_ids") providerAccIds: LongArray): Call<List<ProviderAccountResponse>>
+    fun refreshProviderAccounts(@Query("provideraccount_ids") providerAccIds: LongArray): Call<List<ProviderAccountResponse>>
 
     @POST(URL_PROVIDER_ACCOUNTS)
     fun createProviderAccount(@Body request: ProviderAccountCreateRequest): Call<ProviderAccountResponse>

@@ -28,6 +28,7 @@ import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
+import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
@@ -186,9 +187,9 @@ class GoalsTest : BaseAndroidTest() {
             }
         })
 
-        goals.refreshGoals { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        goals.refreshGoals { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
 
             val testObserver = goals.fetchGoals().test()
 
@@ -239,9 +240,9 @@ class GoalsTest : BaseAndroidTest() {
         testObserver1.awaitValue()
         assertEquals(3211L, testObserver1.value().data?.goalId)
 
-        goals.refreshGoals(status = status, trackingStatus = trackingStatus) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        goals.refreshGoals(status = status, trackingStatus = trackingStatus) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
 
             // Check goal still exists that doesn't match filter
             val testObserver2 = goals.fetchGoal(goalId = 3211).test()
@@ -268,11 +269,11 @@ class GoalsTest : BaseAndroidTest() {
 
         clearLoggedInPreferences()
 
-        goals.refreshGoals { result ->
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+        goals.refreshGoals { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
         }
 
         wait(3)
@@ -851,9 +852,9 @@ class GoalsTest : BaseAndroidTest() {
             }
         })
 
-        goals.refreshGoals { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        goals.refreshGoals { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
         }
 
         goals.refreshGoalPeriods(goalId = goalId) { result ->
@@ -908,9 +909,9 @@ class GoalsTest : BaseAndroidTest() {
             assertEquals(457L, value().data?.get(1)?.goalPeriodId)
         }
 
-        goals.refreshGoals { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        goals.refreshGoals { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
 
             goals.fetchGoals().test().apply {
                 awaitValue()

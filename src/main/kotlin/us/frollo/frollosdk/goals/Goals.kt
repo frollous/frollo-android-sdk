@@ -207,18 +207,18 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
      *
      * @param status Filter goals by their current status (optional)
      * @param trackingStatus Filter goals by their current tracking status (optional)
-     * @param completion Optional completion handler with optional error if the request fails
+     * @param completion Optional completion handler with optional error if the request fails and list of goals if succeeds
      */
     fun refreshGoals(
         status: GoalStatus? = null,
         trackingStatus: GoalTrackingStatus? = null,
-        completion: OnFrolloSDKCompletionListener<Result>? = null
+        completion: OnFrolloSDKCompletionListener<Resource<List<Goal>>>? = null
     ) {
         goalsAPI.fetchGoals(status, trackingStatus).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshGoals", resource.error?.localizedDescription)
-                    completion?.invoke(Result.error(resource.error))
+                    completion?.invoke(Resource.error(resource.error))
                 }
                 Resource.Status.SUCCESS -> {
                     handleGoalsResponse(
@@ -491,11 +491,12 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
         response: List<GoalResponse>?,
         status: GoalStatus?,
         trackingStatus: GoalTrackingStatus?,
-        completion: OnFrolloSDKCompletionListener<Result>?
+        completion: OnFrolloSDKCompletionListener<Resource<List<Goal>>>?
     ) {
+        var models = listOf<Goal>()
         response?.let {
             doAsync {
-                val models = mapGoalsResponse(response)
+                models = mapGoalsResponse(response)
 
                 db.goals().insertAll(*models.toTypedArray())
 
@@ -507,9 +508,9 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
                     removeCachedGoals(staleIds.toLongArray())
                 }
 
-                uiThread { completion?.invoke(Result.success()) }
+                uiThread { completion?.invoke(Resource.success(models)) }
             }
-        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+        } ?: run { completion?.invoke(Resource.success(models)) } // Explicitly invoke completion callback if response is null.
     }
 
     private fun handleGoalPeriodResponse(response: GoalPeriodResponse?, completion: OnFrolloSDKCompletionListener<Result>?) {

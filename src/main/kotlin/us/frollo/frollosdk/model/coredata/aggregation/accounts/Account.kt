@@ -148,7 +148,7 @@ data class Account(
     /** Balance details (optional) */
     @Embedded(prefix = "b_details_") val balanceDetails: BalanceDetails?,
 
-    /** Goal IDs that are associated to this account */
+    /** IDs of ACTIVE Goals that are associated to this account */
     @ColumnInfo(name = "goal_ids") val goalIds: List<Long>?,
 
     /** External ID of the aggregator */

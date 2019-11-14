@@ -23,11 +23,11 @@ import us.frollo.frollosdk.extensions.serializedName
 enum class OpenMode {
     /** Open in a webview inside the app */
     @SerializedName("internal") INTERNAL,
-    /** The content is HTML and should be rendered in a WebView */
+    /** Open in a webview inside the app & show back,forward and refresh buttons */
     @SerializedName("internal_navigation") INTERNAL_NAVIGATION,
-    /** The content contains a link to video content to be played */
+    /** Open in a webview inside the app & create a secure login from the app */
     @SerializedName("internal_secure") INTERNAL_SECURE,
-    /** The content contains an image. Fetch the image from the URL */
+    /** Open in a webview in an external browser */
     @SerializedName("external") EXTERNAL;
 
     /** Enum to serialized string */

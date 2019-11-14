@@ -8,6 +8,7 @@
 - Send application version in headers
 - Add method to refresh Provider Accounts to fetch the latest account data from the aggregation partner.
 - Added a method to refresh all cached merchants
+- Changing in the messages API to support open mode & metadata
 
 ### 3.2.0
 

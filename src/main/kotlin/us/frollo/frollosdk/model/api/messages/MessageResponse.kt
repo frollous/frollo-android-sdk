@@ -21,6 +21,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.messages.Action
 import us.frollo.frollosdk.model.coredata.messages.ContentType
@@ -44,5 +45,6 @@ internal data class MessageResponse(
     @ColumnInfo(name = "content_type") @SerializedName("content_type") val contentType: ContentType,
     @Embedded(prefix = "content_") @SerializedName("content") val content: MessageContent?,
     @Embedded(prefix = "action_") @SerializedName("action") val action: Action?,
-    @ColumnInfo(name = "auto_dismiss") @SerializedName("auto_dismiss") val autoDismiss: Boolean
+    @ColumnInfo(name = "auto_dismiss") @SerializedName("auto_dismiss") val autoDismiss: Boolean,
+    @ColumnInfo(name = "metadata") var metadata: JsonObject?
 )

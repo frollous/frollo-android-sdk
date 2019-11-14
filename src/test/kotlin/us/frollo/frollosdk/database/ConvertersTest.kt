@@ -54,6 +54,7 @@ import us.frollo.frollosdk.model.coredata.goals.GoalTarget
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
 import us.frollo.frollosdk.model.coredata.messages.ContentType
+import us.frollo.frollosdk.model.coredata.messages.OpenMode
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
@@ -221,6 +222,20 @@ class ConvertersTest {
         assertEquals("IMAGE", str)
 
         assertEquals("TEXT", Converters.instance.stringFromContentType(null))
+    }
+
+    @Test
+    fun testStringToOpenMode() {
+        val status = Converters.instance.stringToOpenMode("EXTERNAL")
+        assertEquals(OpenMode.EXTERNAL, status)
+        assertEquals(OpenMode.EXTERNAL, Converters.instance.stringToOpenMode(null))
+    }
+
+    @Test
+    fun testStringFromOpenMode() {
+        val str = Converters.instance.stringFromOpenMode(OpenMode.EXTERNAL)
+        assertEquals("EXTERNAL", str)
+        assertEquals("EXTERNAL", Converters.instance.stringFromOpenMode(null))
     }
 
     @Test

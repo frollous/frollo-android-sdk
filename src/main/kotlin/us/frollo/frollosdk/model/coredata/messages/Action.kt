@@ -26,5 +26,5 @@ data class Action(
     /** Raw value of the action URL (optional) */
     @ColumnInfo(name = "link") @SerializedName("link") var link: String? = null,
     /** Action should open the link externally or internally. Externally means the system should handle opening the link. */
-    @ColumnInfo(name = "open_external") @SerializedName("open_external") var openExternal: Boolean
+    @ColumnInfo(name = "open_mode") @SerializedName("open_mode") var openMode: OpenMode
 )

@@ -76,7 +76,7 @@ import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
     TransactionTag::class,
     Goal::class,
     GoalPeriod::class
-], version = 8, exportSchema = true)
+], version = 9, exportSchema = true)
 
 @TypeConverters(Converters::class)
 abstract class SDKDatabase : RoomDatabase() {
@@ -115,7 +115,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
                         .allowMainThreadQueries() // Needed for some tests
                         // .fallbackToDestructiveMigration()
-                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8)
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9)
                         .build()
 
         // Copy-paste of auto-generated SQLs from room schema json file
@@ -310,6 +310,19 @@ abstract class SDKDatabase : RoomDatabase() {
 
             database.execSQL("COMMIT")
             // END - Alter columns of goal & goal_period tables
+        }
+
+        private val MIGRATION_8_9: Migration = object : Migration(8, 9) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                //
+                database.execSQL("BEGIN TRANSACTION")
+
+                database.execSQL("DROP TABLE message")
+
+                database.execSQL("CREATE TABLE `message` (`msg_id` INTEGER NOT NULL, `event` TEXT NOT NULL, `user_event_id` INTEGER, `placement` INTEGER NOT NULL, `persists` INTEGER NOT NULL, `read` INTEGER NOT NULL, `interacted` INTEGER NOT NULL, `message_types` TEXT NOT NULL, `title` TEXT, `content_type` TEXT NOT NULL, `auto_dismiss` INTEGER NOT NULL, `content_main` TEXT, `content_header` TEXT, `content_footer` TEXT, `content_text` TEXT, `content_image_url` TEXT, `content_design_type` TEXT, `content_url` TEXT, `content_width` REAL, `content_height` REAL, `content_autoplay` INTEGER, `content_autoplay_cellular` INTEGER, `content_icon_url` TEXT, `content_muted` INTEGER, `action_title` TEXT, `action_link` TEXT, `action_open_mode` TEXT,`metadata` TEXT, PRIMARY KEY(`msg_id`))")
+
+                database.execSQL("COMMIT")
+            }
         }
     }
 }

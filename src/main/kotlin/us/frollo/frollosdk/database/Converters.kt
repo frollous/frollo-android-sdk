@@ -50,6 +50,7 @@ import us.frollo.frollosdk.model.coredata.goals.GoalTarget
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
 import us.frollo.frollosdk.model.coredata.messages.ContentType
+import us.frollo.frollosdk.model.coredata.messages.OpenMode
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
@@ -140,6 +141,12 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromContentType(value: ContentType?): String? = value?.name ?: run { ContentType.TEXT.name }
+
+    @TypeConverter
+    fun stringToOpenMode(value: String?): OpenMode? = if (value == null) OpenMode.EXTERNAL else OpenMode.valueOf(value)
+
+    @TypeConverter
+    fun stringFromOpenMode(value: OpenMode?): String? = value?.name ?: run { OpenMode.EXTERNAL.name }
 
     // Aggregation
 

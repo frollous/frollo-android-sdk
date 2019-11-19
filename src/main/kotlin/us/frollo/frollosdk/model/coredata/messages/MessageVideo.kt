@@ -16,6 +16,8 @@
 
 package us.frollo.frollosdk.model.coredata.messages
 
+import com.google.gson.JsonObject
+
 /** Data representation of a VIDEO Message */
 data class MessageVideo(
 
@@ -74,6 +76,8 @@ data class MessageVideo(
     val iconUrl: String?,
 
     /** Raw value for the video URL */
-    val url: String
+    val url: String,
 
-) : Message(messageId, event, userEventId, placement, autoDismiss, persists, read, interacted, messageTypes, title, contentType, action)
+    override val metadata: JsonObject?
+
+) : Message(messageId, event, userEventId, placement, autoDismiss, persists, read, interacted, messageTypes, title, contentType, action, metadata)

@@ -226,16 +226,16 @@ class ConvertersTest {
 
     @Test
     fun testStringToOpenMode() {
-        val status = Converters.instance.stringToOpenMode("EXTERNAL")
-        assertEquals(OpenMode.EXTERNAL, status)
-        assertEquals(OpenMode.EXTERNAL, Converters.instance.stringToOpenMode(null))
+        val status = Converters.instance.stringToOpenMode("INTERNAL")
+        assertEquals(OpenMode.INTERNAL, status)
+        assertEquals(OpenMode.INTERNAL, Converters.instance.stringToOpenMode(null))
     }
 
     @Test
     fun testStringFromOpenMode() {
-        val str = Converters.instance.stringFromOpenMode(OpenMode.EXTERNAL)
-        assertEquals("EXTERNAL", str)
-        assertEquals("EXTERNAL", Converters.instance.stringFromOpenMode(null))
+        val str = Converters.instance.stringFromOpenMode(OpenMode.INTERNAL)
+        assertEquals("INTERNAL", str)
+        assertEquals("INTERNAL", Converters.instance.stringFromOpenMode(null))
     }
 
     @Test

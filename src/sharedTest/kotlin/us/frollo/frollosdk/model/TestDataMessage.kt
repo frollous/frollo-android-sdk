@@ -60,7 +60,7 @@ internal fun testMessageResponseData(type: ContentType? = null, types: List<Stri
 
     return MessageResponse(
             messageId = if (msgId == null) randomNumber().toLong() else msgId,
-            action = Action(link = "frollo://dashboard", openMode = OpenMode.EXTERNAL, title = randomString(30)),
+            action = Action(link = "frollo://dashboard", openMode = OpenMode.INTERNAL, title = randomString(30)),
             contentType = contentType,
             content = content,
             event = randomString(30),

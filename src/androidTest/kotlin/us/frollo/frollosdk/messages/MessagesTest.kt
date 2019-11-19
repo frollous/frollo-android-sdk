@@ -362,6 +362,9 @@ class MessagesTest : BaseAndroidTest() {
                     ContentType.TEXT -> assertTrue(message is MessageText)
                 }
             }
+            val metadata = models?.last()?.metadata
+            assertEquals("holiday", metadata?.get("category")?.asString)
+            assertEquals(true, metadata?.get("subcategory")?.asBoolean)
         }
 
         val request = mockServer.takeRequest()

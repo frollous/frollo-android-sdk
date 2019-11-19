@@ -19,15 +19,15 @@ package us.frollo.frollosdk.model.coredata.messages
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
-/** Indicates the content type of the message and how it should be rendered */
+/** Indicates the open mode of the link and how it should be opened */
 enum class OpenMode {
-    /** Open in a webview inside the app */
+    /** Open the link internally using native webview and no user controls */
     @SerializedName("internal") INTERNAL,
-    /** Open in a webview inside the app & show back,forward and refresh buttons */
+    /** Open the link internally using native webview with navigation controls */
     @SerializedName("internal_navigation") INTERNAL_NAVIGATION,
-    /** Open in a webview inside the app & create a secure login from the app */
+    /** Open the link internally using the secure web view - ChromeTabs */
     @SerializedName("internal_secure") INTERNAL_SECURE,
-    /** Open in a webview in an external browser */
+    /** Open the link using the native browser on the phone (or app if deeplink) */
     @SerializedName("external") EXTERNAL;
 
     /** Enum to serialized string */

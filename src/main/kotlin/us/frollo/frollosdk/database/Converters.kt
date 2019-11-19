@@ -143,10 +143,10 @@ internal class Converters {
     fun stringFromContentType(value: ContentType?): String? = value?.name ?: run { ContentType.TEXT.name }
 
     @TypeConverter
-    fun stringToOpenMode(value: String?): OpenMode? = if (value == null) OpenMode.EXTERNAL else OpenMode.valueOf(value)
+    fun stringToOpenMode(value: String?): OpenMode? = if (value == null) OpenMode.INTERNAL else OpenMode.valueOf(value)
 
     @TypeConverter
-    fun stringFromOpenMode(value: OpenMode?): String? = value?.name ?: run { OpenMode.EXTERNAL.name }
+    fun stringFromOpenMode(value: OpenMode?): String? = value?.name ?: run { OpenMode.INTERNAL.name }
 
     // Aggregation
 

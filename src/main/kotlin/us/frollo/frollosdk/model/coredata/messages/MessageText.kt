@@ -16,6 +16,8 @@
 
 package us.frollo.frollosdk.model.coredata.messages
 
+import com.google.gson.JsonObject
+
 /** Data representation of a TEXT Message */
 data class MessageText(
     /** Unique identifier of the message */
@@ -67,6 +69,8 @@ data class MessageText(
     val imageUrl: String?,
 
     /** Text body content */
-    val text: String?
+    val text: String?,
 
-) : Message(messageId, event, userEventId, placement, autoDismiss, persists, read, interacted, messageTypes, title, contentType, action)
+    override val metadata: JsonObject?
+
+) : Message(messageId, event, userEventId, placement, autoDismiss, persists, read, interacted, messageTypes, title, contentType, action, metadata)

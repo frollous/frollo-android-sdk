@@ -16,6 +16,8 @@
 
 package us.frollo.frollosdk.model.coredata.messages
 
+import com.google.gson.JsonObject
+
 /** Data representation of a IMAGE Message */
 data class MessageImage(
 
@@ -62,6 +64,8 @@ data class MessageImage(
     val width: Double?,
 
     /** Raw value for the image URL */
-    val url: String
+    val url: String,
 
-) : Message(messageId, event, userEventId, placement, autoDismiss, persists, read, interacted, messageTypes, title, contentType, action)
+    override val metadata: JsonObject?
+
+) : Message(messageId, event, userEventId, placement, autoDismiss, persists, read, interacted, messageTypes, title, contentType, action, metadata)

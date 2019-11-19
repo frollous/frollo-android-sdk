@@ -22,9 +22,9 @@ import com.google.gson.annotations.SerializedName
 /** Action data in a message */
 data class Action(
     /** Title of the action (optional) */
-    @ColumnInfo(name = "title") @SerializedName("title") var title: String? = null,
+    @ColumnInfo(name = "title") @SerializedName("title") val title: String? = null,
     /** Raw value of the action URL (optional) */
-    @ColumnInfo(name = "link") @SerializedName("link") var link: String? = null,
+    @ColumnInfo(name = "link") @SerializedName("link") val link: String? = null,
     /** Action should open the link externally or internally. Externally means the system should handle opening the link. */
-    @ColumnInfo(name = "open_mode") @SerializedName("open_mode") var openMode: OpenMode
+    @ColumnInfo(name = "open_mode") @SerializedName("open_mode") val openMode: OpenMode
 )

@@ -48,7 +48,8 @@ internal fun MessageResponse.toMessage(): Message? {
                                 action = action,
                                 footer = content.footer,
                                 header = content.header,
-                                main = mainHtml)
+                                main = mainHtml,
+                                metadata = this.metadata)
                 } ?: run {
                     Log.e("$TAG#toMessage-HTML", "HTML Message : Invalid data in content")
                         null
@@ -74,7 +75,8 @@ internal fun MessageResponse.toMessage(): Message? {
                                 footer = content.footer,
                                 header = content.header,
                                 imageUrl = content.imageUrl,
-                                text = content.text)
+                                text = content.text,
+                                metadata = this.metadata)
                 } ?: run {
                     Log.e("$TAG#toMessage-TEXT", "TEXT Message : Invalid data in content")
                         null
@@ -102,7 +104,8 @@ internal fun MessageResponse.toMessage(): Message? {
                             autoplay = content.autoplay ?: false,
                             autoplayCellular = content.autoplayCellular ?: false,
                             iconUrl = content.iconUrl,
-                            url = content.url)
+                            url = content.url,
+                            metadata = this.metadata)
                 } else {
                     Log.e("$TAG#toMessage-VIDEO", "VIDEO Message : Invalid data in content")
                     null
@@ -126,7 +129,8 @@ internal fun MessageResponse.toMessage(): Message? {
                         action = action,
                         height = content.height,
                         width = content.width,
-                        url = content.url)
+                        url = content.url,
+                        metadata = this.metadata)
             } else {
                 Log.e("$TAG#toMessage-IMAGE", "IMAGE Message : Invalid data in content")
                 null

@@ -46,5 +46,5 @@ internal data class MessageResponse(
     @Embedded(prefix = "content_") @SerializedName("content") val content: MessageContent?,
     @Embedded(prefix = "action_") @SerializedName("action") val action: Action?,
     @ColumnInfo(name = "auto_dismiss") @SerializedName("auto_dismiss") val autoDismiss: Boolean,
-    @ColumnInfo(name = "metadata") var metadata: JsonObject?
+    @ColumnInfo(name = "metadata") @SerializedName("metadata") val metadata: JsonObject?
 )

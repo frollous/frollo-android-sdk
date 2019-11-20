@@ -32,7 +32,7 @@ class ErrorMappingTest {
         val jsonStr = "{\"error\":{\"error_code\":\"F0111\",\"error_message\":\"Invalid username or password\"}}"
         val response = jsonStr.toAPIErrorResponse()
         Assert.assertNotNull(response)
-        Assert.assertEquals("F0111", response?.errorCode.toString())
+        Assert.assertEquals("F0111", response?.errorCode)
         Assert.assertEquals("Invalid username or password", response?.errorMessage)
     }
 

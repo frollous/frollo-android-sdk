@@ -35,6 +35,7 @@ internal fun Int.toAPIErrorType(errorCode: APIErrorCode?): APIErrorType {
             when (errorCode) {
                 APIErrorCode.INVALID_MUST_BE_DIFFERENT -> APIErrorType.PASSWORD_MUST_BE_DIFFERENT
                 APIErrorCode.MIGRATION_FAILED -> APIErrorType.MIGRATION_FAILED
+                APIErrorCode.AGGREGATOR_BAD_REQUEST -> APIErrorType.AGGREGATOR_BAD_REQUEST
                 else -> APIErrorType.BAD_REQUEST
             }
         }

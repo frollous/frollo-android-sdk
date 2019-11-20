@@ -22,58 +22,60 @@ import us.frollo.frollosdk.extensions.serializedName
 /**
  * Frollo API Error Codes
  */
-enum class APIErrorCode {
+enum class APIErrorCode(val rawValue: String) {
     // 400 Bad Request
     /** Invalid Value */
-    @SerializedName("F0001") INVALID_VALUE,
+    @SerializedName("F0001") INVALID_VALUE("F0001"),
     /** Invalid Length */
-    @SerializedName("F0002") INVALID_LENGTH,
+    @SerializedName("F0002") INVALID_LENGTH("F0002"),
     /** Invalid Authorisation Header */
-    @SerializedName("F0003") INVALID_AUTHORISATION_HEADER,
+    @SerializedName("F0003") INVALID_AUTHORISATION_HEADER("F0003"),
     /** Invalid User Agent Header */
-    @SerializedName("F0004") INVALID_USER_AGENT_HEADER,
+    @SerializedName("F0004") INVALID_USER_AGENT_HEADER("F0004"),
     /** Invalid Must Be Different */
-    @SerializedName("F0005") INVALID_MUST_BE_DIFFERENT,
+    @SerializedName("F0005") INVALID_MUST_BE_DIFFERENT("F0005"),
     /** Invalid Over Limit */
-    @SerializedName("F0006") INVALID_OVER_LIMIT,
+    @SerializedName("F0006") INVALID_OVER_LIMIT("F0006"),
     /** Invalid Count */
-    @SerializedName("F0007") INVALID_COUNT,
+    @SerializedName("F0007") INVALID_COUNT("F0007"),
     /** Migration Error */
-    @SerializedName("F0012") MIGRATION_FAILED,
+    @SerializedName("F0012") MIGRATION_FAILED("F0012"),
+    /** Aggregator Bad Request Received */
+    @SerializedName("F0014") AGGREGATOR_BAD_REQUEST("F0014"),
 
     // 401 Not authenticated
     /** Invalid Access Token */
-    @SerializedName("F0101") INVALID_ACCESS_TOKEN,
+    @SerializedName("F0101") INVALID_ACCESS_TOKEN("F0101"),
     /** Invalid Refresh Token */
-    @SerializedName("F0110") INVALID_REFRESH_TOKEN,
+    @SerializedName("F0110") INVALID_REFRESH_TOKEN("F0110"),
     /** Invalid Username Password */
-    @SerializedName("F0111") INVALID_USERNAME_PASSWORD,
+    @SerializedName("F0111") INVALID_USERNAME_PASSWORD("F0111"),
     /** Suspended User */
-    @SerializedName("F0112") SUSPENDED_USER,
+    @SerializedName("F0112") SUSPENDED_USER("F0112"),
     /** Suspended Device */
-    @SerializedName("F0113") SUSPENDED_DEVICE,
+    @SerializedName("F0113") SUSPENDED_DEVICE("F0113"),
     /** Account Locked */
-    @SerializedName("F0114") ACCOUNT_LOCKED,
+    @SerializedName("F0114") ACCOUNT_LOCKED("F0114"),
 
     // 403 Not authorised
     /** Unauthorised */
-    @SerializedName("F0200") UNAUTHORISED,
+    @SerializedName("F0200") UNAUTHORISED("F0200"),
 
     // 404 Object not found
     /** Not Found */
-    @SerializedName("F0300") NOT_FOUND,
+    @SerializedName("F0300") NOT_FOUND("F0300"),
 
     // 409 Conflict
     /** Already Exists */
-    @SerializedName("F0400") ALREADY_EXISTS,
+    @SerializedName("F0400") ALREADY_EXISTS("F0400"),
 
     // 500 Internal Server Error
     /** Aggregator Error */
-    @SerializedName("F9000") AGGREGATOR_ERROR,
+    @SerializedName("F9000") AGGREGATOR_ERROR("F9000"),
     /** Unknown Server Error */
-    @SerializedName("F9998") UNKNOWN_SERVER,
+    @SerializedName("F9998") UNKNOWN_SERVER("F9998"),
     /** Internal Exception */
-    @SerializedName("F9999") INTERNAL_EXCEPTION;
+    @SerializedName("F9999") INTERNAL_EXCEPTION("F9999");
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
@@ -81,4 +83,10 @@ enum class APIErrorCode {
     // Try to get the annotation value if available instead of using plain .toString()
     // Fallback to super.toString() in case annotation is not present/available
             serializedName() ?: super.toString()
+
+    companion object {
+        fun fromRawValue(errorCode: String): APIErrorCode? {
+            return values().find { it.rawValue == errorCode }
+        }
+    }
 }

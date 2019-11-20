@@ -2,13 +2,18 @@
 
 ### 3.3.0
 
+#### Features
+
+- Force a refresh of a provider account with the aggregator
+- Refresh cached merchant data
+- Goals enhancements and generic metadata support
+- Messages generic metadata support
+
 #### Changes
-- Update Frollo Host API version to 2.5
-- Goals enhancements
-- Send application version in headers
-- Add method to refresh Provider Accounts to fetch the latest account data from the aggregation partner.
-- Added a method to refresh all cached merchants
-- Changing in the messages API to support open mode & metadata
+
+- Update Frollo Host API version to 2.6
+- Send app version in addition to SDK version in headers
+- Messages supports expanded URL opening methods
 
 ### 3.2.0
 

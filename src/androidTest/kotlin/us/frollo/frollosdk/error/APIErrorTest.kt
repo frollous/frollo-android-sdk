@@ -165,6 +165,18 @@ class APIErrorTest {
     }
 
     @Test
+    fun testAPIErrorAggregatorBadRequest() {
+        val errorResponse = readStringFromJson(app, R.raw.error_aggregator_bad_request)
+
+        val error = APIError(400, errorResponse)
+        assertEquals(app.resources.getString(APIErrorType.AGGREGATOR_BAD_REQUEST.textResource), error.localizedDescription)
+        assertEquals(400, error.statusCode)
+        assertEquals(APIErrorType.AGGREGATOR_BAD_REQUEST, error.type)
+        assertEquals(APIErrorCode.AGGREGATOR_BAD_REQUEST, error.errorCode)
+        assertNotNull(error.message)
+    }
+
+    @Test
     fun testAPIErrorValueOverLimit() {
         val errorResponse = readStringFromJson(app, R.raw.error_value_over_limit)
 

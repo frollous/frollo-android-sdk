@@ -36,7 +36,7 @@ class APIError(
 
     /** Error code returned by the API if available and recognised */
     val errorCode: APIErrorCode?
-        get() = errorResponse?.errorCode
+        get() = errorResponse?.errorCode?.let { APIErrorCode.fromRawValue(it) }
 
     /** Error message returned by the API if available */
     override val message: String?

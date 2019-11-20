@@ -52,6 +52,8 @@ enum class APIErrorType(
     PASSWORD_MUST_BE_DIFFERENT(R.string.FrolloSDK_Error_API_PasswordMustBeDifferent),
     /** An issue occurred while trying to migrate the user to a new identity provider */
     MIGRATION_FAILED(R.string.FrolloSDK_Error_API_MigrationFailed),
+    /** Aggregator rejected a bad request */
+    AGGREGATOR_BAD_REQUEST(R.string.FrolloSDK_Error_API_AggregatorBadRequest),
 
     /** Invalid access token */
     INVALID_ACCESS_TOKEN(R.string.FrolloSDK_Error_API_InvalidAccessToken),

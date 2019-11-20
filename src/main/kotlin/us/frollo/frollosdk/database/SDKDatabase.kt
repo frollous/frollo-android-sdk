@@ -268,8 +268,9 @@ abstract class SDKDatabase : RoomDatabase() {
                 // New changes in this migration:
                 // 1) Alter report_transaction_history table - add column transaction_tags
                 // 2) Alter report_group_transaction_history table - add column transaction_tags
-                // 4) Alter goals table - make current period columns nullable, delete columns type and sub_type, add column metadata, add column c_period_period_index
-                // 3) Alter goal_period table - add column period_index
+                // 3) Alter goals table - make current period columns nullable, delete columns type and sub_type, add column metadata, add column c_period_period_index
+                // 4) Alter goal_period table - add column period_index
+                // 5) Alter messages table - delete column action_open_external, add column metadata, add column action_open_mode
 
                 commonMigrationsReports6To8(database)
                 commonMigrationsGoals7To8(database)

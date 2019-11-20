@@ -273,6 +273,7 @@ abstract class SDKDatabase : RoomDatabase() {
 
                 commonMigrationsReports6To8(database)
                 commonMigrationsGoals7To8(database)
+                commonMigrationsMessages7To8(database)
             }
         }
 
@@ -283,6 +284,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 // 2) Alter goal_period table - add column period_index
                 // 3) Alter messages table - delete column action_open_external, add column metadata, add column action_open_mode
                 commonMigrationsGoals7To8(database)
+                commonMigrationsMessages7To8(database)
             }
         }
 
@@ -310,11 +312,17 @@ abstract class SDKDatabase : RoomDatabase() {
 
             database.execSQL("COMMIT")
             // END - Alter columns of goal & goal_period tables
+        }
 
+        private fun commonMigrationsMessages7To8(database: SupportSQLiteDatabase) {
+            // START - Alter columns of messages table
             database.execSQL("BEGIN TRANSACTION")
+            database.execSQL("DROP INDEX IF EXISTS  `index_message_msg_id`")
             database.execSQL("DROP TABLE message")
-            database.execSQL("CREATE TABLE `message` (`msg_id` INTEGER NOT NULL, `event` TEXT NOT NULL, `user_event_id` INTEGER, `placement` INTEGER NOT NULL, `persists` INTEGER NOT NULL, `read` INTEGER NOT NULL, `interacted` INTEGER NOT NULL, `message_types` TEXT NOT NULL, `title` TEXT, `content_type` TEXT NOT NULL, `auto_dismiss` INTEGER NOT NULL, `content_main` TEXT, `content_header` TEXT, `content_footer` TEXT, `content_text` TEXT, `content_image_url` TEXT, `content_design_type` TEXT, `content_url` TEXT, `content_width` REAL, `content_height` REAL, `content_autoplay` INTEGER, `content_autoplay_cellular` INTEGER, `content_icon_url` TEXT, `content_muted` INTEGER, `action_title` TEXT, `action_link` TEXT, `action_open_mode` TEXT,`metadata` TEXT, PRIMARY KEY(`msg_id`))")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `message` (`msg_id` INTEGER NOT NULL, `event` TEXT NOT NULL, `user_event_id` INTEGER, `placement` INTEGER NOT NULL, `persists` INTEGER NOT NULL, `read` INTEGER NOT NULL, `interacted` INTEGER NOT NULL, `message_types` TEXT NOT NULL, `title` TEXT, `content_type` TEXT NOT NULL, `auto_dismiss` INTEGER NOT NULL, `metadata` TEXT, `content_main` TEXT, `content_header` TEXT, `content_footer` TEXT, `content_text` TEXT, `content_image_url` TEXT, `content_design_type` TEXT, `content_url` TEXT, `content_width` REAL, `content_height` REAL, `content_autoplay` INTEGER, `content_autoplay_cellular` INTEGER, `content_icon_url` TEXT, `content_muted` INTEGER, `action_title` TEXT, `action_link` TEXT, `action_open_mode` TEXT, PRIMARY KEY(`msg_id`))")
+            database.execSQL("CREATE  INDEX `index_message_msg_id` ON `message` (`msg_id`)")
             database.execSQL("COMMIT")
+            // END - Alter columns of messages table
         }
     }
 }

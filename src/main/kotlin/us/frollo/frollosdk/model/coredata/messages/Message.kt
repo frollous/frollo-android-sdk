@@ -58,7 +58,7 @@ abstract class Message(
     /** Action data containing the URL the user should be taken to when interacting with a message. Can be a deeplink or web URL. */
     open val action: Action?,
 
-    /** Metadata associated with the message */
+    /** Metadata - custom JSON associated with the message (Optional) */
     open val metadata: JsonObject?
 
 ) : IAdapterModel

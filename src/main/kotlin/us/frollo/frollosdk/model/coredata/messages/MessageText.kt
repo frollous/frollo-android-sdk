@@ -71,6 +71,7 @@ data class MessageText(
     /** Text body content */
     val text: String?,
 
+    /** Metadata - custom JSON associated with the message (Optional) */
     override val metadata: JsonObject?
 
 ) : Message(messageId, event, userEventId, placement, autoDismiss, persists, read, interacted, messageTypes, title, contentType, action, metadata)

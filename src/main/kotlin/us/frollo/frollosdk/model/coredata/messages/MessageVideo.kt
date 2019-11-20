@@ -78,6 +78,7 @@ data class MessageVideo(
     /** Raw value for the video URL */
     val url: String,
 
+    /** Metadata - custom JSON associated with the message (Optional) */
     override val metadata: JsonObject?
 
 ) : Message(messageId, event, userEventId, placement, autoDismiss, persists, read, interacted, messageTypes, title, contentType, action, metadata)

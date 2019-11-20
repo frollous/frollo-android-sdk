@@ -16,6 +16,7 @@
 
 package us.frollo.frollosdk.model.coredata.messages
 
+import com.google.gson.JsonObject
 import us.frollo.frollosdk.model.IAdapterModel
 
 /** Data representation of a Message */
@@ -55,6 +56,9 @@ abstract class Message(
     open val contentType: ContentType,
 
     /** Action data containing the URL the user should be taken to when interacting with a message. Can be a deeplink or web URL. */
-    open val action: Action?
+    open val action: Action?,
+
+    /** Metadata - custom JSON associated with the message (Optional) */
+    open val metadata: JsonObject?
 
 ) : IAdapterModel

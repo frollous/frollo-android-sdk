@@ -20,6 +20,7 @@ import us.frollo.frollosdk.model.api.messages.MessageContent
 import us.frollo.frollosdk.model.api.messages.MessageResponse
 import us.frollo.frollosdk.model.coredata.messages.Action
 import us.frollo.frollosdk.model.coredata.messages.ContentType
+import us.frollo.frollosdk.model.coredata.messages.OpenMode
 import us.frollo.frollosdk.testutils.randomBoolean
 import us.frollo.frollosdk.testutils.randomNumber
 import us.frollo.frollosdk.testutils.randomString
@@ -59,7 +60,7 @@ internal fun testMessageResponseData(type: ContentType? = null, types: List<Stri
 
     return MessageResponse(
             messageId = if (msgId == null) randomNumber().toLong() else msgId,
-            action = Action(link = "frollo://dashboard", openExternal = randomBoolean(), title = randomString(30)),
+            action = Action(link = "frollo://dashboard", openMode = OpenMode.INTERNAL, title = randomString(30)),
             contentType = contentType,
             content = content,
             event = randomString(30),
@@ -70,7 +71,8 @@ internal fun testMessageResponseData(type: ContentType? = null, types: List<Stri
             autoDismiss = randomBoolean(),
             read = if (read == null) randomBoolean() else read,
             title = randomString(100),
-            userEventId = randomNumber(1..100000).toLong())
+            userEventId = randomNumber(1..100000).toLong(),
+            metadata = null)
 }
 
 internal fun MessageResponse.testModifyUserResponseData(newTitle: String? = null, types: List<String>? = null, messageContent: MessageContent? = null): MessageResponse {
@@ -87,5 +89,6 @@ internal fun MessageResponse.testModifyUserResponseData(newTitle: String? = null
             autoDismiss = randomBoolean(),
             read = read,
             title = if (newTitle == null) title else newTitle,
-            userEventId = userEventId)
+            userEventId = userEventId,
+            metadata = null)
 }

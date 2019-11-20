@@ -13,8 +13,9 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
-  }
+    "open_mode": "internal_navigation"
+  },
+  "metadata" : {"category":"holiday","subcategory":"true"}
 }, {
   "id": 52451,
   "event": "DEMO_OFFER",
@@ -47,7 +48,7 @@
   "header": "Test",
   "action": {
     "link": "google.com.au",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 51291,
@@ -63,7 +64,7 @@
   "content":  { "design_type": "information", "icon_url": "https://example.com/image.png", "text": "Some body" },
   "action": {
     "link": "frollo://spend/tag/lifestyle?period=history",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 49748,
@@ -83,7 +84,7 @@
   },
   "action": {
     "link": "https://api-sandbox.frollo.us/api/pages/auth_test",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 49747,
@@ -103,7 +104,7 @@
   },
   "action": {
     "link": "https://api-sandbox.frollo.us/pages/deep-links",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 47947,
@@ -120,6 +121,6 @@
   "button": {
     "title": "Show Transactions",
     "link": "frollo://transactions",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }]

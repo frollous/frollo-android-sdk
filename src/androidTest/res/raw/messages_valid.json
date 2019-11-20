@@ -13,7 +13,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 52451,
@@ -46,7 +46,7 @@
   "header": "Test",
   "action": {
     "link": "google.com.au",
-    "open_external": true
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 52376,
@@ -63,7 +63,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 52354,
@@ -92,7 +92,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 52258,
@@ -120,7 +120,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 52161,
@@ -148,7 +148,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 52051,
@@ -176,7 +176,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 51954,
@@ -203,7 +203,7 @@
   "content": { "url": "https://example.com/image.png", "height": 1000, "width": 800 },
   "action": {
     "link": "frollo://spend/tag/lifestyle?period=current",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 51790,
@@ -220,7 +220,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 51768,
@@ -248,7 +248,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 51668,
@@ -276,7 +276,7 @@
   "content": { "design_type": "information", "footer": "Footer", "header": "Header", "icon_url": "https://example.com/image.png", "text": "Some body" },
   "action": {
     "link": "frollo://budget/edit",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 51549,
@@ -293,7 +293,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 51527,
@@ -321,7 +321,7 @@
   "action": {
     "title": "See more details or mark as paid.",
     "link": "frollo://bills/payments",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 51454,
@@ -338,7 +338,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 51432,
@@ -366,7 +366,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 51327,
@@ -393,7 +393,7 @@
   "content": { "url": "https://example.com/image.png", "height": 1000, "width": 800 },
   "action": {
     "link": "frollo://spend/tag/lifestyle?period=history",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 51236,
@@ -410,7 +410,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 51212,
@@ -437,7 +437,7 @@
   "content": { "url": "https://example.com/image.png", "height": 1000, "width": 800 },
   "action": {
     "link": "frollo://goal/user/122",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 51108,
@@ -454,7 +454,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 51084,
@@ -482,7 +482,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 50906,
@@ -510,7 +510,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 50733,
@@ -538,7 +538,7 @@
   "action": {
     "title": "Claim Points",
     "link": "frollo://dashboard/",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }, {
   "id": 50628,
@@ -564,6 +564,6 @@
   "content": { "main": "<html></html>" },
   "action": {
     "link": "https://api.frollo.us/api/pages/redirect?path=https://www.ratecity.com.au/home-loans/homestar-finance/variable-rate-home-loan-principal-and-interest-amounts-750k-lvr-70-80-a.basic?b_slug=homestar\u0026utm_source=Frollo\u0026utm_medium=referral\u0026utm_campaign=App",
-    "open_external": false
+    "open_mode": "internal_navigation"
   }
 }]

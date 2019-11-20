@@ -16,6 +16,8 @@
 
 package us.frollo.frollosdk.model.coredata.messages
 
+import com.google.gson.JsonObject
+
 /** Data representation of a HTML Message */
 data class MessageHTML(
     /** Unique identifier of the message */
@@ -61,6 +63,9 @@ data class MessageHTML(
     val header: String?,
 
     /** HTML content to be rendered */
-    val main: String
+    val main: String,
 
-) : Message(messageId, event, userEventId, placement, autoDismiss, persists, read, interacted, messageTypes, title, contentType, action)
+    /** Metadata - custom JSON associated with the message (Optional) */
+    override val metadata: JsonObject?
+
+) : Message(messageId, event, userEventId, placement, autoDismiss, persists, read, interacted, messageTypes, title, contentType, action, metadata)

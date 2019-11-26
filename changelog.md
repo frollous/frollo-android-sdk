@@ -4,7 +4,7 @@
 
 #### Changes
 
-- eneric metadata support and additional properties for surveys
+- Generic metadata support and additional properties for surveys
 
 ### 3.3.0
 

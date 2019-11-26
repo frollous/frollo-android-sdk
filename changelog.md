@@ -1,5 +1,11 @@
 ## Changelog
 
+### 3.3.1
+
+#### Changes
+
+- Updating the survey to go have details like metadata, display_text, icon_url.
+
 ### 3.3.0
 
 #### Features

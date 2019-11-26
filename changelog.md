@@ -4,7 +4,7 @@
 
 #### Changes
 
-- Updating the survey to go have details like metadata, display_text, icon_url.
+- eneric metadata support and additional properties for surveys
 
 ### 3.3.0
 

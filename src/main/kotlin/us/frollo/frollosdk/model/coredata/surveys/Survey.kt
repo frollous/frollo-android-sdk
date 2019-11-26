@@ -36,10 +36,10 @@ data class Survey(
     /** Generic metadata JSON field */
     @SerializedName("metadata") val metadata: JsonObject?,
 
-    /** title of the survey */
+    /** Survey Title */
     @SerializedName("display_text") val displayText: String?,
 
-    /** icon url for survey */
+    /** Survey Icon URL */
     @SerializedName("icon_url") val iconUrl: String?,
 
     /** List of all questions within the survey. */

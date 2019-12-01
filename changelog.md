@@ -1,5 +1,11 @@
 ## Changelog
 
+### 3.3.1
+
+#### Changes
+
+- Generic metadata support and additional properties for surveys
+
 ### 3.3.0
 
 #### Features

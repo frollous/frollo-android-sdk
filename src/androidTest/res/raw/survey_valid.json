@@ -2,6 +2,9 @@
     "id": 1,
     "key": "FINANCIAL_WELLBEING",
     "name": "Wellbeing Survey",
+    "icon_url": "https://upload.wikimedia.org/wikipedia/en/e/e0/WPVG_icon_2016.svg",
+    "display_text": "This is amazing",
+    "metadata": {"name":"John","age":31,"city":"New York"},
     "questions": [
         {
             "id": 1,

@@ -16,6 +16,7 @@
 
 package us.frollo.frollosdk.model.coredata.surveys
 
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -31,6 +32,15 @@ data class Survey(
 
     /** Name of the survey */
     @SerializedName("name") val name: String?,
+
+    /** Generic metadata JSON field */
+    @SerializedName("metadata") val metadata: JsonObject?,
+
+    /** Survey Title */
+    @SerializedName("display_text") val displayText: String?,
+
+    /** Survey Icon URL */
+    @SerializedName("icon_url") val iconUrl: String?,
 
     /** List of all questions within the survey. */
     @SerializedName("questions") val questions: List<SurveyQuestion>

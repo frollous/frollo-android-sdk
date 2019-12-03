@@ -33,11 +33,8 @@ import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
-import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
-import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.testReportAccountBalanceData
-import us.frollo.frollosdk.model.testReportTransactionHistoryData
 import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.network.api.ReportsAPI
 import us.frollo.frollosdk.test.R
@@ -574,7 +571,9 @@ class ReportsTest : BaseAndroidTest() {
 
     // History Report Tests
 
-    @Test
+    // TODO: Rewrite these tests for reports method with new API
+
+    /*@Test
     fun testFetchHistoryTransactionReports() {
         initSetup()
 
@@ -1610,5 +1609,5 @@ class ReportsTest : BaseAndroidTest() {
         assertEquals(3, testObserver.value().data?.size)
 
         tearDown()
-    }
+    }*/
 }

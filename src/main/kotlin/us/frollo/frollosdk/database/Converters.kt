@@ -44,6 +44,9 @@ import us.frollo.frollosdk.model.coredata.bills.BillFrequency
 import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.model.coredata.bills.BillStatus
 import us.frollo.frollosdk.model.coredata.bills.BillType
+import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
+import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
+import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -350,6 +353,26 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromGoalFrequency(value: GoalFrequency?): String? = value?.name ?: GoalFrequency.SINGULAR.name
+
+    // Budget
+
+    @TypeConverter
+    fun stringFromBudgetTrackingStatus(value: BudgetTrackingStatus?): String? = value?.name ?: BudgetTrackingStatus.AHEAD.name
+
+    @TypeConverter
+    fun stringToBudgetTrackingStatus(value: String?): BudgetTrackingStatus? = if (value == null) BudgetTrackingStatus.AHEAD else BudgetTrackingStatus.valueOf(value)
+
+    @TypeConverter
+    fun stringFromBudgetStatus(value: BudgetStatus?): String? = value?.name ?: BudgetStatus.UNSTARTED.name
+
+    @TypeConverter
+    fun stringToBudgetStatus(value: String?): BudgetStatus? = if (value == null) BudgetStatus.UNSTARTED else BudgetStatus.valueOf(value)
+
+    @TypeConverter
+    fun stringFromBudgetFrequency(value: BudgetFrequency?): String? = value?.name ?: BudgetFrequency.MONTHLY.name
+
+    @TypeConverter
+    fun stringToBudgetFrequency(value: String?): BudgetFrequency? = if (value == null) BudgetFrequency.MONTHLY else BudgetFrequency.valueOf(value)
 
     // Shared
 

@@ -55,6 +55,8 @@ import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
 import us.frollo.frollosdk.model.coredata.user.User
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
+import us.frollo.frollosdk.model.coredata.budgets.Budget
+import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
 import us.frollo.frollosdk.model.coredata.goals.Goal
 import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
 
@@ -75,7 +77,9 @@ import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
     BillPayment::class,
     TransactionTag::class,
     Goal::class,
-    GoalPeriod::class
+    GoalPeriod::class,
+    Budget::class,
+    BudgetPeriod::class
 ], version = 8, exportSchema = true)
 
 @TypeConverters(Converters::class)

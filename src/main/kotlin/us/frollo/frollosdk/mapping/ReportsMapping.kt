@@ -17,13 +17,11 @@
 package us.frollo.frollosdk.mapping
 
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
-import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
 import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalance
 import us.frollo.frollosdk.model.coredata.reports.ReportGroupTransactionHistory
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
-import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 
@@ -34,18 +32,6 @@ internal fun AccountBalanceReportResponse.Report.BalanceReport.toReportAccountBa
                 period = period,
                 currency = currency,
                 accountId = id)
-
-internal fun TransactionCurrentReportResponse.Report.toReportTransactionCurrent(grouping: ReportGrouping, budgetCategory: BudgetCategory? = null, linkedId: Long?, name: String?) =
-        ReportTransactionCurrent(
-                day = day,
-                linkedId = linkedId,
-                name = name,
-                amount = spendValue,
-                previous = previousPeriodValue,
-                average = averageValue,
-                budget = budgetValue,
-                filteredBudgetCategory = budgetCategory,
-                grouping = grouping)
 
 internal fun TransactionHistoryReportResponse.Report.toReportTransactionHistory(grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory? = null, tags: List<String>? = null) =
         ReportTransactionHistory(

@@ -33,7 +33,6 @@ import us.frollo.frollosdk.extensions.changeDateFormat
 import us.frollo.frollosdk.extensions.dailyToWeekly
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchAccountBalanceReports
-import us.frollo.frollosdk.extensions.fetchTransactionCurrentReports
 import us.frollo.frollosdk.extensions.fetchTransactionHistoryReports
 import us.frollo.frollosdk.extensions.isValidFormat
 import us.frollo.frollosdk.extensions.sqlForExistingAccountBalanceReports
@@ -41,14 +40,11 @@ import us.frollo.frollosdk.extensions.sqlForFetchingAccountBalanceReports
 import us.frollo.frollosdk.extensions.sqlForHistoryReports
 import us.frollo.frollosdk.extensions.sqlForStaleHistoryReportIds
 import us.frollo.frollosdk.extensions.sqlForStaleIdsAccountBalanceReports
-import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toReportAccountBalance
 import us.frollo.frollosdk.mapping.toReportGroupTransactionHistory
-import us.frollo.frollosdk.mapping.toReportTransactionCurrent
 import us.frollo.frollosdk.mapping.toReportTransactionHistory
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
-import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalanceRelation
@@ -58,13 +54,11 @@ import us.frollo.frollosdk.model.coredata.reports.ReportDateFormat.Companion.DAT
 import us.frollo.frollosdk.model.coredata.reports.ReportDateFormat.Companion.MONTHLY
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
-import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
-import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrentRelation
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
 import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistoryRelation
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.ReportsAPI
-import java.lang.Exception
 
 /**
  * Manages all aspects of reporting of aggregation data including spending and balances
@@ -149,67 +143,6 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                             period = period,
                             accountId = accountId,
                             accountType = accountType,
-                            completion = completion)
-                }
-            }
-        }
-    }
-
-    // Transactions Current Reports
-
-    /**
-     * Fetch current transaction reports from the cache
-     *
-     * @param grouping Grouping that reports should be broken down into
-     * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
-     * @param overall Filter reports to show just overall reports or by breakdown categories, e.g. by budget category. Leaving this blank will return both overall and breakdown reports (Optional)
-     *
-     * @return LiveData object of Resource<List<ReportTransactionCurrentRelation>> which can be observed using an Observer for future changes as well.
-     */
-    fun currentTransactionReports(grouping: ReportGrouping, budgetCategory: BudgetCategory? = null, overall: Boolean? = null): LiveData<Resource<List<ReportTransactionCurrentRelation>>> =
-            Transformations.map(db.reportsTransactionCurrent().load(grouping, budgetCategory)) { models ->
-                Resource.success(
-                        when (overall) {
-                            true -> models.filter { it.report?.linkedId == null }
-                            false -> models.filter { it.report?.linkedId != null }
-                            else -> models
-                        }
-                )
-            }
-
-    /**
-     * Advanced method to fetch current transaction reports by SQL query from the cache
-     *
-     * @param query SimpleSQLiteQuery: Select query which fetches current transaction reports from the cache
-     *
-     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
-     *
-     * @return LiveData object of Resource<List<ReportTransactionCurrentRelation>> which can be observed using an Observer for future changes as well.
-     */
-    fun currentTransactionReports(query: SimpleSQLiteQuery): LiveData<Resource<List<ReportTransactionCurrentRelation>>> =
-            Transformations.map(db.reportsTransactionCurrent().loadByQuery(query)) { model ->
-                Resource.success(model)
-            }
-
-    /**
-     * Refresh transaction current reports from the host
-     *
-     * @param grouping Grouping that reports should be broken down into
-     * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
-     * @param completion Optional completion handler with optional error if the request fails
-     */
-    fun refreshTransactionCurrentReports(grouping: ReportGrouping, budgetCategory: BudgetCategory? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        reportsAPI.fetchTransactionCurrentReports(grouping, budgetCategory).enqueue { resource ->
-            when (resource.status) {
-                Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshTransactionCurrentReports", resource.error?.localizedDescription)
-                    completion?.invoke(Result.error(resource.error))
-                }
-                Resource.Status.SUCCESS -> {
-                    handleTransactionCurrentReportsResponse(
-                            response = resource.data,
-                            grouping = grouping,
-                            budgetCategory = budgetCategory,
                             completion = completion)
                 }
             }
@@ -379,117 +312,6 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
             db.reportsAccountBalance().deleteMany(staleIds)
         } catch (e: Exception) {
             Log.e("$TAG#handleAccountBalanceReportsForDate", e.message)
-        }
-    }
-
-    private fun handleTransactionCurrentReportsResponse(
-        response: TransactionCurrentReportResponse?,
-        grouping: ReportGrouping,
-        budgetCategory: BudgetCategory?,
-        completion: OnFrolloSDKCompletionListener<Result>? = null
-    ) {
-        response?.let {
-            doAsync {
-                val reportsToInsert = mutableListOf<ReportTransactionCurrent>()
-                val reportsToUpdate = mutableListOf<ReportTransactionCurrent>()
-                val idsToDelete = mutableListOf<Long>()
-                val linkedIds = mutableListOf<Long>()
-
-                handleTransactionCurrentDayReportsResponse(
-                        reportsResponse = response.days.toMutableList(),
-                        grouping = grouping,
-                        budgetCategory = budgetCategory,
-                        reportsToInsert = reportsToInsert,
-                        reportsToUpdate = reportsToUpdate,
-                        idsToDelete = idsToDelete)
-
-                response.groups.forEach {
-                    linkedIds.add(it.id)
-
-                    handleTransactionCurrentDayReportsResponse(
-                            reportsResponse = it.days.toMutableList(),
-                            grouping = grouping,
-                            budgetCategory = budgetCategory,
-                            linkedId = it.id,
-                            linkedName = it.name,
-                            reportsToInsert = reportsToInsert,
-                            reportsToUpdate = reportsToUpdate,
-                            idsToDelete = idsToDelete)
-                }
-
-                // Refresh missing merchants
-                if (grouping == ReportGrouping.MERCHANT)
-                    aggregation.fetchMissingMerchants(linkedIds.toSet())
-
-                db.reportsTransactionCurrent().insertAndDeleteInTransaction(
-                        new = reportsToInsert,
-                        existing = reportsToUpdate,
-                        staleIds = idsToDelete)
-
-                uiThread { completion?.invoke(Result.success()) }
-            }
-        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
-    }
-
-    // WARNING: Do not call this method on the main thread
-    private fun handleTransactionCurrentDayReportsResponse(
-        reportsResponse: MutableList<TransactionCurrentReportResponse.Report>,
-        grouping: ReportGrouping,
-        budgetCategory: BudgetCategory? = null,
-        linkedId: Long? = null,
-        linkedName: String? = null,
-        reportsToInsert: MutableList<ReportTransactionCurrent>,
-        reportsToUpdate: MutableList<ReportTransactionCurrent>,
-        idsToDelete: MutableList<Long>
-    ) {
-        try {
-            // Sort by day
-            reportsResponse.sortBy { it.day }
-
-            // Fetch existing reports for updating
-            val reportDays = reportsResponse.map { it.day }.toIntArray()
-
-            val existingReports = db.reportsTransactionCurrent().find(
-                    grouping = grouping,
-                    budgetCategory = budgetCategory,
-                    linkedId = linkedId,
-                    days = reportDays)
-
-            // Sort by day
-            existingReports.sortBy { it.day }
-
-            var index = 0
-
-            reportsResponse.forEach { response ->
-                val report = response.toReportTransactionCurrent(
-                        grouping = grouping,
-                        budgetCategory = budgetCategory,
-                        linkedId = linkedId,
-                        name = linkedName)
-
-                if (index < existingReports.size && existingReports[index].day == response.day) {
-                    // Update
-                    report.reportId = existingReports[index].reportId
-
-                    reportsToUpdate.add(report)
-
-                    index += 1
-                } else {
-                    // Insert
-                    reportsToInsert.add(report)
-                }
-            }
-
-            // Fetch and delete any leftovers
-            val staleIds = db.reportsTransactionCurrent().findStaleIds(
-                    grouping = grouping,
-                    budgetCategory = budgetCategory,
-                    linkedId = linkedId,
-                    days = reportDays)
-
-            idsToDelete.addAll(staleIds)
-        } catch (e: Exception) {
-            Log.e("$TAG#handleTransactionCurrentDayReportsResponse", e.message)
         }
     }
 

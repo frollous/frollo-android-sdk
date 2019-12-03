@@ -23,7 +23,6 @@ import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.testAccountBalanceReportResponseData
-import us.frollo.frollosdk.model.testTransactionCurrentReportResponseData
 import us.frollo.frollosdk.model.testTransactionHistoryReportResponseData
 
 class ReportsMappingTest {
@@ -37,21 +36,6 @@ class ReportsMappingTest {
         assertEquals("AUD", model.currency)
         assertEquals(ReportPeriod.MONTH, model.period)
         assertEquals(1L, model.accountId)
-    }
-
-    @Test
-    fun testResponseToReportTransactionCurrent() {
-        val response = testTransactionCurrentReportResponseData()
-        val model = response.days[0].toReportTransactionCurrent(ReportGrouping.BUDGET_CATEGORY, budgetCategory = BudgetCategory.SAVINGS, linkedId = 1, name = "Unknown")
-        assertEquals(1, model.day)
-        assertNotNull(model.amount)
-        assertNotNull(model.average)
-        assertNotNull(model.budget)
-        assertNotNull(model.previous)
-        assertEquals(1L, model.linkedId)
-        assertEquals("Unknown", model.name)
-        assertEquals(ReportGrouping.BUDGET_CATEGORY, model.grouping)
-        assertEquals(BudgetCategory.SAVINGS, model.filteredBudgetCategory)
     }
 
     @Test

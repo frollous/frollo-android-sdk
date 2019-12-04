@@ -33,15 +33,17 @@ import us.frollo.frollosdk.extensions.changeDateFormat
 import us.frollo.frollosdk.extensions.dailyToWeekly
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchAccountBalanceReports
-import us.frollo.frollosdk.extensions.fetchTransactionHistoryReports
+import us.frollo.frollosdk.extensions.fetchReports
 import us.frollo.frollosdk.extensions.isValidFormat
 import us.frollo.frollosdk.extensions.sqlForExistingAccountBalanceReports
 import us.frollo.frollosdk.extensions.sqlForFetchingAccountBalanceReports
 import us.frollo.frollosdk.extensions.sqlForStaleIdsAccountBalanceReports
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toReportAccountBalance
+import us.frollo.frollosdk.mapping.toReports
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
+import us.frollo.frollosdk.model.coredata.reports.Report
 import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalanceRelation
 import us.frollo.frollosdk.model.coredata.reports.ReportDateFormat
 import us.frollo.frollosdk.model.coredata.reports.ReportDateFormat.Companion.DAILY
@@ -49,6 +51,7 @@ import us.frollo.frollosdk.model.coredata.reports.ReportDateFormat.Companion.DAT
 import us.frollo.frollosdk.model.coredata.reports.ReportDateFormat.Companion.MONTHLY
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
+import us.frollo.frollosdk.model.coredata.reports.TransactionReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.ReportsAPI
@@ -77,7 +80,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      *
      * @return LiveData object of Resource<List<ReportAccountBalanceRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun accountBalanceReports(
+    fun fetchAccountBalanceReports(
         fromDate: String,
         toDate: String,
         period: ReportPeriod,
@@ -101,7 +104,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      *
      * @return LiveData object of Resource<List<ReportAccountBalanceRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun accountBalanceReports(query: SimpleSQLiteQuery): LiveData<Resource<List<ReportAccountBalanceRelation>>> =
+    fun fetchAccountBalanceReports(query: SimpleSQLiteQuery): LiveData<Resource<List<ReportAccountBalanceRelation>>> =
             Transformations.map(db.reportsAccountBalance().loadWithRelation(query)) { model ->
                 Resource.success(model)
             }
@@ -142,37 +145,42 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         }
     }
 
-    // Transactions History Reports
+    // Transactions Reports
 
     /**
-     * Refresh transaction history reports from the host
+     * Fetch transaction reports from the host
      *
-     * @param fromDate Start date in the format yyyy-MM-dd to fetch reports from (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
-     * @param toDate End date in the format yyyy-MM-dd to fetch reports up to (inclusive). See [ReportDateFormat.DATE_PATTERN_FOR_REQUEST]
+     * @param fromDate Start date in the format yyyy-MM-dd to fetch reports from (inclusive). See [Report.DATE_FORMAT_PATTERN]
+     * @param toDate End date in the format yyyy-MM-dd to fetch reports up to (inclusive). See [Report.DATE_FORMAT_PATTERN]
      * @param grouping Grouping that reports should be broken down into
      * @param period Period that reports should be broken down by
      * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
      * @param transactionTag Transaction tag that reports should be filtered by (Optional)
+     * @param categoryId Transaction category ID that reports should be filtered by (Optional)
+     * @param merchantId Merchant ID that reports should be filtered by (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun refreshTransactionHistoryReports(
+    fun fetchTransactionReports(
         fromDate: String,
         toDate: String,
         grouping: ReportGrouping,
-        period: ReportPeriod,
+        period: TransactionReportPeriod,
         budgetCategory: BudgetCategory? = null,
         transactionTag: String? = null,
-        completion: OnFrolloSDKCompletionListener<Result>
+        categoryId: Long? = null,
+        merchantId: Long? = null,
+        completion: OnFrolloSDKCompletionListener<Resource<List<Report>>>
     ) {
-        // TODO: Refactor to support the new reports API endpoints
-        reportsAPI.fetchTransactionHistoryReports(grouping, period, fromDate, toDate, budgetCategory, transactionTag).enqueue { resource ->
+        reportsAPI.fetchReports(grouping, period, fromDate, toDate, budgetCategory, transactionTag, categoryId, merchantId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshTransactionHistoryReports", resource.error?.localizedDescription)
-                    completion.invoke(Result.error(resource.error))
+                    Log.e("$TAG#fetchTransactionReports", resource.error?.localizedDescription)
+                    completion.invoke(resource.map { null })
                 }
                 Resource.Status.SUCCESS -> {
-                    completion.invoke(Result.success())
+                    completion.invoke(resource.map { response ->
+                        response?.toReports(grouping, period)
+                    })
                 }
             }
         }

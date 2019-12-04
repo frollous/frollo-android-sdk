@@ -18,6 +18,7 @@ package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.QueryMap
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.ReportsResponse
@@ -25,12 +26,16 @@ import us.frollo.frollosdk.model.api.reports.ReportsResponse
 internal interface ReportsAPI {
     companion object {
         const val URL_REPORT_ACCOUNT_BALANCE = "reports/accounts/history/balances"
-        const val URL_REPORT_TRANSACTIONS_HISTORY = "reports/transactions/history"
+        const val URL_REPORTS_CATEGORIES = "reports/categories"
+        const val URL_REPORTS_CATEGORY = "reports/categories/{category_id}"
     }
 
     @GET(URL_REPORT_ACCOUNT_BALANCE)
     fun fetchAccountBalanceReports(@QueryMap options: Map<String, String>): Call<AccountBalanceReportResponse>
 
-    @GET(URL_REPORT_TRANSACTIONS_HISTORY)
-    fun fetchTransactionHistoryReports(@QueryMap options: Map<String, String>): Call<ReportsResponse>
+    @GET(URL_REPORTS_CATEGORIES)
+    fun fetchReportsByCategory(@QueryMap options: Map<String, String>): Call<ReportsResponse>
+
+    @GET(URL_REPORTS_CATEGORY)
+    fun fetchReportsByCategory(@Path("category_id") categoryId: Long, @QueryMap options: Map<String, String>): Call<ReportsResponse>
 }

@@ -31,6 +31,7 @@ import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
+import us.frollo.frollosdk.model.coredata.reports.TransactionReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.surveys.Survey
 import us.frollo.frollosdk.network.api.BillsAPI
@@ -148,18 +149,26 @@ internal fun ReportsAPI.fetchAccountBalanceReports(
     return fetchAccountBalanceReports(queryMap)
 }
 
-internal fun ReportsAPI.fetchTransactionHistoryReports(
+internal fun ReportsAPI.fetchReports(
     grouping: ReportGrouping,
-    period: ReportPeriod,
+    period: TransactionReportPeriod,
     fromDate: String,
     toDate: String,
     budgetCategory: BudgetCategory? = null,
-    transactionTag: String? = null
+    transactionTag: String? = null,
+    categoryId: Long? = null,
+    merchantId: Long? = null
 ): Call<ReportsResponse> {
     val queryMap = mutableMapOf("grouping" to grouping.toString(), "period" to period.toString(), "from_date" to fromDate, "to_date" to toDate)
-    budgetCategory?.let { queryMap.put("budget_category", it.toString()) }
-    transactionTag?.let { queryMap.put("tags", it) }
-    return fetchTransactionHistoryReports(queryMap)
+
+    return when (grouping) {
+        // TODO: Replace this else with actual grouping values as and when the APIs are implemented
+        else -> {
+            categoryId?.let { id ->
+                fetchReportsByCategory(id, queryMap)
+            } ?: fetchReportsByCategory(queryMap)
+        }
+    }
 }
 
 // Bills

@@ -19,11 +19,8 @@ package us.frollo.frollosdk.mapping
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
-import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.testAccountBalanceReportResponseData
-import us.frollo.frollosdk.model.testTransactionHistoryReportResponseData
 
 class ReportsMappingTest {
 
@@ -38,7 +35,8 @@ class ReportsMappingTest {
         assertEquals(1L, model.accountId)
     }
 
-    @Test
+    // TODO: Refactor to use new reports API methods
+    /*@Test
     fun testResponseToReportTransactionHistory() {
         val response = testTransactionHistoryReportResponseData()
         val model = response.data[0].toReportTransactionHistory(ReportGrouping.BUDGET_CATEGORY, period = ReportPeriod.MONTH, budgetCategory = BudgetCategory.SAVINGS)
@@ -63,5 +61,5 @@ class ReportsMappingTest {
         assertEquals(1L, model.linkedId)
         assertEquals("living", model.name)
         assertEquals(2, model.transactionIds?.size)
-    }
+    }*/
 }

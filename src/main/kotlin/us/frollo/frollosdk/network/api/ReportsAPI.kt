@@ -20,7 +20,7 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.QueryMap
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
-import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
+import us.frollo.frollosdk.model.api.reports.ReportsResponse
 
 internal interface ReportsAPI {
     companion object {
@@ -32,5 +32,5 @@ internal interface ReportsAPI {
     fun fetchAccountBalanceReports(@QueryMap options: Map<String, String>): Call<AccountBalanceReportResponse>
 
     @GET(URL_REPORT_TRANSACTIONS_HISTORY)
-    fun fetchTransactionHistoryReports(@QueryMap options: Map<String, String>): Call<TransactionHistoryReportResponse>
+    fun fetchTransactionHistoryReports(@QueryMap options: Map<String, String>): Call<ReportsResponse>
 }

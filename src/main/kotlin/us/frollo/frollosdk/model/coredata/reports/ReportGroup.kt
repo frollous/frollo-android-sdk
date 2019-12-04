@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.mapping
+package us.frollo.frollosdk.model.coredata.reports
 
-import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
-import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalance
-import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
+import us.frollo.frollosdk.model.IAdapterModel
 
-internal fun AccountBalanceReportResponse.Report.BalanceReport.toReportAccountBalance(date: String, period: ReportPeriod) =
-        ReportAccountBalance(
-                date = date,
-                value = value,
-                period = period,
-                currency = currency,
-                accountId = id)
+/** Data representation of transactions group report */
+abstract class ReportGroup : IAdapterModel

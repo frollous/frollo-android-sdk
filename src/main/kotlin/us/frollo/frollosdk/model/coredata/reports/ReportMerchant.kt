@@ -16,12 +16,10 @@
 
 package us.frollo.frollosdk.model.coredata.reports
 
-import us.frollo.frollosdk.model.IAdapterModel
-import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import java.math.BigDecimal
 
-/** Data representation of history transaction overall report */
-data class ReportTransactionHistory(
+/** Data representation of transactions by category report */
+data class ReportMerchant(
 
     /** Date of the report period. Check [ReportDateFormat] for the date formats. */
     val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
@@ -29,23 +27,13 @@ data class ReportTransactionHistory(
     /** Value of the report */
     val value: BigDecimal,
 
-    /** Budget value for the report (Optional) */
-    val budget: BigDecimal?,
+    /** Indicates if the [ReportMerchant.value] is income or expense */
+    val isIncome: Boolean,
+
+    /** Associated merchant report groups */
+    val groups: List<ReportGroupMerchant>,
 
     /** Period of the report */
-    val period: ReportPeriod,
+    val period: ReportPeriod
 
-    /** Filter budget category if the report was filtered to a specific category */
-    val filteredBudgetCategory: BudgetCategory?,
-
-    /** Transaction tags related to the report */
-    val transactionTags: List<String>?,
-
-    /** Grouping - how the report response has been broken down */
-    val grouping: ReportGrouping
-
-) : IAdapterModel {
-
-    /** Unique ID of the overall report */
-    var reportId: Long = 0
-}
+) : Report()

@@ -25,7 +25,7 @@ import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummar
 import us.frollo.frollosdk.model.api.bills.BillPaymentResponse
 import us.frollo.frollosdk.model.api.goals.GoalResponse
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
-import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
+import us.frollo.frollosdk.model.api.reports.ReportsResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
@@ -155,7 +155,7 @@ internal fun ReportsAPI.fetchTransactionHistoryReports(
     toDate: String,
     budgetCategory: BudgetCategory? = null,
     transactionTag: String? = null
-): Call<TransactionHistoryReportResponse> {
+): Call<ReportsResponse> {
     val queryMap = mutableMapOf("grouping" to grouping.toString(), "period" to period.toString(), "from_date" to fromDate, "to_date" to toDate)
     budgetCategory?.let { queryMap.put("budget_category", it.toString()) }
     transactionTag?.let { queryMap.put("tags", it) }

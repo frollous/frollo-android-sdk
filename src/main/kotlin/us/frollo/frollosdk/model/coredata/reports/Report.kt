@@ -18,13 +18,5 @@ package us.frollo.frollosdk.model.coredata.reports
 
 import us.frollo.frollosdk.model.IAdapterModel
 
-/** History Transactions Report with associated data */
-data class ReportTransactionHistoryRelation(
-
-    /** Overall report */
-    var report: ReportTransactionHistory? = null,
-
-    /** Associated group reports */
-    var groups: List<ReportGroupTransactionHistoryRelation>? = null
-
-) : IAdapterModel
+/** Data representation of transactions report */
+abstract class Report : IAdapterModel

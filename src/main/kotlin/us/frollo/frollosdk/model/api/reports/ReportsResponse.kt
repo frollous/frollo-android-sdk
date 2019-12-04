@@ -19,21 +19,21 @@ package us.frollo.frollosdk.model.api.reports
 import com.google.gson.annotations.SerializedName
 import java.math.BigDecimal
 
-internal data class TransactionHistoryReportResponse(
-    @SerializedName("data") val data: List<Report>
+internal data class ReportsResponse(
+    @SerializedName("data") val data: List<ReportResponse>
 ) {
 
-    internal data class Report(
+    internal data class ReportResponse(
         @SerializedName("date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
         @SerializedName("value") val value: BigDecimal,
-        @SerializedName("budget") val budget: BigDecimal?,
-        @SerializedName("groups") val groups: List<GroupReport>
+        @SerializedName("income") val income: Boolean,
+        @SerializedName("groups") val groups: List<ReportGroupResponse>
     ) {
 
-        internal data class GroupReport(
+        internal data class ReportGroupResponse(
             @SerializedName("id") val id: Long,
             @SerializedName("name") val name: String,
-            @SerializedName("budget") val budget: BigDecimal?,
+            @SerializedName("income") val income: Boolean,
             @SerializedName("value") val value: BigDecimal,
             @SerializedName("transaction_ids") val transactionIds: List<Long>
         )

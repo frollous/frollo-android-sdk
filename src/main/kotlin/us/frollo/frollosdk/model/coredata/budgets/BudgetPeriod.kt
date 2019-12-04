@@ -45,13 +45,6 @@ data class BudgetPeriod(
 
     @ColumnInfo(name = "end_date") val endDate: String, // yyyy-MM-dd
 
-    /**
-     * Tracking Status of the Budget Period (Optional)
-     *
-     * This will have a value for past & current budget periods. But, null for future budget periods.
-     */
-    @ColumnInfo(name = "tracking_status") val trackingStatus: BudgetTrackingStatus?,
-
     /** Current amount progressed against the Budget Period. Depending on [Budget.trackingType] of the budget this is the sum of all transactions for the period */
     @ColumnInfo(name = "current_amount") val currentAmount: BigDecimal,
 
@@ -60,6 +53,13 @@ data class BudgetPeriod(
 
     /** Required amount for the Budget Period to get back or stay on track with the budget */
     @ColumnInfo(name = "required_amount") val requiredAmount: BigDecimal,
+
+    /**
+     * Tracking Status of the Budget Period (Optional)
+     *
+     * This will have a value for past & current budget periods. But, null for future budget periods.
+     */
+    @ColumnInfo(name = "tracking_status") val trackingStatus: BudgetTrackingStatus?,
 
     /** Index of the Budget Period */
     @ColumnInfo(name = "index") val index: Int

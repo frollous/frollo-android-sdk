@@ -25,9 +25,9 @@ enum class BudgetPeriodResponse(
     @SerializedName("budget_id") val budgetId: Long,
     @SerializedName("start_date") val startDate: String, // yyyy-MM-dd
     @SerializedName("end_date") val endDate: String, // yyyy-MM-dd
-    @SerializedName("tracking_status") var trackingStatus: BudgetTrackingStatus,
     @SerializedName("current_amount") val currentAmount: BigDecimal,
     @SerializedName("target_amount") val targetAmount: BigDecimal,
     @SerializedName("required_amount") val requiredAmount: BigDecimal,
+    @SerializedName("tracking_status") var trackingStatus: BudgetTrackingStatus,
     @SerializedName("index") val index: Int
 )

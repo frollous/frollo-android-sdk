@@ -24,21 +24,28 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import java.math.BigDecimal
 
 internal data class BudgetResponse(
-    @SerializedName("id")val id: Long,
-    @SerializedName("is_current")val isCurrent: Boolean,
-    @SerializedName("type")val type: String,
-    @SerializedName("type_value")val typeValue: String,
-    @SerializedName("user_id")val userId: Long,
-    @SerializedName("status")val status: BudgetStatus,
-    @SerializedName("tracking_status")val trackingStatus: BudgetTrackingStatus,
-    @SerializedName("frequency")val frequency: BudgetFrequency,
-    @SerializedName("currency")val currency: String,
-    @SerializedName("current_amount")val currentAmount: BigDecimal,
-    @SerializedName("period_amount")val periodAmount: BigDecimal,
-    @SerializedName("target_amount")val targetAmount: BigDecimal,
-    @SerializedName("estimated_target_amount")val estimatedTargetAmount: BigDecimal,
-    @SerializedName("start_date")val startDate: String, // yyyy-MM-dd
-    @SerializedName("periods_count")val periodsCount: Long,
-    @SerializedName("metadata")val metadata: JsonObject?,
+    @SerializedName("id") val id: Long,
+    @SerializedName("is_current") val isCurrent: Boolean,
+    @SerializedName("image_url") val imageUrl: Boolean?,
+
+    @SerializedName("tracking_status") val trackingStatus: BudgetTrackingStatus,
+    @SerializedName("status") val status: BudgetStatus,
+    @SerializedName("frequency") val frequency: BudgetFrequency,
+
+
+    @SerializedName("user_id") val userId: Long,
+
+    @SerializedName("currency") val currency: String,
+    @SerializedName("current_amount") val currentAmount: BigDecimal,
+    @SerializedName("period_amount") val periodAmount: BigDecimal,
+
+    @SerializedName("start_date") val startDate: String, // yyyy-MM-dd
+    @SerializedName("type") val type: String,
+    @SerializedName("type_value") val typeValue: String,
+
+    @SerializedName("periods_count") val periodsCount: Long,
+
+    @SerializedName("metadata") val metadata: JsonObject?,
     @SerializedName("current_period") val currentPeriod: BudgetPeriodResponse?
-)
+
+   )

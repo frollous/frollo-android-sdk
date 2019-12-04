@@ -30,36 +30,45 @@ import java.math.BigDecimal
 
 @Entity(tableName = "budget",
         indices = [
-            Index("id")])
+            Index("budget_id")])
 
-/** Data representation of a Goal */
+/** Data representation of a Budget */
 data class Budget(
 
     /** Unique ID for budget */
     @PrimaryKey
-    @ColumnInfo(name = "id")val id: Long,
-    @ColumnInfo(name = "is_current")val isCurrent: Boolean,
-    @ColumnInfo(name = "type")val type: String,
-    @ColumnInfo(name = "type_value")val typeValue: String,
-    @ColumnInfo(name = "user_id")val userId: Long,
+    @ColumnInfo(name = "budget_id") val id: Long,
+    /** Boolean field that says if this budget is current */
+    @ColumnInfo(name = "is_current") val isCurrent: Boolean,
+    /** Budget type - budget_category, category, merchant */
+    @ColumnInfo(name = "type") val type: String,
+    /** Budget type value - living, categoryId, merchantId */
+    @ColumnInfo(name = "type_value") val typeValue: String,
+    /** unique id of the user */
+    @ColumnInfo(name = "user_id") val userId: Long,
+    /** enum specifying if the user is on track with the budget. refer [BudgetTrackingStatus] */
     @ColumnInfo(name = "tracking_status")val trackingStatus: BudgetTrackingStatus,
-    @ColumnInfo(name = "status")val status: BudgetStatus,
-    @ColumnInfo(name = "frequency")val frequency: BudgetFrequency,
-    @ColumnInfo(name = "currency")val currency: String,
-    @ColumnInfo(name = "current_amount")val currentAmount: BigDecimal,
-    @ColumnInfo(name = "period_amount")val periodAmount: BigDecimal,
-    @ColumnInfo(name = "target_amount")val targetAmount: BigDecimal,
-    @ColumnInfo(name = "estimated_target_amount")val estimatedTargetAmount: BigDecimal,
-    @ColumnInfo(name = "start_date")val startDate: String, // yyyy-MM-dd
-    @ColumnInfo(name = "periods_count")val periodsCount: Long,
-    @ColumnInfo(name = "metadata")val metadata: JsonObject?,
-    @Embedded(prefix = "budget_period_") val currentPeriod: BudgetPeriod?
-
+    /** enum specifying the status of the budget. refer [BudgetStatus] */
+    @ColumnInfo(name = "status") val status: BudgetStatus,
+    /** enum specifying the period for which the budget i set. refer [BudgetFrequency] */
+    @ColumnInfo(name = "frequency") val frequency: BudgetFrequency,
+    /** Currency ISO code of the Budget */
+    @ColumnInfo(name = "currency") val currency: String,
+    /** Amount spent currently to the Budget */
+    @ColumnInfo(name = "current_amount") val currentAmount: BigDecimal,
+    /** Amount allocated the Budget period */
+    @ColumnInfo(name = "period_amount") val periodAmount: BigDecimal,
+    /** Start date of the Budget */
+    @ColumnInfo(name = "start_date") val startDate: String, // yyyy-MM-dd
+    /** 'n'th time the budget is being repeated */
+    @ColumnInfo(name = "periods_count") val periodsCount: Long,
+    /** Metadata - custom JSON to be stored with the goal (Optional) */
+    @ColumnInfo(name = "metadata") val metadata: JsonObject?,
+    /** Current active budget period  */
+    @Embedded(prefix = "c_period_") val currentPeriod: BudgetPeriod?
 ) : IAdapterModel {
-
     companion object {
-
-        /** Date format for dates associated with Goal */
+        /** Date format for dates associated with Budget */
         const val DATE_FORMAT_PATTERN = "yyyy-MM-dd"
     }
 }

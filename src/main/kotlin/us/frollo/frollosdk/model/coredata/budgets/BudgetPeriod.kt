@@ -25,34 +25,43 @@ import java.math.BigDecimal
 
 @Entity(tableName = "budget_period",
         indices = [
-            Index("id"),
+            Index("budget_period_id"),
             Index("budget_id")])
 
-/** Data representation of a budget Period */
+/** Data representation of a Budget Period */
 data class BudgetPeriod(
 
-    /** Unique ID of the budget period */
+    /** Unique ID of the Budget Period */
     @PrimaryKey
-    @ColumnInfo(name = "id") val budgetPeriodId: Long,
+    @ColumnInfo(name = "budget_period_id") val budgetPeriodId: Long,
+
     /** Unique ID of the parent budget */
     @ColumnInfo(name = "budget_id") val budgetId: Long,
-    /** Date the budget period starts. See [BudgetPeriod.DATE_FORMAT_PATTERN] for the date format pattern */
+
+    /** Date the Budget Period starts. See [BudgetPeriod.DATE_FORMAT_PATTERN] for the date format pattern */
+
     @ColumnInfo(name = "start_date") val startDate: String, // yyyy-MM-dd
-    /** End date of the budget period. See [BudgetPeriod.DATE_FORMAT_PATTERN] for the date format pattern */
+    /** End date of the Budget Period. See [BudgetPeriod.DATE_FORMAT_PATTERN] for the date format pattern */
+
     @ColumnInfo(name = "end_date") val endDate: String, // yyyy-MM-dd
+
     /**
-     * Tracking Status of the budget period (Optional)
+     * Tracking Status of the Budget Period (Optional)
      *
      * This will have a value for past & current budget periods. But, null for future budget periods.
      */
     @ColumnInfo(name = "tracking_status") val trackingStatus: BudgetTrackingStatus?,
-    /** Current amount progressed against the budget period. Depending on [budget.trackingType] of the budget this will include credits and/or debits towards the budget */
+
+    /** Current amount progressed against the Budget Period. Depending on [Budget.trackingType] of the budget this is the sum of all transactions for the period */
     @ColumnInfo(name = "current_amount") val currentAmount: BigDecimal,
-    /** Target amount to reach for the budget period */
+
+    /** Target amount to reach for the Budget Period */
     @ColumnInfo(name = "target_amount") val targetAmount: BigDecimal,
-    /** Required amount for the budget period to get back or stay on track with the budget */
+
+    /** Required amount for the Budget Period to get back or stay on track with the budget */
     @ColumnInfo(name = "required_amount") val requiredAmount: BigDecimal,
-    /** Index of the budget period */
+
+    /** Index of the Budget Period */
     @ColumnInfo(name = "index") val index: Int
 
 ) : IAdapterModel {

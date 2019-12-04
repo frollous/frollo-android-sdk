@@ -48,6 +48,9 @@ import us.frollo.frollosdk.model.coredata.bills.BillFrequency
 import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.model.coredata.bills.BillStatus
 import us.frollo.frollosdk.model.coredata.bills.BillType
+import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
+import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
+import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -809,6 +812,50 @@ class ConvertersTest {
         assertEquals("ACTIVE", str)
 
         assertEquals("UNSTARTED", Converters.instance.stringFromGoalStatus(null))
+    }
+
+    @Test
+    fun testStringToBudgetTrackingStatus() {
+        val status = Converters.instance.stringToBudgetTrackingStatus("AHEAD")
+        assertEquals(BudgetTrackingStatus.AHEAD, status)
+
+        assertEquals(BudgetTrackingStatus.AHEAD, Converters.instance.stringToBudgetTrackingStatus(null))
+    }
+
+    @Test
+    fun testStringFromBudgetTrackingStatus() {
+        val str = Converters.instance.stringFromBudgetTrackingStatus(BudgetTrackingStatus.AHEAD)
+        assertEquals("AHEAD", str)
+        assertEquals("AHEAD", Converters.instance.stringFromBudgetTrackingStatus(null))
+    }
+
+    @Test
+    fun testStringToBudgetStatus() {
+        val status = Converters.instance.stringToBudgetStatus("UNSTARTED")
+        assertEquals(BudgetStatus.UNSTARTED, status)
+        assertEquals(BudgetStatus.UNSTARTED, Converters.instance.stringToBudgetStatus(null))
+    }
+
+    @Test
+    fun testStringFromBudgetStatus() {
+        val str = Converters.instance.stringFromBudgetStatus(BudgetStatus.UNSTARTED)
+        assertEquals("UNSTARTED", str)
+        assertEquals("UNSTARTED", Converters.instance.stringFromBudgetStatus(null))
+    }
+
+    @Test
+    fun testStringToBudgetFrequency() {
+        val status = Converters.instance.stringToBudgetFrequency("MONTHLY")
+        assertEquals(BudgetFrequency.MONTHLY, status)
+        assertEquals(BudgetFrequency.MONTHLY, Converters.instance.stringToBudgetFrequency(null))
+    }
+
+    @Test
+    fun testStringFromBudgetFrequency() {
+        val str = Converters.instance.stringFromBudgetFrequency(BudgetFrequency.MONTHLY)
+        assertEquals("MONTHLY", str)
+
+        assertEquals("MONTHLY", Converters.instance.stringFromBudgetFrequency(null))
     }
 
     @Test

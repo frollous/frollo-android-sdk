@@ -19,6 +19,7 @@ package us.frollo.frollosdk.model.coredata.budgets
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
+/** The frequency at which you want to split up your budget */
 enum class BudgetFrequency {
 
     /** Annually */
@@ -42,7 +43,7 @@ enum class BudgetFrequency {
     /** Quarterly */
     @SerializedName("quarterly") QUARTERLY,
 
-    /** Singular */
+    /** Singular - there will only be one BudgetPeriod for the Budget */
     @SerializedName("singular") SINGULAR,
 
     /** Weekly */

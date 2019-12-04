@@ -25,7 +25,6 @@ import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummar
 import us.frollo.frollosdk.model.api.bills.BillPaymentResponse
 import us.frollo.frollosdk.model.api.goals.GoalResponse
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
-import us.frollo.frollosdk.model.api.reports.TransactionCurrentReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
@@ -147,12 +146,6 @@ internal fun ReportsAPI.fetchAccountBalanceReports(
     accountType?.let { queryMap.put("container", it.toString()) }
     accountId?.let { queryMap.put("account_id", it.toString()) }
     return fetchAccountBalanceReports(queryMap)
-}
-
-internal fun ReportsAPI.fetchTransactionCurrentReports(grouping: ReportGrouping, budgetCategory: BudgetCategory? = null): Call<TransactionCurrentReportResponse> {
-    val queryMap = mutableMapOf("grouping" to grouping.toString())
-    budgetCategory?.let { queryMap.put("budget_category", it.toString()) }
-    return fetchTransactionCurrentReports(queryMap)
 }
 
 internal fun ReportsAPI.fetchTransactionHistoryReports(

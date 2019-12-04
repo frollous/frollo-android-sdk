@@ -33,9 +33,6 @@ import us.frollo.frollosdk.database.dao.MessageDao
 import us.frollo.frollosdk.database.dao.ProviderAccountDao
 import us.frollo.frollosdk.database.dao.ProviderDao
 import us.frollo.frollosdk.database.dao.ReportAccountBalanceDao
-import us.frollo.frollosdk.database.dao.ReportGroupTransactionHistoryDao
-import us.frollo.frollosdk.database.dao.ReportTransactionCurrentDao
-import us.frollo.frollosdk.database.dao.ReportTransactionHistoryDao
 import us.frollo.frollosdk.database.dao.TransactionCategoryDao
 import us.frollo.frollosdk.database.dao.TransactionDao
 import us.frollo.frollosdk.database.dao.TransactionUserTagsDao
@@ -45,18 +42,15 @@ import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
+import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.bills.Bill
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
-import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalance
-import us.frollo.frollosdk.model.coredata.reports.ReportGroupTransactionHistory
-import us.frollo.frollosdk.model.coredata.reports.ReportTransactionCurrent
-import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
-import us.frollo.frollosdk.model.coredata.user.User
-import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
 import us.frollo.frollosdk.model.coredata.goals.Goal
 import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
+import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalance
+import us.frollo.frollosdk.model.coredata.user.User
 
 @Database(entities = [
     User::class,
@@ -67,9 +61,6 @@ import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
     Transaction::class,
     TransactionCategory::class,
     Merchant::class,
-    ReportTransactionCurrent::class,
-    ReportTransactionHistory::class,
-    ReportGroupTransactionHistory::class,
     ReportAccountBalance::class,
     Bill::class,
     BillPayment::class,
@@ -89,9 +80,6 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun transactions(): TransactionDao
     internal abstract fun transactionCategories(): TransactionCategoryDao
     internal abstract fun merchants(): MerchantDao
-    internal abstract fun reportsTransactionCurrent(): ReportTransactionCurrentDao
-    internal abstract fun reportsTransactionHistory(): ReportTransactionHistoryDao
-    internal abstract fun reportGroupsTransactionHistory(): ReportGroupTransactionHistoryDao
     internal abstract fun reportsAccountBalance(): ReportAccountBalanceDao
     internal abstract fun bills(): BillDao
     internal abstract fun billPayments(): BillPaymentDao

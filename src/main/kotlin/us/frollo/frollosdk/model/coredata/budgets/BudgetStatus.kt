@@ -19,6 +19,7 @@ package us.frollo.frollosdk.model.coredata.budgets
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
+/** Status of the budget */
 enum class BudgetStatus {
     /** Unstarted - budget is pending and not started yet */
     @SerializedName("unstarted") UNSTARTED,
@@ -32,7 +33,7 @@ enum class BudgetStatus {
     /** Failed - user overspent on his budget */
     @SerializedName("failed") FAILED,
 
-    /** Finalising - budget is finished but some transactions may move from pending to posted which could affect the goal (usually within 2 business days) */
+    /** Finalising - budget is finished but some transactions may move from pending to posted which could affect the budget (usually within 2 business days) */
     @SerializedName("finalising") FINALISING,
 
     /** Cancelled - user cancelled the budget */

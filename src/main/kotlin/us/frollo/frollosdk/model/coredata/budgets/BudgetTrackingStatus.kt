@@ -19,6 +19,7 @@ package us.frollo.frollosdk.model.coredata.budgets
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
+/** How the user is tracking against an in progress budget */
 enum class BudgetTrackingStatus {
 
     /** Ahead - user is ahead on budget */

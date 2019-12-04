@@ -23,7 +23,7 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import java.math.BigDecimal
 
-internal data class BudgetsResponse(
+internal data class BudgetResponse(
     @SerializedName("id")val id: Long,
     @SerializedName("is_current")val isCurrent: Boolean,
     @SerializedName("type")val type: String,

@@ -162,11 +162,15 @@ internal fun ReportsAPI.fetchReports(
     val queryMap = mutableMapOf("grouping" to grouping.toString(), "period" to period.toString(), "from_date" to fromDate, "to_date" to toDate)
 
     return when (grouping) {
-        // TODO: Replace this else with actual grouping values as and when the APIs are implemented
-        else -> {
+        ReportGrouping.CATEGORY -> {
             categoryId?.let { id ->
                 fetchReportsByCategory(id, queryMap)
             } ?: fetchReportsByCategory(queryMap)
+        }
+        else -> {
+            merchantId?.let { id ->
+                fetchReportsByMerchant(id, queryMap)
+            } ?: fetchReportsByMerchant(queryMap)
         }
     }
 }

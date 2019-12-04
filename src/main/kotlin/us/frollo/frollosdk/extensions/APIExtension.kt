@@ -167,10 +167,15 @@ internal fun ReportsAPI.fetchReports(
                 fetchReportsByCategory(id, queryMap)
             } ?: fetchReportsByCategory(queryMap)
         }
-        else -> {
+        ReportGrouping.MERCHANT -> {
             merchantId?.let { id ->
                 fetchReportsByMerchant(id, queryMap)
             } ?: fetchReportsByMerchant(queryMap)
+        }
+        else -> {
+            budgetCategory?.let { bCategory ->
+                fetchReportsByBudgetCategory(bCategory.budgetCategoryId, queryMap)
+            } ?: fetchReportsByBudgetCategory(queryMap)
         }
     }
 }

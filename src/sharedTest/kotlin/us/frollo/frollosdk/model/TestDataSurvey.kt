@@ -51,5 +51,8 @@ internal fun testSurveyData(): Survey {
             id = 3,
             key = "FINANCIAL_WELLBEING",
             name = randomUUID(),
-            questions = questions)
+            questions = questions,
+            displayText = null,
+            iconUrl = null,
+            metadata = null)
 }

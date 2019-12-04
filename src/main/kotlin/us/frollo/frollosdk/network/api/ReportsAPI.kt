@@ -32,6 +32,8 @@ internal interface ReportsAPI {
         const val URL_REPORTS_MERCHANT = "reports/merchants/{merchant_id}"
         const val URL_REPORTS_BUDGET_CATEGORIES = "reports/budget_categories"
         const val URL_REPORTS_BUDGET_CATEGORY = "reports/budget_categories/{budget_category_id}"
+        const val URL_REPORTS_TAGS = "reports/tags"
+        const val URL_REPORTS_TAG = "reports/tags/{tag}"
     }
 
     @GET(URL_REPORT_ACCOUNT_BALANCE)
@@ -54,4 +56,10 @@ internal interface ReportsAPI {
 
     @GET(URL_REPORTS_BUDGET_CATEGORY)
     fun fetchReportsByBudgetCategory(@Path("budget_category_id") budgetCategoryId: Long, @QueryMap options: Map<String, String>): Call<ReportsResponse>
+
+    @GET(URL_REPORTS_TAGS)
+    fun fetchReportsByTag(@QueryMap options: Map<String, String>): Call<ReportsResponse>
+
+    @GET(URL_REPORTS_TAG)
+    fun fetchReportsByTag(@Path("tag") tag: String, @QueryMap options: Map<String, String>): Call<ReportsResponse>
 }

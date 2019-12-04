@@ -16,27 +16,41 @@
 
 package us.frollo.frollosdk.model.coredata.reports
 
+import us.frollo.frollosdk.model.IAdapterModel
 import java.math.BigDecimal
 
-/** Data representation of transactions by tag report group */
-data class ReportGroupTag(
+/** Data representation of transactions group report */
+data class GroupReport(
 
-    /** Name of the tag */
-    val tagName: String,
+    /** Unique ID of the related object. E.g. merchant or category */
+    val linkedId: String,
+
+    /** Name of the related object (Optional) */
+    val name: String,
 
     /** Value of the report */
     val value: BigDecimal,
 
-    /** Indicates if the [ReportGroupTag.value] is income or expense */
+    /** Indicates if the [GroupReport.value] is income or expense */
     val isIncome: Boolean,
 
-    /** Date of the report period. Check [ReportDateFormat] for the date formats. */
-    val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
+    /** Date of the report period. Check [GroupReport.DATE_FORMAT_PATTERN] for the date format. */
+    val date: String, // yyyy-MM-dd
 
     /** Transaction ids related to the report */
     val transactionIds: List<Long>?,
 
     /** Period of the report */
-    val period: ReportPeriod
+    val period: TransactionReportPeriod,
 
-) : ReportGroup()
+    /** Grouping - how the report response has been broken down */
+    val grouping: ReportGrouping
+
+) : IAdapterModel {
+
+    companion object {
+
+        /** Date format for dates associated with Transaction Reports */
+        const val DATE_FORMAT_PATTERN = "yyyy-MM-dd"
+    }
+}

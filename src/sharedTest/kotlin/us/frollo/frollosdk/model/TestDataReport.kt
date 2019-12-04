@@ -41,7 +41,7 @@ internal fun testAccountBalanceReportResponseData(): AccountBalanceReportRespons
 
 internal fun testReportsResponseData(): ReportsResponse {
     val groups = listOf(
-            ReportsResponse.ReportResponse.ReportGroupResponse(
+            ReportsResponse.ReportResponse.GroupReportResponse(
                     id = 1,
                     name = "living",
                     value = randomNumber().toBigDecimal(),

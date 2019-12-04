@@ -27,10 +27,10 @@ internal data class ReportsResponse(
         @SerializedName("date") val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
         @SerializedName("value") val value: BigDecimal,
         @SerializedName("income") val income: Boolean,
-        @SerializedName("groups") val groups: List<ReportGroupResponse>
+        @SerializedName("groups") val groups: List<GroupReportResponse>
     ) {
 
-        internal data class ReportGroupResponse(
+        internal data class GroupReportResponse(
             @SerializedName("id") val id: Long,
             @SerializedName("name") val name: String,
             @SerializedName("income") val income: Boolean,

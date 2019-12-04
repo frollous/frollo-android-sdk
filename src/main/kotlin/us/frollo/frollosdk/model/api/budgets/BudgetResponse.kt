@@ -32,7 +32,6 @@ internal data class BudgetResponse(
     @SerializedName("status") val status: BudgetStatus,
     @SerializedName("frequency") val frequency: BudgetFrequency,
 
-
     @SerializedName("user_id") val userId: Long,
 
     @SerializedName("currency") val currency: String,
@@ -48,4 +47,4 @@ internal data class BudgetResponse(
     @SerializedName("metadata") val metadata: JsonObject?,
     @SerializedName("current_period") val currentPeriod: BudgetPeriodResponse?
 
-   )
+)

@@ -816,17 +816,17 @@ class ConvertersTest {
 
     @Test
     fun testStringToBudgetTrackingStatus() {
-        val status = Converters.instance.stringToBudgetTrackingStatus("AHEAD")
-        assertEquals(BudgetTrackingStatus.AHEAD, status)
+        val status = Converters.instance.stringToBudgetTrackingStatus("ON_TRACK")
+        assertEquals(BudgetTrackingStatus.ON_TRACK, status)
 
-        assertEquals(BudgetTrackingStatus.AHEAD, Converters.instance.stringToBudgetTrackingStatus(null))
+        assertEquals(BudgetTrackingStatus.ON_TRACK, Converters.instance.stringToBudgetTrackingStatus(null))
     }
 
     @Test
     fun testStringFromBudgetTrackingStatus() {
-        val str = Converters.instance.stringFromBudgetTrackingStatus(BudgetTrackingStatus.AHEAD)
-        assertEquals("AHEAD", str)
-        assertEquals("AHEAD", Converters.instance.stringFromBudgetTrackingStatus(null))
+        val str = Converters.instance.stringFromBudgetTrackingStatus(BudgetTrackingStatus.ON_TRACK)
+        assertEquals("ON_TRACK", str)
+        assertEquals("ON_TRACK", Converters.instance.stringFromBudgetTrackingStatus(null))
     }
 
     @Test

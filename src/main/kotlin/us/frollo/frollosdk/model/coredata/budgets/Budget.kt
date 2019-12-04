@@ -16,7 +16,6 @@
 
 package us.frollo.frollosdk.model.coredata.budgets
 
-import androidx.annotation.Nullable
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
@@ -57,18 +56,16 @@ data class Budget(
     /** unique id of the user */
     @ColumnInfo(name = "user_id") val userId: Long,
 
-
-
-        /** Currency ISO code of the Budget */
+    /** Currency ISO code of the Budget */
     @ColumnInfo(name = "currency") val currency: String,
 
-        /** Amount spent currently to the Budget */
+    /** Amount spent currently to the Budget */
     @ColumnInfo(name = "current_amount") val currentAmount: BigDecimal,
 
-        /** Amount allocated the Budget period */
+    /** Amount allocated the Budget period */
     @ColumnInfo(name = "period_amount") val periodAmount: BigDecimal,
 
-        /** Start date of the Budget */
+    /** Start date of the Budget */
     @ColumnInfo(name = "start_date") val startDate: String, // yyyy-MM-dd
 
     /** Budget type - budget_category, category, merchant */
@@ -77,14 +74,15 @@ data class Budget(
     /** Budget type value - living, categoryId, merchantId */
     @ColumnInfo(name = "type_value") val typeValue: String,
 
-        /** 'n'th time the budget is being repeated */
+    /** 'n'th time the budget is being repeated */
     @ColumnInfo(name = "periods_count") val periodsCount: Long,
 
-        /** Metadata - custom JSON to be stored with the goal (Optional) */
+    /** Metadata - custom JSON to be stored with the goal (Optional) */
     @ColumnInfo(name = "metadata") val metadata: JsonObject?,
 
-        /** Current active budget period  */
+    /** Current active budget period  */
     @Embedded(prefix = "c_period_") val currentPeriod: BudgetPeriod?
+
 ) : IAdapterModel {
     companion object {
         /** Date format for dates associated with Budget */

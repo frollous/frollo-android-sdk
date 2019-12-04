@@ -357,10 +357,10 @@ internal class Converters {
     // Budget
 
     @TypeConverter
-    fun stringFromBudgetTrackingStatus(value: BudgetTrackingStatus?): String? = value?.name ?: BudgetTrackingStatus.AHEAD.name
+    fun stringFromBudgetTrackingStatus(value: BudgetTrackingStatus?): String? = value?.name ?: BudgetTrackingStatus.ON_TRACK.name
 
     @TypeConverter
-    fun stringToBudgetTrackingStatus(value: String?): BudgetTrackingStatus? = if (value == null) BudgetTrackingStatus.AHEAD else BudgetTrackingStatus.valueOf(value)
+    fun stringToBudgetTrackingStatus(value: String?): BudgetTrackingStatus? = if (value == null) BudgetTrackingStatus.ON_TRACK else BudgetTrackingStatus.valueOf(value)
 
     @TypeConverter
     fun stringFromBudgetStatus(value: BudgetStatus?): String? = value?.name ?: BudgetStatus.UNSTARTED.name

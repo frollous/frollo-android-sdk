@@ -46,7 +46,7 @@ class BudgetsTest : BaseAndroidTest() {
     }
 
     @Test
-    fun testRefreshGoals() {
+    fun testRefreshBudgets() {
         initSetup()
 
         val body = readStringFromJson(app, R.raw.budget_valid)

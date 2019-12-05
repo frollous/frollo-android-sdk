@@ -23,18 +23,12 @@ import us.frollo.frollosdk.model.api.budgets.BudgetResponse
 
 internal interface BudgetsAPI {
     companion object {
-        // Goal URLs
-        const val URL_BUDGETS = "budgets"
-        const val URL_GOAL = "goals/{goal_id}"
 
-        // Goal Period URLs
-        const val URL_GOAL_PERIODS = "goals/{goal_id}/periods"
-        const val URL_GOAL_PERIOD = "goals/{goal_id}/periods/{period_id}"
+        const val URL_BUDGETS = "budgets"
+
     }
 
-    // Goal API
-
-    // Query parameters: {status, tracking_status}
+    // Query parameters: {current, category_type}
     @GET(URL_BUDGETS)
     fun fetchBudgets(@QueryMap queryParams: Map<String, String>): Call<List<BudgetResponse>>
 }

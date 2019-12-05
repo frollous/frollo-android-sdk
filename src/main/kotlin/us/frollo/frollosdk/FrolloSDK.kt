@@ -53,7 +53,6 @@ import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
-import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.notifications.Notifications
 import us.frollo.frollosdk.preferences.Preferences
@@ -260,7 +259,7 @@ object FrolloSDK {
             // 17. Setup Notifications
             _notifications = Notifications(userManagement, events, messages)
 
-            //18. Setup Budgets
+            // 18. Setup Budgets
             _budgets = Budgets(network, database)
 
             if (version.migrationNeeded()) {

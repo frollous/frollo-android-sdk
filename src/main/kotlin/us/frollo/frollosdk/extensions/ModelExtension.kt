@@ -21,6 +21,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.model.api.budgets.BudgetPeriodResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
+import us.frollo.frollosdk.model.api.budgets.BudgetType
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
@@ -38,7 +39,10 @@ import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.model.coredata.bills.BillStatus
 import us.frollo.frollosdk.model.coredata.bills.BillType
 import us.frollo.frollosdk.model.coredata.budgets.Budget
+import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
+import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
+import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -421,3 +425,23 @@ internal fun BudgetResponse.toBudget(): Budget = Budget(this.budgetId, this.isCu
 
 internal fun BudgetPeriodResponse?.toBudgetPeriod(): BudgetPeriod? = this?.let { BudgetPeriod(it.budgetPeriodId, it.budgetId, it.startDate, it.endDate,
         it.currentAmount, it.targetAmount, it.requiredAmount, it.trackingStatus, it.index) }
+
+internal fun sqlForBudget(
+    current: Boolean = true,
+    budgetFrequency: BudgetFrequency? = null,
+    budgetStatus: BudgetStatus? = null,
+    budgetTrackingStatus: BudgetTrackingStatus? = null,
+    budgetType: BudgetType? = null,
+    budgetTypeValue: String? = null
+): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("budget")
+
+    budgetFrequency?.let { sqlQueryBuilder.appendSelection(selection = "frequency = '${ it.name }'") }
+    budgetStatus?.let { sqlQueryBuilder.appendSelection(selection = "status = '${ it.name }'") }
+    budgetTrackingStatus?.let { sqlQueryBuilder.appendSelection(selection = "tracking_status = '${ it.name }'") }
+    budgetType?.let { sqlQueryBuilder.appendSelection(selection = "type = '${ it.name }'") }
+    budgetTypeValue?.let { sqlQueryBuilder.appendSelection(selection = "type_value = '$it'") }
+    sqlQueryBuilder.appendSelection(selection = "is_current = ${current.toInt()}")
+
+    return sqlQueryBuilder.create()
+}

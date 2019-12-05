@@ -20,7 +20,7 @@ import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import java.math.BigDecimal
 
-enum class BudgetPeriodResponse(
+internal data class BudgetPeriodResponse(
     @SerializedName("id") val budgetPeriodId: Long,
     @SerializedName("budget_id") val budgetId: Long,
     @SerializedName("start_date") val startDate: String, // yyyy-MM-dd

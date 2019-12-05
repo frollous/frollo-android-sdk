@@ -16,15 +16,21 @@
 
 package us.frollo.frollosdk.budgets
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.extensions.enqueue
+import us.frollo.frollosdk.extensions.sqlForBudget
 import us.frollo.frollosdk.extensions.toBudget
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.model.api.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.budgets.Budget
+import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
+import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
+import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.network.api.BudgetsAPI
 
 /** Manages user Budgets and tracking */
@@ -46,9 +52,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      *
      */
     fun refreshBudgets(
-            current: Boolean = true,
-            budgetType: BudgetType = BudgetType.BUDGET_CATEGORY,
-            completion: OnFrolloSDKCompletionListener<Resource<List<Budget>>>? = null
+        current: Boolean = true,
+        budgetType: BudgetType = BudgetType.BUDGET_CATEGORY,
+        completion: OnFrolloSDKCompletionListener<Resource<List<Budget>>>? = null
     ) {
         val queryMap = mutableMapOf<String, String>()
         queryMap["current"] = current.toString()
@@ -73,4 +79,19 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
             }
         }
     }
+
+    /**
+     * Fetches all budgets from the local database
+     */
+    fun fetchAllBudgets(
+        current: Boolean = false,
+        budgetFrequency: BudgetFrequency? = null,
+        budgetStatus: BudgetStatus? = null,
+        budgetTrackingStatus: BudgetTrackingStatus? = null,
+        budgetType: BudgetType? = null,
+        budgetTypeValue: String? = null
+    ): LiveData<Resource<List<Budget>>> =
+            Transformations.map(db.budgetsDao().loadByQuery(sqlForBudget(current, budgetFrequency, budgetStatus, budgetTrackingStatus, budgetType, budgetTypeValue))) { models ->
+                Resource.success(models)
+            }
 }

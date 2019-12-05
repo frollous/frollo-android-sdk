@@ -51,6 +51,8 @@ import us.frollo.frollosdk.model.coredata.goals.Goal
 import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
 import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalance
 import us.frollo.frollosdk.model.coredata.user.User
+import us.frollo.frollosdk.model.coredata.budgets.Budget
+import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
 
 @Database(entities = [
     User::class,
@@ -66,7 +68,9 @@ import us.frollo.frollosdk.model.coredata.user.User
     BillPayment::class,
     TransactionTag::class,
     Goal::class,
-    GoalPeriod::class
+    GoalPeriod::class,
+    Budget::class,
+    BudgetPeriod::class
 ], version = 8, exportSchema = true)
 
 @TypeConverters(Converters::class)

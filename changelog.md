@@ -1,10 +1,12 @@
 ## Changelog
 
-### 3.3.1
+### 3.4.0
 
-#### Changes
+#### Features
 
 - Generic metadata support and additional properties for surveys
+- Refactor and Remodel Transaction Reports
+- Budgets & Budget Periods
 
 ### 3.3.0
 

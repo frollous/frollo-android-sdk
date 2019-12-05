@@ -18,6 +18,8 @@ package us.frollo.frollosdk.model
 
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.ReportsResponse
+import us.frollo.frollosdk.model.api.reports.ReportsResponse.ReportResponse
+import us.frollo.frollosdk.model.api.reports.ReportsResponse.ReportResponse.GroupReportResponse
 import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalance
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.testutils.randomBoolean
@@ -40,21 +42,25 @@ internal fun testAccountBalanceReportResponseData(): AccountBalanceReportRespons
 }
 
 internal fun testReportsResponseData(): ReportsResponse {
-    val groups = listOf(
-            ReportsResponse.ReportResponse.GroupReportResponse(
-                    id = 1,
-                    name = "living",
-                    value = randomNumber().toBigDecimal(),
-                    income = randomBoolean(),
-                    transactionIds = listOf(1093435, 2959945)))
+    return ReportsResponse(listOf(testReportResponseData()))
+}
 
-    val data = listOf(ReportsResponse.ReportResponse(
-            date = "2019-03",
+internal fun testReportResponseData(): ReportResponse {
+    val groups = listOf(testGroupReportResponseData())
+    return ReportResponse(
+            date = "2019-03-01",
             value = randomNumber().toBigDecimal(),
             income = randomBoolean(),
-            groups = groups))
+            groups = groups)
+}
 
-    return ReportsResponse(data = data)
+internal fun testGroupReportResponseData(): GroupReportResponse {
+    return GroupReportResponse(
+            id = 1,
+            name = "living",
+            value = randomNumber().toBigDecimal(),
+            income = randomBoolean(),
+            transactionIds = listOf(1093435, 2959945))
 }
 
 internal fun testReportAccountBalanceData(

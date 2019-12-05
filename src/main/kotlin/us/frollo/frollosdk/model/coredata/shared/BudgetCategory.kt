@@ -43,4 +43,9 @@ enum class BudgetCategory(val budgetCategoryId: Long) {
     // Try to get the annotation value if available instead of using plain .toString()
     // Fallback to super.toString() in case annotation is not present/available
             serializedName() ?: super.toString()
+
+    companion object {
+        fun getById(budgetCategoryId: Long): BudgetCategory? =
+                values().find { it.budgetCategoryId == budgetCategoryId }
+    }
 }

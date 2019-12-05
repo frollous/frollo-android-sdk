@@ -20,6 +20,7 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import us.frollo.frollosdk.extensions.fromJson
+import us.frollo.frollosdk.model.api.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountGroup
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
@@ -373,6 +374,12 @@ internal class Converters {
 
     @TypeConverter
     fun stringToBudgetFrequency(value: String?): BudgetFrequency? = if (value == null) BudgetFrequency.MONTHLY else BudgetFrequency.valueOf(value)
+
+    @TypeConverter
+    fun stringFromBudgetType(value: BudgetType?): String? = value?.name ?: BudgetType.BUDGET_CATEGORY.name
+
+    @TypeConverter
+    fun stringToBudgetType(value: String?): BudgetType? = if (value == null) BudgetType.BUDGET_CATEGORY else BudgetType.valueOf(value)
 
     // Shared
 

@@ -23,6 +23,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.JsonObject
 import us.frollo.frollosdk.model.IAdapterModel
+import us.frollo.frollosdk.model.api.budgets.BudgetType
 import java.math.BigDecimal
 
 // Declaring the ColumnInfo allows for the renaming of variables without
@@ -36,24 +37,24 @@ import java.math.BigDecimal
 data class Budget(
     /** Unique ID for budget */
     @PrimaryKey
-    @ColumnInfo(name = "budget_id") val id: Long,
+    @ColumnInfo(name = "budget_id") val budgetId: Long,
 
-    /** Boolean field that says if this budget is current */
+    /** Indicates if this budget is current active */
     @ColumnInfo(name = "is_current") val isCurrent: Boolean,
 
-    /** Image url for the Budget */
+    /** Image URL for the Budget (Optional) */
     @ColumnInfo(name = "image_url") val imageUrl: String?,
 
-    /** enum specifying if the user is on track with the budget. refer [BudgetTrackingStatus] */
+    /** Tracking status of the user with the budget. Refer [BudgetTrackingStatus] */
     @ColumnInfo(name = "tracking_status")val trackingStatus: BudgetTrackingStatus,
 
-    /** enum specifying the status of the budget. refer [BudgetStatus] */
+    /** Status of the budget. Refer [BudgetStatus] */
     @ColumnInfo(name = "status") val status: BudgetStatus,
 
-    /** enum specifying the period for which the budget i set. refer [BudgetFrequency] */
+    /** The frequency at which you want to split up this budget. Refer [BudgetFrequency] */
     @ColumnInfo(name = "frequency") val frequency: BudgetFrequency,
 
-    /** unique id of the user */
+    /** Unique ID of the user */
     @ColumnInfo(name = "user_id") val userId: Long,
 
     /** Currency ISO code of the Budget */
@@ -66,15 +67,15 @@ data class Budget(
     @ColumnInfo(name = "period_amount") val periodAmount: BigDecimal,
 
     /** Start date of the Budget */
-    @ColumnInfo(name = "start_date") val startDate: String, // yyyy-MM-dd
+    @ColumnInfo(name = "start_date") val startDate: String?, // yyyy-MM-dd
 
     /** Budget type - budget_category, category, merchant */
-    @ColumnInfo(name = "type") val type: String,
+    @ColumnInfo(name = "type") val type: BudgetType,
 
-    /** Budget type value - living, categoryId, merchantId */
+    /** Budget type value - This can be budget category name (Eg: living) or categoryId or merchantId based on the Budget Type */
     @ColumnInfo(name = "type_value") val typeValue: String,
 
-    /** 'n'th time the budget is being repeated */
+    /** The number of periods that belong to this budget. As they are created on the budget creation this number won't be changing. */
     @ColumnInfo(name = "periods_count") val periodsCount: Long,
 
     /** Metadata - custom JSON to be stored with the goal (Optional) */

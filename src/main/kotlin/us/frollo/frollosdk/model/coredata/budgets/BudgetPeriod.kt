@@ -39,13 +39,12 @@ data class BudgetPeriod(
     @ColumnInfo(name = "budget_id") val budgetId: Long,
 
     /** Date the Budget Period starts. See [BudgetPeriod.DATE_FORMAT_PATTERN] for the date format pattern */
-
     @ColumnInfo(name = "start_date") val startDate: String, // yyyy-MM-dd
-    /** End date of the Budget Period. See [BudgetPeriod.DATE_FORMAT_PATTERN] for the date format pattern */
 
+    /** End date of the Budget Period. See [BudgetPeriod.DATE_FORMAT_PATTERN] for the date format pattern */
     @ColumnInfo(name = "end_date") val endDate: String, // yyyy-MM-dd
 
-    /** Current amount progressed against the Budget Period. Depending on [Budget.trackingType] of the budget this is the sum of all transactions for the period */
+    /** Current amount progressed against the Budget Period. Depending on [Budget.type] of the budget this is the sum of all transactions for the period */
     @ColumnInfo(name = "current_amount") val currentAmount: BigDecimal,
 
     /** Target amount to reach for the Budget Period */
@@ -55,13 +54,11 @@ data class BudgetPeriod(
     @ColumnInfo(name = "required_amount") val requiredAmount: BigDecimal,
 
     /**
-     * Tracking Status of the Budget Period (Optional)
-     *
-     * This will have a value for past & current budget periods. But, null for future budget periods.
+     * Tracking Status of the Budget Period
      */
-    @ColumnInfo(name = "tracking_status") val trackingStatus: BudgetTrackingStatus?,
+    @ColumnInfo(name = "tracking_status") val trackingStatus: BudgetTrackingStatus,
 
-    /** Index of the Budget Period */
+    /** The number of periods that belong to this budget. As they are created on the budget creation this number won't be changing. */
     @ColumnInfo(name = "index") val index: Int
 
 ) : IAdapterModel {

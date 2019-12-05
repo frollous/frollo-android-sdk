@@ -24,7 +24,7 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import java.math.BigDecimal
 
 internal data class BudgetResponse(
-    @SerializedName("id") val id: Long,
+    @SerializedName("id") val budgetId: Long,
     @SerializedName("is_current") val isCurrent: Boolean,
     @SerializedName("image_url") val imageUrl: String?,
 
@@ -38,8 +38,8 @@ internal data class BudgetResponse(
     @SerializedName("current_amount") val currentAmount: BigDecimal,
     @SerializedName("period_amount") val periodAmount: BigDecimal,
 
-    @SerializedName("start_date") val startDate: String, // yyyy-MM-dd
-    @SerializedName("type") val type: String,
+    @SerializedName("start_date") val startDate: String?, // yyyy-MM-dd
+    @SerializedName("type") val type: BudgetType,
     @SerializedName("type_value") val typeValue: String,
 
     @SerializedName("periods_count") val periodsCount: Long,

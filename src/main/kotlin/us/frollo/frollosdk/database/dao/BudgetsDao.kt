@@ -57,6 +57,9 @@ internal interface BudgetsDao {
     @Query("DELETE FROM budget")
     fun clear()
 
+    @Query("DELETE FROM budget_period")
+    fun clearBudgetPeriods()
+
     // Relation methods
 
     @Transaction

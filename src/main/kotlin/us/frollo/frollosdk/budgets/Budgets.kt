@@ -27,11 +27,11 @@ import us.frollo.frollosdk.model.api.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.network.api.BudgetsAPI
 
-/** Manages user goals and tracking */
+/** Manages user Budgets and tracking */
 class Budgets(network: NetworkService, private val db: SDKDatabase) {
 
     companion object {
-        private const val TAG = "Goals"
+        private const val TAG = "Budgets"
     }
 
     private val budgetsAPI: BudgetsAPI = network.create(BudgetsAPI::class.java)
@@ -45,7 +45,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @param completion Optional completion handler with optional error if the request fails
      *
      */
-    fun refreshGoals(
+    fun refreshBudgets(
             current: Boolean = true,
             budgetType: BudgetType = BudgetType.BUDGET_CATEGORY,
             completion: OnFrolloSDKCompletionListener<Resource<List<Budget>>>? = null
@@ -60,6 +60,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
                     completion?.invoke(Resource.error(resource.error))
                 }
                 Resource.Status.SUCCESS -> {
+                    db.budgetsDao().clear()
+                    db.budgetsDao().clearBudgetPeriods()
+
                     val budgetResponseList = resource.data
                     budgetResponseList?.let {
                         val budgetList = it.map { budgetResponse -> budgetResponse.toBudget() }

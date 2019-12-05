@@ -416,7 +416,8 @@ internal fun String.toBudgetCategory(): BudgetCategory? {
     }
 }
 
-internal fun BudgetResponse.toBudget(): Budget = Budget(this.id, this.isCurrent, this.imageUrl, this.trackingStatus, this.status, this.frequency,
+internal fun BudgetResponse.toBudget(): Budget = Budget(this.budgetId, this.isCurrent, this.imageUrl, this.trackingStatus, this.status, this.frequency,
         this.userId, this.currency, this.currentAmount, this.periodAmount, this.startDate, this.type, this.typeValue, this.periodsCount, this.metadata, this.currentPeriod.toBudgetPeriod())
 
-internal fun BudgetPeriodResponse?.toBudgetPeriod(): BudgetPeriod? = this?.let { BudgetPeriod(it.budgetPeriodId, it.budgetId, it.startDate, it.endDate, it.currentAmount, it.targetAmount, it.requiredAmount, it.trackingStatus, it.index) }
+internal fun BudgetPeriodResponse?.toBudgetPeriod(): BudgetPeriod? = this?.let { BudgetPeriod(it.budgetPeriodId, it.budgetId, it.startDate, it.endDate,
+        it.currentAmount, it.targetAmount, it.requiredAmount, it.trackingStatus, it.index) }

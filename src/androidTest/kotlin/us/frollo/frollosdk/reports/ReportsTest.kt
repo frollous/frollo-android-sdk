@@ -883,10 +883,12 @@ class ReportsTest : BaseAndroidTest() {
         tearDown()
     }
 
+    @Test
     fun testFetchBudgetCategoryReportsGroupedByTransactionCategory() {
         // TODO: to be implemented
     }
 
+    @Test
     fun testFetchTagReports() {
         // TODO: to be implemented
     }

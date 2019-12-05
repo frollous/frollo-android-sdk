@@ -16,6 +16,7 @@
 
 package us.frollo.frollosdk.reports
 
+import com.jraska.livedata.test
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
@@ -29,9 +30,18 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
 import us.frollo.frollosdk.base.Resource
+import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
+import us.frollo.frollosdk.error.FrolloSDKError
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
+import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.reports.TransactionReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.model.testReportAccountBalanceData
+import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.network.api.ReportsAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
@@ -52,7 +62,7 @@ class ReportsTest : BaseAndroidTest() {
 
     // Account Balance Reports Tests
 
-    /*@Test
+    @Test
     fun testFetchAccountBalanceReports() {
         initSetup()
 
@@ -563,7 +573,7 @@ class ReportsTest : BaseAndroidTest() {
         assertEquals(BigDecimal("208.55"), report?.report?.value)
 
         tearDown()
-    }*/
+    }
 
     // History Report Tests
 
@@ -751,12 +761,126 @@ class ReportsTest : BaseAndroidTest() {
         tearDown()
     }
 
+    @Test
     fun testFetchTransactionCategoryReportsDaily() {
-        // TODO: to be implemented
+        initSetup()
+
+        val fromDate = "2019-10-01"
+        val toDate = "2019-12-31"
+        val period = TransactionReportPeriod.DAILY
+        val grouping = ReportGrouping.TRANSACTION_CATEGORY
+        val requestPath = "${ReportsAPI.URL_REPORTS_CATEGORIES}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
+
+        val body = readStringFromJson(app, R.raw.transaction_reports_txn_category_daily_2019_10_01_2019_12_31)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        reports.fetchTransactionCategoryReports(period = period, fromDate = fromDate, toDate = toDate) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val models = resource.data
+            assertNotNull(models)
+
+            // Check for overall reports
+            val overallReports = models?.sortedBy { it.date }
+            assertEquals(92, overallReports?.size)
+
+            val report = overallReports?.first()!!
+            assertEquals("2019-10-01", report.date)
+            assertEquals(BigDecimal("44.5"), report.value)
+            assertFalse(report.isIncome)
+            assertNotNull(report.groups)
+            assertEquals(2, report.groups.size)
+
+            // Check for group reports
+            val groupReports = overallReports.filter { it.date == "2019-10-03" }[0].groups.sortedBy { it.linkedId }
+            assertEquals(3, groupReports.size)
+
+            val groupReport = groupReports.last()
+            assertEquals("2019-10-03", groupReport.date)
+            assertEquals(BigDecimal("128.0"), groupReport.value)
+            assertFalse(groupReport.isIncome)
+            assertEquals(77L, groupReport.linkedId)
+            assertEquals("Restaurants", groupReport.name)
+            assertEquals(2, groupReport.transactionIds?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
     }
 
+    @Test
     fun testFetchTransactionCategoryReportsWeekly() {
-        // TODO: to be implemented
+        initSetup()
+
+        val fromDate = "2019-01-01"
+        val toDate = "2019-12-31"
+        val period = TransactionReportPeriod.WEEKLY
+        val grouping = ReportGrouping.TRANSACTION_CATEGORY
+        val requestPath = "${ReportsAPI.URL_REPORTS_CATEGORIES}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
+
+        val body = readStringFromJson(app, R.raw.transaction_reports_txn_category_weekly_2019_01_01_2019_12_31)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        reports.fetchTransactionCategoryReports(period = period, fromDate = fromDate, toDate = toDate) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val models = resource.data
+            assertNotNull(models)
+
+            // Check for overall reports
+            val overallReports = models?.sortedBy { it.date }
+            assertEquals(52, overallReports?.size)
+
+            val report = overallReports?.filter { it.date == "2019-06-04" }!![0]
+            assertEquals("2019-06-04", report.date)
+            assertEquals(BigDecimal("472.64"), report.value)
+            assertFalse(report.isIncome)
+            assertNotNull(report.groups)
+            assertEquals(7, report.groups.size)
+
+            // Check for group reports
+            val groupReports = overallReports.filter { it.date == "2019-06-11" }[0].groups.sortedBy { it.linkedId }
+            assertEquals(8, groupReports.size)
+
+            val groupReport = groupReports.last()
+            assertEquals("2019-06-11", groupReport.date)
+            assertEquals(BigDecimal("3250.0"), groupReport.value)
+            assertTrue(groupReport.isIncome)
+            assertEquals(84L, groupReport.linkedId)
+            assertEquals("Salary/Regular Income", groupReport.name)
+            assertEquals(1, groupReport.transactionIds?.size)
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        wait(3)
+
+        tearDown()
     }
 
     fun testFetchBudgetCategoryReportsGroupedByTransactionCategory() {
@@ -766,367 +890,4 @@ class ReportsTest : BaseAndroidTest() {
     fun testFetchTagReports() {
         // TODO: to be implemented
     }
-
-    /*@Test
-    fun testFetchingHistoryReportsByTransactionCategoryDaily() {
-        initSetup()
-
-        val fromDate = "2018-01-01"
-        val toDate = "2018-12-31"
-        val period = ReportPeriod.DAY
-        val grouping = ReportGrouping.TRANSACTION_CATEGORY
-        val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
-
-        val body = readStringFromJson(app, R.raw.transaction_reports_history_txn_category_daily_2018_01_01_2018_12_31)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == requestPath) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        reports.refreshTransactionHistoryReports(grouping = grouping, period = period, fromDate = fromDate, toDate = toDate) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            val testObserver = reports.historyTransactionReports(grouping = grouping, period = period, fromDate = fromDate, toDate = toDate).test()
-            testObserver.awaitValue()
-            val models = testObserver.value().data
-            assertNotNull(models)
-
-            // Check for overall reports
-            val overallReports = models?.sortedBy { it.report?.date }
-            assertEquals(365, overallReports?.size)
-
-            val last = overallReports?.last()
-            assertEquals("2018-12-31", last?.report?.date)
-            assertEquals(BigDecimal("-84.6"), last?.report?.value)
-            assertNull(last?.report?.budget)
-            assertNull(last?.report?.filteredBudgetCategory)
-            assertNotNull(last?.groups)
-            assertEquals(3, last?.groups?.size)
-
-            // Check for group reports
-            val groupReports = overallReports?.filter { it.report?.date == "2018-06-02" }?.get(0)?.groups?.sortedBy { it.groupReport?.linkedId }
-            assertEquals(2, groupReports?.size)
-
-            val gr = groupReports?.first()
-            assertEquals("2018-06-02", gr?.groupReport?.date)
-            assertEquals(BigDecimal("-12.6"), gr?.groupReport?.value)
-            assertNull(gr?.groupReport?.budget)
-            assertNull(gr?.groupReport?.filteredBudgetCategory)
-            assertNotNull(gr?.overall)
-            assertEquals("2018-06-02", gr?.overall?.date)
-            assertEquals(66L, gr?.groupReport?.linkedId)
-            assertEquals("Groceries", gr?.groupReport?.name)
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(requestPath, request.trimmedPath)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testFetchingHistoryReportsByTransactionCategoryMonthly() {
-        initSetup()
-
-        val fromDate = "2018-01-01"
-        val toDate = "2018-12-31"
-        val period = ReportPeriod.MONTH
-        val grouping = ReportGrouping.TRANSACTION_CATEGORY
-        val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
-
-        val body = readStringFromJson(app, R.raw.transaction_reports_history_txn_category_monthly_2018_01_01_2018_12_31)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == requestPath) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        reports.refreshTransactionHistoryReports(grouping = grouping, period = period, fromDate = fromDate, toDate = toDate) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            val testObserver = reports.historyTransactionReports(grouping = grouping, period = period, fromDate = fromDate, toDate = toDate).test()
-            testObserver.awaitValue()
-            val models = testObserver.value().data
-            assertNotNull(models)
-
-            // Check for overall reports
-            val overallReports = models?.sortedBy { it.report?.date }
-            assertEquals(12, overallReports?.size)
-
-            val third = overallReports?.get(2)
-            assertEquals("2018-03", third?.report?.date)
-            assertEquals(BigDecimal("563.17"), third?.report?.value)
-            assertNull(third?.report?.budget)
-            assertNull(third?.report?.filteredBudgetCategory)
-            assertNotNull(third?.groups)
-            assertEquals(15, third?.groups?.size)
-
-            // Check for group reports
-            val groupReports = overallReports?.filter { it.report?.date == "2018-05" }?.get(0)?.groups?.sortedBy { it.groupReport?.linkedId }
-            assertEquals(15, groupReports?.size)
-
-            val gr = groupReports?.first()
-            assertEquals("2018-05", gr?.groupReport?.date)
-            assertEquals(BigDecimal("-29.98"), gr?.groupReport?.value)
-            assertNull(gr?.groupReport?.budget)
-            assertNull(gr?.groupReport?.filteredBudgetCategory)
-            assertNotNull(gr?.overall)
-            assertEquals("2018-05", gr?.overall?.date)
-            assertEquals(64L, gr?.groupReport?.linkedId)
-            assertEquals("Entertainment/Recreation", gr?.groupReport?.name)
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(requestPath, request.trimmedPath)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testFetchingHistoryReportsByTransactionCategoryWeekly() {
-        initSetup()
-
-        val fromDate = "2018-01-01"
-        val toDate = "2018-12-31"
-        val period = ReportPeriod.WEEK
-        val grouping = ReportGrouping.TRANSACTION_CATEGORY
-        val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
-
-        val body = readStringFromJson(app, R.raw.transaction_reports_history_txn_category_weekly_2018_01_01_2018_12_31)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == requestPath) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        reports.refreshTransactionHistoryReports(grouping = grouping, period = period, fromDate = fromDate, toDate = toDate) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            val testObserver = reports.historyTransactionReports(grouping = grouping, period = period, fromDate = fromDate, toDate = toDate).test()
-            testObserver.awaitValue()
-            val models = testObserver.value().data
-            assertNotNull(models)
-
-            // Check for overall reports
-            val overallReports = models?.sortedBy { it.report?.date }
-            assertEquals(59, overallReports?.size)
-
-            val last = overallReports?.last()
-            assertEquals("2018-12-5", last?.report?.date)
-            assertEquals(BigDecimal("-577.6"), last?.report?.value)
-            assertNull(last?.report?.budget)
-            assertNull(last?.report?.filteredBudgetCategory)
-            assertNotNull(last?.groups)
-            assertEquals(6, last?.groups?.size)
-
-            // Check for group reports
-            val groupReports = overallReports?.filter { it.report?.date == "2018-12-5" }?.get(0)?.groups?.sortedBy { it.groupReport?.linkedId }
-            assertEquals(6, groupReports?.size)
-
-            val gr = groupReports?.first()
-            assertEquals("2018-12-5", gr?.groupReport?.date)
-            assertEquals(BigDecimal("-12.6"), gr?.groupReport?.value)
-            assertNull(gr?.groupReport?.budget)
-            assertNull(gr?.groupReport?.filteredBudgetCategory)
-            assertNotNull(gr?.overall)
-            assertEquals("2018-12-5", gr?.overall?.date)
-            assertEquals(66L, gr?.groupReport?.linkedId)
-            assertEquals("Groceries", gr?.groupReport?.name)
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(requestPath, request.trimmedPath)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testFetchingHistoryReportsFilteredByBudgetCategory() {
-        initSetup()
-
-        val fromDate = "2018-01-01"
-        val toDate = "2018-12-31"
-        val period = ReportPeriod.MONTH
-        val grouping = ReportGrouping.TRANSACTION_CATEGORY
-        val budgetCategory = BudgetCategory.LIFESTYLE
-        val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate&budget_category=$budgetCategory"
-
-        val body = readStringFromJson(app, R.raw.transaction_reports_history_txn_category_monthly_lifestyle_2018_01_01_2018_12_31)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == requestPath) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        reports.refreshTransactionHistoryReports(grouping = grouping, period = period, fromDate = fromDate, toDate = toDate, budgetCategory = budgetCategory) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            val testObserver = reports.historyTransactionReports(grouping = grouping, period = period, fromDate = fromDate, toDate = toDate, budgetCategory = budgetCategory).test()
-            testObserver.awaitValue()
-            val models = testObserver.value().data
-            assertNotNull(models)
-
-            // Check for overall reports
-            val overallReports = models?.sortedBy { it.report?.date }
-            assertEquals(12, overallReports?.size)
-
-            val fifth = overallReports?.get(4)
-            assertEquals("2018-05", fifth?.report?.date)
-            assertEquals(BigDecimal("-778.93"), fifth?.report?.value)
-            assertNull(fifth?.report?.budget)
-            assertEquals(BudgetCategory.LIFESTYLE, fifth?.report?.filteredBudgetCategory)
-            assertNotNull(fifth?.groups)
-            assertEquals(7, fifth?.groups?.size)
-
-            // Check for group reports
-            val groupReports = overallReports?.filter { it.report?.date == "2018-05" }?.get(0)?.groups?.sortedBy { it.groupReport?.linkedId }
-            assertEquals(7, groupReports?.size)
-
-            val gr = groupReports?.last()
-            assertEquals("2018-05", gr?.groupReport?.date)
-            assertEquals(BigDecimal("-40.0"), gr?.groupReport?.value)
-            assertNull(gr?.groupReport?.budget)
-            assertEquals(BudgetCategory.LIFESTYLE, gr?.groupReport?.filteredBudgetCategory)
-            assertNotNull(gr?.overall)
-            assertEquals("2018-05", gr?.overall?.date)
-            assertEquals(94L, gr?.groupReport?.linkedId)
-            assertEquals("Electronics/General Merchandise", gr?.groupReport?.name)
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(requestPath, request.trimmedPath)
-
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testRefreshHistoryReportsByTags() {
-        initSetup()
-
-        val grouping = ReportGrouping.BUDGET_CATEGORY
-        val period = ReportPeriod.MONTH
-        val budgetCategory: BudgetCategory? = BudgetCategory.LIFESTYLE
-        val transactionTag = "frollo"
-
-        val fromDate = "2018-01-01"
-        val toDate = "2018-12-31"
-
-        val requestPath = "${ReportsAPI.URL_REPORT_TRANSACTIONS_HISTORY}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate&budget_category=$budgetCategory&tags=$transactionTag"
-
-        val body = readStringFromJson(app, R.raw.transaction_reports_history_budget_category_monthly_2018_01_01_2018_12_31)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == requestPath) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        reports.refreshTransactionHistoryReports(period = period, fromDate = fromDate, toDate = toDate, grouping = grouping, transactionTag = transactionTag, budgetCategory = budgetCategory) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            val testObserver = reports.historyTransactionReports(fromDate = fromDate, toDate = toDate, grouping = grouping, period = ReportPeriod.MONTH, budgetCategory = budgetCategory, transactionTag = transactionTag).test()
-            testObserver.awaitValue()
-            val models = testObserver.value().data
-            assertNotNull(models)
-
-            // Check for overall reports
-            assertEquals(12, models?.size)
-
-            // Check for overall reports
-            val overallReports = models?.sortedBy { it.report?.date }
-            assertEquals(12, overallReports?.size)
-
-            val first = overallReports?.first()
-            assertEquals("2018-01", first?.report?.date)
-            assertEquals(BigDecimal("744.37"), first?.report?.value)
-            assertEquals(BigDecimal("11000.0"), first?.report?.budget)
-            assertEquals(first?.report?.filteredBudgetCategory, BudgetCategory.LIFESTYLE)
-            assertNotNull(first?.groups)
-            assertEquals(4, first?.groups?.size)
-
-            // Check for group reports
-            val groupReports = overallReports?.filter { it.report?.date == "2018-03" }?.get(0)?.groups?.sortedBy { it.groupReport?.linkedId }
-            assertEquals(4, groupReports?.size)
-
-            val gr = groupReports?.first()
-            assertEquals("2018-03", gr?.groupReport?.date)
-            assertEquals(BigDecimal("3250.0"), gr?.groupReport?.value)
-            assertEquals(BigDecimal("4050.0"), gr?.groupReport?.budget)
-            assertEquals(gr?.groupReport?.filteredBudgetCategory, BudgetCategory.LIFESTYLE)
-            assertNotNull(gr?.overall)
-            assertEquals("2018-03", gr?.overall?.date)
-            assertEquals(0L, gr?.groupReport?.linkedId)
-            assertEquals("income", gr?.groupReport?.name)
-            assertEquals(BudgetCategory.INCOME, gr?.budgetCategory)
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(requestPath, request.trimmedPath)
-        wait(3)
-        tearDown()
-    }
-
-    @Test
-    fun testFetchingHistoryReportsByTags() {
-        initSetup()
-
-        val data1 = testReportTransactionHistoryData(id = 100, date = "2018-06", period = ReportPeriod.MONTH, grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, transactionTags = listOf("hi", "hello"))
-        val data2 = testReportTransactionHistoryData(id = 101, date = "2018-06-03", period = ReportPeriod.DAY, grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, transactionTags = listOf("hi", "hello"))
-        val data3 = testReportTransactionHistoryData(id = 102, date = "2018-06-02", period = ReportPeriod.DAY, grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, transactionTags = listOf("hi"))
-        val data4 = testReportTransactionHistoryData(id = 103, date = "2018-06-01", period = ReportPeriod.DAY, grouping = ReportGrouping.MERCHANT, budgetCategory = BudgetCategory.LIVING, transactionTags = listOf("hi"))
-
-        val list = mutableListOf(data1, data2, data3, data4)
-
-        database.reportsTransactionHistory().insertAll(*list.toTypedArray())
-
-        var testObserver = reports.historyTransactionReports(fromDate = "2018-05-01", toDate = "2018-06-30", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.MONTH, transactionTag = "hi", budgetCategory = BudgetCategory.LIVING).test()
-        testObserver.awaitValue()
-        assertNotNull(testObserver.value().data)
-        assertEquals(1, testObserver.value().data?.size)
-
-        testObserver = reports.historyTransactionReports(fromDate = "2018-05-01", toDate = "2018-06-30", grouping = ReportGrouping.MERCHANT, period = ReportPeriod.DAY, transactionTag = "hi", budgetCategory = BudgetCategory.LIVING).test()
-        testObserver.awaitValue()
-        assertNotNull(testObserver.value().data)
-        assertEquals(3, testObserver.value().data?.size)
-
-        tearDown()
-    }*/
 }

@@ -26,7 +26,7 @@ import java.math.BigDecimal
 internal data class BudgetResponse(
     @SerializedName("id") val id: Long,
     @SerializedName("is_current") val isCurrent: Boolean,
-    @SerializedName("image_url") val imageUrl: Boolean?,
+    @SerializedName("image_url") val imageUrl: String?,
 
     @SerializedName("tracking_status") val trackingStatus: BudgetTrackingStatus,
     @SerializedName("status") val status: BudgetStatus,

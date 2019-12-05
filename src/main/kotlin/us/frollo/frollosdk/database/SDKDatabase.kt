@@ -26,6 +26,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import us.frollo.frollosdk.database.dao.AccountDao
 import us.frollo.frollosdk.database.dao.BillDao
 import us.frollo.frollosdk.database.dao.BillPaymentDao
+import us.frollo.frollosdk.database.dao.BudgetsDao
 import us.frollo.frollosdk.database.dao.GoalDao
 import us.frollo.frollosdk.database.dao.GoalPeriodDao
 import us.frollo.frollosdk.database.dao.MerchantDao
@@ -90,6 +91,7 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun userTags(): TransactionUserTagsDao
     internal abstract fun goals(): GoalDao
     internal abstract fun goalPeriods(): GoalPeriodDao
+    internal abstract fun budgetsDao(): BudgetsDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"

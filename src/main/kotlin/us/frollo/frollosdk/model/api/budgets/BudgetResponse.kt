@@ -38,7 +38,7 @@ internal data class BudgetResponse(
     @SerializedName("current_amount") val currentAmount: BigDecimal,
     @SerializedName("period_amount") val periodAmount: BigDecimal,
 
-    @SerializedName("start_date") val startDate: String, // yyyy-MM-dd
+    @SerializedName("start_date") val startDate: String?, // yyyy-MM-dd
     @SerializedName("type") val type: BudgetType,
     @SerializedName("type_value") val typeValue: String,
 

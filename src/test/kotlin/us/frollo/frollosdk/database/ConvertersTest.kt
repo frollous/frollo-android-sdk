@@ -816,6 +816,22 @@ class ConvertersTest {
     }
 
     @Test
+    fun testStringToGoalFrequency() {
+        val status = Converters.instance.stringToGoalFrequency("ANNUALLY")
+        assertEquals(GoalFrequency.ANNUALLY, status)
+
+        assertEquals(GoalFrequency.SINGULAR, Converters.instance.stringToGoalFrequency(null))
+    }
+
+    @Test
+    fun testStringFromGoalFrequency() {
+        val str = Converters.instance.stringFromGoalFrequency(GoalFrequency.ANNUALLY)
+        assertEquals("ANNUALLY", str)
+
+        assertEquals("SINGULAR", Converters.instance.stringFromGoalFrequency(null))
+    }
+
+    @Test
     fun testStringToBudgetTrackingStatus() {
         val status = Converters.instance.stringToBudgetTrackingStatus("ON_TRACK")
         assertEquals(BudgetTrackingStatus.ON_TRACK, status)
@@ -857,22 +873,6 @@ class ConvertersTest {
         assertEquals("MONTHLY", str)
 
         assertEquals("MONTHLY", Converters.instance.stringFromBudgetFrequency(null))
-    }
-
-    @Test
-    fun testStringToGoalFrequency() {
-        val status = Converters.instance.stringToGoalFrequency("ANNUALLY")
-        assertEquals(GoalFrequency.ANNUALLY, status)
-
-        assertEquals(GoalFrequency.SINGULAR, Converters.instance.stringToGoalFrequency(null))
-    }
-
-    @Test
-    fun testStringFromGoalFrequency() {
-        val str = Converters.instance.stringFromGoalFrequency(GoalFrequency.ANNUALLY)
-        assertEquals("ANNUALLY", str)
-
-        assertEquals("SINGULAR", Converters.instance.stringFromGoalFrequency(null))
     }
 
     @Test

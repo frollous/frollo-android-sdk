@@ -20,7 +20,7 @@ import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
 /**
- * Period - the time period the report is broken down to
+ * Period - the time period the account balance report is broken down to
  */
 enum class ReportPeriod(
     /** Date format to convert date from stored date string to user's current locale */

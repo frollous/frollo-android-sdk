@@ -17,13 +17,8 @@
 package us.frollo.frollosdk.mapping
 
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
-import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
 import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalance
-import us.frollo.frollosdk.model.coredata.reports.ReportGroupTransactionHistory
-import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
-import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
-import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 
 internal fun AccountBalanceReportResponse.Report.BalanceReport.toReportAccountBalance(date: String, period: ReportPeriod) =
         ReportAccountBalance(
@@ -32,27 +27,3 @@ internal fun AccountBalanceReportResponse.Report.BalanceReport.toReportAccountBa
                 period = period,
                 currency = currency,
                 accountId = id)
-
-internal fun TransactionHistoryReportResponse.Report.toReportTransactionHistory(grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory? = null, tags: List<String>? = null) =
-        ReportTransactionHistory(
-                date = date,
-                value = value,
-                budget = budget,
-                period = period,
-                filteredBudgetCategory = budgetCategory,
-                transactionTags = tags,
-                grouping = grouping)
-
-internal fun TransactionHistoryReportResponse.Report.GroupReport.toReportGroupTransactionHistory(grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory? = null, date: String, reportId: Long, tags: List<String>? = null) =
-        ReportGroupTransactionHistory(
-                linkedId = id,
-                name = name,
-                value = value,
-                budget = budget,
-                transactionIds = transactionIds,
-                transactionTags = tags,
-                period = period,
-                date = date,
-                filteredBudgetCategory = budgetCategory,
-                grouping = grouping,
-                reportId = reportId)

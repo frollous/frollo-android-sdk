@@ -17,35 +17,40 @@
 package us.frollo.frollosdk.model.coredata.reports
 
 import us.frollo.frollosdk.model.IAdapterModel
-import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import java.math.BigDecimal
 
-/** Data representation of history transaction overall report */
-data class ReportTransactionHistory(
+/** Data representation of transactions group report */
+data class GroupReport(
 
-    /** Date of the report period. Check [ReportDateFormat] for the date formats. */
-    val date: String, // daily yyyy-MM-dd, monthly yyyy-MM, weekly yyyy-MM-W
+    /** Unique ID of the related object. E.g. merchant or category */
+    val linkedId: String,
+
+    /** Name of the related object (Optional) */
+    val name: String,
 
     /** Value of the report */
     val value: BigDecimal,
 
-    /** Budget value for the report (Optional) */
-    val budget: BigDecimal?,
+    /** Indicates if the [GroupReport.value] is income or expense */
+    val isIncome: Boolean,
+
+    /** Date of the report period. Check [GroupReport.DATE_FORMAT_PATTERN] for the date format. */
+    val date: String, // yyyy-MM-dd
+
+    /** Transaction ids related to the report */
+    val transactionIds: List<Long>?,
 
     /** Period of the report */
-    val period: ReportPeriod,
-
-    /** Filter budget category if the report was filtered to a specific category */
-    val filteredBudgetCategory: BudgetCategory?,
-
-    /** Transaction tags related to the report */
-    val transactionTags: List<String>?,
+    val period: TransactionReportPeriod,
 
     /** Grouping - how the report response has been broken down */
     val grouping: ReportGrouping
 
 ) : IAdapterModel {
 
-    /** Unique ID of the overall report */
-    var reportId: Long = 0
+    companion object {
+
+        /** Date format for dates associated with Transaction Reports */
+        const val DATE_FORMAT_PATTERN = "yyyy-MM-dd"
+    }
 }

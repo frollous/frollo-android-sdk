@@ -20,21 +20,33 @@ import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
 /**
- * Represents how a transaction report response should be broken down. E.g. by merchant
+ * Period - the time period the transaction report is broken down to
  */
-enum class ReportGrouping {
+enum class TransactionReportPeriod {
 
-    /** Budget Category */
-    @SerializedName("budget_category") BUDGET_CATEGORY,
+    /** Annually */
+    @SerializedName("annually") ANNUALLY,
 
-    /** Transaction Category */
-    @SerializedName("category") CATEGORY,
+    /** Biannually - twice in a year */
+    @SerializedName("biannually") BIANNUALLY,
 
-    /** Merchant */
-    @SerializedName("merchant") MERCHANT,
+    /** Daily */
+    @SerializedName("daily") DAILY,
 
-    /** User Tag */
-    @SerializedName("tag") TAG;
+    /** Fortnightly */
+    @SerializedName("fortnightly") FORTNIGHTLY,
+
+    /** Every four weeks */
+    @SerializedName("four_weekly") FOUR_WEEKLY,
+
+    /** Monthly */
+    @SerializedName("monthly") MONTHLY,
+
+    /** Quarterly */
+    @SerializedName("quarterly") QUARTERLY,
+
+    /** Weekly */
+    @SerializedName("weekly") WEEKLY;
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

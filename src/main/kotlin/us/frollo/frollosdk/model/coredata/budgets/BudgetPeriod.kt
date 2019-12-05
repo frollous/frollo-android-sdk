@@ -53,9 +53,7 @@ data class BudgetPeriod(
     /** Required amount for the Budget Period to get back or stay on track with the budget */
     @ColumnInfo(name = "required_amount") val requiredAmount: BigDecimal,
 
-    /**
-     * Tracking Status of the Budget Period
-     */
+    /** Tracking Status of the Budget Period */
     @ColumnInfo(name = "tracking_status") val trackingStatus: BudgetTrackingStatus,
 
     /** The number of periods that belong to this budget. As they are created on the budget creation this number won't be changing. */

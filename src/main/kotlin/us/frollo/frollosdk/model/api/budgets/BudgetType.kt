@@ -19,16 +19,16 @@ package us.frollo.frollosdk.model.api.budgets
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
-/** Fetch the budgets by BUDGET_CATEGORY or CATEGORY or MERCHANT*/
+/** Type of budget */
 enum class BudgetType {
 
-    /** BUDGET_CATEGORY */
+    /** Based on budget category */
     @SerializedName("budget_category") BUDGET_CATEGORY,
 
-    /** CATEGORY - twice in a year */
+    /** Based on transaction category */
     @SerializedName("category") CATEGORY,
 
-    /** MERCHANT */
+    /** Based on merchant */
     @SerializedName("merchant") MERCHANT;
 
     /** Enum to serialized string */

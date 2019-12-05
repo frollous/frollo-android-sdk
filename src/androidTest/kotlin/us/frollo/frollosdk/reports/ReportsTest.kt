@@ -68,7 +68,7 @@ class ReportsTest : BaseAndroidTest() {
 
         database.reportsAccountBalance().insert(*list.toTypedArray())
 
-        val testObserver = reports.accountBalanceReports(fromDate = "2017-06-01", toDate = "2018-01-31", period = ReportPeriod.DAY).test()
+        val testObserver = reports.fetchAccountBalanceReports(fromDate = "2017-06-01", toDate = "2018-01-31", period = ReportPeriod.DAY).test()
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
         assertEquals(2, testObserver.value().data?.size)
@@ -81,7 +81,7 @@ class ReportsTest : BaseAndroidTest() {
         initSetup()
 
         try {
-            reports.accountBalanceReports(fromDate = "2017-06", toDate = "2018-01", period = ReportPeriod.DAY)
+            reports.fetchAccountBalanceReports(fromDate = "2017-06", toDate = "2018-01", period = ReportPeriod.DAY)
         } catch (e: FrolloSDKError) {
             assertEquals("Invalid format for from/to date", e.localizedMessage)
         }
@@ -138,7 +138,7 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            val testObserver = reports.accountBalanceReports(period = period, fromDate = fromDate, toDate = toDate).test()
+            val testObserver = reports.fetchAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate).test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
@@ -188,7 +188,7 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            val testObserver = reports.accountBalanceReports(period = period, fromDate = fromDate, toDate = toDate).test()
+            val testObserver = reports.fetchAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate).test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
@@ -238,7 +238,7 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            val testObserver = reports.accountBalanceReports(period = period, fromDate = fromDate, toDate = toDate).test()
+            val testObserver = reports.fetchAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate).test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
@@ -289,7 +289,7 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            val testObserver = reports.accountBalanceReports(period = period, fromDate = fromDate, toDate = toDate, accountId = accountId).test()
+            val testObserver = reports.fetchAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate, accountId = accountId).test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
@@ -350,7 +350,7 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            val testObserver = reports.accountBalanceReports(period = period, fromDate = fromDate, toDate = toDate, accountType = accountType).test()
+            val testObserver = reports.fetchAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate, accountType = accountType).test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
@@ -407,7 +407,7 @@ class ReportsTest : BaseAndroidTest() {
 
         wait(3)
 
-        var testObserver = reports.accountBalanceReports(period = period, fromDate = oldFromDate, toDate = oldToDate).test()
+        var testObserver = reports.fetchAccountBalanceReports(period = period, fromDate = oldFromDate, toDate = oldToDate).test()
         testObserver.awaitValue()
         var models = testObserver.value().data
         assertNotNull(models)
@@ -424,7 +424,7 @@ class ReportsTest : BaseAndroidTest() {
         assertEquals(BigDecimal("208.55"), report?.report?.value)
 
         // Check new reports don't exist
-        testObserver = reports.accountBalanceReports(period = period, fromDate = newFromDate, toDate = newToDate).test()
+        testObserver = reports.fetchAccountBalanceReports(period = period, fromDate = newFromDate, toDate = newToDate).test()
         testObserver.awaitValue()
         models = testObserver.value().data
         fetchedReports = models?.sortedBy { it.report?.accountId }?.filter { it.report?.date == "2019-02" }
@@ -438,7 +438,7 @@ class ReportsTest : BaseAndroidTest() {
 
         wait(3)
 
-        testObserver = reports.accountBalanceReports(period = period, fromDate = oldFromDate, toDate = oldToDate).test()
+        testObserver = reports.fetchAccountBalanceReports(period = period, fromDate = oldFromDate, toDate = oldToDate).test()
         testObserver.awaitValue()
         models = testObserver.value().data
 
@@ -453,7 +453,7 @@ class ReportsTest : BaseAndroidTest() {
         assertEquals(period, report?.report?.period)
         assertEquals(BigDecimal("-1191.45"), report?.report?.value)
 
-        testObserver = reports.accountBalanceReports(period = period, fromDate = newFromDate, toDate = newToDate).test()
+        testObserver = reports.fetchAccountBalanceReports(period = period, fromDate = newFromDate, toDate = newToDate).test()
         testObserver.awaitValue()
         models = testObserver.value().data
 
@@ -522,7 +522,7 @@ class ReportsTest : BaseAndroidTest() {
         wait(5)
 
         // Check for day reports
-        var testObserver = reports.accountBalanceReports(period = period1, fromDate = fromDate, toDate = toDate).test()
+        var testObserver = reports.fetchAccountBalanceReports(period = period1, fromDate = fromDate, toDate = toDate).test()
         testObserver.awaitValue()
         var models = testObserver.value().data
 
@@ -537,7 +537,7 @@ class ReportsTest : BaseAndroidTest() {
         assertEquals(BigDecimal("-1191.45"), report?.report?.value)
 
         // Check for week report
-        testObserver = reports.accountBalanceReports(period = period2, fromDate = fromDate, toDate = toDate).test()
+        testObserver = reports.fetchAccountBalanceReports(period = period2, fromDate = fromDate, toDate = toDate).test()
         testObserver.awaitValue()
         models = testObserver.value().data
 
@@ -552,7 +552,7 @@ class ReportsTest : BaseAndroidTest() {
         assertEquals(BigDecimal("-1191.45"), report?.report?.value)
 
         // Check for month reports
-        testObserver = reports.accountBalanceReports(period = period3, fromDate = fromDate, toDate = toDate).test()
+        testObserver = reports.fetchAccountBalanceReports(period = period3, fromDate = fromDate, toDate = toDate).test()
         testObserver.awaitValue()
         models = testObserver.value().data
 

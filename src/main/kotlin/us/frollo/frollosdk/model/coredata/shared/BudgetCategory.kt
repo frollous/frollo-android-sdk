@@ -20,22 +20,22 @@ import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
 /** Indicates a budget type */
-enum class BudgetCategory {
+enum class BudgetCategory(val budgetCategoryId: Long) {
 
     /** Income budget */
-    @SerializedName("income") INCOME,
+    @SerializedName("income") INCOME(0),
 
     /** Living budget */
-    @SerializedName("living") LIVING,
+    @SerializedName("living") LIVING(1),
 
     /** Lifestyle budget */
-    @SerializedName("lifestyle") LIFESTYLE,
+    @SerializedName("lifestyle") LIFESTYLE(2),
 
     /** Savings budget */
-    @SerializedName("goals") SAVINGS,
+    @SerializedName("goals") SAVINGS(3),
 
     /** One offs budget */
-    @SerializedName("one_off") ONE_OFF;
+    @SerializedName("one_off") ONE_OFF(4);
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

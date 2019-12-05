@@ -23,7 +23,7 @@ import java.math.BigDecimal
 data class GroupReport(
 
     /** Unique ID of the related object. E.g. merchant or category */
-    val linkedId: String,
+    val linkedId: Long,
 
     /** Name of the related object (Optional) */
     val name: String,

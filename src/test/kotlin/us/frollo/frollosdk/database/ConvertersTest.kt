@@ -23,6 +23,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
+import us.frollo.frollosdk.model.api.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountGroup
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
@@ -872,6 +873,22 @@ class ConvertersTest {
         assertEquals("ANNUALLY", str)
 
         assertEquals("SINGULAR", Converters.instance.stringFromGoalFrequency(null))
+    }
+
+    @Test
+    fun testStringToBudgetType() {
+        val status = Converters.instance.stringToBudgetType("BUDGET_CATEGORY")
+        assertEquals(BudgetType.BUDGET_CATEGORY, status)
+
+        assertEquals(BudgetType.BUDGET_CATEGORY, Converters.instance.stringToBudgetType(null))
+    }
+
+    @Test
+    fun testStringFromBudgetType() {
+        val str = Converters.instance.stringFromBudgetType(BudgetType.BUDGET_CATEGORY)
+        assertEquals("BUDGET_CATEGORY", str)
+
+        assertEquals("BUDGET_CATEGORY", Converters.instance.stringFromBudgetType(null))
     }
 
     @Test

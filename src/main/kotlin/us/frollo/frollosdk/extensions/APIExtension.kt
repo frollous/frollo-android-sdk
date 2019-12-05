@@ -149,7 +149,7 @@ internal fun ReportsAPI.fetchAccountBalanceReports(
     return fetchAccountBalanceReports(queryMap)
 }
 
-internal fun ReportsAPI.fetchReports(
+internal fun ReportsAPI.fetchTransactionReports(
     grouping: ReportGrouping,
     period: TransactionReportPeriod,
     fromDate: String,
@@ -162,7 +162,7 @@ internal fun ReportsAPI.fetchReports(
     val queryMap = mutableMapOf("grouping" to grouping.toString(), "period" to period.toString(), "from_date" to fromDate, "to_date" to toDate)
 
     return when (grouping) {
-        ReportGrouping.CATEGORY -> {
+        ReportGrouping.TRANSACTION_CATEGORY -> {
             categoryId?.let { id ->
                 fetchReportsByCategory(id, queryMap)
             } ?: fetchReportsByCategory(queryMap)

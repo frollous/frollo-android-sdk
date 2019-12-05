@@ -26,14 +26,15 @@ import us.frollo.frollosdk.model.api.reports.ReportsResponse
 internal interface ReportsAPI {
     companion object {
         const val URL_REPORT_ACCOUNT_BALANCE = "reports/accounts/history/balances"
-        const val URL_REPORTS_CATEGORIES = "reports/categories"
-        const val URL_REPORTS_CATEGORY = "reports/categories/{category_id}"
-        const val URL_REPORTS_MERCHANTS = "reports/merchants"
-        const val URL_REPORTS_MERCHANT = "reports/merchants/{merchant_id}"
-        const val URL_REPORTS_BUDGET_CATEGORIES = "reports/budget_categories"
-        const val URL_REPORTS_BUDGET_CATEGORY = "reports/budget_categories/{budget_category_id}"
-        const val URL_REPORTS_TAGS = "reports/tags"
-        const val URL_REPORTS_TAG = "reports/tags/{tag}"
+        private const val URL_BASE_REPORTS = "reports/transactions"
+        const val URL_REPORTS_CATEGORIES = "$URL_BASE_REPORTS/categories"
+        const val URL_REPORTS_CATEGORY = "$URL_BASE_REPORTS/categories/{category_id}"
+        const val URL_REPORTS_MERCHANTS = "$URL_BASE_REPORTS/merchants"
+        const val URL_REPORTS_MERCHANT = "$URL_BASE_REPORTS/merchants/{merchant_id}"
+        const val URL_REPORTS_BUDGET_CATEGORIES = "$URL_BASE_REPORTS/budget_categories"
+        const val URL_REPORTS_BUDGET_CATEGORY = "$URL_BASE_REPORTS/budget_categories/{budget_category_id}"
+        const val URL_REPORTS_TAGS = "$URL_BASE_REPORTS/tags"
+        const val URL_REPORTS_TAG = "$URL_BASE_REPORTS/tags/{tag}"
     }
 
     @GET(URL_REPORT_ACCOUNT_BALANCE)

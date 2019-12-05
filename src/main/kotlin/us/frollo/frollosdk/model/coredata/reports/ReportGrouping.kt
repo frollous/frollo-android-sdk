@@ -28,7 +28,7 @@ enum class ReportGrouping {
     @SerializedName("budget_category") BUDGET_CATEGORY,
 
     /** Transaction Category */
-    @SerializedName("category") CATEGORY,
+    @SerializedName("category") TRANSACTION_CATEGORY,
 
     /** Merchant */
     @SerializedName("merchant") MERCHANT,

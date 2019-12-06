@@ -25,7 +25,6 @@ internal interface BudgetsAPI {
     companion object {
 
         const val URL_BUDGETS = "budgets"
-
     }
 
     // Query parameters: {current, category_type}

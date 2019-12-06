@@ -84,7 +84,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * Fetches all budgets from the local database
      */
     fun fetchAllBudgets(
-        current: Boolean = false,
+        current: Boolean? = null,
         budgetFrequency: BudgetFrequency? = null,
         budgetStatus: BudgetStatus? = null,
         budgetTrackingStatus: BudgetTrackingStatus? = null,

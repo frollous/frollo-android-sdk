@@ -427,7 +427,7 @@ internal fun BudgetPeriodResponse?.toBudgetPeriod(): BudgetPeriod? = this?.let {
         it.currentAmount, it.targetAmount, it.requiredAmount, it.trackingStatus, it.index) }
 
 internal fun sqlForBudget(
-    current: Boolean = true,
+    current: Boolean? = null,
     budgetFrequency: BudgetFrequency? = null,
     budgetStatus: BudgetStatus? = null,
     budgetTrackingStatus: BudgetTrackingStatus? = null,
@@ -441,7 +441,7 @@ internal fun sqlForBudget(
     budgetTrackingStatus?.let { sqlQueryBuilder.appendSelection(selection = "tracking_status = '${ it.name }'") }
     budgetType?.let { sqlQueryBuilder.appendSelection(selection = "type = '${ it.name }'") }
     budgetTypeValue?.let { sqlQueryBuilder.appendSelection(selection = "type_value = '$it'") }
-    sqlQueryBuilder.appendSelection(selection = "is_current = ${current.toInt()}")
+    current?.let { sqlQueryBuilder.appendSelection(selection = "is_current = ${it.toInt()}") }
 
     return sqlQueryBuilder.create()
 }

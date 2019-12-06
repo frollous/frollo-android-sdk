@@ -892,4 +892,92 @@ class ReportsTest : BaseAndroidTest() {
     fun testFetchTagReports() {
         // TODO: to be implemented
     }
+
+    @Test
+    fun testFetchMerchantReportsFailsIfLoggedOut() {
+        initSetup()
+
+        clearLoggedInPreferences()
+
+        val fromDate = "2019-01-01"
+        val toDate = "2019-12-31"
+        val period = TransactionReportPeriod.MONTHLY
+
+        reports.fetchMerchantReports(period = period, fromDate = fromDate, toDate = toDate) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionCategoryReportsFailsIfLoggedOut() {
+        initSetup()
+
+        clearLoggedInPreferences()
+
+        val fromDate = "2019-01-01"
+        val toDate = "2019-12-31"
+        val period = TransactionReportPeriod.MONTHLY
+
+        reports.fetchTransactionCategoryReports(period = period, fromDate = fromDate, toDate = toDate) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchBudgetCategoryReportsFailsIfLoggedOut() {
+        initSetup()
+
+        clearLoggedInPreferences()
+
+        val fromDate = "2019-01-01"
+        val toDate = "2019-12-31"
+        val period = TransactionReportPeriod.MONTHLY
+
+        reports.fetchBudgetCategoryReports(period = period, fromDate = fromDate, toDate = toDate) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTagReportsFailsIfLoggedOut() {
+        initSetup()
+
+        clearLoggedInPreferences()
+
+        val fromDate = "2019-01-01"
+        val toDate = "2019-12-31"
+        val period = TransactionReportPeriod.MONTHLY
+
+        reports.fetchTagReports(period = period, fromDate = fromDate, toDate = toDate) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+        }
+
+        wait(3)
+
+        tearDown()
+    }
 }

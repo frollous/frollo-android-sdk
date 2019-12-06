@@ -71,7 +71,7 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
     GoalPeriod::class,
     Budget::class,
     BudgetPeriod::class
-], version = 8, exportSchema = true)
+], version = 9, exportSchema = true)
 
 @TypeConverters(Converters::class)
 abstract class SDKDatabase : RoomDatabase() {
@@ -107,7 +107,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
                         .allowMainThreadQueries() // Needed for some tests
                         // .fallbackToDestructiveMigration()
-                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8)
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9)
                         .build()
 
         // Copy-paste of auto-generated SQLs from room schema json file
@@ -316,6 +316,24 @@ abstract class SDKDatabase : RoomDatabase() {
             database.execSQL("CREATE  INDEX `index_message_msg_id` ON `message` (`msg_id`)")
             database.execSQL("COMMIT")
             // END - Alter columns of messages table
+        }
+
+        private val MIGRATION_8_9: Migration = object : Migration(8, 9) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // New changes in this migration:
+                // 1) Delete table report_transaction_current
+                // 2) Delete table report_transaction_history
+                // 3) Delete table report_group_transaction_history
+                database.execSQL("DROP INDEX IF EXISTS `index_report_transaction_current_report_id`")
+                database.execSQL("DROP INDEX IF EXISTS `index_report_transaction_current_linked_id_day_filtered_budget_category_report_grouping`")
+                database.execSQL("DROP TABLE report_transaction_current")
+                database.execSQL("DROP INDEX IF EXISTS `index_report_transaction_history_report_id`")
+                database.execSQL("DROP INDEX IF EXISTS `index_report_transaction_history_date_period_filtered_budget_category_report_grouping_transaction_tags`")
+                database.execSQL("DROP TABLE report_transaction_history")
+                database.execSQL("DROP INDEX IF EXISTS `index_report_group_transaction_history_report_group_id`")
+                database.execSQL("DROP INDEX IF EXISTS `index_report_group_transaction_history_linked_id_date_period_filtered_budget_category_report_grouping_transaction_tags`")
+                database.execSQL("DROP TABLE report_group_transaction_history")
+            }
         }
     }
 }

@@ -18,7 +18,9 @@ package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.QueryMap
+import us.frollo.frollosdk.model.api.budgets.BudgetCreateRequest
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
 
 internal interface BudgetsAPI {
@@ -30,4 +32,7 @@ internal interface BudgetsAPI {
     // Query parameters: {current, category_type}
     @GET(URL_BUDGETS)
     fun fetchBudgets(@QueryMap queryParams: Map<String, String>): Call<List<BudgetResponse>>
+
+    @POST(URL_BUDGETS)
+    fun createBudget(budgetCreateRequest: BudgetCreateRequest): Call<BudgetResponse>
 }

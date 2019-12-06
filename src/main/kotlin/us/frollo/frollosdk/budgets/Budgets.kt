@@ -16,8 +16,10 @@
 
 package us.frollo.frollosdk.budgets
 
+import android.util.TypedValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import com.google.gson.JsonObject
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
@@ -26,6 +28,8 @@ import us.frollo.frollosdk.extensions.sqlForBudget
 import us.frollo.frollosdk.extensions.toBudget
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.logging.Log
+import us.frollo.frollosdk.model.api.budgets.BudgetCreateRequest
+import us.frollo.frollosdk.model.api.budgets.BudgetResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
@@ -74,6 +78,30 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
                         val budgetList = it.map { budgetResponse -> budgetResponse.toBudget() }
                         db.budgetsDao().insertAll(*budgetList.toTypedArray())
                         completion?.invoke(Resource.success(budgetList))
+                    }
+                }
+            }
+        }
+    }
+
+    fun createBudget(budgetFrequency: BudgetFrequency, periodAmount:Long, type: BudgetType,
+                     typedValue: String,startDate:String?,imageUrl:String?,metadata: JsonObject?,
+                     completion: OnFrolloSDKCompletionListener<Resource<Budget>>? = null){
+        val budgetCreateRequest = BudgetCreateRequest(budgetFrequency,periodAmount,type,typedValue,startDate,imageUrl,metadata)
+        budgetsAPI.createBudget(budgetCreateRequest).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#createBudget", resource.error?.localizedDescription)
+                    completion?.invoke(Resource.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+
+                    val budgetResponseList = resource.data
+                    budgetResponseList?.let {
+
+                        val budget = it.toBudget()
+                        db.budgetsDao().insert(budget)
+                        completion?.invoke(Resource.success(budget))
                     }
                 }
             }

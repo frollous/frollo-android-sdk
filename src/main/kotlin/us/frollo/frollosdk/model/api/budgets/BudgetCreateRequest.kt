@@ -19,12 +19,14 @@ package us.frollo.frollosdk.model.api.budgets
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
+import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 
 internal data class BudgetCreateRequest(
-        @SerializedName("frequency") val budgetFrequency: BudgetFrequency,
-        @SerializedName("period_amount") val periodAmount:Long,
-        @SerializedName("type") val type: BudgetType,
-        @SerializedName("type_value") val typedValue: String,
-        @SerializedName("start_date") val startDate:String?,
-        @SerializedName("image_url") val imageUrl:String?,
-        @SerializedName("metadata") val metadata: JsonObject?)
+    @SerializedName("frequency") val budgetFrequency: BudgetFrequency,
+    @SerializedName("period_amount") val periodAmount: Long,
+    @SerializedName("type") val type: BudgetType,
+    @SerializedName("type_value") val typedValue: String,
+    @SerializedName("start_date") val startDate: String?,
+    @SerializedName("image_url") val imageUrl: String?,
+    @SerializedName("metadata") val metadata: JsonObject?
+)

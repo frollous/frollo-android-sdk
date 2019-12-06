@@ -24,8 +24,8 @@ import us.frollo.frollosdk.model.api.budgets.BudgetCreateRequest
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
 
 internal interface BudgetsAPI {
-    companion object {
 
+    companion object {
         const val URL_BUDGETS = "budgets"
     }
 

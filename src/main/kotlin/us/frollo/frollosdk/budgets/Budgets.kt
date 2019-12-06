@@ -16,21 +16,24 @@
 
 package us.frollo.frollosdk.budgets
 
-import android.util.TypedValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.google.gson.JsonObject
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.extensions.enqueue
-import us.frollo.frollosdk.extensions.sqlForBudget
-import us.frollo.frollosdk.extensions.toBudget
+import us.frollo.frollosdk.extensions.fetchBudgets
+import us.frollo.frollosdk.extensions.sqlForBudgets
+import us.frollo.frollosdk.extensions.sqlForBudgetIds
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.logging.Log
+import us.frollo.frollosdk.mapping.toBudget
 import us.frollo.frollosdk.model.api.budgets.BudgetCreateRequest
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
-import us.frollo.frollosdk.model.api.budgets.BudgetType
+import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
@@ -47,47 +50,72 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
     private val budgetsAPI: BudgetsAPI = network.create(BudgetsAPI::class.java)
 
     /**
+     * Fetches all budgets from the local database
+     *
+     * @param current Filter budgets by currently active budgets (Optional)
+     * @param frequency Filter budgets by budget frequency (Optional)
+     * @param status Filter budgets by budget status (Optional)
+     * @param trackingStatus Filter budgets by tracking status (Optional)
+     * @param type Filter budgets by budget type (Optional)
+     * @param typeValue Filter budgets by budget type value (Optional)
+     *
+     * @return LiveData object of Resource<List<Budget>> which can be observed using an Observer for future changes as well.
+     *
+     */
+    fun fetchBudgets(
+        current: Boolean? = null,
+        frequency: BudgetFrequency? = null,
+        status: BudgetStatus? = null,
+        trackingStatus: BudgetTrackingStatus? = null,
+        type: BudgetType? = null,
+        typeValue: String? = null
+    ): LiveData<Resource<List<Budget>>> =
+            Transformations.map(
+                    db.budgets().loadByQuery(
+                            sqlForBudgets(current, frequency, status, trackingStatus, type, typeValue)
+                    )
+            ) { models ->
+                Resource.success(models)
+            }
+
+    /**
      * Refresh all budgets from the host
      *
-     *
-     * @param current Fetch only currently active budgets(true) or all (false)
-     * @param budgetType fetch budgets by [BudgetType]
+     * @param current Filter budgets by currently active budgets (Optional)
+     * @param budgetType Filter budgets by budget type (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      *
      */
     fun refreshBudgets(
-        current: Boolean = true,
-        budgetType: BudgetType = BudgetType.BUDGET_CATEGORY,
-        completion: OnFrolloSDKCompletionListener<Resource<List<Budget>>>? = null
+        current: Boolean? = null,
+        budgetType: BudgetType? = null,
+        completion: OnFrolloSDKCompletionListener<Result<List<Budget>>>? = null
     ) {
-        val queryMap = mutableMapOf<String, String>()
-        queryMap["current"] = current.toString()
-        queryMap["category_type"] = budgetType.toString()
-        budgetsAPI.fetchBudgets(queryMap).enqueue { resource ->
+
+        budgetsAPI.fetchBudgets(current, budgetType).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshBudgets", resource.error?.localizedDescription)
-                    completion?.invoke(Resource.error(resource.error))
+                    completion?.invoke(Result.failure(Throwable("API error")))
                 }
                 Resource.Status.SUCCESS -> {
-                    db.budgetsDao().clear()
-                    db.budgetsDao().clearBudgetPeriods()
-
-                    val budgetResponseList = resource.data
-                    budgetResponseList?.let {
-                        val budgetList = it.map { budgetResponse -> budgetResponse.toBudget() }
-                        db.budgetsDao().insertAll(*budgetList.toTypedArray())
-                        completion?.invoke(Resource.success(budgetList))
-                    }
+                    handleBudgetsResponse(response = resource.data, current = current, budgetType = budgetType, completion = completion)
                 }
             }
         }
     }
 
-    fun createBudget(budgetFrequency: BudgetFrequency, periodAmount:Long, type: BudgetType,
-                     typedValue: String,startDate:String?,imageUrl:String?,metadata: JsonObject?,
-                     completion: OnFrolloSDKCompletionListener<Resource<Budget>>? = null){
-        val budgetCreateRequest = BudgetCreateRequest(budgetFrequency,periodAmount,type,typedValue,startDate,imageUrl,metadata)
+    fun createBudget(
+        budgetFrequency: BudgetFrequency,
+        periodAmount: Long,
+        type: BudgetType,
+        typedValue: String,
+        startDate: String?,
+        imageUrl: String?,
+        metadata: JsonObject?,
+        completion: OnFrolloSDKCompletionListener<Resource<Budget>>? = null
+    ) {
+        val budgetCreateRequest = BudgetCreateRequest(budgetFrequency, periodAmount, type, typedValue, startDate, imageUrl, metadata)
         budgetsAPI.createBudget(budgetCreateRequest).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -100,7 +128,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
                     budgetResponseList?.let {
 
                         val budget = it.toBudget()
-                        db.budgetsDao().insert(budget)
+                        db.budgets().insert(budget)
                         completion?.invoke(Resource.success(budget))
                     }
                 }
@@ -108,18 +136,49 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    /**
-     * Fetches all budgets from the local database
-     */
-    fun fetchAllBudgets(
+    private fun handleBudgetsResponse(
+        response: List<BudgetResponse>?,
         current: Boolean? = null,
-        budgetFrequency: BudgetFrequency? = null,
-        budgetStatus: BudgetStatus? = null,
-        budgetTrackingStatus: BudgetTrackingStatus? = null,
         budgetType: BudgetType? = null,
-        budgetTypeValue: String? = null
-    ): LiveData<Resource<List<Budget>>> =
-            Transformations.map(db.budgetsDao().loadByQuery(sqlForBudget(current, budgetFrequency, budgetStatus, budgetTrackingStatus, budgetType, budgetTypeValue))) { models ->
-                Resource.success(models)
+        completion: OnFrolloSDKCompletionListener<Result<List<Budget>>>?
+    ) {
+        var models = listOf<Budget>()
+        response?.let { list ->
+            doAsync {
+                models = list.map { it.toBudget() }
+
+                db.budgets().insertAll(*models.toTypedArray())
+
+                val apiIds = models.map { it.budgetId }.toHashSet()
+                val allBudgetIds = db.budgets().getIdsByQuery(sqlForBudgetIds(current, budgetType)).toHashSet()
+                val staleIds = allBudgetIds.minus(apiIds)
+
+                if (staleIds.isNotEmpty()) {
+                    removeCachedBudgets(staleIds.toLongArray())
+                }
+
+                uiThread { completion?.invoke(Result.success(models)) }
             }
+        } ?: run { completion?.invoke(Result.success(models)) } // Explicitly invoke completion callback if response is null.
+    }
+
+    // WARNING: Do not call this method on the main thread
+    private fun removeCachedBudgets(budgetIds: LongArray) {
+        if (budgetIds.isNotEmpty()) {
+            db.budgets().deleteMany(budgetIds)
+
+            // Manually delete budget periods associated to this goal
+            // as we are not using ForeignKeys because ForeignKey constraints
+            // do not allow to insert data into child table prior to parent table
+            val budgetPeriodIds = db.budgetPeriods().getIdsByBudgetIds(budgetIds)
+            removeCachedBudgetPeriods(budgetPeriodIds)
+        }
+    }
+
+    // WARNING: Do not call this method on the main thread
+    private fun removeCachedBudgetPeriods(budgetPeriodIds: LongArray) {
+        if (budgetPeriodIds.isNotEmpty()) {
+            db.budgetPeriods().deleteMany(budgetPeriodIds)
+        }
+    }
 }

@@ -21,6 +21,7 @@ import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
+import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import java.math.BigDecimal
 
 internal data class BudgetResponse(

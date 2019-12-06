@@ -23,6 +23,8 @@ import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.api.bills.BillPaymentResponse
+import us.frollo.frollosdk.model.api.budgets.BudgetResponse
+import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.api.goals.GoalResponse
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
@@ -34,6 +36,7 @@ import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.surveys.Survey
 import us.frollo.frollosdk.network.api.BillsAPI
+import us.frollo.frollosdk.network.api.BudgetsAPI
 import us.frollo.frollosdk.network.api.GoalsAPI
 import us.frollo.frollosdk.network.api.ReportsAPI
 import us.frollo.frollosdk.network.api.SurveysAPI
@@ -193,4 +196,16 @@ internal fun GoalsAPI.fetchGoals(status: GoalStatus? = null, trackingStatus: Goa
     status?.let { queryMap.put("status", status.toString()) }
     trackingStatus?.let { queryMap.put("tracking_status", trackingStatus.toString()) }
     return fetchGoals(queryMap)
+}
+
+// Budgets
+
+internal fun BudgetsAPI.fetchBudgets(
+    current: Boolean? = null,
+    budgetType: BudgetType? = null
+): Call<List<BudgetResponse>> {
+    val queryMap = mutableMapOf<String, String>()
+    current?.let { queryMap["current"] = it.toString() }
+    budgetType?.let { queryMap["category_type"] = it.toString() }
+    return fetchBudgets(queryMap)
 }

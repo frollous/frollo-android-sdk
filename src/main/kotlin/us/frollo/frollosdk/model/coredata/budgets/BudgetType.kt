@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.budgets
+package us.frollo.frollosdk.model.coredata.budgets
 
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName

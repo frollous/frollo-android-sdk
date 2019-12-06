@@ -134,6 +134,12 @@ object FrolloSDK {
         get() = _goals ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     /**
+     * Budgets - Tracking and managing budgets. See [Budgets] for details
+     */
+    val budgets: Budgets
+        get() = _budgets ?: throw IllegalAccessException(SDK_NOT_SETUP)
+
+    /**
      * User - User management. See [UserManagement] for details
      */
     val userManagement: UserManagement
@@ -377,6 +383,7 @@ object FrolloSDK {
                 toDate = LocalDate.now().toString(Transaction.DATE_FORMAT_PATTERN))
         userManagement.refreshUser()
         messages.refreshUnreadMessages()
+        budgets.fetchBudgets()
     }
 
     /**

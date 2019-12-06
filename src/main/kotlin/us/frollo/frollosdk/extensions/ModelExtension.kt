@@ -19,9 +19,7 @@ package us.frollo.frollosdk.extensions
 import android.os.Bundle
 import androidx.sqlite.db.SimpleSQLiteQuery
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
-import us.frollo.frollosdk.model.api.budgets.BudgetPeriodResponse
-import us.frollo.frollosdk.model.api.budgets.BudgetResponse
-import us.frollo.frollosdk.model.api.budgets.BudgetType
+import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
@@ -38,9 +36,7 @@ import us.frollo.frollosdk.model.coredata.bills.BillFrequency
 import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.model.coredata.bills.BillStatus
 import us.frollo.frollosdk.model.coredata.bills.BillType
-import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
-import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
@@ -420,13 +416,7 @@ internal fun String.toBudgetCategory(): BudgetCategory? {
     }
 }
 
-internal fun BudgetResponse.toBudget(): Budget = Budget(this.budgetId, this.isCurrent, this.imageUrl, this.trackingStatus, this.status, this.frequency,
-        this.userId, this.currency, this.currentAmount, this.periodAmount, this.startDate, this.type, this.typeValue, this.periodsCount, this.metadata, this.currentPeriod.toBudgetPeriod())
-
-internal fun BudgetPeriodResponse?.toBudgetPeriod(): BudgetPeriod? = this?.let { BudgetPeriod(it.budgetPeriodId, it.budgetId, it.startDate, it.endDate,
-        it.currentAmount, it.targetAmount, it.requiredAmount, it.trackingStatus, it.index) }
-
-internal fun sqlForBudget(
+internal fun sqlForBudgets(
     current: Boolean? = null,
     budgetFrequency: BudgetFrequency? = null,
     budgetStatus: BudgetStatus? = null,
@@ -442,6 +432,19 @@ internal fun sqlForBudget(
     budgetType?.let { sqlQueryBuilder.appendSelection(selection = "type = '${ it.name }'") }
     budgetTypeValue?.let { sqlQueryBuilder.appendSelection(selection = "type_value = '$it'") }
     current?.let { sqlQueryBuilder.appendSelection(selection = "is_current = ${it.toInt()}") }
+
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForBudgetIds(
+    current: Boolean? = null,
+    budgetType: BudgetType? = null
+): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("budget")
+
+    sqlQueryBuilder.columns(arrayOf("budget_id"))
+    current?.let { sqlQueryBuilder.appendSelection(selection = "is_current = ${ it.toInt() }") }
+    budgetType?.let { sqlQueryBuilder.appendSelection(selection = "budget_type = '${ it.name }'") }
 
     return sqlQueryBuilder.create()
 }

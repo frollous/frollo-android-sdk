@@ -28,7 +28,7 @@ import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetRelation
 
 @Dao
-internal interface BudgetsDao {
+internal interface BudgetDao {
 
     @Query("SELECT * FROM budget")
     fun load(): LiveData<List<Budget>>
@@ -48,8 +48,8 @@ internal interface BudgetsDao {
     @RawQuery
     fun getIdsByQuery(queryStr: SupportSQLiteQuery): List<Long>
 
-    @Query("DELETE FROM budget WHERE budget_id IN (:budgetId)")
-    fun deleteMany(budgetId: LongArray)
+    @Query("DELETE FROM budget WHERE budget_id IN (:budgetIds)")
+    fun deleteMany(budgetIds: LongArray)
 
     @Query("DELETE FROM budget WHERE budget_id = :budgetId")
     fun delete(budgetId: Long)
@@ -57,11 +57,7 @@ internal interface BudgetsDao {
     @Query("DELETE FROM budget")
     fun clear()
 
-    @Query("DELETE FROM budget_period")
-    fun clearBudgetPeriods()
-
     // Relation methods
-
     @Transaction
     @Query("SELECT * FROM budget")
     fun loadWithRelation(): LiveData<List<BudgetRelation>>

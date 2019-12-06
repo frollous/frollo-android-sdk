@@ -19,7 +19,11 @@ package us.frollo.frollosdk.model.coredata.shared
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
-/** Indicates a budget type */
+/**
+ * Indicates category of the budget
+ *
+ * @param budgetCategoryId Unique ID for the budget category in relation to that on the host
+ */
 enum class BudgetCategory(val budgetCategoryId: Long) {
 
     /** Income budget */
@@ -45,6 +49,12 @@ enum class BudgetCategory(val budgetCategoryId: Long) {
             serializedName() ?: super.toString()
 
     companion object {
+        /**
+         * Get instance of BudgetCategory from budget category ID
+         *
+         * @param budgetCategoryId Unique ID for the budget category in relation to that on the host
+         * @return Returns BudgetCategory or null if no match
+         */
         fun getById(budgetCategoryId: Long): BudgetCategory? =
                 values().find { it.budgetCategoryId == budgetCategoryId }
     }

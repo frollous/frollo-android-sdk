@@ -131,7 +131,7 @@ class BudgetPeriodDaoTest {
     fun testInsert() {
         val data = testBudgetPeriodResponseData(budgetPeriodId = 100)
 
-        db.budgetPeriods().insert(data.toBudgetPeriod()!!)
+        db.budgetPeriods().insert(data.toBudgetPeriod())
 
         val testObserver = db.budgetPeriods().load(budgetPeriodId = data.budgetPeriodId).test()
 
@@ -239,7 +239,7 @@ class BudgetPeriodDaoTest {
     @Test
     fun testLoadByGoalPeriodIdWithRelation() {
         db.budgets().insert(testBudgetResponseData(budgetId = 123).toBudget())
-        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 123).toBudgetPeriod()!!)
+        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 123).toBudgetPeriod())
 
         val testObserver = db.budgetPeriods().loadWithRelation(budgetPeriodId = 456).test()
 
@@ -256,7 +256,7 @@ class BudgetPeriodDaoTest {
     @Test
     fun testLoadByGoalIdWithRelation() {
         db.budgets().insert(testBudgetResponseData(budgetId = 123).toBudget())
-        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 123).toBudgetPeriod()!!)
+        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 123).toBudgetPeriod())
 
         val testObserver = db.budgetPeriods().loadByBudgetIdWithRelation(budgetId = 123).test()
 
@@ -275,7 +275,7 @@ class BudgetPeriodDaoTest {
     @Test
     fun testLoadByQueryWithRelation() {
         db.budgets().insert(testBudgetResponseData(budgetId = 123).toBudget())
-        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 123).toBudgetPeriod()!!)
+        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 123).toBudgetPeriod())
 
         val query = SimpleSQLiteQuery("SELECT * FROM budget_period WHERE budget_id = 123")
         val testObserver = db.budgetPeriods().loadByQueryWithRelation(query).test()

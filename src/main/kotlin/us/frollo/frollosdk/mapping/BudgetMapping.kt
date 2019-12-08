@@ -36,27 +36,14 @@ internal fun BudgetResponse.toBudget(): Budget = Budget(this.budgetId,
         this.typeValue,
         this.periodsCount,
         this.metadata,
-        this.currentPeriod.toBudgetPeriod())
+        this.currentPeriod?.toBudgetPeriod())
 
-internal fun BudgetPeriodResponse?.toBudgetPeriod(): BudgetPeriod? = this?.let {
-    BudgetPeriod(it.budgetPeriodId,
-            it.budgetId,
-            it.startDate,
-            it.endDate,
-            it.currentAmount,
-            it.targetAmount,
-            it.requiredAmount,
-            it.trackingStatus,
-            it.index)
-}
-
-internal fun BudgetPeriodResponse.toBudgetPeriodX(): BudgetPeriod =
-    BudgetPeriod(this.budgetPeriodId,
-            this.budgetId,
-            this.startDate,
-            this.endDate,
-            this.currentAmount,
-            this.targetAmount,
-            this.requiredAmount,
-            this.trackingStatus,
-            this.index)
+internal fun BudgetPeriodResponse.toBudgetPeriod(): BudgetPeriod = BudgetPeriod(this.budgetPeriodId,
+        this.budgetId,
+        this.startDate,
+        this.endDate,
+        this.currentAmount,
+        this.targetAmount,
+        this.requiredAmount,
+        this.trackingStatus,
+        this.index)

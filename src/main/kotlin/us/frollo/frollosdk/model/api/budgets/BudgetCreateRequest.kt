@@ -20,13 +20,14 @@ import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
+import java.math.BigDecimal
 
 internal data class BudgetCreateRequest(
     @SerializedName("frequency") val budgetFrequency: BudgetFrequency,
-    @SerializedName("period_amount") val periodAmount: Long,
+    @SerializedName("period_amount") val periodAmount: BigDecimal,
     @SerializedName("type") val type: BudgetType,
     @SerializedName("type_value") val typedValue: String,
-    @SerializedName("start_date") val startDate: String?,
-    @SerializedName("image_url") val imageUrl: String?,
-    @SerializedName("metadata") val metadata: JsonObject?
+    @SerializedName("start_date") val startDate: String? = null,
+    @SerializedName("image_url") val imageUrl: String? = null,
+    @SerializedName("metadata") val metadata: JsonObject? = null
 )

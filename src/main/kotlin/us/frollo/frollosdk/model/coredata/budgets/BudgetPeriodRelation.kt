@@ -24,22 +24,22 @@ import us.frollo.frollosdk.model.IAdapterModel
 data class BudgetPeriodRelation(
 
     /** Budget Period */
-    @Embedded
-    var goalPeriod: BudgetPeriod? = null,
+@Embedded
+var budgetPeriod: BudgetPeriod? = null,
 
     /** Associated Budget
-     *
-     * Even though its a list this will have only one element. It is requirement of Room database for this to be a list.
-     */
-    @Relation(parentColumn = "budget_id", entityColumn = "budget_id", entity = Budget::class)
-    var goals: List<BudgetRelation>? = null
+ *
+ * Even though its a list this will have only one element. It is requirement of Room database for this to be a list.
+ */
+@Relation(parentColumn = "budget_id", entityColumn = "budget_id", entity = Budget::class)
+var budgets: List<BudgetRelation>? = null
 
 ) : IAdapterModel {
 
     /** Associated Budget */
-    val goal: BudgetRelation?
+    val budget: BudgetRelation?
         get() {
-            val models = goals
+            val models = budgets
             return if (models?.isNotEmpty() == true) models[0] else null
         }
 }

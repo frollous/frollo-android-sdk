@@ -39,6 +39,7 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.network.api.BudgetsAPI
+import java.math.BigDecimal
 
 /** Manages user Budgets and tracking */
 class Budgets(network: NetworkService, private val db: SDKDatabase) {
@@ -107,7 +108,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
 
     fun createBudget(
         budgetFrequency: BudgetFrequency,
-        periodAmount: Long,
+        periodAmount: BigDecimal,
         type: BudgetType,
         typedValue: String,
         startDate: String?,

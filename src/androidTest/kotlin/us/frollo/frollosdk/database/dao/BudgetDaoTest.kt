@@ -32,7 +32,7 @@ import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.mapping.toBudget
-import us.frollo.frollosdk.mapping.toBudgetPeriodX
+import us.frollo.frollosdk.mapping.toBudgetPeriod
 import us.frollo.frollosdk.model.testBudgetPeriodResponseData
 import us.frollo.frollosdk.model.testBudgetResponseData
 
@@ -207,8 +207,8 @@ class BudgetDaoTest {
     @Test
     fun testLoadAllWithRelation() {
         db.budgets().insert(testBudgetResponseData(budgetId = 123).toBudget())
-        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 123).toBudgetPeriodX())
-        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 457, budgetId = 123).toBudgetPeriodX())
+        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 123).toBudgetPeriod())
+        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 457, budgetId = 123).toBudgetPeriod())
 
         val testObserver = db.budgets().loadWithRelation().test()
 
@@ -228,8 +228,8 @@ class BudgetDaoTest {
     fun testLoadBybudgetIdWithRelation() {
 
         db.budgets().insert(testBudgetResponseData(budgetId = 123).toBudget())
-        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 123).toBudgetPeriodX())
-        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 457, budgetId = 123).toBudgetPeriodX())
+        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 123).toBudgetPeriod())
+        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 457, budgetId = 123).toBudgetPeriod())
 
         val testObserver = db.budgets().loadWithRelation(budgetId = 123).test()
         testObserver.awaitValue()
@@ -245,8 +245,8 @@ class BudgetDaoTest {
     @Test
     fun testLoadByQueryWithRelation() {
         db.budgets().insert(testBudgetResponseData(budgetId = 123).toBudget())
-        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 123).toBudgetPeriodX())
-        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 457, budgetId = 123).toBudgetPeriodX())
+        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 123).toBudgetPeriod())
+        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 457, budgetId = 123).toBudgetPeriod())
 
         val query = SimpleSQLiteQuery("SELECT * FROM budget")
         val testObserver = db.budgets().loadByQueryWithRelation(query).test()

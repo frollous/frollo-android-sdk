@@ -16,18 +16,18 @@
 
 package us.frollo.frollosdk.model.api.budgets
 
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
-import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
+import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
+import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import java.math.BigDecimal
 
-internal data class BudgetPeriodResponse(
-    @SerializedName("id") val budgetPeriodId: Long,
-    @SerializedName("budget_id") val budgetId: Long,
-    @SerializedName("start_date") val startDate: String, // yyyy-MM-dd
-    @SerializedName("end_date") val endDate: String, // yyyy-MM-dd
-    @SerializedName("current_amount") val currentAmount: BigDecimal,
-    @SerializedName("target_amount") val targetAmount: BigDecimal,
-    @SerializedName("required_amount") val requiredAmount: BigDecimal,
-    @SerializedName("tracking_status") var trackingStatus: BudgetTrackingStatus,
-    @SerializedName("index") val index: Int
+internal data class BudgetCreateRequest(
+    @SerializedName("frequency") val budgetFrequency: BudgetFrequency,
+    @SerializedName("period_amount") val periodAmount: BigDecimal,
+    @SerializedName("type") val type: BudgetType,
+    @SerializedName("type_value") val typedValue: String,
+    @SerializedName("start_date") val startDate: String? = null,
+    @SerializedName("image_url") val imageUrl: String? = null,
+    @SerializedName("metadata") val metadata: JsonObject? = null
 )

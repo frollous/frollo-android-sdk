@@ -34,6 +34,10 @@ import us.frollo.frollosdk.model.coredata.bills.BillFrequency
 import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.model.coredata.bills.BillStatus
 import us.frollo.frollosdk.model.coredata.bills.BillType
+import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
+import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
+import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
+import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -272,6 +276,24 @@ class ModelExtensionTest {
 
         query = sqlForGoalPeriods()
         assertEquals("SELECT  *  FROM goal_period", query.sql)
+    }
+
+    @Test
+    fun testSQLForBudgets() {
+        var query = sqlForBudgets(true, BudgetFrequency.MONTHLY, BudgetStatus.UNSTARTED, BudgetTrackingStatus.BEHIND, BudgetType.MERCHANT, "1")
+        assertEquals("SELECT  *  FROM budget WHERE frequency = 'MONTHLY' AND status = 'UNSTARTED' AND tracking_status = 'BEHIND' AND type = 'MERCHANT' AND type_value = '1' AND is_current = 1 ", query.sql)
+
+        query = sqlForBudgets()
+        assertEquals("SELECT  *  FROM budget", query.sql)
+    }
+
+    @Test
+    fun testSQLForBudgetIds() {
+        var query = sqlForBudgetIds(true, BudgetType.TRANSACTION_CATEGORY)
+        assertEquals("SELECT budget_id  FROM budget WHERE is_current = 1 AND type = 'TRANSACTION_CATEGORY' ", query.sql)
+
+        query = sqlForBudgetIds()
+        assertEquals("SELECT budget_id  FROM budget", query.sql)
     }
 
     @Test

@@ -444,7 +444,7 @@ internal fun sqlForBudgetIds(
 
     sqlQueryBuilder.columns(arrayOf("budget_id"))
     current?.let { sqlQueryBuilder.appendSelection(selection = "is_current = ${ it.toInt() }") }
-    budgetType?.let { sqlQueryBuilder.appendSelection(selection = "budget_type = '${ it.name }'") }
+    budgetType?.let { sqlQueryBuilder.appendSelection(selection = "type = '${ it.name }'") }
 
     return sqlQueryBuilder.create()
 }

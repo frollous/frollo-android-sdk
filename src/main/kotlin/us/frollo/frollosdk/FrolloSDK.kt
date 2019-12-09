@@ -383,7 +383,7 @@ object FrolloSDK {
                 toDate = LocalDate.now().toString(Transaction.DATE_FORMAT_PATTERN))
         userManagement.refreshUser()
         messages.refreshUnreadMessages()
-        budgets.fetchBudgets()
+        budgets.refreshBudgets()
     }
 
     /**

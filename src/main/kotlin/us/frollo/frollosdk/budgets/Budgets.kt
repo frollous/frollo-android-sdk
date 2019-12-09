@@ -18,6 +18,7 @@ package us.frollo.frollosdk.budgets
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import androidx.sqlite.db.SimpleSQLiteQuery
 import com.google.gson.JsonObject
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -31,13 +32,16 @@ import us.frollo.frollosdk.extensions.sqlForBudgetIds
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toBudget
+import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.model.api.budgets.BudgetCreateRequest
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
+import us.frollo.frollosdk.model.coredata.budgets.BudgetRelation
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
+import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.network.api.BudgetsAPI
 import java.math.BigDecimal
 
@@ -51,7 +55,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
     private val budgetsAPI: BudgetsAPI = network.create(BudgetsAPI::class.java)
 
     /**
-     * Fetches all budgets from the local database
+     * Fetch budgets from the cache
      *
      * @param current Filter budgets by currently active budgets (Optional)
      * @param frequency Filter budgets by budget frequency (Optional)
@@ -85,19 +89,17 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @param current Filter budgets by currently active budgets (Optional)
      * @param budgetType Filter budgets by budget type (Optional)
      * @param completion Optional completion handler with optional error if the request fails
-     *
      */
     fun refreshBudgets(
         current: Boolean? = null,
         budgetType: BudgetType? = null,
-        completion: OnFrolloSDKCompletionListener<Result<List<Budget>>>? = null
+        completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
-
         budgetsAPI.fetchBudgets(current, budgetType).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshBudgets", resource.error?.localizedDescription)
-                    completion?.invoke(Result.failure(Throwable("API error")))
+                    completion?.invoke(Result.error(resource.error))
                 }
                 Resource.Status.SUCCESS -> {
                     handleBudgetsResponse(response = resource.data, current = current, budgetType = budgetType, completion = completion)
@@ -106,7 +108,170 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    fun createBudget(
+    /**
+     * Advanced method to fetch budgets by SQL query from the cache
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches goals from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<Budget>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchBudgets(query: SimpleSQLiteQuery): LiveData<Resource<List<Budget>>> =
+            Transformations.map(db.budgets().loadByQuery(query)) { model ->
+                Resource.success(model)
+            }
+
+    /**
+     * Fetch budgets from the cache with associated data
+     *
+     * @param current Filter by budget if its current (optional)
+     * @param frequency Filter by the [BudgetFrequency] of the budget (optional)
+     * @param status Filter by the [BudgetTrackingStatus] of the budget (optional)
+     * @param budgetTrackingStatus Filter by [BudgetTrackingStatus] of the budget (optional)
+     * @param type Filter by the [BudgetType] with which the budgetId are associated with (optional)
+     * @param typeValue Either BudgetCategory or merchantId or categoryId (optional)
+     *
+     * @return LiveData object of Resource<List<BudgetRelation> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchGoalsWithRelation(
+        current: Boolean?,
+        frequency: BudgetFrequency? = null,
+        status: BudgetStatus? = null,
+        budgetTrackingStatus: BudgetTrackingStatus,
+        type: BudgetType? = null,
+        typeValue: String? = null
+    ): LiveData<Resource<List<BudgetRelation>>> =
+            Transformations.map(db.budgets().loadByQueryWithRelation(
+                    sqlForBudgets(
+                            current = current,
+                            budgetFrequency = frequency,
+                            budgetStatus = status,
+                            budgetTrackingStatus = budgetTrackingStatus,
+                            budgetType = type,
+                            budgetTypeValue = typeValue))
+            ) { models ->
+                Resource.success(models)
+            }
+
+    /**
+     * Advanced method to fetch budgets by SQL query from the cache with associated data
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches goals from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<BudgetRelation>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchGoalsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<BudgetRelation>>> =
+            Transformations.map(db.budgets().loadByQueryWithRelation(query)) { model ->
+                Resource.success(model)
+            }
+
+    /**
+     * Create a new budget on the host by Budget category
+     *
+     * @param budgetFrequency The frequency at which you want to split up this budget. Refer [BudgetFrequency]
+     * @param periodAmount Amount allocated the Budget period
+     * @param type Either Budget category, category or merchant
+     * @param budgetCategory Unique if of the category, based on which you create a budget
+     * @param startDate Start date of the budget. Defaults to today (Optional)
+     * @param imageUrl Image Url of the budget. Defaults to today (Optional)
+     * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
+     * @param periodAmount Amount allocated the Budget period
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun createBudgetCategoryBudget(
+        budgetFrequency: BudgetFrequency,
+        periodAmount: BigDecimal,
+        type: BudgetType,
+        budgetCategory: BudgetCategory,
+        startDate: String?,
+        imageUrl: String?,
+        metadata: JsonObject?,
+        completion: OnFrolloSDKCompletionListener<Resource<Budget>>? = null
+    ) =
+            createBudget(budgetFrequency,
+            periodAmount, type,
+            budgetCategory.toString(),
+            startDate,
+            imageUrl,
+            metadata, completion)
+
+    /**
+     * Create a new budget on the host by category
+     *
+     * @param budgetFrequency The frequency at which you want to split up this budget. Refer [BudgetFrequency]
+     * @param periodAmount Amount allocated the Budget period
+     * @param type Either Budget category, category or merchant
+     * @param categoryId Unique if of the category, based on which you create a budget
+     * @param startDate Start date of the budget. Defaults to today (Optional)
+     * @param imageUrl Image Url of the budget. Defaults to today (Optional)
+     * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
+     * @param periodAmount Amount allocated the Budget period
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun createCategoryBudget(
+        budgetFrequency: BudgetFrequency,
+        periodAmount: BigDecimal,
+        type: BudgetType,
+        categoryId: Long,
+        startDate: String?,
+        imageUrl: String?,
+        metadata: JsonObject?,
+        completion: OnFrolloSDKCompletionListener<Resource<Budget>>? = null
+    ) =
+            createBudget(budgetFrequency,
+                    periodAmount, type,
+                    categoryId.toString(),
+                    startDate,
+                    imageUrl,
+                    metadata, completion)
+
+    /**
+     * Create a new budget on the host by merchant
+     *
+     * @param budgetFrequency The frequency at which you want to split up this budget. Refer [BudgetFrequency]
+     * @param periodAmount Amount allocated the Budget period
+     * @param type Either Budget category, category or merchant
+     * @param merchantId Unique if of the merchant, based on which you create a budget
+     * @param startDate Start date of the budget. Defaults to today (Optional)
+     * @param imageUrl Image Url of the budget. Defaults to today (Optional)
+     * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
+     * @param periodAmount Amount allocated the Budget period
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun createMerchantBudget(
+        budgetFrequency: BudgetFrequency,
+        periodAmount: BigDecimal,
+        type: BudgetType,
+        merchantId: Long,
+        startDate: String?,
+        imageUrl: String?,
+        metadata: JsonObject?,
+        completion: OnFrolloSDKCompletionListener<Resource<Budget>>? = null
+    ) =
+            createBudget(budgetFrequency,
+                    periodAmount, type,
+                    merchantId.toString(),
+                    startDate,
+                    imageUrl,
+                    metadata, completion)
+
+    /**
+     * Create a new budget on the host
+     *
+     * @param budgetFrequency The frequency at which you want to split up this budget. Refer [BudgetFrequency]
+     * @param periodAmount Amount allocated the Budget period
+     * @param type Either Budget category, category or merchant
+     * @param typedValue Budget category, categoryId or merchantId
+     * @param startDate Start date of the budget. Defaults to today (Optional)
+     * @param imageUrl Image Url of the budget. Defaults to today (Optional)
+     * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
+     * @param periodAmount Amount allocated the Budget period
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    private fun createBudget(
         budgetFrequency: BudgetFrequency,
         periodAmount: BigDecimal,
         type: BudgetType,
@@ -116,7 +281,14 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         metadata: JsonObject?,
         completion: OnFrolloSDKCompletionListener<Resource<Budget>>? = null
     ) {
-        val budgetCreateRequest = BudgetCreateRequest(budgetFrequency, periodAmount, type, typedValue, startDate, imageUrl, metadata)
+        val budgetCreateRequest = BudgetCreateRequest(
+                budgetFrequency = budgetFrequency,
+                periodAmount = periodAmount,
+                type = type,
+                typedValue = typedValue,
+                startDate = startDate,
+                imageUrl = imageUrl,
+                metadata = metadata)
         budgetsAPI.createBudget(budgetCreateRequest).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -124,15 +296,18 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
                     completion?.invoke(Resource.error(resource.error))
                 }
                 Resource.Status.SUCCESS -> {
-
-                    val budgetResponseList = resource.data
-                    budgetResponseList?.let {
-
-                        val budget = it.toBudget()
-                        db.budgets().insert(budget)
-                        completion?.invoke(Resource.success(budget))
-                    }
+                    handleBudgetsResponse(resource.data, completion)
                 }
+            }
+        }
+    }
+
+    private fun handleBudgetsResponse(budgetResponse: BudgetResponse?, completion: OnFrolloSDKCompletionListener<Resource<Budget>>? = null) {
+        doAsync {
+            budgetResponse?.let {
+                val budget = it.toBudget()
+                db.budgets().insert(budget)
+                uiThread { completion?.invoke(Resource.success(budget)) }
             }
         }
     }
@@ -141,12 +316,12 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         response: List<BudgetResponse>?,
         current: Boolean? = null,
         budgetType: BudgetType? = null,
-        completion: OnFrolloSDKCompletionListener<Result<List<Budget>>>?
+        completion: OnFrolloSDKCompletionListener<Result>?
     ) {
-        var models = listOf<Budget>()
+
         response?.let { list ->
             doAsync {
-                models = list.map { it.toBudget() }
+                val models = mapBudgetResponse(list)
 
                 db.budgets().insertAll(*models.toTypedArray())
 
@@ -158,17 +333,19 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
                     removeCachedBudgets(staleIds.toLongArray())
                 }
 
-                uiThread { completion?.invoke(Result.success(models)) }
+                uiThread { completion?.invoke(Result.success()) }
             }
-        } ?: run { completion?.invoke(Result.success(models)) } // Explicitly invoke completion callback if response is null.
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
+
+    private fun mapBudgetResponse(list: List<BudgetResponse>): List<Budget> = list.map { it.toBudget() }
 
     // WARNING: Do not call this method on the main thread
     private fun removeCachedBudgets(budgetIds: LongArray) {
         if (budgetIds.isNotEmpty()) {
             db.budgets().deleteMany(budgetIds)
 
-            // Manually delete budget periods associated to this goal
+            // Manually delete budget periods associated to this budget
             // as we are not using ForeignKeys because ForeignKey constraints
             // do not allow to insert data into child table prior to parent table
             val budgetPeriodIds = db.budgetPeriods().getIdsByBudgetIds(budgetIds)

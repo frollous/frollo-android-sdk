@@ -27,12 +27,16 @@ import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
+import us.frollo.frollosdk.error.DataError
+import us.frollo.frollosdk.error.DataErrorSubType
+import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.mapping.toBudget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.testBudgetResponseData
 import us.frollo.frollosdk.network.api.BudgetsAPI
+import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
@@ -50,7 +54,7 @@ class BudgetsTest : BaseAndroidTest() {
     }
 
     @Test
-    fun testFetchGoals() {
+    fun testFetchBudgets() {
         initSetup()
 
         val data1 = testBudgetResponseData(100, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
@@ -64,11 +68,9 @@ class BudgetsTest : BaseAndroidTest() {
         val data9 = testBudgetResponseData(109, frequency = BudgetFrequency.BIANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
 
         val list = mutableListOf(data1, data2, data3, data4, data5, data6, data7, data8, data9)
-
         database.budgets().insertAll(*list.map { it.toBudget() }.toList().toTypedArray())
 
         val testObserver = budgets.fetchBudgets(
-
                 frequency = BudgetFrequency.MONTHLY,
                 status = BudgetStatus.ACTIVE,
                 trackingStatus = BudgetTrackingStatus.ON_TRACK).test()
@@ -87,7 +89,10 @@ class BudgetsTest : BaseAndroidTest() {
         clearLoggedInPreferences()
 
         budgets.refreshBudgets { result ->
-            assertEquals("API error", result.exceptionOrNull()?.localizedMessage)
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
         }
 
         wait(3)
@@ -114,7 +119,6 @@ class BudgetsTest : BaseAndroidTest() {
 
         budgets.refreshBudgets { resource ->
             val testObserver = budgets.fetchBudgets(current = true).test()
-
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
             assertEquals(1, testObserver.value().data?.size)

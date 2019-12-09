@@ -134,7 +134,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      *
      * @return LiveData object of Resource<List<BudgetRelation> which can be observed using an Observer for future changes as well.
      */
-    fun fetchGoalsWithRelation(
+    fun fetchBudgetsWithRelation(
         current: Boolean?,
         frequency: BudgetFrequency? = null,
         status: BudgetStatus? = null,
@@ -163,7 +163,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      *
      * @return LiveData object of Resource<List<BudgetRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchGoalsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<BudgetRelation>>> =
+    fun fetchBudgetWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<BudgetRelation>>> =
             Transformations.map(db.budgets().loadByQueryWithRelation(query)) { model ->
                 Resource.success(model)
             }

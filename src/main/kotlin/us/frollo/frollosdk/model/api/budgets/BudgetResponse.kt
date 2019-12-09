@@ -21,12 +21,13 @@ import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
+import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import java.math.BigDecimal
 
 internal data class BudgetResponse(
     @SerializedName("id") val budgetId: Long,
     @SerializedName("is_current") val isCurrent: Boolean,
-    @SerializedName("image_url") val imageUrl: Boolean?,
+    @SerializedName("image_url") val imageUrl: String?,
 
     @SerializedName("tracking_status") val trackingStatus: BudgetTrackingStatus,
     @SerializedName("status") val status: BudgetStatus,

@@ -34,6 +34,7 @@ import us.frollo.frollosdk.authentication.OAuth2Authentication
 import us.frollo.frollosdk.authentication.TokenInjector
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.bills.Bills
+import us.frollo.frollosdk.budgets.Budgets
 import us.frollo.frollosdk.core.ACTION.ACTION_AUTHENTICATION_CHANGED
 import us.frollo.frollosdk.core.ARGUMENT.ARG_AUTHENTICATION_STATUS
 import us.frollo.frollosdk.core.AppInfo
@@ -133,6 +134,12 @@ object FrolloSDK {
         get() = _goals ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     /**
+     * Budgets - Tracking and managing budgets. See [Budgets] for details
+     */
+    val budgets: Budgets
+        get() = _budgets ?: throw IllegalAccessException(SDK_NOT_SETUP)
+
+    /**
      * User - User management. See [UserManagement] for details
      */
     val userManagement: UserManagement
@@ -147,6 +154,7 @@ object FrolloSDK {
     private var _reports: Reports? = null
     private var _bills: Bills? = null
     private var _goals: Goals? = null
+    private var _budgets: Budgets? = null
     private var _userManagement: UserManagement? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
@@ -256,6 +264,9 @@ object FrolloSDK {
 
             // 17. Setup Notifications
             _notifications = Notifications(userManagement, events, messages)
+
+            // 18. Setup Budgets
+            _budgets = Budgets(network, database)
 
             if (version.migrationNeeded()) {
                 version.migrateVersion()
@@ -372,6 +383,7 @@ object FrolloSDK {
                 toDate = LocalDate.now().toString(Transaction.DATE_FORMAT_PATTERN))
         userManagement.refreshUser()
         messages.refreshUnreadMessages()
+        budgets.refreshBudgets()
     }
 
     /**

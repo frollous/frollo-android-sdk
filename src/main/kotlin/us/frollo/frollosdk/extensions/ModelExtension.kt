@@ -19,6 +19,7 @@ package us.frollo.frollosdk.extensions
 import android.os.Bundle
 import androidx.sqlite.db.SimpleSQLiteQuery
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
+import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
@@ -35,6 +36,9 @@ import us.frollo.frollosdk.model.coredata.bills.BillFrequency
 import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.model.coredata.bills.BillStatus
 import us.frollo.frollosdk.model.coredata.bills.BillType
+import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
+import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
+import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -410,4 +414,37 @@ internal fun String.toBudgetCategory(): BudgetCategory? {
         BudgetCategory.ONE_OFF.toString() -> BudgetCategory.ONE_OFF
         else -> null
     }
+}
+
+internal fun sqlForBudgets(
+    current: Boolean? = null,
+    budgetFrequency: BudgetFrequency? = null,
+    budgetStatus: BudgetStatus? = null,
+    budgetTrackingStatus: BudgetTrackingStatus? = null,
+    budgetType: BudgetType? = null,
+    budgetTypeValue: String? = null
+): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("budget")
+
+    budgetFrequency?.let { sqlQueryBuilder.appendSelection(selection = "frequency = '${ it.name }'") }
+    budgetStatus?.let { sqlQueryBuilder.appendSelection(selection = "status = '${ it.name }'") }
+    budgetTrackingStatus?.let { sqlQueryBuilder.appendSelection(selection = "tracking_status = '${ it.name }'") }
+    budgetType?.let { sqlQueryBuilder.appendSelection(selection = "type = '${ it.name }'") }
+    budgetTypeValue?.let { sqlQueryBuilder.appendSelection(selection = "type_value = '$it'") }
+    current?.let { sqlQueryBuilder.appendSelection(selection = "is_current = ${it.toInt()}") }
+
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForBudgetIds(
+    current: Boolean? = null,
+    budgetType: BudgetType? = null
+): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("budget")
+
+    sqlQueryBuilder.columns(arrayOf("budget_id"))
+    current?.let { sqlQueryBuilder.appendSelection(selection = "is_current = ${ it.toInt() }") }
+    budgetType?.let { sqlQueryBuilder.appendSelection(selection = "type = '${ it.name }'") }
+
+    return sqlQueryBuilder.create()
 }

@@ -23,7 +23,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.JsonObject
 import us.frollo.frollosdk.model.IAdapterModel
-import us.frollo.frollosdk.model.api.budgets.BudgetType
 import java.math.BigDecimal
 
 // Declaring the ColumnInfo allows for the renaming of variables without

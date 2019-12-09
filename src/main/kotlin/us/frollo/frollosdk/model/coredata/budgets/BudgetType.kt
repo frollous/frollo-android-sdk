@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.budgets
+package us.frollo.frollosdk.model.coredata.budgets
 
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
@@ -26,7 +26,7 @@ enum class BudgetType {
     @SerializedName("budget_category") BUDGET_CATEGORY,
 
     /** Based on transaction category */
-    @SerializedName("category") CATEGORY,
+    @SerializedName("category") TRANSACTION_CATEGORY,
 
     /** Based on merchant */
     @SerializedName("merchant") MERCHANT;

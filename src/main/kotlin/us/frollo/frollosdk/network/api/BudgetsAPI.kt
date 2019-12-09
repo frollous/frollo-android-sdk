@@ -35,7 +35,7 @@ internal interface BudgetsAPI {
         const val URL_BUDGETS = "budgets"
         const val URL_BUDGET = "$URL_BUDGETS/{budget_id}"
 
-        // Goal Period URLs
+        // Budget Period URLs
         const val URL_BUDGET_PERIODS = "$URL_BUDGETS/{budget_id}/periods"
         const val URL_BUDGET_PERIOD = "$URL_BUDGETS/{budget_id}/periods/{period_id}"
     }

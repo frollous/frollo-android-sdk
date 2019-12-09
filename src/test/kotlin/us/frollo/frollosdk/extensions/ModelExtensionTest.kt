@@ -290,7 +290,7 @@ class ModelExtensionTest {
     @Test
     fun testSQLForBudgetIds() {
         var query = sqlForBudgetIds(true, BudgetType.TRANSACTION_CATEGORY)
-        assertEquals("SELECT budget_id  FROM budget WHERE is_current = 1 AND type = 'CATEGORY' ", query.sql)
+        assertEquals("SELECT budget_id  FROM budget WHERE is_current = 1 AND type = 'TRANSACTION_CATEGORY' ", query.sql)
 
         query = sqlForBudgetIds()
         assertEquals("SELECT budget_id  FROM budget", query.sql)

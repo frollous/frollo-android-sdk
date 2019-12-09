@@ -19,6 +19,10 @@ package us.frollo.frollosdk.model.api.aggregation.merchants
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 
+internal data class MerchantsResponse(
+    @SerializedName("data") val data: List<MerchantResponse>
+)
+
 internal data class MerchantResponse(
     @SerializedName("id") val merchantId: Long,
     @SerializedName("name") val name: String,

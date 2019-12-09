@@ -1789,7 +1789,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         aggregationAPI.fetchMerchantsByIDs(merchantIds).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleMerchantsResponse(response = resource.data, byIds = true, completion = completion)
+                    handleMerchantsResponse(response = resource.data?.data, byIds = true, completion = completion)
                 }
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshMerchantsByIDs", resource.error?.localizedDescription)
@@ -1808,7 +1808,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         aggregationAPI.fetchMerchants().enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
-                    handleMerchantsResponse(response = resource.data, completion = completion)
+                    handleMerchantsResponse(response = resource.data?.data, completion = completion)
                 }
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshMerchants", resource.error?.localizedDescription)

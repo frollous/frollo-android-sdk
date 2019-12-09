@@ -33,7 +33,10 @@ import us.frollo.frollosdk.extensions.changeDateFormat
 import us.frollo.frollosdk.extensions.dailyToWeekly
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchAccountBalanceReports
-import us.frollo.frollosdk.extensions.fetchTransactionReports
+import us.frollo.frollosdk.extensions.fetchBudgetCategoryReports
+import us.frollo.frollosdk.extensions.fetchMerchantReports
+import us.frollo.frollosdk.extensions.fetchTagReports
+import us.frollo.frollosdk.extensions.fetchTransactionCategoryReports
 import us.frollo.frollosdk.extensions.isValidFormat
 import us.frollo.frollosdk.extensions.sqlForExistingAccountBalanceReports
 import us.frollo.frollosdk.extensions.sqlForFetchingAccountBalanceReports
@@ -42,6 +45,7 @@ import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toReportAccountBalance
 import us.frollo.frollosdk.mapping.toReports
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
+import us.frollo.frollosdk.model.api.reports.ReportsResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.reports.Report
 import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalanceRelation
@@ -154,7 +158,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      * @param toDate End date in the format yyyy-MM-dd to fetch reports up to (inclusive). See [Report.DATE_FORMAT_PATTERN]
      * @param period Period that reports should be broken down by
      * @param categoryId Transaction category ID that reports should be filtered by. Leave blank to return all reports of that grouping (Optional)
-     * @param grouping Grouping that reports should be broken down into
+     * @param grouping Grouping that reports should be broken down into (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun fetchTransactionCategoryReports(
@@ -162,16 +166,22 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         toDate: String,
         period: TransactionReportPeriod,
         categoryId: Long? = null,
-        grouping: ReportGrouping = ReportGrouping.TRANSACTION_CATEGORY,
+        grouping: ReportGrouping? = null,
         completion: OnFrolloSDKCompletionListener<Resource<List<Report>>>
     ) {
-        fetchTransactionReports(
+        reportsAPI.fetchTransactionCategoryReports(
                 fromDate = fromDate,
                 toDate = toDate,
                 period = period,
                 grouping = grouping,
-                categoryId = categoryId,
-                completion = completion)
+                categoryId = categoryId).enqueue { resource ->
+
+            handleTransactionReports(
+                    resource = resource,
+                    period = period,
+                    grouping = grouping ?: ReportGrouping.TRANSACTION_CATEGORY, // Set default grouping only while sending back result to the app
+                    completion = completion)
+        }
     }
 
     /**
@@ -181,7 +191,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      * @param toDate End date in the format yyyy-MM-dd to fetch reports up to (inclusive). See [Report.DATE_FORMAT_PATTERN]
      * @param period Period that reports should be broken down by
      * @param merchantId Merchant ID that reports should be filtered by. Leave blank to return all reports of that grouping (Optional)
-     * @param grouping Grouping that reports should be broken down into
+     * @param grouping Grouping that reports should be broken down into (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun fetchMerchantReports(
@@ -189,16 +199,22 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         toDate: String,
         period: TransactionReportPeriod,
         merchantId: Long? = null,
-        grouping: ReportGrouping = ReportGrouping.MERCHANT,
+        grouping: ReportGrouping? = null,
         completion: OnFrolloSDKCompletionListener<Resource<List<Report>>>
     ) {
-        fetchTransactionReports(
+        reportsAPI.fetchMerchantReports(
                 fromDate = fromDate,
                 toDate = toDate,
                 period = period,
                 grouping = grouping,
-                merchantId = merchantId,
-                completion = completion)
+                merchantId = merchantId).enqueue { resource ->
+
+            handleTransactionReports(
+                    resource = resource,
+                    period = period,
+                    grouping = grouping ?: ReportGrouping.MERCHANT, // Set default grouping only while sending back result to the app
+                    completion = completion)
+        }
     }
 
     /**
@@ -208,7 +224,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      * @param toDate End date in the format yyyy-MM-dd to fetch reports up to (inclusive). See [Report.DATE_FORMAT_PATTERN]
      * @param period Period that reports should be broken down by
      * @param budgetCategory Budget Category to filter reports by. Leave blank to return all reports of that grouping (Optional)
-     * @param grouping Grouping that reports should be broken down into
+     * @param grouping Grouping that reports should be broken down into (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun fetchBudgetCategoryReports(
@@ -216,16 +232,22 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         toDate: String,
         period: TransactionReportPeriod,
         budgetCategory: BudgetCategory? = null,
-        grouping: ReportGrouping = ReportGrouping.BUDGET_CATEGORY,
+        grouping: ReportGrouping? = null,
         completion: OnFrolloSDKCompletionListener<Resource<List<Report>>>
     ) {
-        fetchTransactionReports(
+        reportsAPI.fetchBudgetCategoryReports(
                 fromDate = fromDate,
                 toDate = toDate,
                 period = period,
                 grouping = grouping,
-                budgetCategory = budgetCategory,
-                completion = completion)
+                budgetCategory = budgetCategory).enqueue { resource ->
+
+            handleTransactionReports(
+                    resource = resource,
+                    period = period,
+                    grouping = grouping ?: ReportGrouping.BUDGET_CATEGORY, // Set default grouping only while sending back result to the app
+                    completion = completion)
+        }
     }
 
     /**
@@ -235,7 +257,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      * @param toDate End date in the format yyyy-MM-dd to fetch reports up to (inclusive). See [Report.DATE_FORMAT_PATTERN]
      * @param period Period that reports should be broken down by
      * @param transactionTag Transaction tag that reports should be filtered by. Leave blank to return all reports of that grouping (Optional)
-     * @param grouping Grouping that reports should be broken down into
+     * @param grouping Grouping that reports should be broken down into (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun fetchTagReports(
@@ -243,41 +265,21 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         toDate: String,
         period: TransactionReportPeriod,
         transactionTag: String? = null,
-        grouping: ReportGrouping = ReportGrouping.TAG,
+        grouping: ReportGrouping? = null,
         completion: OnFrolloSDKCompletionListener<Resource<List<Report>>>
     ) {
-        fetchTransactionReports(
+        reportsAPI.fetchTagReports(
                 fromDate = fromDate,
                 toDate = toDate,
                 period = period,
                 grouping = grouping,
-                transactionTag = transactionTag,
-                completion = completion)
-    }
+                transactionTag = transactionTag).enqueue { resource ->
 
-    private fun fetchTransactionReports(
-        grouping: ReportGrouping,
-        period: TransactionReportPeriod,
-        fromDate: String,
-        toDate: String,
-        budgetCategory: BudgetCategory? = null,
-        transactionTag: String? = null,
-        categoryId: Long? = null,
-        merchantId: Long? = null,
-        completion: OnFrolloSDKCompletionListener<Resource<List<Report>>>
-    ) {
-        reportsAPI.fetchTransactionReports(grouping, period, fromDate, toDate, budgetCategory, transactionTag, categoryId, merchantId).enqueue { resource ->
-            when (resource.status) {
-                Resource.Status.ERROR -> {
-                    Log.e("$TAG#fetchTransactionReports", resource.error?.localizedDescription)
-                    completion.invoke(resource.map { null })
-                }
-                Resource.Status.SUCCESS -> {
-                    completion.invoke(resource.map { response ->
-                        response?.toReports(grouping, period)
-                    })
-                }
-            }
+            handleTransactionReports(
+                    resource = resource,
+                    period = period,
+                    grouping = grouping ?: ReportGrouping.TAG, // Set default grouping only while sending back result to the app
+                    completion = completion)
         }
     }
 
@@ -350,6 +352,25 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
             db.reportsAccountBalance().deleteMany(staleIds)
         } catch (e: Exception) {
             Log.e("$TAG#handleAccountBalanceReportsForDate", e.message)
+        }
+    }
+
+    private fun handleTransactionReports(
+        resource: Resource<ReportsResponse>,
+        period: TransactionReportPeriod,
+        grouping: ReportGrouping,
+        completion: OnFrolloSDKCompletionListener<Resource<List<Report>>>
+    ) {
+        when (resource.status) {
+            Resource.Status.ERROR -> {
+                Log.e("$TAG#fetchTransactionReports", resource.error?.localizedDescription)
+                completion.invoke(resource.map { null })
+            }
+            Resource.Status.SUCCESS -> {
+                completion.invoke(resource.map { response ->
+                    response?.toReports(grouping, period)
+                })
+            }
         }
     }
 

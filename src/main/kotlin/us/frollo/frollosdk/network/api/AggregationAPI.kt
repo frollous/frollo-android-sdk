@@ -29,6 +29,7 @@ import retrofit2.http.QueryMap
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
+import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantsResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountCreateRequest
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
@@ -140,14 +141,14 @@ internal interface AggregationAPI {
     // Merchant API
 
     @GET(URL_MERCHANTS)
-    fun fetchMerchants(): Call<List<MerchantResponse>>
+    fun fetchMerchants(): Call<MerchantsResponse>
 
     @GET(URL_MERCHANT)
     fun fetchMerchant(@Path("merchant_id") merchantId: Long): Call<MerchantResponse>
 
     // Query parameters: {merchant_ids}
     @GET(URL_MERCHANTS)
-    fun fetchMerchantsByIds(@QueryMap queryParams: Map<String, String>): Call<List<MerchantResponse>>
+    fun fetchMerchantsByIds(@QueryMap queryParams: Map<String, String>): Call<MerchantsResponse>
 
     // Tags
 

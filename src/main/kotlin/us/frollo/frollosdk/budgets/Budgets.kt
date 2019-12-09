@@ -35,6 +35,7 @@ import us.frollo.frollosdk.mapping.toBudget
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.model.api.budgets.BudgetCreateRequest
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
+import us.frollo.frollosdk.model.api.budgets.BudgetUpdateRequest
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
@@ -53,6 +54,30 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
     }
 
     private val budgetsAPI: BudgetsAPI = network.create(BudgetsAPI::class.java)
+
+    /**
+     * Fetch budget by ID from the cache
+     *
+     * @param budgetId Unique budget ID to fetch
+     *
+     * @return LiveData object of Resource<Budget> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchBudget(budgetId: Long): LiveData<Resource<Budget>> =
+            Transformations.map(db.budgets().load(budgetId)) { model ->
+                Resource.success(model)
+            }
+
+    /**
+     * Fetch budget by ID from the cache along with other associated data.
+     *
+     * @param budgetId Unique budget ID to fetch
+     *
+     * @return LiveData object of Resource<BudgetRelation> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchBudgetWithRelation(budgetId: Long): LiveData<Resource<BudgetRelation>> =
+            Transformations.map(db.budgets().loadWithRelation(budgetId)) { model ->
+                Resource.success(model)
+            }
 
     /**
      * Fetch budgets from the cache
@@ -107,6 +132,73 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
             }
         }
     }
+
+    /**
+     * Refresh a specific budget by ID from the host
+     *
+     * @param budgetId ID of the budget to fetch
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun refreshBudget(budgetId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        budgetsAPI.fetchBudget(budgetId).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshBudget", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleBudgetResponse(response = resource.data, completion = completion)
+                }
+            }
+        }
+    }
+
+    /**
+     * Update a budget on the host
+     *
+     * @param budget Updated budget data model
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun updateBudget(budget: Budget, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        val request = BudgetUpdateRequest(
+                periodAmount = budget.periodAmount,
+                imageUrl = budget.imageUrl,
+                metadata = budget.metadata ?: JsonObject())
+
+        budgetsAPI.updateBudget(budget.budgetId, request).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#updateBudget", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleBudgetResponse(response = resource.data, completion = completion)
+                }
+            }
+        }
+    }
+
+    /**
+     * Cancel a specific budget by ID from the host
+     *
+     * @param budgetId ID of the budget to be abandoned
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun deleteBudget(budgetId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        budgetsAPI.deleteBudget(budgetId).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("#deleteBudget", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    removeCachedBudgets(longArrayOf(budgetId))
+                    completion?.invoke(Result.success())
+                }
+            }
+        }
+    }
+
 
     /**
      * Advanced method to fetch budgets by SQL query from the cache
@@ -250,8 +342,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         imageUrl: String?,
         metadata: JsonObject?,
         completion: OnFrolloSDKCompletionListener<Resource<Budget>>? = null
-    ) =
-            createBudget(budgetFrequency,
+    ) = createBudget(budgetFrequency,
                     periodAmount, type,
                     merchantId.toString(),
                     startDate,
@@ -358,5 +449,17 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         if (budgetPeriodIds.isNotEmpty()) {
             db.budgetPeriods().deleteMany(budgetPeriodIds)
         }
+    }
+
+    private fun handleBudgetResponse(response: BudgetResponse?, completion: OnFrolloSDKCompletionListener<Result>?) {
+        response?.let {
+            doAsync {
+                val model = response.toBudget()
+
+                db.budgets().insert(model)
+
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
 }

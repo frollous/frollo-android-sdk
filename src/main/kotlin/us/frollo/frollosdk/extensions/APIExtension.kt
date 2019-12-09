@@ -209,3 +209,13 @@ internal fun BudgetsAPI.fetchBudgets(
     budgetType?.let { queryMap["category_type"] = it.toString() }
     return fetchBudgets(queryMap)
 }
+
+internal fun BudgetsAPI.fetchBudgetPeriods(
+        fromDate: String? = null,
+        toDate: String? = null
+): Call<List<BudgetResponse>> {
+    val queryMap = mutableMapOf<String, String>()
+    fromDate?.let { queryMap["from_date"] = it }
+    toDate?.let { queryMap["to_date"] = it }
+    return fetchBudgets(queryMap)
+}

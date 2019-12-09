@@ -584,8 +584,7 @@ class ReportsTest : BaseAndroidTest() {
         val fromDate = "2019-01-01"
         val toDate = "2019-12-31"
         val period = TransactionReportPeriod.MONTHLY
-        val grouping = ReportGrouping.MERCHANT
-        val requestPath = "${ReportsAPI.URL_REPORTS_MERCHANTS}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
+        val requestPath = "${ReportsAPI.URL_REPORTS_MERCHANTS}?period=$period&from_date=$fromDate&to_date=$toDate"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_merchant_monthly_2019_01_01_2019_12_31)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -616,6 +615,8 @@ class ReportsTest : BaseAndroidTest() {
             assertTrue(report.isIncome)
             assertNotNull(report.groups)
             assertEquals(22, report.groups.size)
+            assertEquals(ReportGrouping.MERCHANT, report.grouping)
+            assertEquals(period, report.period)
 
             // Check for group reports
             val groupReports = overallReports.filter { it.date == "2019-07-01" }[0].groups.sortedBy { it.linkedId }
@@ -628,6 +629,8 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(292L, groupReport.linkedId)
             assertEquals("SUSHI PTY. LTD.", groupReport.name)
             assertEquals(2, groupReport.transactionIds?.size)
+            assertEquals(ReportGrouping.MERCHANT, groupReport.grouping)
+            assertEquals(period, groupReport.period)
         }
 
         val request = mockServer.takeRequest()
@@ -645,8 +648,7 @@ class ReportsTest : BaseAndroidTest() {
         val fromDate = "2019-01-01"
         val toDate = "2019-12-31"
         val period = TransactionReportPeriod.MONTHLY
-        val grouping = ReportGrouping.BUDGET_CATEGORY
-        val requestPath = "${ReportsAPI.URL_REPORTS_BUDGET_CATEGORIES}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
+        val requestPath = "${ReportsAPI.URL_REPORTS_BUDGET_CATEGORIES}?period=$period&from_date=$fromDate&to_date=$toDate"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_budget_category_monthly_2019_01_01_2019_12_31)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -677,6 +679,8 @@ class ReportsTest : BaseAndroidTest() {
             assertTrue(report.isIncome)
             assertNotNull(report.groups)
             assertEquals(5, report.groups.size)
+            assertEquals(ReportGrouping.BUDGET_CATEGORY, report.grouping)
+            assertEquals(period, report.period)
 
             // Check for group reports
             val groupReports = overallReports.filter { it.date == "2019-07-01" }[0].groups.sortedBy { it.linkedId }
@@ -690,6 +694,8 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals("living", groupReport.name)
             assertEquals(28, groupReport.transactionIds?.size)
             assertEquals(BudgetCategory.LIVING, BudgetCategory.getById(groupReport.linkedId))
+            assertEquals(ReportGrouping.BUDGET_CATEGORY, groupReport.grouping)
+            assertEquals(period, groupReport.period)
         }
 
         val request = mockServer.takeRequest()
@@ -707,8 +713,7 @@ class ReportsTest : BaseAndroidTest() {
         val fromDate = "2019-01-01"
         val toDate = "2019-12-31"
         val period = TransactionReportPeriod.MONTHLY
-        val grouping = ReportGrouping.TRANSACTION_CATEGORY
-        val requestPath = "${ReportsAPI.URL_REPORTS_CATEGORIES}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
+        val requestPath = "${ReportsAPI.URL_REPORTS_CATEGORIES}?period=$period&from_date=$fromDate&to_date=$toDate"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_txn_category_monthly_2019_01_01_2019_12_31)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -739,6 +744,8 @@ class ReportsTest : BaseAndroidTest() {
             assertTrue(report.isIncome)
             assertNotNull(report.groups)
             assertEquals(15, report.groups.size)
+            assertEquals(ReportGrouping.TRANSACTION_CATEGORY, report.grouping)
+            assertEquals(period, report.period)
 
             // Check for group reports
             val groupReports = overallReports.filter { it.date == "2019-07-01" }[0].groups.sortedBy { it.linkedId }
@@ -751,6 +758,8 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(94L, groupReport.linkedId)
             assertEquals("Electronics/General Merchandise", groupReport.name)
             assertEquals(1, groupReport.transactionIds?.size)
+            assertEquals(ReportGrouping.TRANSACTION_CATEGORY, groupReport.grouping)
+            assertEquals(period, groupReport.period)
         }
 
         val request = mockServer.takeRequest()
@@ -768,8 +777,7 @@ class ReportsTest : BaseAndroidTest() {
         val fromDate = "2019-10-01"
         val toDate = "2019-12-31"
         val period = TransactionReportPeriod.DAILY
-        val grouping = ReportGrouping.TRANSACTION_CATEGORY
-        val requestPath = "${ReportsAPI.URL_REPORTS_CATEGORIES}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
+        val requestPath = "${ReportsAPI.URL_REPORTS_CATEGORIES}?period=$period&from_date=$fromDate&to_date=$toDate"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_txn_category_daily_2019_10_01_2019_12_31)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -800,6 +808,8 @@ class ReportsTest : BaseAndroidTest() {
             assertFalse(report.isIncome)
             assertNotNull(report.groups)
             assertEquals(2, report.groups.size)
+            assertEquals(ReportGrouping.TRANSACTION_CATEGORY, report.grouping)
+            assertEquals(period, report.period)
 
             // Check for group reports
             val groupReports = overallReports.filter { it.date == "2019-10-03" }[0].groups.sortedBy { it.linkedId }
@@ -812,6 +822,8 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(77L, groupReport.linkedId)
             assertEquals("Restaurants", groupReport.name)
             assertEquals(2, groupReport.transactionIds?.size)
+            assertEquals(ReportGrouping.TRANSACTION_CATEGORY, groupReport.grouping)
+            assertEquals(period, groupReport.period)
         }
 
         val request = mockServer.takeRequest()
@@ -829,8 +841,7 @@ class ReportsTest : BaseAndroidTest() {
         val fromDate = "2019-01-01"
         val toDate = "2019-12-31"
         val period = TransactionReportPeriod.WEEKLY
-        val grouping = ReportGrouping.TRANSACTION_CATEGORY
-        val requestPath = "${ReportsAPI.URL_REPORTS_CATEGORIES}?grouping=$grouping&period=$period&from_date=$fromDate&to_date=$toDate"
+        val requestPath = "${ReportsAPI.URL_REPORTS_CATEGORIES}?period=$period&from_date=$fromDate&to_date=$toDate"
 
         val body = readStringFromJson(app, R.raw.transaction_reports_txn_category_weekly_2019_01_01_2019_12_31)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -861,6 +872,8 @@ class ReportsTest : BaseAndroidTest() {
             assertFalse(report.isIncome)
             assertNotNull(report.groups)
             assertEquals(7, report.groups.size)
+            assertEquals(ReportGrouping.TRANSACTION_CATEGORY, report.grouping)
+            assertEquals(period, report.period)
 
             // Check for group reports
             val groupReports = overallReports.filter { it.date == "2019-06-11" }[0].groups.sortedBy { it.linkedId }
@@ -873,6 +886,8 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(84L, groupReport.linkedId)
             assertEquals("Salary/Regular Income", groupReport.name)
             assertEquals(1, groupReport.transactionIds?.size)
+            assertEquals(ReportGrouping.TRANSACTION_CATEGORY, groupReport.grouping)
+            assertEquals(period, groupReport.period)
         }
 
         val request = mockServer.takeRequest()

@@ -21,9 +21,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
-import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.model.coredata.reports.TransactionReportPeriod
 import us.frollo.frollosdk.model.testAccountBalanceReportResponseData
-import us.frollo.frollosdk.model.testTransactionHistoryReportResponseData
+import us.frollo.frollosdk.model.testGroupReportResponseData
+import us.frollo.frollosdk.model.testReportResponseData
+import us.frollo.frollosdk.model.testReportsResponseData
 
 class ReportsMappingTest {
 
@@ -39,27 +41,37 @@ class ReportsMappingTest {
     }
 
     @Test
-    fun testResponseToReportTransactionHistory() {
-        val response = testTransactionHistoryReportResponseData()
-        val model = response.data[0].toReportTransactionHistory(ReportGrouping.BUDGET_CATEGORY, period = ReportPeriod.MONTH, budgetCategory = BudgetCategory.SAVINGS)
-        assertEquals("2019-03", model.date)
-        assertNotNull(model.value)
-        assertNotNull(model.budget)
-        assertEquals(ReportGrouping.BUDGET_CATEGORY, model.grouping)
-        assertEquals(ReportPeriod.MONTH, model.period)
-        assertEquals(BudgetCategory.SAVINGS, model.filteredBudgetCategory)
+    fun testReportsResponseToReports() {
+        val response = testReportsResponseData()
+        val models = response.toReports(ReportGrouping.BUDGET_CATEGORY, period = TransactionReportPeriod.MONTHLY)
+        assertEquals(1, models.size)
+        assertEquals("2019-03-01", models[0].date)
+        assertEquals(1, models[0].groups.size)
+        assertEquals("2019-03-01", models[0].groups[0].date)
     }
 
     @Test
-    fun testResponseToReportGroupTransactionHistory() {
-        val response = testTransactionHistoryReportResponseData()
-        val model = response.data[0].groups[0].toReportGroupTransactionHistory(ReportGrouping.BUDGET_CATEGORY, period = ReportPeriod.MONTH, budgetCategory = BudgetCategory.SAVINGS, date = "2019-03", reportId = 1)
-        assertEquals("2019-03", model.date)
+    fun testReportResponseToReport() {
+        val response = testReportResponseData()
+        val model = response.toReport(ReportGrouping.BUDGET_CATEGORY, period = TransactionReportPeriod.MONTHLY)
+        assertEquals("2019-03-01", model.date)
         assertNotNull(model.value)
-        assertNotNull(model.budget)
+        assertNotNull(model.isIncome)
         assertEquals(ReportGrouping.BUDGET_CATEGORY, model.grouping)
-        assertEquals(ReportPeriod.MONTH, model.period)
-        assertEquals(BudgetCategory.SAVINGS, model.filteredBudgetCategory)
+        assertEquals(TransactionReportPeriod.MONTHLY, model.period)
+        assertEquals(1, model.groups.size)
+        assertEquals("2019-03-01", model.groups[0].date)
+    }
+
+    @Test
+    fun testGroupReportResponseToGroupReport() {
+        val response = testGroupReportResponseData()
+        val model = response.toGroupReport(ReportGrouping.BUDGET_CATEGORY, period = TransactionReportPeriod.MONTHLY, date = "2019-03-01")
+        assertEquals("2019-03-01", model.date)
+        assertNotNull(model.value)
+        assertNotNull(model.isIncome)
+        assertEquals(ReportGrouping.BUDGET_CATEGORY, model.grouping)
+        assertEquals(TransactionReportPeriod.MONTHLY, model.period)
         assertEquals(1L, model.linkedId)
         assertEquals("living", model.name)
         assertEquals(2, model.transactionIds?.size)

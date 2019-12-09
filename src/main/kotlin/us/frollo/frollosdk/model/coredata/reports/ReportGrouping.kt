@@ -24,17 +24,17 @@ import us.frollo.frollosdk.extensions.serializedName
  */
 enum class ReportGrouping {
 
-    /** Budget category */
-    @SerializedName("by_budget_category") BUDGET_CATEGORY,
+    /** Budget Category */
+    @SerializedName("budget_category") BUDGET_CATEGORY,
 
     /** Transaction Category */
-    @SerializedName("by_transaction_category") TRANSACTION_CATEGORY,
-
-    /** Transaction Category Parent Group */
-    @SerializedName("by_transaction_category_group") TRANSACTION_CATEGORY_GROUP,
+    @SerializedName("category") TRANSACTION_CATEGORY,
 
     /** Merchant */
-    @SerializedName("by_merchant") MERCHANT;
+    @SerializedName("merchant") MERCHANT,
+
+    /** User Tag */
+    @SerializedName("tag") TAG;
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

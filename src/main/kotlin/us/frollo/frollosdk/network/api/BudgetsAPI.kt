@@ -28,7 +28,6 @@ import us.frollo.frollosdk.model.api.budgets.BudgetCreateRequest
 import us.frollo.frollosdk.model.api.budgets.BudgetPeriodResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetUpdateRequest
-import us.frollo.frollosdk.model.api.goals.GoalResponse
 
 internal interface BudgetsAPI {
 
@@ -59,7 +58,7 @@ internal interface BudgetsAPI {
 
     // Budget Period API
     @GET(URL_BUDGET_PERIODS)
-    fun fetchBudgetPeriods(@Path("budget_id") budgetId: Long,@QueryMap queryParams: Map<String, String>): Call<List<BudgetPeriodResponse>>
+    fun fetchBudgetPeriods(@Path("budget_id") budgetId: Long, @QueryMap queryParams: Map<String, String>): Call<List<BudgetPeriodResponse>>
 
     @GET(URL_BUDGET_PERIOD)
     fun fetchBudgetPeriod(@Path("budget_id") budgetId: Long, @Path("period_id") periodId: Long): Call<BudgetPeriodResponse>

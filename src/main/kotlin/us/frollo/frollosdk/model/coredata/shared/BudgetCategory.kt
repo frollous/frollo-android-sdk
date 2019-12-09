@@ -19,23 +19,27 @@ package us.frollo.frollosdk.model.coredata.shared
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
-/** Indicates a budget type */
-enum class BudgetCategory {
+/**
+ * Indicates category of the budget
+ *
+ * @param budgetCategoryId Unique ID for the budget category in relation to that on the host
+ */
+enum class BudgetCategory(val budgetCategoryId: Long) {
 
     /** Income budget */
-    @SerializedName("income") INCOME,
+    @SerializedName("income") INCOME(0),
 
     /** Living budget */
-    @SerializedName("living") LIVING,
+    @SerializedName("living") LIVING(1),
 
     /** Lifestyle budget */
-    @SerializedName("lifestyle") LIFESTYLE,
+    @SerializedName("lifestyle") LIFESTYLE(2),
 
     /** Savings budget */
-    @SerializedName("goals") SAVINGS,
+    @SerializedName("goals") SAVINGS(3),
 
     /** One offs budget */
-    @SerializedName("one_off") ONE_OFF;
+    @SerializedName("one_off") ONE_OFF(4);
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
@@ -43,4 +47,15 @@ enum class BudgetCategory {
     // Try to get the annotation value if available instead of using plain .toString()
     // Fallback to super.toString() in case annotation is not present/available
             serializedName() ?: super.toString()
+
+    companion object {
+        /**
+         * Get instance of BudgetCategory from budget category ID
+         *
+         * @param budgetCategoryId Unique ID for the budget category in relation to that on the host
+         * @return Returns BudgetCategory or null if no match
+         */
+        fun getById(budgetCategoryId: Long): BudgetCategory? =
+                values().find { it.budgetCategoryId == budgetCategoryId }
+    }
 }

@@ -20,21 +20,33 @@ import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
 /**
- * Period - the time period the account balance report is broken down to
+ * Period - the time period the transaction report is broken down to
  */
-enum class ReportPeriod(
-    /** Date format to convert date from stored date string to user's current locale */
-    val dateFormatPattern: String
-) {
+enum class TransactionReportPeriod {
 
-    /** Days */
-    @SerializedName("by_day") DAY(ReportDateFormat.DAILY),
+    /** Annually */
+    @SerializedName("annually") ANNUALLY,
 
-    /** Months */
-    @SerializedName("by_month") MONTH(ReportDateFormat.MONTHLY),
+    /** Biannually - twice in a year */
+    @SerializedName("biannually") BIANNUALLY,
 
-    /** Weeks */
-    @SerializedName("by_week") WEEK(ReportDateFormat.WEEKLY);
+    /** Daily */
+    @SerializedName("daily") DAILY,
+
+    /** Fortnightly */
+    @SerializedName("fortnightly") FORTNIGHTLY,
+
+    /** Every four weeks */
+    @SerializedName("four_weekly") FOUR_WEEKLY,
+
+    /** Monthly */
+    @SerializedName("monthly") MONTHLY,
+
+    /** Quarterly */
+    @SerializedName("quarterly") QUARTERLY,
+
+    /** Weekly */
+    @SerializedName("weekly") WEEKLY;
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

@@ -26,7 +26,7 @@ enum class BudgetType {
     @SerializedName("budget_category") BUDGET_CATEGORY,
 
     /** Based on transaction category */
-    @SerializedName("category") CATEGORY,
+    @SerializedName("category") TRANSACTION_CATEGORY,
 
     /** Based on merchant */
     @SerializedName("merchant") MERCHANT;

@@ -21,6 +21,8 @@ import us.frollo.frollosdk.extensions.serializedName
 
 /**
  * Frollo API Error Codes
+ *
+ * @param rawValue Frollo API Error Code raw value from the host
  */
 enum class APIErrorCode(val rawValue: String) {
     // 400 Bad Request
@@ -85,6 +87,12 @@ enum class APIErrorCode(val rawValue: String) {
             serializedName() ?: super.toString()
 
     companion object {
+        /**
+         * Get instance of APIErrorCode from error code raw value
+         *
+         * @param errorCode Error Code raw value from the host
+         * @return Returns APIErrorCode  or null if no match
+         */
         fun fromRawValue(errorCode: String): APIErrorCode? {
             return values().find { it.rawValue == errorCode }
         }

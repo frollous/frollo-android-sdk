@@ -17,16 +17,14 @@
 package us.frollo.frollosdk.model
 
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
-import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
+import us.frollo.frollosdk.model.api.reports.ReportsResponse
+import us.frollo.frollosdk.model.api.reports.ReportsResponse.ReportResponse
+import us.frollo.frollosdk.model.api.reports.ReportsResponse.ReportResponse.GroupReportResponse
 import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalance
-import us.frollo.frollosdk.model.coredata.reports.ReportGroupTransactionHistory
-import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
-import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
-import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.testutils.randomBoolean
 import us.frollo.frollosdk.testutils.randomNumber
 import java.math.BigDecimal
-import kotlin.random.Random
 
 internal fun testAccountBalanceReportResponseData(): AccountBalanceReportResponse {
     val accounts = listOf(
@@ -43,22 +41,26 @@ internal fun testAccountBalanceReportResponseData(): AccountBalanceReportRespons
     return AccountBalanceReportResponse(data = data)
 }
 
-internal fun testTransactionHistoryReportResponseData(): TransactionHistoryReportResponse {
-    val groups = listOf(
-            TransactionHistoryReportResponse.Report.GroupReport(
-                    id = 1,
-                    name = "living",
-                    value = randomNumber().toBigDecimal(),
-                    budget = randomNumber().toBigDecimal(),
-                    transactionIds = listOf(1093435, 2959945)))
+internal fun testReportsResponseData(): ReportsResponse {
+    return ReportsResponse(listOf(testReportResponseData()))
+}
 
-    val data = listOf(TransactionHistoryReportResponse.Report(
-            date = "2019-03",
+internal fun testReportResponseData(): ReportResponse {
+    val groups = listOf(testGroupReportResponseData())
+    return ReportResponse(
+            date = "2019-03-01",
             value = randomNumber().toBigDecimal(),
-            budget = randomNumber().toBigDecimal(),
-            groups = groups))
+            income = randomBoolean(),
+            groups = groups)
+}
 
-    return TransactionHistoryReportResponse(data = data)
+internal fun testGroupReportResponseData(): GroupReportResponse {
+    return GroupReportResponse(
+            id = 1,
+            name = "living",
+            value = randomNumber().toBigDecimal(),
+            income = randomBoolean(),
+            transactionIds = listOf(1093435, 2959945))
 }
 
 internal fun testReportAccountBalanceData(
@@ -76,59 +78,6 @@ internal fun testReportAccountBalanceData(
             period = period)
 
     id?.let { report.reportId = it }
-
-    return report
-}
-
-internal fun testReportTransactionHistoryData(
-    date: String,
-    period: ReportPeriod,
-    grouping: ReportGrouping? = null,
-    budgetCategory: BudgetCategory? = null,
-    id: Long? = null,
-    value: BigDecimal? = null,
-    transactionTags: List<String>? = null
-): ReportTransactionHistory {
-    val report = ReportTransactionHistory(
-            date = date,
-            value = value ?: BigDecimal(34.67),
-            budget = BigDecimal(30.00),
-            period = period,
-            filteredBudgetCategory = budgetCategory,
-            transactionTags = transactionTags,
-            grouping = grouping ?: ReportGrouping.values()[Random.nextInt(ReportGrouping.values().size)])
-
-    id?.let { report.reportId = it }
-
-    return report
-}
-
-internal fun testReportGroupTransactionHistoryData(
-    date: String,
-    linkedId: Long,
-    linkedName: String,
-    period: ReportPeriod,
-    grouping: ReportGrouping? = null,
-    budgetCategory: BudgetCategory? = null,
-    id: Long? = null,
-    value: BigDecimal? = null,
-    transactionTags: List<String>? = null,
-    reportId: Long
-): ReportGroupTransactionHistory {
-    val report = ReportGroupTransactionHistory(
-            date = date,
-            linkedId = linkedId,
-            name = linkedName,
-            value = value ?: BigDecimal(34.67),
-            budget = BigDecimal(30.00),
-            transactionIds = null,
-            period = period,
-            filteredBudgetCategory = budgetCategory,
-            transactionTags = transactionTags,
-            grouping = grouping ?: ReportGrouping.values()[Random.nextInt(ReportGrouping.values().size)],
-            reportId = reportId)
-
-    id?.let { report.reportGroupId = it }
 
     return report
 }

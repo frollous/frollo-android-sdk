@@ -17,13 +17,15 @@
 package us.frollo.frollosdk.mapping
 
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
-import us.frollo.frollosdk.model.api.reports.TransactionHistoryReportResponse
+import us.frollo.frollosdk.model.api.reports.ReportsResponse
+import us.frollo.frollosdk.model.api.reports.ReportsResponse.ReportResponse
+import us.frollo.frollosdk.model.api.reports.ReportsResponse.ReportResponse.GroupReportResponse
+import us.frollo.frollosdk.model.coredata.reports.GroupReport
+import us.frollo.frollosdk.model.coredata.reports.Report
 import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalance
-import us.frollo.frollosdk.model.coredata.reports.ReportGroupTransactionHistory
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
-import us.frollo.frollosdk.model.coredata.reports.ReportTransactionHistory
-import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.model.coredata.reports.TransactionReportPeriod
 
 internal fun AccountBalanceReportResponse.Report.BalanceReport.toReportAccountBalance(date: String, period: ReportPeriod) =
         ReportAccountBalance(
@@ -33,26 +35,35 @@ internal fun AccountBalanceReportResponse.Report.BalanceReport.toReportAccountBa
                 currency = currency,
                 accountId = id)
 
-internal fun TransactionHistoryReportResponse.Report.toReportTransactionHistory(grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory? = null, tags: List<String>? = null) =
-        ReportTransactionHistory(
-                date = date,
-                value = value,
-                budget = budget,
-                period = period,
-                filteredBudgetCategory = budgetCategory,
-                transactionTags = tags,
-                grouping = grouping)
+internal fun ReportsResponse.toReports(grouping: ReportGrouping, period: TransactionReportPeriod): List<Report> {
+    val reports = mutableListOf<Report>()
+    this.data.forEach { reportResponse ->
+        reports.add(reportResponse.toReport(grouping, period))
+    }
+    return reports
+}
 
-internal fun TransactionHistoryReportResponse.Report.GroupReport.toReportGroupTransactionHistory(grouping: ReportGrouping, period: ReportPeriod, budgetCategory: BudgetCategory? = null, date: String, reportId: Long, tags: List<String>? = null) =
-        ReportGroupTransactionHistory(
+internal fun ReportResponse.toReport(grouping: ReportGrouping, period: TransactionReportPeriod): Report {
+    val groups = mutableListOf<GroupReport>()
+    this.groups.forEach { groupResponse ->
+        groups.add(groupResponse.toGroupReport(grouping, period, this.date))
+    }
+    return Report(
+            date = date,
+            isIncome = income,
+            value = value,
+            groups = groups,
+            grouping = grouping,
+            period = period)
+}
+
+internal fun GroupReportResponse.toGroupReport(grouping: ReportGrouping, period: TransactionReportPeriod, date: String): GroupReport =
+        GroupReport(
                 linkedId = id,
                 name = name,
+                isIncome = income,
                 value = value,
-                budget = budget,
                 transactionIds = transactionIds,
-                transactionTags = tags,
-                period = period,
-                date = date,
-                filteredBudgetCategory = budgetCategory,
                 grouping = grouping,
-                reportId = reportId)
+                period = period,
+                date = date)

@@ -21,7 +21,7 @@ import com.google.gson.annotations.SerializedName
 import java.math.BigDecimal
 
 internal data class BudgetUpdateRequest(
-    @SerializedName("period_amount") val periodAmount: BigDecimal,
+    @SerializedName("period_amount") val periodAmount: BigDecimal? = null,
     @SerializedName("image_url") val imageUrl: String? = null,
     @SerializedName("metadata") val metadata: JsonObject? = null
 )

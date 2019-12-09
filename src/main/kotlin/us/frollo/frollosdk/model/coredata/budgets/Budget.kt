@@ -42,7 +42,7 @@ data class Budget(
     @ColumnInfo(name = "is_current") val isCurrent: Boolean,
 
     /** Image URL for the Budget (Optional) */
-    @ColumnInfo(name = "image_url") val imageUrl: String?,
+    @ColumnInfo(name = "image_url") var imageUrl: String?,
 
     /** Tracking status of the user with the budget. Refer [BudgetTrackingStatus] */
     @ColumnInfo(name = "tracking_status")val trackingStatus: BudgetTrackingStatus,
@@ -63,7 +63,7 @@ data class Budget(
     @ColumnInfo(name = "current_amount") val currentAmount: BigDecimal,
 
     /** Amount allocated the Budget period */
-    @ColumnInfo(name = "period_amount") val periodAmount: BigDecimal,
+    @ColumnInfo(name = "period_amount") var periodAmount: BigDecimal,
 
     /** Start date of the Budget */
     @ColumnInfo(name = "start_date") val startDate: String?, // yyyy-MM-dd
@@ -78,7 +78,7 @@ data class Budget(
     @ColumnInfo(name = "periods_count") val periodsCount: Long,
 
     /** Metadata - custom JSON to be stored with the goal (Optional) */
-    @ColumnInfo(name = "metadata") val metadata: JsonObject?,
+    @ColumnInfo(name = "metadata") var metadata: JsonObject?,
 
     /** Current active budget period  */
     @Embedded(prefix = "c_period_") val currentPeriod: BudgetPeriod?

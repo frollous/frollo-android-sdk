@@ -17,16 +17,27 @@
 package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
+import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.QueryMap
 import us.frollo.frollosdk.model.api.budgets.BudgetCreateRequest
+import us.frollo.frollosdk.model.api.budgets.BudgetPeriodResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
+import us.frollo.frollosdk.model.api.budgets.BudgetUpdateRequest
 
 internal interface BudgetsAPI {
 
     companion object {
         const val URL_BUDGETS = "budgets"
+        const val URL_BUDGET = "$URL_BUDGETS/{budget_id}"
+
+        // Budget Period URLs
+        const val URL_BUDGET_PERIODS = "$URL_BUDGETS/{budget_id}/periods"
+        const val URL_BUDGET_PERIOD = "$URL_BUDGETS/{budget_id}/periods/{period_id}"
     }
 
     // Query parameters: {current, category_type}
@@ -35,4 +46,20 @@ internal interface BudgetsAPI {
 
     @POST(URL_BUDGETS)
     fun createBudget(budgetCreateRequest: BudgetCreateRequest): Call<BudgetResponse>
+
+    @GET(URL_BUDGET)
+    fun fetchBudget(@Path("budget_id") budgetId: Long): Call<BudgetResponse>
+
+    @PUT(URL_BUDGET)
+    fun updateBudget(@Path("budget_id") budgetId: Long, @Body request: BudgetUpdateRequest): Call<BudgetResponse>
+
+    @DELETE(URL_BUDGET)
+    fun deleteBudget(@Path("budget_id") budgetId: Long): Call<Void>
+
+    // Budget Period API
+    @GET(URL_BUDGET_PERIODS)
+    fun fetchBudgetPeriods(@Path("budget_id") budgetId: Long, @QueryMap queryParams: Map<String, String>): Call<List<BudgetPeriodResponse>>
+
+    @GET(URL_BUDGET_PERIOD)
+    fun fetchBudgetPeriod(@Path("budget_id") budgetId: Long, @Path("period_id") periodId: Long): Call<BudgetPeriodResponse>
 }

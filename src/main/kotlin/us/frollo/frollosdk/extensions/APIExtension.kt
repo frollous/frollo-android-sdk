@@ -23,6 +23,7 @@ import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.api.bills.BillPaymentResponse
+import us.frollo.frollosdk.model.api.budgets.BudgetPeriodResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.api.goals.GoalResponse
@@ -256,4 +257,15 @@ internal fun BudgetsAPI.fetchBudgets(
     current?.let { queryMap["current"] = it.toString() }
     budgetType?.let { queryMap["category_type"] = it.toString() }
     return fetchBudgets(queryMap)
+}
+
+internal fun BudgetsAPI.fetchBudgetPeriods(
+    budgetId: Long,
+    fromDate: String? = null,
+    toDate: String? = null
+): Call<List<BudgetPeriodResponse>> {
+    val queryMap = mutableMapOf<String, String>()
+    fromDate?.let { queryMap["from_date"] = it }
+    toDate?.let { queryMap["to_date"] = it }
+    return fetchBudgetPeriods(budgetId, queryMap)
 }

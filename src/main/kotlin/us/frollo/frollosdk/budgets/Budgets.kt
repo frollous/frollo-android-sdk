@@ -116,7 +116,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         status: BudgetStatus? = null,
         trackingStatus: BudgetTrackingStatus? = null
     ): LiveData<Resource<List<Budget>>> =
-            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.CATEGORY, categoryId.toString())
+            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.TRANSACTION_CATEGORY, categoryId.toString())
 
     /**
      * Fetch budgets from the cache
@@ -204,7 +204,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
             fetchBudgetsWithRelation(current, frequency, status, trackingStatus, BudgetType.BUDGET_CATEGORY, budgetCategory.toString())
 
     /**
-     * Fetch budgets with relation from the cache by Category
+     * Fetch budgets with relation from the cache by transaction category
      *
      * @param categoryId Filter budgets by specific merchant
      * @param current Filter budgets by currently active budgets (Optional)
@@ -222,7 +222,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         status: BudgetStatus? = null,
         trackingStatus: BudgetTrackingStatus? = null
     ): LiveData<Resource<List<BudgetRelation>>> =
-            fetchBudgetsWithRelation(current, frequency, status, trackingStatus, BudgetType.CATEGORY, categoryId.toString())
+            fetchBudgetsWithRelation(current, frequency, status, trackingStatus, BudgetType.TRANSACTION_CATEGORY, categoryId.toString())
 
     /**
      * Fetch budgets from the cache with associated data
@@ -318,7 +318,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
     ) = createBudget(budgetFrequency, periodAmount, BudgetType.BUDGET_CATEGORY, budgetCategory.toString(), startDate, imageUrl, metadata, completion)
 
     /**
-     * Create a new budget on the host by category
+     * Create a new budget on the host by transaction category
      *
      * @param budgetFrequency The frequency at which you want to split up this budget. Refer [BudgetFrequency]
      * @param periodAmount Amount allocated the Budget period
@@ -337,7 +337,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         imageUrl: String? = null,
         metadata: JsonObject? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
-    ) = createBudget(budgetFrequency, periodAmount, BudgetType.CATEGORY, categoryId.toString(), startDate, imageUrl, metadata, completion)
+    ) = createBudget(budgetFrequency, periodAmount, BudgetType.TRANSACTION_CATEGORY, categoryId.toString(), startDate, imageUrl, metadata, completion)
 
     /**
      * Create a new budget on the host by merchant

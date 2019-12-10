@@ -46,8 +46,9 @@ import us.frollo.frollosdk.network.api.GoalsAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
-import us.frollo.frollosdk.testutils.wait
 import java.math.BigDecimal
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class GoalsTest : BaseAndroidTest() {
 
@@ -118,6 +119,8 @@ class GoalsTest : BaseAndroidTest() {
     fun testRefreshGoalById() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         val goalId: Long = 3211
 
         val requestPath = "goals/$goalId"
@@ -143,12 +146,14 @@ class GoalsTest : BaseAndroidTest() {
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
             assertEquals(goalId, testObserver.value().data?.goalId)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -157,6 +162,8 @@ class GoalsTest : BaseAndroidTest() {
     fun testRefreshGoalByIdFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         goals.refreshGoal(goalId = 3211) { result ->
@@ -164,9 +171,11 @@ class GoalsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -174,6 +183,8 @@ class GoalsTest : BaseAndroidTest() {
     @Test
     fun testRefreshGoals() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.goals_valid)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -201,12 +212,14 @@ class GoalsTest : BaseAndroidTest() {
 
             metadata = testObserver.value().data?.get(1)?.metadata
             assertEquals("Holiday", metadata?.get("type")?.asString)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(GoalsAPI.URL_GOALS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -214,6 +227,8 @@ class GoalsTest : BaseAndroidTest() {
     @Test
     fun testRefreshGoalsFiltered() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val status = GoalStatus.CANCELLED
         val trackingStatus = GoalTrackingStatus.ON_TRACK
@@ -253,12 +268,14 @@ class GoalsTest : BaseAndroidTest() {
             val testObserver3 = goals.fetchGoals(status = status, trackingStatus = trackingStatus).test()
             testObserver3.awaitValue()
             assertEquals(2, testObserver3.value().data?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -267,6 +284,8 @@ class GoalsTest : BaseAndroidTest() {
     fun testRefreshGoalsFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         goals.refreshGoals { resource ->
@@ -274,9 +293,11 @@ class GoalsTest : BaseAndroidTest() {
             assertNotNull(resource.error)
             assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -284,6 +305,8 @@ class GoalsTest : BaseAndroidTest() {
     @Test
     fun testCreateGoalTargetAmount() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.goal_id_3211)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -320,12 +343,14 @@ class GoalsTest : BaseAndroidTest() {
             assertNotNull(testObserver.value().data)
             assertEquals(3211L, testObserver.value().data?.goalId)
             assertEquals(GoalTarget.AMOUNT, testObserver.value().data?.target)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(GoalsAPI.URL_GOALS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -333,6 +358,8 @@ class GoalsTest : BaseAndroidTest() {
     @Test
     fun testCreateGoalTargetDate() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.goal_id_3212)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -369,12 +396,14 @@ class GoalsTest : BaseAndroidTest() {
             assertNotNull(testObserver.value().data)
             assertEquals(3212L, testObserver.value().data?.goalId)
             assertEquals(GoalTarget.DATE, testObserver.value().data?.target)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(GoalsAPI.URL_GOALS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -382,6 +411,8 @@ class GoalsTest : BaseAndroidTest() {
     @Test
     fun testCreateGoalTargetOpenEnded() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.goal_id_3213)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -418,12 +449,14 @@ class GoalsTest : BaseAndroidTest() {
             assertNotNull(testObserver.value().data)
             assertEquals(3213L, testObserver.value().data?.goalId)
             assertEquals(GoalTarget.OPEN_ENDED, testObserver.value().data?.target)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(GoalsAPI.URL_GOALS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -431,6 +464,8 @@ class GoalsTest : BaseAndroidTest() {
     @Test
     fun testCreateGoalFailsIfLoggedOut() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         clearLoggedInPreferences()
 
@@ -452,9 +487,11 @@ class GoalsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -462,6 +499,8 @@ class GoalsTest : BaseAndroidTest() {
     @Test
     fun testCreateGoalInvalidDataFails() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         goals.createGoal(
                 name = "My test goal",
@@ -481,9 +520,11 @@ class GoalsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.API, (result.error as DataError).type)
             assertEquals(DataErrorSubType.INVALID_DATA, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -491,6 +532,8 @@ class GoalsTest : BaseAndroidTest() {
     @Test
     fun testUpdateGoal() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val goalId: Long = 3211
 
@@ -523,12 +566,14 @@ class GoalsTest : BaseAndroidTest() {
             assertNotNull(models)
             assertEquals(goalId, models?.goalId)
             assertEquals("Holiday Fund", models?.name)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -536,6 +581,8 @@ class GoalsTest : BaseAndroidTest() {
     @Test
     fun testUpdateGoalFailsIfLoggedOut() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         clearLoggedInPreferences()
 
@@ -545,9 +592,11 @@ class GoalsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -555,6 +604,8 @@ class GoalsTest : BaseAndroidTest() {
     @Test
     fun testDeleteGoal() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val goalId: Long = 3211
 
@@ -587,12 +638,14 @@ class GoalsTest : BaseAndroidTest() {
 
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -601,6 +654,8 @@ class GoalsTest : BaseAndroidTest() {
     fun testDeleteGoalFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         goals.deleteGoal(3211) { result ->
@@ -608,9 +663,11 @@ class GoalsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -711,6 +768,8 @@ class GoalsTest : BaseAndroidTest() {
     fun testRefreshGoalPeriods() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         val goalId: Long = 123
         val requestPath = "goals/$goalId/periods"
 
@@ -745,12 +804,14 @@ class GoalsTest : BaseAndroidTest() {
             assertEquals("2019-07-18", period?.startDate)
             assertEquals(BigDecimal("150"), period?.targetAmount)
             assertEquals(GoalTrackingStatus.BEHIND, period?.trackingStatus)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -759,6 +820,8 @@ class GoalsTest : BaseAndroidTest() {
     fun testRefreshGoalPeriodsFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         goals.refreshGoalPeriods(goalId = 123) { result ->
@@ -766,9 +829,11 @@ class GoalsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -776,6 +841,8 @@ class GoalsTest : BaseAndroidTest() {
     @Test
     fun testRefreshGoalPeriodById() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val goalId: Long = 123
         val goalPeriodId: Long = 897
@@ -802,12 +869,14 @@ class GoalsTest : BaseAndroidTest() {
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
             assertEquals(897L, testObserver.value().data?.goalPeriodId)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -816,6 +885,8 @@ class GoalsTest : BaseAndroidTest() {
     fun testRefreshGoalPeriodByIdFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         goals.refreshGoalPeriod(goalId = 123, goalPeriodId = 897) { result ->
@@ -823,9 +894,11 @@ class GoalsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -833,6 +906,8 @@ class GoalsTest : BaseAndroidTest() {
     @Test
     fun testGoalPeriodsLinkToGoals() {
         initSetup()
+
+        val signal = CountDownLatch(2)
 
         val goalId: Long = 3211
         val requestPath = "goals/$goalId/periods"
@@ -855,14 +930,18 @@ class GoalsTest : BaseAndroidTest() {
         goals.refreshGoals { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
+
+            signal.countDown()
         }
 
         goals.refreshGoalPeriods(goalId = goalId) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         val testObserver = goals.fetchGoalPeriodWithRelation(goalPeriodId = 9000).test()
 
@@ -878,6 +957,8 @@ class GoalsTest : BaseAndroidTest() {
     @Test
     fun testLinkingRemoveCachedCascade() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.goals_valid)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -937,9 +1018,11 @@ class GoalsTest : BaseAndroidTest() {
 
                 assertNull(value().data)
             }
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }

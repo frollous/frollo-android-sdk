@@ -46,8 +46,9 @@ import us.frollo.frollosdk.network.api.ReportsAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
-import us.frollo.frollosdk.testutils.wait
 import java.math.BigDecimal
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class ReportsTest : BaseAndroidTest() {
 
@@ -105,6 +106,8 @@ class ReportsTest : BaseAndroidTest() {
     fun testFetchingAccountBalanceReportsFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         reports.refreshAccountBalanceReports(period = ReportPeriod.DAY, fromDate = "2018-10-28", toDate = "2019-01-29") { result ->
@@ -112,9 +115,11 @@ class ReportsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -122,6 +127,8 @@ class ReportsTest : BaseAndroidTest() {
     @Test
     fun testFetchingAccountBalanceReportsByDay() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val fromDate = "2018-10-28"
         val toDate = "2019-01-29"
@@ -159,12 +166,14 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals("AUD", report?.report?.currency)
             assertEquals(period, report?.report?.period)
             assertEquals(BigDecimal("-1191.45"), report?.report?.value)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(5)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -172,6 +181,8 @@ class ReportsTest : BaseAndroidTest() {
     @Test
     fun testFetchingAccountBalanceReportsByMonth() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val fromDate = "2018-10-28"
         val toDate = "2019-01-29"
@@ -209,12 +220,14 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals("AUD", report?.report?.currency)
             assertEquals(period, report?.report?.period)
             assertEquals(BigDecimal("208.55"), report?.report?.value)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -222,6 +235,8 @@ class ReportsTest : BaseAndroidTest() {
     @Test
     fun testFetchingAccountBalanceReportsByWeek() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val fromDate = "2018-10-28"
         val toDate = "2019-01-29"
@@ -259,12 +274,14 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals("AUD", report?.report?.currency)
             assertEquals(period, report?.report?.period)
             assertEquals(BigDecimal("-1191.45"), report?.report?.value)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(5)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -272,6 +289,8 @@ class ReportsTest : BaseAndroidTest() {
     @Test
     fun testFetchingAccountBalanceReportsByAccountID() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val fromDate = "2018-10-28"
         val toDate = "2019-01-29"
@@ -310,12 +329,14 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals("AUD", report?.report?.currency)
             assertEquals(period, report?.report?.period)
             assertEquals(BigDecimal("-2641.45"), report?.report?.value)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -323,6 +344,8 @@ class ReportsTest : BaseAndroidTest() {
     @Test
     fun testFetchingAccountBalanceReportsByAccountType() {
         initSetup()
+
+        val signal1 = CountDownLatch(1)
 
         val fromDate = "2018-10-28"
         val toDate = "2019-01-29"
@@ -348,9 +371,13 @@ class ReportsTest : BaseAndroidTest() {
         aggregation.refreshAccounts { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal1.countDown()
         }
 
-        wait(3)
+        signal1.await(3, TimeUnit.SECONDS)
+
+        val signal2 = CountDownLatch(1)
 
         reports.refreshAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate, accountType = accountType) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
@@ -371,9 +398,11 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals("AUD", report?.report?.currency)
             assertEquals(period, report?.report?.period)
             assertEquals(BigDecimal("42000.00"), report?.report?.value)
+
+            signal2.countDown()
         }
 
-        wait(3)
+        signal2.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -381,6 +410,8 @@ class ReportsTest : BaseAndroidTest() {
     @Test
     fun testFetchingAccountBalanceReportsUpdatesExisting() {
         initSetup()
+
+        val signal1 = CountDownLatch(1)
 
         val oldFromDate = "2018-10-28"
         val oldToDate = "2018-11-29"
@@ -409,9 +440,13 @@ class ReportsTest : BaseAndroidTest() {
         reports.refreshAccountBalanceReports(period = period, fromDate = oldFromDate, toDate = oldToDate) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal1.countDown()
         }
 
-        wait(3)
+        signal1.await(3, TimeUnit.SECONDS)
+
+        val signal2 = CountDownLatch(1)
 
         var testObserver = reports.fetchAccountBalanceReports(period = period, fromDate = oldFromDate, toDate = oldToDate).test()
         testObserver.awaitValue()
@@ -440,9 +475,11 @@ class ReportsTest : BaseAndroidTest() {
         reports.refreshAccountBalanceReports(period = period, fromDate = newFromDate, toDate = newToDate) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal2.countDown()
         }
 
-        wait(3)
+        signal2.await(3, TimeUnit.SECONDS)
 
         testObserver = reports.fetchAccountBalanceReports(period = period, fromDate = oldFromDate, toDate = oldToDate).test()
         testObserver.awaitValue()
@@ -481,6 +518,8 @@ class ReportsTest : BaseAndroidTest() {
     fun testFetchingAccountBalanceReportsCommingling() {
         initSetup()
 
+        val signal = CountDownLatch(3)
+
         val fromDate = "2018-10-28"
         val toDate = "2019-01-29"
         val period1 = ReportPeriod.DAY
@@ -513,19 +552,25 @@ class ReportsTest : BaseAndroidTest() {
         reports.refreshAccountBalanceReports(period = period1, fromDate = fromDate, toDate = toDate) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
         reports.refreshAccountBalanceReports(period = period2, fromDate = fromDate, toDate = toDate) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
         reports.refreshAccountBalanceReports(period = period3, fromDate = fromDate, toDate = toDate) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
-        wait(5)
+        signal.await(5, TimeUnit.SECONDS)
 
         // Check for day reports
         var testObserver = reports.fetchAccountBalanceReports(period = period1, fromDate = fromDate, toDate = toDate).test()
@@ -581,6 +626,8 @@ class ReportsTest : BaseAndroidTest() {
     fun testFetchMerchantReports() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         val fromDate = "2019-01-01"
         val toDate = "2019-12-31"
         val period = TransactionReportPeriod.MONTHLY
@@ -631,12 +678,14 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(2, groupReport.transactionIds?.size)
             assertEquals(ReportGrouping.MERCHANT, groupReport.grouping)
             assertEquals(period, groupReport.period)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -644,6 +693,8 @@ class ReportsTest : BaseAndroidTest() {
     @Test
     fun testFetchBudgetCategoryReports() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val fromDate = "2019-01-01"
         val toDate = "2019-12-31"
@@ -696,12 +747,14 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(BudgetCategory.LIVING, BudgetCategory.getById(groupReport.linkedId))
             assertEquals(ReportGrouping.BUDGET_CATEGORY, groupReport.grouping)
             assertEquals(period, groupReport.period)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -709,6 +762,8 @@ class ReportsTest : BaseAndroidTest() {
     @Test
     fun testFetchTransactionCategoryReportsMonthly() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val fromDate = "2019-01-01"
         val toDate = "2019-12-31"
@@ -760,12 +815,14 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(1, groupReport.transactionIds?.size)
             assertEquals(ReportGrouping.TRANSACTION_CATEGORY, groupReport.grouping)
             assertEquals(period, groupReport.period)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -773,6 +830,8 @@ class ReportsTest : BaseAndroidTest() {
     @Test
     fun testFetchTransactionCategoryReportsDaily() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val fromDate = "2019-10-01"
         val toDate = "2019-12-31"
@@ -824,12 +883,14 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(2, groupReport.transactionIds?.size)
             assertEquals(ReportGrouping.TRANSACTION_CATEGORY, groupReport.grouping)
             assertEquals(period, groupReport.period)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -837,6 +898,8 @@ class ReportsTest : BaseAndroidTest() {
     @Test
     fun testFetchTransactionCategoryReportsWeekly() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val fromDate = "2019-01-01"
         val toDate = "2019-12-31"
@@ -888,12 +951,14 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(1, groupReport.transactionIds?.size)
             assertEquals(ReportGrouping.TRANSACTION_CATEGORY, groupReport.grouping)
             assertEquals(period, groupReport.period)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -912,6 +977,8 @@ class ReportsTest : BaseAndroidTest() {
     fun testFetchMerchantReportsFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         val fromDate = "2019-01-01"
@@ -923,9 +990,11 @@ class ReportsTest : BaseAndroidTest() {
             assertNotNull(resource.error)
             assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -933,6 +1002,8 @@ class ReportsTest : BaseAndroidTest() {
     @Test
     fun testFetchTransactionCategoryReportsFailsIfLoggedOut() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         clearLoggedInPreferences()
 
@@ -945,9 +1016,11 @@ class ReportsTest : BaseAndroidTest() {
             assertNotNull(resource.error)
             assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -955,6 +1028,8 @@ class ReportsTest : BaseAndroidTest() {
     @Test
     fun testFetchBudgetCategoryReportsFailsIfLoggedOut() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         clearLoggedInPreferences()
 
@@ -967,9 +1042,11 @@ class ReportsTest : BaseAndroidTest() {
             assertNotNull(resource.error)
             assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -977,6 +1054,8 @@ class ReportsTest : BaseAndroidTest() {
     @Test
     fun testFetchTagReportsFailsIfLoggedOut() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         clearLoggedInPreferences()
 
@@ -989,9 +1068,11 @@ class ReportsTest : BaseAndroidTest() {
             assertNotNull(resource.error)
             assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }

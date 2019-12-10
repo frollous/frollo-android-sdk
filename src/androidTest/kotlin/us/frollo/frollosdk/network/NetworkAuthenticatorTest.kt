@@ -35,7 +35,8 @@ import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
-import us.frollo.frollosdk.testutils.wait
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class NetworkAuthenticatorTest : BaseAndroidTest() {
 
@@ -50,6 +51,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
     @Test
     fun testPreemptiveAccessTokenRefresh() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -86,9 +89,11 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
             assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
             assertEquals(2550794799, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -96,6 +101,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
     @Test
     fun testInvalidAccessTokenRefresh() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockServer.setDispatcher(object : Dispatcher() {
             var failedOnce = false
@@ -141,9 +148,11 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
             assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
             assertEquals(2550794799, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -151,6 +160,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
     @Test
     fun testRequestsGetCancelledAfterMultipleInvalidAccessTokenFromServer() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -189,9 +200,11 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
 
             // Retries is not reset
             assertEquals(6, network.invalidTokenRetries)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -199,6 +212,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
     @Test
     fun testInvalidAccessTokenRetriesReset() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockServer.setDispatcher(object : Dispatcher() {
             var userRequestCount = 0
@@ -244,9 +259,11 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
 
             // Retries is reset
             assertEquals(0, network.invalidTokenRetries)
+
+            signal.countDown()
         }
 
-        wait(8)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -254,6 +271,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
     @Test
     fun testInvalidRefreshTokenFails() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -276,9 +295,11 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -286,6 +307,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
     @Test
     fun testRequestsGetRetriedAfterRefreshingAccessToken() {
         initSetup()
+
+        val signal = CountDownLatch(3)
 
         mockServer.setDispatcher(object : Dispatcher() {
             var userRequestCount = 0
@@ -327,6 +350,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             assertNull(resource.error)
 
             assertNotNull(resource.data)
+
+            signal.countDown()
         }
 
         userAPI.fetchUser().enqueue { resource ->
@@ -334,6 +359,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             assertNull(resource.error)
 
             assertNotNull(resource.data)
+
+            signal.countDown()
         }
 
         userAPI.fetchUser().enqueue { resource ->
@@ -341,9 +368,11 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             assertNull(resource.error)
 
             assertNotNull(resource.data)
+
+            signal.countDown()
         }
 
-        wait(8)
+        signal.await(3, TimeUnit.SECONDS)
 
         assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
         assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
@@ -355,6 +384,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
     @Test
     fun testRequestsGetCancelledAfterRefreshingAccessTokenFails() {
         initSetup()
+
+        val signal = CountDownLatch(3)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -389,19 +420,25 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
         userAPI.fetchUser().enqueue { resource ->
             assertEquals(Resource.Status.ERROR, resource.status)
             assertNotNull(resource.error)
+
+            signal.countDown()
         }
 
         userAPI.fetchUser().enqueue { resource ->
             assertEquals(Resource.Status.ERROR, resource.status)
             assertNotNull(resource.error)
+
+            signal.countDown()
         }
 
-        wait(8)
+        signal.await(8, TimeUnit.SECONDS)
 
         tearDown()
     }

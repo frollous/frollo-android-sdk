@@ -66,6 +66,8 @@ import us.frollo.frollosdk.testutils.randomUUID
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class AggregationTest : BaseAndroidTest() {
 
@@ -168,6 +170,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshProviders() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         val body = readStringFromJson(app, R.raw.providers_valid)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -189,12 +193,14 @@ class AggregationTest : BaseAndroidTest() {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(311, models?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(AggregationAPI.URL_PROVIDERS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -203,6 +209,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshProvidersFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.refreshProviders { result ->
@@ -210,9 +218,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -220,6 +230,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testRefreshProviderByID() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.provider_id_12345)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -242,12 +254,14 @@ class AggregationTest : BaseAndroidTest() {
             val model = testObserver.value().data
             assertNotNull(model)
             assertEquals(12345L, model?.providerId)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/providers/12345", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -256,6 +270,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshProviderByIdFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.refreshProvider(12345L) { result ->
@@ -263,9 +279,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -416,6 +434,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshProviderAccounts() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         val body = readStringFromJson(app, R.raw.provider_accounts_valid)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -437,12 +457,14 @@ class AggregationTest : BaseAndroidTest() {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(4, models?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(AggregationAPI.URL_PROVIDER_ACCOUNTS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -450,6 +472,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testSyncProviderAccounts() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val refreshBody = readStringFromJson(app, R.raw.provider_accounts_valid)
         val syncBody = readStringFromJson(app, R.raw.provider_accounts_valid_sync)
@@ -480,10 +504,12 @@ class AggregationTest : BaseAndroidTest() {
                 assertEquals(4, models?.size)
                 assertEquals(AccountRefreshStatus.FAILED, models?.get(0)?.refreshStatus?.status)
                 assertEquals(AccountRefreshStatus.UPDATING, models?.get(1)?.refreshStatus?.status)
+
+                signal.countDown()
             }
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -492,6 +518,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshProviderAccountsByIdFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.refreshProviderAccounts { result ->
@@ -499,9 +527,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -509,6 +539,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testRefreshProviderAccountByID() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.provider_account_id_123)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -531,12 +563,14 @@ class AggregationTest : BaseAndroidTest() {
             val model = testObserver.value().data
             assertNotNull(model)
             assertEquals(123L, model?.providerAccountId)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/provideraccounts/123", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -545,6 +579,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshProviderAccountByIdFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.refreshProviderAccount(123L) { result ->
@@ -552,9 +588,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -562,6 +600,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testCreateProviderAccount() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.provider_account_id_123)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -586,12 +626,14 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(models)
             assertEquals(1, models?.size)
             assertEquals(123L, models?.get(0)?.providerAccountId)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(AggregationAPI.URL_PROVIDER_ACCOUNTS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -600,6 +642,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testCreateProviderAccountFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.createProviderAccount(providerId = 4078, loginForm = loginFormFilledData()) { resource ->
@@ -607,9 +651,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(resource.error)
             assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -617,6 +663,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testDeleteProviderAccount() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -635,18 +683,18 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            wait(1)
-
             val testObserver = aggregation.fetchProviderAccount(12345).test()
             testObserver.awaitValue()
             val model = testObserver.value().data
             assertNull(model)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/provideraccounts/12345", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -655,6 +703,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testDeleteProviderAccountFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.deleteProviderAccount(12345) { result ->
@@ -662,9 +712,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -672,6 +724,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testUpdateProviderAccount() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.provider_account_id_123)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -695,12 +749,14 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(models)
             assertEquals(1, models?.size)
             assertEquals(123L, models?.get(0)?.providerAccountId)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/provideraccounts/123", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -709,6 +765,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testUpdateProviderAccountFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.updateProviderAccount(loginForm = loginFormFilledData(), providerAccountId = 123) { result ->
@@ -716,9 +774,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -753,7 +813,7 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals(4, models?.size)
         }
 
-        wait(3)
+        wait(1)
 
         val testObserver2 = aggregation.fetchProviders().test()
         testObserver2.awaitValue()
@@ -914,6 +974,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshAccounts() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         val body = readStringFromJson(app, R.raw.accounts_valid)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -935,12 +997,14 @@ class AggregationTest : BaseAndroidTest() {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(8, models?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(AggregationAPI.URL_ACCOUNTS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -949,6 +1013,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshAccountsFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.refreshAccounts { result ->
@@ -956,9 +1022,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -966,6 +1034,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testRefreshAccountByID() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.account_id_542)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -988,12 +1058,14 @@ class AggregationTest : BaseAndroidTest() {
             val model = testObserver.value().data
             assertNotNull(model)
             assertEquals(542L, model?.accountId)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/accounts/542", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1002,6 +1074,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshAccountByIdFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.refreshAccount(542) { result ->
@@ -1009,9 +1083,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1019,6 +1095,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testUpdateAccountValid() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.account_id_542)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -1050,12 +1128,14 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals(1, models?.size)
             assertEquals(542L, models?.get(0)?.accountId)
             assertEquals(867L, models?.get(0)?.providerAccountId)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/accounts/542", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1063,6 +1143,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testUpdateAccountFailsIfLoggedOut() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         clearLoggedInPreferences()
 
@@ -1077,9 +1159,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1087,6 +1171,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testUpdateAccountInvalid() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.account_id_542)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -1113,9 +1199,11 @@ class AggregationTest : BaseAndroidTest() {
             assertTrue(result.error is DataError)
             assertEquals(DataErrorType.API, (result.error as DataError).type)
             assertEquals(DataErrorSubType.INVALID_DATA, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1451,6 +1539,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshTransactions() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         val body = readStringFromJson(app, R.raw.transactions_2018_08_01_valid)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -1472,12 +1562,14 @@ class AggregationTest : BaseAndroidTest() {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(111, models?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("${AggregationAPI.URL_TRANSACTIONS}?from_date=2018-06-01&to_date=2018-08-08&skip=0&count=200", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1486,6 +1578,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshTransactionsFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.refreshTransactions(fromDate = "2018-06-01", toDate = "2018-08-08") { result ->
@@ -1493,9 +1587,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1503,6 +1599,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testRefreshPaginatedTransactions() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -1528,9 +1626,11 @@ class AggregationTest : BaseAndroidTest() {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(311, models?.size)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1538,6 +1638,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testRefreshTransactionByID() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.transaction_id_194630)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -1560,12 +1662,14 @@ class AggregationTest : BaseAndroidTest() {
             val model = testObserver.value().data
             assertNotNull(model)
             assertEquals(194630L, model?.transactionId)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/transactions/194630", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1574,6 +1678,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshTransactionByIdFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.refreshTransaction(194630L) { result ->
@@ -1581,9 +1687,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1591,6 +1699,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testRefreshTransactionsByIds() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.transactions_2018_08_01_valid)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -1613,12 +1723,14 @@ class AggregationTest : BaseAndroidTest() {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(111, models?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("${AggregationAPI.URL_TRANSACTIONS}?transaction_ids=1%2C2%2C3%2C4%2C5", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1627,6 +1739,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshTransactionByIdsFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.refreshTransactions(longArrayOf(1, 2, 3, 4, 5)) { result ->
@@ -1634,9 +1748,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1644,6 +1760,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testExcludeTransaction() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.transaction_id_194630_excluded)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -1671,12 +1789,14 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals(1, models?.size)
             assertEquals(194630L, models?.get(0)?.transactionId)
             assertTrue(models?.get(0)?.included == false)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/transactions/194630", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1684,6 +1804,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testExcludeTransactionFailsIfLoggedOut() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         clearLoggedInPreferences()
 
@@ -1695,9 +1817,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1705,6 +1829,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testRecategoriseTransaction() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.transaction_id_194630)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -1732,12 +1858,14 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals(1, models?.size)
             assertEquals(194630L, models?.get(0)?.transactionId)
             assertEquals(77L, models?.get(0)?.categoryId)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/transactions/194630", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1745,6 +1873,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testRecategoriseTransactionFailsIfLoggedOut() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         clearLoggedInPreferences()
 
@@ -1756,9 +1886,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1766,6 +1898,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testUpdateTransaction() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.transaction_id_194630)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -1792,12 +1926,14 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals(1, models?.size)
             assertEquals(194630L, models?.get(0)?.transactionId)
             assertEquals(939L, models?.get(0)?.accountId)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/transactions/194630", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1806,6 +1942,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testUpdateTransactionFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.updateTransaction(194630, testTransactionResponseData().toTransaction()) { result ->
@@ -1813,9 +1951,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1823,6 +1963,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testTransactionSearch() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val searchTerm = "Travel"
         val requestPath = "${AggregationAPI.URL_TRANSACTIONS_SEARCH}?search_term=$searchTerm&skip=0&count=200"
@@ -1851,12 +1993,14 @@ class AggregationTest : BaseAndroidTest() {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(111, models?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1865,6 +2009,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testTransactionSearchFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.transactionSearch(searchTerm = "Travel") { result ->
@@ -1872,9 +2018,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1882,6 +2030,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testSearchPaginatedTransactions() {
         initSetup()
+
+        val signal1 = CountDownLatch(1)
 
         val searchTerm = "Travel"
         val requestPath1 = "${AggregationAPI.URL_TRANSACTIONS_SEARCH}?search_term=$searchTerm&from_date=2018-08-01&to_date=2018-08-31&skip=0&count=200"
@@ -1915,9 +2065,13 @@ class AggregationTest : BaseAndroidTest() {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(200, models?.size)
+
+            signal1.countDown()
         }
 
-        wait(3)
+        signal1.await(3, TimeUnit.SECONDS)
+
+        val signal2 = CountDownLatch(1)
 
         aggregation.transactionSearch(searchTerm = searchTerm, page = 1, fromDate = "2018-08-01", toDate = "2018-08-31") { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
@@ -1932,9 +2086,11 @@ class AggregationTest : BaseAndroidTest() {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(111, models?.size)
+
+            signal2.countDown()
         }
 
-        wait(3)
+        signal2.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -1969,7 +2125,7 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals(111, models?.size)
         }
 
-        wait(3)
+        wait(1)
 
         val testObserver2 = aggregation.fetchMerchants().test()
         testObserver2.awaitValue()
@@ -1986,6 +2142,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testFetchTransactionsSummary() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.transactions_summary_valid)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -2006,12 +2164,14 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(resource.data)
             assertEquals(166L, resource.data?.count)
             assertEquals((-1039.0).toBigDecimal(), resource.data?.sum)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?from_date=2018-06-01&to_date=2018-08-08", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2020,6 +2180,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testFetchTransactionsSummaryFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.fetchTransactionsSummary(fromDate = "2018-06-01", toDate = "2018-08-08") { result ->
@@ -2027,9 +2189,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2037,6 +2201,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testFetchTransactionsSummaryByIDs() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.transactions_summary_valid)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -2057,12 +2223,14 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(resource.data)
             assertEquals(166L, resource.data?.count)
             assertEquals((-1039.0).toBigDecimal(), resource.data?.sum)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?transaction_ids=1%2C2%2C3%2C4%2C5", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2071,6 +2239,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testFetchTransactionsSummaryByIDsFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.fetchTransactionsSummary(transactionIds = longArrayOf(1, 2, 3, 4, 5)) { result ->
@@ -2078,9 +2248,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2090,6 +2262,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testFetchTagsForTransaction() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.transaction_update_tag)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -2109,12 +2283,14 @@ class AggregationTest : BaseAndroidTest() {
 
             assertNotNull(resource.data)
             assertEquals(4, resource.data?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("${AggregationAPI.URL_TRANSACTIONS}/12345/tags", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2123,6 +2299,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testFetchTagsForTransactionFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.fetchTagsForTransaction(transactionId = 12345) { resource ->
@@ -2130,9 +2308,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(resource.error)
             assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2140,6 +2320,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testAddTagsToTransaction() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -2169,12 +2351,14 @@ class AggregationTest : BaseAndroidTest() {
             val model = testObserver.value().data
             assertNotNull(model)
             assertEquals(5, model?.userTags?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("${AggregationAPI.URL_TRANSACTIONS}/12345/tags", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2183,6 +2367,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testAddTagsToTransactionFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.addTagsToTransaction(transactionId = 12345, tagApplyAllPairs = arrayOf(TagApplyAllPair("tag1", true))) { result ->
@@ -2190,9 +2376,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2201,14 +2389,18 @@ class AggregationTest : BaseAndroidTest() {
     fun testAddTagsToTransactionFailsIfEmptyTags() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         aggregation.addTagsToTransaction(transactionId = 12345, tagApplyAllPairs = arrayOf()) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.API, (result.error as DataError).type)
             assertEquals(DataErrorSubType.INVALID_DATA, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2216,6 +2408,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testRemoveTagsFromTransaction() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -2245,12 +2439,14 @@ class AggregationTest : BaseAndroidTest() {
             val model = testObserver.value().data
             assertNotNull(model)
             assertEquals(1, model?.userTags?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("${AggregationAPI.URL_TRANSACTIONS}/12345/tags", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2259,6 +2455,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRemoveTagsFromTransactionFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.removeTagsFromTransaction(transactionId = 12345, tagApplyAllPairs = arrayOf(TagApplyAllPair("tag1", true))) { result ->
@@ -2266,9 +2464,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2277,14 +2477,18 @@ class AggregationTest : BaseAndroidTest() {
     fun testRemoveTagsFromTransactionFailsIfEmptyTags() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         aggregation.removeTagsFromTransaction(transactionId = 12345, tagApplyAllPairs = arrayOf()) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.API, (result.error as DataError).type)
             assertEquals(DataErrorSubType.INVALID_DATA, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2304,9 +2508,6 @@ class AggregationTest : BaseAndroidTest() {
         testObserver.awaitValue()
         val list2 = testObserver.value().data!!
         assertEquals(3, list2.size)
-        tearDown()
-
-        wait(3)
 
         tearDown()
     }
@@ -2331,9 +2532,6 @@ class AggregationTest : BaseAndroidTest() {
         testObserver.awaitValue()
         val list2 = testObserver.value().data!!
         assertEquals(1, list2.size)
-        tearDown()
-
-        wait(3)
 
         tearDown()
     }
@@ -2341,6 +2539,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testRefreshTransactionUserTags() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.transactions_user_tags)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -2363,12 +2563,14 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(model)
             assertEquals("cafe", model?.get(0)?.name)
             assertEquals(model?.size, 5)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(AggregationAPI.URL_USER_TAGS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2377,6 +2579,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshTransactionUserTagsFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.refreshTransactionUserTags { result ->
@@ -2384,9 +2588,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2394,6 +2600,9 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testFetchSuggestedTransactionTags() {
         initSetup()
+
+        val signal = CountDownLatch(1)
+
         val body = readStringFromJson(app, R.raw.transactions_user_tags)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -2413,14 +2622,20 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(model)
             assertEquals("pub_lunch", model[0].name)
             assertEquals(model.size, 5)
+
+            signal.countDown()
         }
-        wait(3)
+
+        signal.await(3, TimeUnit.SECONDS)
+
         tearDown()
     }
 
     @Test
     fun testFetchSuggestedTransactionTagsFailsIfLoggedOut() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         clearLoggedInPreferences()
 
@@ -2429,9 +2644,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2478,6 +2695,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshTransactionCategories() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         val body = readStringFromJson(app, R.raw.transaction_categories_valid)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -2499,12 +2718,14 @@ class AggregationTest : BaseAndroidTest() {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(63, models?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(AggregationAPI.URL_TRANSACTION_CATEGORIES, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2513,6 +2734,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshTransactionCategoriesFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.refreshTransactionCategories { result ->
@@ -2520,9 +2743,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2569,6 +2794,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshMerchants() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         val body = readStringFromJson(app, R.raw.merchants_valid)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -2590,20 +2817,23 @@ class AggregationTest : BaseAndroidTest() {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(1200, models?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(AggregationAPI.URL_MERCHANTS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
 
     @Test
     fun testRefreshCachedMerchants() {
-
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val data1 = testMerchantResponseData(merchantId = 238)
         val data2 = testMerchantResponseData(merchantId = 686)
@@ -2636,9 +2866,11 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals(686L, merchant?.merchantId)
             assertEquals("Rent", merchant?.name)
             assertEquals(MerchantType.RETAILER, merchant?.merchantType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2647,6 +2879,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshMerchantsFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.refreshMerchants { result ->
@@ -2654,9 +2888,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2664,6 +2900,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testRefreshMerchantByID() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.merchant_id_197)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -2686,12 +2924,14 @@ class AggregationTest : BaseAndroidTest() {
             val model = testObserver.value().data
             assertNotNull(model)
             assertEquals(197L, model?.merchantId)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("aggregation/merchants/197", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2700,6 +2940,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshMerchantByIDFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.refreshMerchant(197L) { result ->
@@ -2707,9 +2949,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2717,6 +2961,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testRefreshMerchantsByIds() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.merchants_by_id)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -2739,12 +2985,14 @@ class AggregationTest : BaseAndroidTest() {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(2, models?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("${AggregationAPI.URL_MERCHANTS}?merchant_ids=22%2C30%2C31%2C106%2C691", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2753,6 +3001,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshMerchantsByIdsFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         aggregation.refreshMerchants(longArrayOf(22, 30, 31, 106, 691)) { result ->
@@ -2760,9 +3010,11 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -2770,6 +3022,8 @@ class AggregationTest : BaseAndroidTest() {
     @Test
     fun testLinkingRemoveCachedCascade() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.providers_valid)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -2847,12 +3101,14 @@ class AggregationTest : BaseAndroidTest() {
             val testObserver13 = goals.fetchGoalPeriod(goalPeriodId = 1012).test()
             testObserver13.awaitValue()
             assertNull(testObserver13.value().data)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(AggregationAPI.URL_PROVIDERS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }

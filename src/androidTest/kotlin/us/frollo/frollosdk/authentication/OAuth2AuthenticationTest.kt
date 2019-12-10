@@ -45,7 +45,8 @@ import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.randomString
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
-import us.frollo.frollosdk.testutils.wait
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class OAuth2AuthenticationTest : BaseAndroidTest() {
 
@@ -66,6 +67,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
     fun testLoginUser() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
@@ -85,12 +88,14 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
             assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
             assertEquals(2550794799, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
         val request2 = mockTokenServer.takeRequest()
         assertEquals(TOKEN_URL, request2.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -98,6 +103,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
     @Test
     fun testInvalidLoginUser() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -124,12 +131,14 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1L, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
         val request = mockTokenServer.takeRequest()
         assertEquals(TOKEN_URL, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -137,6 +146,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
     @Test
     fun testLoginUserFailsIfLoggedIn() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -159,11 +170,13 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
 
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.ALREADY_LOGGED_IN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
         assertEquals(0, mockTokenServer.requestCount)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -181,6 +194,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
     @Test
     fun testHandleWebLoginResponse() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -204,12 +219,14 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
             assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
             assertEquals(2550794799, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
         val request2 = mockTokenServer.takeRequest()
         assertEquals(TOKEN_URL, request2.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -239,6 +256,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
     fun testLogoutUser() {
         initSetup()
 
+        val signal = CountDownLatch(2)
+
         var tokenRevoked = false
 
         preferences.loggedIn = true
@@ -250,6 +269,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == REVOKE_TOKEN_URL) {
                     tokenRevoked = true
+                    signal.countDown()
                     return MockResponse()
                             .setResponseCode(204)
                 }
@@ -257,9 +277,11 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             }
         })
 
-        oAuth2Authentication.logout()
+        oAuth2Authentication.logout {
+            signal.countDown()
+        }
 
-        wait(2)
+        signal.await(3, TimeUnit.SECONDS)
 
         assertFalse(oAuth2Authentication.loggedIn)
         assertNull(preferences.encryptedAccessToken)
@@ -273,6 +295,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
     @Test
     fun testUserLoggedOutOn401() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.error_suspended_device)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -302,9 +326,11 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -312,6 +338,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
     @Test
     fun testRefreshTokensFailsIfNoRefreshToken() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         preferences.loggedIn = true
         preferences.resetEncryptedRefreshToken()
@@ -336,9 +364,11 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             assertTrue(result.error is DataError)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_REFRESH_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(2)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -346,6 +376,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
     @Test
     fun testExchangeAuthorizationCode() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -366,12 +398,14 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
             assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
             assertEquals(2550794799, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
         val request2 = mockTokenServer.takeRequest()
         assertEquals(TOKEN_URL, request2.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -379,6 +413,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
     @Test
     fun testExchangeAuthorizationCodeInvalid() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -401,12 +437,14 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1L, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
         val request = mockTokenServer.takeRequest()
         assertEquals(TOKEN_URL, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -414,6 +452,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
     @Test
     fun testExchangeAuthorizationCodeFailsIfLoggedIn() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -434,11 +474,13 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
 
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.ALREADY_LOGGED_IN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
         assertEquals(0, mockTokenServer.requestCount)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -446,6 +488,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
     @Test
     fun testExchangeLegacyRefreshToken() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -468,12 +512,14 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             assertEquals("MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3", keystore.decrypt(preferences.encryptedAccessToken))
             assertEquals("IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk", keystore.decrypt(preferences.encryptedRefreshToken))
             assertEquals(2550794799, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
         val request2 = mockTokenServer.takeRequest()
         assertEquals(TOKEN_URL, request2.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -481,6 +527,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
     @Test
     fun testExchangeLegacyRefreshTokenFailure() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockTokenServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -505,12 +553,14 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1L, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
         val request2 = mockTokenServer.takeRequest()
         assertEquals(TOKEN_URL, request2.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }

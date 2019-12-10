@@ -40,7 +40,8 @@ import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
-import us.frollo.frollosdk.testutils.wait
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class BudgetsTest : BaseAndroidTest() {
 
@@ -86,6 +87,8 @@ class BudgetsTest : BaseAndroidTest() {
     fun testRefreshBudgetsFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         budgets.refreshBudgets { result ->
@@ -93,9 +96,11 @@ class BudgetsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -104,6 +109,8 @@ class BudgetsTest : BaseAndroidTest() {
     @Test
     fun testRefreshBudgets() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.budget_valid)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -122,10 +129,14 @@ class BudgetsTest : BaseAndroidTest() {
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
             assertEquals(1, testObserver.value().data?.size)
+
+            signal.countDown()
         }
 
-        mockServer.takeRequest()
-        wait(3)
+        val request = mockServer.takeRequest()
+        assertEquals(BudgetsAPI.URL_BUDGETS, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }

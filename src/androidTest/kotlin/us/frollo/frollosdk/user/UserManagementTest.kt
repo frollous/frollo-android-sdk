@@ -50,8 +50,9 @@ import us.frollo.frollosdk.testutils.randomString
 import us.frollo.frollosdk.testutils.randomUUID
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
-import us.frollo.frollosdk.testutils.wait
 import java.util.Date
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class UserManagementTest : BaseAndroidTest() {
 
@@ -66,14 +67,14 @@ class UserManagementTest : BaseAndroidTest() {
         assertNotNull(testObserver2.value().data)
         assertEquals(12345L, testObserver2.value().data?.userId)
 
-        wait(3)
-
         tearDown()
     }
 
     @Test
     fun testRegisterUser() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.user_details_complete)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -99,19 +100,20 @@ class UserManagementTest : BaseAndroidTest() {
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            // TODO: Some issue with below code. Need to debug.
-            // val testObserver = userManagement.fetchUser().test()
-            // testObserver.awaitValue()
-            // assertNotNull(testObserver.value().data)
+            val testObserver = userManagement.fetchUser().test()
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
 
-            // val expectedResponse = Gson().fromJson<UserResponse>(body)
-            // assertEquals(expectedResponse.toUser(), testObserver.value().data)
+            val expectedResponse = Gson().fromJson<UserResponse>(body)
+            assertEquals(expectedResponse?.toUser(), testObserver.value().data)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_REGISTER, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -119,6 +121,8 @@ class UserManagementTest : BaseAndroidTest() {
     @Test
     fun testRegisterUserInvalid() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -153,9 +157,11 @@ class UserManagementTest : BaseAndroidTest() {
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1L, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -163,6 +169,8 @@ class UserManagementTest : BaseAndroidTest() {
     @Test
     fun testRefreshUser() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
@@ -191,12 +199,14 @@ class UserManagementTest : BaseAndroidTest() {
 
             val expectedResponse = Gson().fromJson<UserResponse>(body)!!
             assertEquals(expectedResponse.toUser(), testObserver.value().data)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_USER_DETAILS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -204,6 +214,8 @@ class UserManagementTest : BaseAndroidTest() {
     @Test
     fun testUpdateUser() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
@@ -232,12 +244,14 @@ class UserManagementTest : BaseAndroidTest() {
 
             val expectedResponse = Gson().fromJson<UserResponse>(body)!!
             assertEquals(expectedResponse.toUser(), testObserver.value().data)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_USER_DETAILS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -245,6 +259,8 @@ class UserManagementTest : BaseAndroidTest() {
     @Test
     fun testUpdateUserFailsIfLoggedOut() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         clearLoggedInPreferences()
 
@@ -267,11 +283,13 @@ class UserManagementTest : BaseAndroidTest() {
 
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
         assertEquals(0, mockServer.requestCount)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -279,6 +297,8 @@ class UserManagementTest : BaseAndroidTest() {
     @Test
     fun testUpdateAttribution() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
@@ -307,12 +327,14 @@ class UserManagementTest : BaseAndroidTest() {
 
             val expectedResponse = Gson().fromJson<UserResponse>(body)!!
             assertEquals(expectedResponse.toUser(), testObserver.value().data)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_USER_DETAILS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -320,6 +342,8 @@ class UserManagementTest : BaseAndroidTest() {
     @Test
     fun testChangePassword() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
@@ -339,12 +363,14 @@ class UserManagementTest : BaseAndroidTest() {
         userManagement.changePassword(currentPassword = randomUUID(), newPassword = randomUUID()) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_CHANGE_PASSWORD, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -352,6 +378,8 @@ class UserManagementTest : BaseAndroidTest() {
     @Test
     fun testChangePasswordFailsIfTooShort() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
@@ -374,11 +402,13 @@ class UserManagementTest : BaseAndroidTest() {
 
             assertEquals(DataErrorType.API, (result.error as DataError).type)
             assertEquals(DataErrorSubType.PASSWORD_TOO_SHORT, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
         assertEquals(0, mockServer.requestCount)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -386,6 +416,8 @@ class UserManagementTest : BaseAndroidTest() {
     @Test
     fun testDeleteUser() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -410,12 +442,14 @@ class UserManagementTest : BaseAndroidTest() {
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_DELETE_USER, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -423,6 +457,8 @@ class UserManagementTest : BaseAndroidTest() {
     @Test
     fun testDeleteUserFailsIfLoggedOut() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         clearLoggedInPreferences()
 
@@ -444,11 +480,13 @@ class UserManagementTest : BaseAndroidTest() {
 
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
         assertEquals(0, mockServer.requestCount)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -456,6 +494,8 @@ class UserManagementTest : BaseAndroidTest() {
     @Test
     fun testResetPassword() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         preferences.loggedIn = true
 
@@ -472,12 +512,14 @@ class UserManagementTest : BaseAndroidTest() {
         userManagement.resetPassword(email = "user@frollo.us") { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_PASSWORD_RESET, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -485,6 +527,8 @@ class UserManagementTest : BaseAndroidTest() {
     @Test
     fun testUpdateDevice() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -504,12 +548,14 @@ class UserManagementTest : BaseAndroidTest() {
         userManagement.updateDevice(notificationToken = "SomeToken12345") { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(DeviceAPI.URL_DEVICE, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -517,6 +563,8 @@ class UserManagementTest : BaseAndroidTest() {
     @Test
     fun testUpdateDeviceCompliance() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -536,12 +584,14 @@ class UserManagementTest : BaseAndroidTest() {
         userManagement.updateDeviceCompliance(true) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(DeviceAPI.URL_DEVICE, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -568,6 +618,8 @@ class UserManagementTest : BaseAndroidTest() {
     fun testMigrateUser() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
@@ -591,12 +643,14 @@ class UserManagementTest : BaseAndroidTest() {
             assertNull(preferences.encryptedAccessToken)
             assertNull(preferences.encryptedRefreshToken)
             assertEquals(-1, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_MIGRATE_USER, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -604,6 +658,8 @@ class UserManagementTest : BaseAndroidTest() {
     @Test
     fun testMigrateUserFailsMigrationError() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         preferences.loggedIn = true
         preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
@@ -633,12 +689,14 @@ class UserManagementTest : BaseAndroidTest() {
             assertEquals("ExistingAccessToken", keystore.decrypt(preferences.encryptedAccessToken))
             assertEquals("ExistingRefreshToken", keystore.decrypt(preferences.encryptedRefreshToken))
             assertEquals(expiry, preferences.accessTokenExpiry)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_MIGRATE_USER, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -647,6 +705,8 @@ class UserManagementTest : BaseAndroidTest() {
     fun testMigrateUserFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         userManagement.migrateUser(password = randomUUID()) { result ->
@@ -654,11 +714,13 @@ class UserManagementTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_REFRESH_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
         assertEquals(0, mockServer.requestCount)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -666,6 +728,8 @@ class UserManagementTest : BaseAndroidTest() {
     @Test
     fun testMigrateUserFailsMissingRefreshToken() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         preferences.loggedIn = true
         preferences.resetEncryptedRefreshToken()
@@ -689,9 +753,11 @@ class UserManagementTest : BaseAndroidTest() {
 
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_REFRESH_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -699,6 +765,8 @@ class UserManagementTest : BaseAndroidTest() {
     @Test
     fun testMigrateUserFailsIfTooShort() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         preferences.loggedIn = true
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
@@ -712,9 +780,11 @@ class UserManagementTest : BaseAndroidTest() {
 
             assertEquals(DataErrorType.API, (result.error as DataError).type)
             assertEquals(DataErrorSubType.PASSWORD_TOO_SHORT, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }

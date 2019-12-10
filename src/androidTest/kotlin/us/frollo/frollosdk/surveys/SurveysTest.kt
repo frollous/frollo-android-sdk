@@ -38,7 +38,8 @@ import us.frollo.frollosdk.network.api.SurveysAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
-import us.frollo.frollosdk.testutils.wait
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class SurveysTest : BaseAndroidTest() {
 
@@ -54,6 +55,8 @@ class SurveysTest : BaseAndroidTest() {
     @Test
     fun testFetchSurvey() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val surveyKey = "FINANCIAL_WELLBEING"
 
@@ -83,12 +86,14 @@ class SurveysTest : BaseAndroidTest() {
             assertEquals(SurveyQuestionType.SLIDER, model?.questions?.get(0)?.type)
             assertEquals(1L, model?.questions?.get(0)?.id)
             assertEquals(1, model?.questions?.get(0)?.answers?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("user/surveys/$surveyKey", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -97,6 +102,8 @@ class SurveysTest : BaseAndroidTest() {
     fun testFetchSurveyFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         surveys.fetchSurvey(surveyKey = "FINANCIAL_WELLBEING") { result ->
@@ -104,9 +111,11 @@ class SurveysTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -114,6 +123,8 @@ class SurveysTest : BaseAndroidTest() {
     @Test
     fun testFetchLatestSurvey() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val surveyKey = "FINANCIAL_WELLBEING"
         val latest = true
@@ -141,12 +152,14 @@ class SurveysTest : BaseAndroidTest() {
             assertEquals(SurveyQuestionType.SLIDER, model?.questions?.get(0)?.type)
             assertEquals(1L, model?.questions?.get(0)?.id)
             assertEquals(1, model?.questions?.get(0)?.answers?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("user/surveys/$surveyKey?latest=$latest", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -154,6 +167,8 @@ class SurveysTest : BaseAndroidTest() {
     @Test
     fun testSubmitSurvey() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val testSurvey = testSurveyData()
 
@@ -182,12 +197,14 @@ class SurveysTest : BaseAndroidTest() {
             assertEquals(1, model?.questions?.get(0)?.answers?.size)
             assertEquals(1L, model?.questions?.get(0)?.answers?.get(0)?.id)
             assertEquals(SurveyAnswerType.SELECTION, model?.questions?.get(0)?.answers?.get(0)?.type)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(SurveysAPI.URL_SURVEYS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -196,6 +213,8 @@ class SurveysTest : BaseAndroidTest() {
     fun testSubmitSurveyFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         surveys.submitSurvey(survey = testSurveyData()) { result ->
@@ -203,9 +222,11 @@ class SurveysTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }

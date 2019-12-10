@@ -99,7 +99,7 @@ class NotificationsTest : BaseAndroidTest() {
 
         notifications.handlePushNotification(testMessageNotificationBundle())
 
-        wait(3)
+        wait(1)
 
         val request = mockServer.takeRequest()
         assertEquals("messages/12345", request.trimmedPath)

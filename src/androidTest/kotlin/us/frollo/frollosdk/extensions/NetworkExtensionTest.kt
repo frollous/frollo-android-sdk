@@ -35,7 +35,6 @@ import us.frollo.frollosdk.base.LiveDataCallAdapterFactory
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.TestAPI
 import us.frollo.frollosdk.testutils.readStringFromJson
-import us.frollo.frollosdk.testutils.wait
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
@@ -59,6 +58,8 @@ import us.frollo.frollosdk.testutils.trimmedPath
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.security.cert.CertPathValidatorException
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLException
 
 class NetworkExtensionTest {
@@ -104,6 +105,8 @@ class NetworkExtensionTest {
     fun testNetworkCallResponseSuccess() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TestAPI.URL_TEST) {
@@ -118,12 +121,14 @@ class NetworkExtensionTest {
         testAPI.testData().enqueue { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(TestAPI.URL_TEST, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -131,6 +136,8 @@ class NetworkExtensionTest {
     @Test
     fun testNetworkCallResponseFailure() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -148,12 +155,14 @@ class NetworkExtensionTest {
             assertNotNull(resource.error)
             assertTrue(resource.error is APIError)
             assertEquals(APIErrorType.OTHER_AUTHORISATION, (resource.error as APIError).type)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(TestAPI.URL_TEST, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -162,6 +171,8 @@ class NetworkExtensionTest {
     fun testNetworkCallFailure() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         mockServer.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.DISCONNECT_AFTER_REQUEST })
 
         testAPI.testData().enqueue { resource ->
@@ -169,9 +180,11 @@ class NetworkExtensionTest {
             assertNotNull(resource.error)
             assertTrue(resource.error is NetworkError)
             assertEquals(NetworkErrorType.CONNECTION_FAILURE, (resource.error as NetworkError).type)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }

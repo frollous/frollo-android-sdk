@@ -51,8 +51,9 @@ import us.frollo.frollosdk.network.api.BillsAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
-import us.frollo.frollosdk.testutils.wait
 import java.math.BigDecimal
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class BillsTest : BaseAndroidTest() {
 
@@ -171,6 +172,8 @@ class BillsTest : BaseAndroidTest() {
     fun testCreateBillWithTransaction() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         val body = readStringFromJson(app, R.raw.bill_id_12345)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -196,12 +199,14 @@ class BillsTest : BaseAndroidTest() {
             assertNotNull(models)
             assertEquals(12345L, models?.billId)
             assertEquals("Netflix", models?.name)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(BillsAPI.URL_BILLS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -209,6 +214,8 @@ class BillsTest : BaseAndroidTest() {
     @Test
     fun testCreateBillFailsIfLoggedOut() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         clearLoggedInPreferences()
 
@@ -219,9 +226,11 @@ class BillsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -229,6 +238,8 @@ class BillsTest : BaseAndroidTest() {
     @Test
     fun testCreateBillManually() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.bill_id_12345)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -255,12 +266,14 @@ class BillsTest : BaseAndroidTest() {
             assertNotNull(model)
             assertEquals(12345L, model?.billId)
             assertEquals("Netflix", model?.name)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(BillsAPI.URL_BILLS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -268,6 +281,8 @@ class BillsTest : BaseAndroidTest() {
     @Test
     fun testDeleteBill() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val billId: Long = 12345
 
@@ -300,12 +315,14 @@ class BillsTest : BaseAndroidTest() {
 
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -314,6 +331,8 @@ class BillsTest : BaseAndroidTest() {
     fun testDeleteBillFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         bills.deleteBill(12345) { result ->
@@ -321,9 +340,11 @@ class BillsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -331,6 +352,8 @@ class BillsTest : BaseAndroidTest() {
     @Test
     fun testRefreshBills() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.bills_valid)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -353,12 +376,14 @@ class BillsTest : BaseAndroidTest() {
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
             assertEquals(7, testObserver.value().data?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(BillsAPI.URL_BILLS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -367,6 +392,8 @@ class BillsTest : BaseAndroidTest() {
     fun testRefreshBillsFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         bills.refreshBills { result ->
@@ -374,9 +401,11 @@ class BillsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -384,6 +413,8 @@ class BillsTest : BaseAndroidTest() {
     @Test
     fun testRefreshBillById() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val billId: Long = 12345
 
@@ -412,12 +443,14 @@ class BillsTest : BaseAndroidTest() {
             assertNotNull(models)
             assertEquals(12345L, models?.billId)
             assertEquals("Netflix", models?.name)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -426,6 +459,8 @@ class BillsTest : BaseAndroidTest() {
     fun testRefreshBillByIdFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         bills.refreshBill(12345) { result ->
@@ -433,9 +468,11 @@ class BillsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -443,6 +480,8 @@ class BillsTest : BaseAndroidTest() {
     @Test
     fun testUpdateBill() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val billId: Long = 12345
 
@@ -475,12 +514,14 @@ class BillsTest : BaseAndroidTest() {
             assertNotNull(models)
             assertEquals(12345L, models?.billId)
             assertEquals("Netflix", models?.name)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -489,6 +530,8 @@ class BillsTest : BaseAndroidTest() {
     fun testUpdateBillByIdFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         bills.updateBill(testBillResponseData(billId = 12345).toBill()) { result ->
@@ -496,9 +539,11 @@ class BillsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -506,6 +551,8 @@ class BillsTest : BaseAndroidTest() {
     @Test
     fun testBillsLinkToAccounts() {
         initSetup()
+
+        val signal = CountDownLatch(2)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -525,14 +572,18 @@ class BillsTest : BaseAndroidTest() {
         aggregation.refreshAccounts { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
         bills.refreshBills { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         val testObserver = bills.fetchBillWithRelation(billId = 1249).test()
 
@@ -548,6 +599,8 @@ class BillsTest : BaseAndroidTest() {
     @Test
     fun testBillsLinkToMerchants() {
         initSetup()
+
+        val signal = CountDownLatch(2)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -567,14 +620,18 @@ class BillsTest : BaseAndroidTest() {
         aggregation.refreshMerchants { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
         bills.refreshBills { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         val testObserver = bills.fetchBillWithRelation(billId = 1249).test()
 
@@ -590,6 +647,8 @@ class BillsTest : BaseAndroidTest() {
     @Test
     fun testBillsLinkToTransactionCategories() {
         initSetup()
+
+        val signal = CountDownLatch(2)
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -609,14 +668,18 @@ class BillsTest : BaseAndroidTest() {
         aggregation.refreshTransactionCategories { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
         bills.refreshBills { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         val testObserver = bills.fetchBillWithRelation(billId = 1249).test()
 
@@ -797,6 +860,8 @@ class BillsTest : BaseAndroidTest() {
     fun testDeleteBillPayment() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         val billPaymentId: Long = 12345
 
         val requestPath = "bills/payments/$billPaymentId"
@@ -828,12 +893,14 @@ class BillsTest : BaseAndroidTest() {
 
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -842,6 +909,8 @@ class BillsTest : BaseAndroidTest() {
     fun testDeleteBillPaymentFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         bills.deleteBillPayment(12345) { result ->
@@ -849,9 +918,11 @@ class BillsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -859,6 +930,8 @@ class BillsTest : BaseAndroidTest() {
     @Test
     fun testRefreshBillPayments() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val fromDate = "2018-12-01"
         val toDate = "2021-12-02"
@@ -885,12 +958,14 @@ class BillsTest : BaseAndroidTest() {
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
             assertEquals(7, testObserver.value().data?.size)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -899,6 +974,8 @@ class BillsTest : BaseAndroidTest() {
     fun testRefreshBillPaymentsFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         bills.refreshBillPayments(fromDate = "2018-12-01", toDate = "2021-12-02") { result ->
@@ -906,9 +983,11 @@ class BillsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -916,6 +995,8 @@ class BillsTest : BaseAndroidTest() {
     @Test
     fun testUpdateBillPayment() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val billPaymentId: Long = 12345
 
@@ -948,12 +1029,14 @@ class BillsTest : BaseAndroidTest() {
             assertNotNull(models)
             assertEquals(12345L, models?.billPaymentId)
             assertEquals("Optus Internet", models?.name)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -962,6 +1045,8 @@ class BillsTest : BaseAndroidTest() {
     fun testUpdateBillPaymentFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         bills.updateBillPayment(billPaymentId = 12345, paid = true) { result ->
@@ -969,9 +1054,11 @@ class BillsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -979,6 +1066,8 @@ class BillsTest : BaseAndroidTest() {
     @Test
     fun testBillPaymentsLinkToBills() {
         initSetup()
+
+        val signal = CountDownLatch(2)
 
         val fromDate = "2018-12-01"
         val toDate = "2021-12-02"
@@ -1002,14 +1091,18 @@ class BillsTest : BaseAndroidTest() {
         bills.refreshBills { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
         bills.refreshBillPayments(fromDate = fromDate, toDate = toDate) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         val testObserver = bills.fetchBillPaymentWithRelation(billPaymentId = 7991).test()
 
@@ -1025,6 +1118,8 @@ class BillsTest : BaseAndroidTest() {
     @Test
     fun testLinkingRemoveCachedCascade() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.bills_valid)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -1084,9 +1179,11 @@ class BillsTest : BaseAndroidTest() {
 
                 assertNull(value().data)
             }
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }

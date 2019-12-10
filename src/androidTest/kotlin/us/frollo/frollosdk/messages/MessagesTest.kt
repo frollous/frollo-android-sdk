@@ -45,6 +45,8 @@ import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class MessagesTest : BaseAndroidTest() {
 
@@ -176,6 +178,8 @@ class MessagesTest : BaseAndroidTest() {
     fun testRefreshMessages() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         val body = readStringFromJson(app, R.raw.messages_valid)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -205,12 +209,14 @@ class MessagesTest : BaseAndroidTest() {
                     ContentType.TEXT -> assertTrue(message is MessageText)
                 }
             }
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(MessagesAPI.URL_MESSAGES, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -219,6 +225,8 @@ class MessagesTest : BaseAndroidTest() {
     fun testRefreshMessagesFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         messages.refreshMessages { result ->
@@ -226,9 +234,11 @@ class MessagesTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -236,6 +246,8 @@ class MessagesTest : BaseAndroidTest() {
     @Test
     fun testRefreshMessagesSkipsInvalid() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.messages_invalid)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -266,12 +278,14 @@ class MessagesTest : BaseAndroidTest() {
                     ContentType.TEXT -> assertTrue(message is MessageText)
                 }
             }
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(MessagesAPI.URL_MESSAGES, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -279,6 +293,8 @@ class MessagesTest : BaseAndroidTest() {
     @Test
     fun testRefreshMessageByID() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.message_id_12345)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -301,12 +317,14 @@ class MessagesTest : BaseAndroidTest() {
             val model = testObserver.value().data
             assertNotNull(model)
             assertEquals(12345L, model?.messageId)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("messages/12345", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -315,6 +333,8 @@ class MessagesTest : BaseAndroidTest() {
     fun testRefreshMessageByIDFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         messages.refreshMessage(12345L) { result ->
@@ -322,9 +342,11 @@ class MessagesTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -332,6 +354,8 @@ class MessagesTest : BaseAndroidTest() {
     @Test
     fun testRefreshUnreadMessages() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.messages_unread)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -365,12 +389,14 @@ class MessagesTest : BaseAndroidTest() {
             val metadata = models?.last()?.metadata
             assertEquals("holiday", metadata?.get("category")?.asString)
             assertEquals(true, metadata?.get("subcategory")?.asBoolean)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(MessagesAPI.URL_UNREAD, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -379,6 +405,8 @@ class MessagesTest : BaseAndroidTest() {
     fun testRefreshUnreadMessagesFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         messages.refreshUnreadMessages { result ->
@@ -386,9 +414,11 @@ class MessagesTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -396,6 +426,8 @@ class MessagesTest : BaseAndroidTest() {
     @Test
     fun testUpdateMessage() {
         initSetup()
+
+        val signal = CountDownLatch(1)
 
         val body = readStringFromJson(app, R.raw.message_id_12345)
         mockServer.setDispatcher(object : Dispatcher() {
@@ -418,12 +450,14 @@ class MessagesTest : BaseAndroidTest() {
             val model = testObserver.value().data
             assertNotNull(model)
             assertEquals(12345L, model?.messageId)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals("messages/12345", request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -432,6 +466,8 @@ class MessagesTest : BaseAndroidTest() {
     fun testUpdateMessageFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         messages.updateMessage(12345L, true, true) { result ->
@@ -439,9 +475,11 @@ class MessagesTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -464,7 +502,7 @@ class MessagesTest : BaseAndroidTest() {
 
         messages.handleMessageNotification(testMessageNotificationPayload())
 
-        wait(3)
+        wait(1)
 
         val request = mockServer.takeRequest()
         assertEquals("messages/12345", request.trimmedPath)

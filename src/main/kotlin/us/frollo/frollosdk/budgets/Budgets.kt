@@ -33,7 +33,11 @@ import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toBudget
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.extensions.fetchBudgetPeriods
+import us.frollo.frollosdk.extensions.sqlForBudgetPeriodIds
+import us.frollo.frollosdk.mapping.toBudgetPeriod
 import us.frollo.frollosdk.model.api.budgets.BudgetCreateRequest
+import us.frollo.frollosdk.model.api.budgets.BudgetPeriodResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetUpdateRequest
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
@@ -341,6 +345,49 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
     }
 
     /**
+     * Refresh a budget period
+     *
+     * @param budgetId ID of the budget to fetch
+     * @param periodId ID of the budget to fetch
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun refreshBudgetPeriod(budgetId: Long, periodId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        budgetsAPI.fetchBudgetPeriod(budgetId, periodId).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshBudgetPeriod", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleBudgetPeriodResponse(response = resource.data, completion = completion)
+                }
+            }
+        }
+    }
+
+    /**
+     * Refresh a budget periods by budget id from the host
+     *
+     * @param budgetId ID of the budget to fetch
+     * @param fromDate start date of budget from which you want to refresh budget
+     * @param toDate start date of the budget up to which you wan to refresh a budget
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun refreshBudgetPeriods(budgetId: Long, fromDate: String? = null, toDate: String? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        budgetsAPI.fetchBudgetPeriods(budgetId, fromDate, toDate).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshBudgetPeriod", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleBudgetPeriodsResponse(resource.data, budgetId, fromDate, toDate, completion)
+                }
+            }
+        }
+    }
+
+    /**
      * Create a new budget on the host by Budget category
      *
      * @param budgetFrequency The frequency at which you want to split up this budget. Refer [BudgetFrequency]
@@ -552,5 +599,31 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         if (budgetPeriodIds.isNotEmpty()) {
             db.budgetPeriods().deleteMany(budgetPeriodIds)
         }
+    }
+
+    private fun handleBudgetPeriodsResponse(response: List<BudgetPeriodResponse>?, budgetId: Long, fromDate: String? = null, toDate: String? = null, completion: ((Result) -> Unit)?) {
+
+        response?.let {
+            doAsync {
+                val models = response.map { it.toBudgetPeriod() }
+
+                val apiIds = models.map { it.budgetPeriodId }.toHashSet()
+                val allPeriodIds = db.budgetPeriods().getIds(sqlForBudgetPeriodIds(budgetId, fromDate, toDate)).toHashSet()
+                val staleIds = allPeriodIds.minus(apiIds)
+
+                if (staleIds.isNotEmpty()) {
+                    removeCachedBudgetPeriods(staleIds.toLongArray())
+                }
+
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    private fun handleBudgetPeriodResponse(response: BudgetPeriodResponse?, completion: ((Result) -> Unit)?) {
+        response?.let {
+            db.budgetPeriods().insert(it.toBudgetPeriod())
+            completion?.invoke(Result.success())
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
 }

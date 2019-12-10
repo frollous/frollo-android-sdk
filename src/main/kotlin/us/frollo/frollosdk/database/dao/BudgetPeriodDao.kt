@@ -39,6 +39,9 @@ internal interface BudgetPeriodDao {
     @RawQuery(observedEntities = [BudgetPeriod::class])
     fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<BudgetPeriod>>
 
+    @RawQuery
+    fun getIds(queryStr: SupportSQLiteQuery): LongArray
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: BudgetPeriod): LongArray
 

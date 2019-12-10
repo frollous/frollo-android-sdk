@@ -118,7 +118,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     companion object {
         private const val TAG = "Aggregation"
         private const val TRANSACTION_BATCH_SIZE = 200
-        private const val MERCHANT_BATCH_SIZE = 500
+        private const val MERCHANT_BATCH_SIZE = 50 // DO NOT INCREASE THIS. API MAX SIZE IS 50.
     }
 
     private val aggregationAPI: AggregationAPI = network.create(AggregationAPI::class.java)
@@ -1804,7 +1804,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      *
      * @param completion Optional completion handler with optional error if the request fails
      */
-    internal fun refreshMerchants(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun refreshMerchants(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         aggregationAPI.fetchMerchants().enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
@@ -1817,6 +1817,93 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
             }
         }
     }
+
+
+
+    /*
+    fun refreshTransactions(
+        fromDate: String,
+        toDate: String,
+        accountIds: LongArray? = null,
+        transactionIncluded: Boolean? = null,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
+        doAsync {
+            refreshNextTransactions(fromDate, toDate, accountIds, transactionIncluded, 0, longArrayOf(), longArrayOf(), completion)
+        }
+    }
+
+    private fun refreshNextTransactions(
+        fromDate: String,
+        toDate: String,
+        accountIds: LongArray? = null,
+        transactionIncluded: Boolean? = null,
+        skip: Int,
+        updatedTransactionIds: LongArray,
+        updatedMerchantIds: LongArray,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
+
+        aggregationAPI.fetchTransactionsByQuery(fromDate = fromDate, toDate = toDate,
+                accountIds = accountIds, transactionIncluded = transactionIncluded,
+                count = TRANSACTION_BATCH_SIZE, skip = skip).enqueue { resource ->
+
+            when (resource.status) {
+                Resource.Status.SUCCESS -> {
+                    val response = resource.data
+                    response?.let {
+                        val updatedIds = insertTransactions(response).plus(updatedTransactionIds)
+                        val merchantIds = it.map { model -> model.merchant.id }.toLongArray().plus(updatedMerchantIds)
+
+                        if (it.size >= TRANSACTION_BATCH_SIZE) {
+                            refreshNextTransactions(fromDate, toDate, accountIds, transactionIncluded,
+                                    skip + TRANSACTION_BATCH_SIZE, updatedIds, merchantIds, completion)
+                        } else {
+                            fetchMissingMerchants(merchantIds.toSet())
+                            removeTransactions(fromDate, toDate, accountIds, transactionIncluded, updatedIds, completion)
+                        }
+                    } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshNextTransactions", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+            }
+        }
+    }
+
+    // Do not call this method from main thread. Call this asynchronously.
+    private fun insertTransactions(response: List<TransactionResponse>): LongArray {
+        val models = mapTransactionResponse(response)
+        db.transactions().insertAll(*models.toTypedArray())
+
+        return response.map { it.transactionId }.toLongArray()
+    }
+
+    // Do not call this method from main thread. Call this asynchronously.
+    private fun removeTransactions(
+        fromDate: String,
+        toDate: String,
+        accountIds: LongArray? = null,
+        transactionIncluded: Boolean? = null,
+        excludingIds: LongArray,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
+
+        val apiIds = excludingIds.sorted()
+        val staleIds = ArrayList(db.transactions().getIdsQuery(
+                sqlForTransactionStaleIds(fromDate = fromDate, toDate = toDate,
+                        accountIds = accountIds, transactionIncluded = transactionIncluded)).sorted())
+
+        staleIds.removeAll(apiIds)
+
+        if (staleIds.isNotEmpty()) {
+            removeCachedTransactions(staleIds.toLongArray())
+        }
+
+        completion?.invoke(Result.success())
+    }
+     */
 
     /**
      * Refresh merchant data for all cached merchants from the host

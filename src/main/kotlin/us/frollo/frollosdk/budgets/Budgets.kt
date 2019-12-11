@@ -639,7 +639,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         response?.let {
             doAsync {
                 val models = response.map { it.toBudgetPeriod() }
-
+                db.budgetPeriods().insertAll(*models.toTypedArray())
                 val apiIds = models.map { it.budgetPeriodId }.toHashSet()
                 val allPeriodIds = db.budgetPeriods().getIds(sqlForBudgetPeriodIds(budgetId, fromDate, toDate)).toHashSet()
                 val staleIds = allPeriodIds.minus(apiIds)

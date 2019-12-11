@@ -297,6 +297,15 @@ class ModelExtensionTest {
     }
 
     @Test
+    fun testSQLForBudgetPeriodIds() {
+        var query = sqlForBudgetPeriodIds(123, "13-03-1989", "14-03-1989")
+        assertEquals("SELECT budget_period_id  FROM budget_period WHERE budget_id = 123  AND (start_date BETWEEN Date('13-03-1989') AND Date('14-03-1989')) ", query.sql)
+
+        query = sqlForBudgetPeriodIds(123)
+        assertEquals("SELECT budget_period_id  FROM budget_period WHERE budget_id = 123  ", query.sql)
+    }
+
+    @Test
     fun testStringToBudgetCategory() {
         var category = "living".toBudgetCategory()
         assertEquals(BudgetCategory.LIVING, category)

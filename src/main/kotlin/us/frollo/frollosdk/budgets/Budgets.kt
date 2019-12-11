@@ -35,6 +35,7 @@ import us.frollo.frollosdk.mapping.toBudget
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.extensions.fetchBudgetPeriods
 import us.frollo.frollosdk.extensions.sqlForBudgetPeriodIds
+import us.frollo.frollosdk.extensions.sqlForBudgetPeriods
 import us.frollo.frollosdk.mapping.toBudgetPeriod
 import us.frollo.frollosdk.model.api.budgets.BudgetCreateRequest
 import us.frollo.frollosdk.model.api.budgets.BudgetPeriodResponse
@@ -43,6 +44,7 @@ import us.frollo.frollosdk.model.api.budgets.BudgetUpdateRequest
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
+import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
 import us.frollo.frollosdk.model.coredata.budgets.BudgetRelation
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
@@ -345,49 +347,6 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
     }
 
     /**
-     * Refresh a budget period
-     *
-     * @param budgetId ID of the budget to fetch
-     * @param periodId ID of the budget to fetch
-     * @param completion Optional completion handler with optional error if the request fails
-     */
-    fun refreshBudgetPeriod(budgetId: Long, periodId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        budgetsAPI.fetchBudgetPeriod(budgetId, periodId).enqueue { resource ->
-            when (resource.status) {
-                Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshBudgetPeriod", resource.error?.localizedDescription)
-                    completion?.invoke(Result.error(resource.error))
-                }
-                Resource.Status.SUCCESS -> {
-                    handleBudgetPeriodResponse(response = resource.data, completion = completion)
-                }
-            }
-        }
-    }
-
-    /**
-     * Refresh a budget periods by budget id from the host
-     *
-     * @param budgetId ID of the budget to fetch
-     * @param fromDate start date of budget from which you want to refresh budget
-     * @param toDate start date of the budget up to which you wan to refresh a budget
-     * @param completion Optional completion handler with optional error if the request fails
-     */
-    fun refreshBudgetPeriods(budgetId: Long, fromDate: String? = null, toDate: String? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        budgetsAPI.fetchBudgetPeriods(budgetId, fromDate, toDate).enqueue { resource ->
-            when (resource.status) {
-                Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshBudgetPeriod", resource.error?.localizedDescription)
-                    completion?.invoke(Result.error(resource.error))
-                }
-                Resource.Status.SUCCESS -> {
-                    handleBudgetPeriodsResponse(resource.data, budgetId, fromDate, toDate, completion)
-                }
-            }
-        }
-    }
-
-    /**
      * Create a new budget on the host by Budget category
      *
      * @param budgetFrequency The frequency at which you want to split up this budget. Refer [BudgetFrequency]
@@ -543,6 +502,81 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
+    // Budget Periods
+
+    // Budget Period
+
+    /**
+     * Fetch goal period by ID from the cache
+     *
+     * @param budgetPeriodId Unique goal period ID to fetch
+     *
+     * @return LiveData object of Resource<BudgetPeriod> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchBudgetPeriod(budgetPeriodId: Long): LiveData<Resource<BudgetPeriod>> =
+            Transformations.map(db.budgetPeriods().load(budgetPeriodId)) { model ->
+                Resource.success(model)
+            }
+
+    /**
+     * Fetch goal periods by budget ID from the cache
+     *
+     * @param budgetId Goal ID of the goal periods to fetch (optional)
+     * @param trackingStatus Filter by the tracking status (optional)
+     *
+     * @return LiveData object of Resource<List<BudgetPeriod>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchBudgetPeriods(
+        budgetId: Long? = null,
+        trackingStatus: BudgetTrackingStatus? = null
+    ): LiveData<Resource<List<BudgetPeriod>>> =
+            Transformations.map(db.budgetPeriods().loadByQuery(sqlForBudgetPeriods(budgetId, trackingStatus))) { models ->
+                Resource.success(models)
+            }
+
+    /**
+     * Refresh a budget period
+     *
+     * @param budgetId ID of the budget period to refresh
+     * @param periodId ID of the budget period to refresh
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun refreshBudgetPeriod(budgetId: Long, periodId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        budgetsAPI.fetchBudgetPeriod(budgetId, periodId).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshBudgetPeriod", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleBudgetPeriodResponse(response = resource.data, completion = completion)
+                }
+            }
+        }
+    }
+
+    /**
+     * Refresh a budget periods by budget id from the host
+     *
+     * @param budgetId ID of the budget to fetch
+     * @param fromDate start date of budget from which you want to refresh budget
+     * @param toDate start date of the budget up to which you wan to refresh a budget
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun refreshBudgetPeriods(budgetId: Long, fromDate: String? = null, toDate: String? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        budgetsAPI.fetchBudgetPeriods(budgetId, fromDate, toDate).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshBudgetPeriods", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleBudgetPeriodsResponse(resource.data, budgetId, fromDate, toDate, completion)
+                }
+            }
+        }
+    }
+
     private fun handleBudgetResponse(response: BudgetResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
@@ -602,7 +636,6 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
     }
 
     private fun handleBudgetPeriodsResponse(response: List<BudgetPeriodResponse>?, budgetId: Long, fromDate: String? = null, toDate: String? = null, completion: ((Result) -> Unit)?) {
-
         response?.let {
             doAsync {
                 val models = response.map { it.toBudgetPeriod() }
@@ -622,8 +655,10 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
 
     private fun handleBudgetPeriodResponse(response: BudgetPeriodResponse?, completion: ((Result) -> Unit)?) {
         response?.let {
-            db.budgetPeriods().insert(it.toBudgetPeriod())
-            completion?.invoke(Result.success())
+            doAsync {
+                db.budgetPeriods().insert(it.toBudgetPeriod())
+                uiThread { completion?.invoke(Result.success()) }
+            }
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
     }
 }

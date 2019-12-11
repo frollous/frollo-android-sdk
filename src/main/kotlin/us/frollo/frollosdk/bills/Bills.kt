@@ -160,7 +160,7 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * Create a new bill on the host from a transaction
      *
      * @param transactionId ID of the transaction representing a bill payment
-     * @param frequency How often the bill reoccurs
+     * @param frequency How often the bill recurs
      * @param nextPaymentDate Date of the next payment is due
      * @param name Custom name for the bill (Optional: defaults to the transaction name)
      * @param notes Notes attached to the bill (Optional)

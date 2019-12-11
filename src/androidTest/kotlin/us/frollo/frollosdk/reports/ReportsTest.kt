@@ -46,6 +46,7 @@ import us.frollo.frollosdk.network.api.ReportsAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
+import us.frollo.frollosdk.testutils.wait
 import java.math.BigDecimal
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -128,8 +129,6 @@ class ReportsTest : BaseAndroidTest() {
     fun testFetchingAccountBalanceReportsByDay() {
         initSetup()
 
-        val signal = CountDownLatch(1)
-
         val fromDate = "2018-10-28"
         val toDate = "2019-01-29"
         val period = ReportPeriod.DAY
@@ -166,14 +165,12 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals("AUD", report?.report?.currency)
             assertEquals(period, report?.report?.period)
             assertEquals(BigDecimal("-1191.45"), report?.report?.value)
-
-            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        signal.await(3, TimeUnit.SECONDS)
+        wait(5)
 
         tearDown()
     }
@@ -236,8 +233,6 @@ class ReportsTest : BaseAndroidTest() {
     fun testFetchingAccountBalanceReportsByWeek() {
         initSetup()
 
-        val signal = CountDownLatch(1)
-
         val fromDate = "2018-10-28"
         val toDate = "2019-01-29"
         val period = ReportPeriod.WEEK
@@ -274,14 +269,12 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals("AUD", report?.report?.currency)
             assertEquals(period, report?.report?.period)
             assertEquals(BigDecimal("-1191.45"), report?.report?.value)
-
-            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        signal.await(3, TimeUnit.SECONDS)
+        wait(5)
 
         tearDown()
     }
@@ -345,7 +338,7 @@ class ReportsTest : BaseAndroidTest() {
     fun testFetchingAccountBalanceReportsByAccountType() {
         initSetup()
 
-        val signal1 = CountDownLatch(1)
+        val signal = CountDownLatch(1)
 
         val fromDate = "2018-10-28"
         val toDate = "2019-01-29"
@@ -372,12 +365,10 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            signal1.countDown()
+            signal.countDown()
         }
 
-        signal1.await(3, TimeUnit.SECONDS)
-
-        val signal2 = CountDownLatch(1)
+        signal.await(3, TimeUnit.SECONDS)
 
         reports.refreshAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate, accountType = accountType) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
@@ -398,11 +389,9 @@ class ReportsTest : BaseAndroidTest() {
             assertEquals("AUD", report?.report?.currency)
             assertEquals(period, report?.report?.period)
             assertEquals(BigDecimal("42000.00"), report?.report?.value)
-
-            signal2.countDown()
         }
 
-        signal2.await(3, TimeUnit.SECONDS)
+        wait(5)
 
         tearDown()
     }

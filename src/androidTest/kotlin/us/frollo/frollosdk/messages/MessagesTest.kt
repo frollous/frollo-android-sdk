@@ -502,7 +502,7 @@ class MessagesTest : BaseAndroidTest() {
 
         messages.handleMessageNotification(testMessageNotificationPayload())
 
-        wait(1)
+        wait(3)
 
         val request = mockServer.takeRequest()
         assertEquals("messages/12345", request.trimmedPath)

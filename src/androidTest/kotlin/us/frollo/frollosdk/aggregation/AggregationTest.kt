@@ -813,7 +813,7 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals(4, models?.size)
         }
 
-        wait(1)
+        wait(3)
 
         val testObserver2 = aggregation.fetchProviders().test()
         testObserver2.awaitValue()
@@ -2125,7 +2125,7 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals(111, models?.size)
         }
 
-        wait(1)
+        wait(3)
 
         val testObserver2 = aggregation.fetchMerchants().test()
         testObserver2.awaitValue()

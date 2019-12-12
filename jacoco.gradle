@@ -1,0 +1,51 @@
+// Jacoco is a code coverage tool. By default, jacoco only runs for espresso tests. This contains the necessary configuration
+// that allows us to run coverage reports for unit tests, and also for the combination of unit tests + espresso tests.
+
+// For unit tests coverage run the 'test<Flavor><BuildType>UnitTestCoverage' task. Results are in in 'build/reports/jacoco' folder.
+// For espresso tests coverage run the 'create<Flavor><BuildType>CoverageReport' task. Results are in 'build/reports/coverage' folder.
+// For unit and espresso tests coverage run the 'unitAndEspresso<Flavor><BuildType>TestCoverage' task. Results are in 'build/reports/jacoco'
+// folder.
+apply plugin: 'jacoco'
+
+// Android Gradle Plugin out of the box only supports code coverage for instrumentation espresso) tests.
+// This add support for unit tests as well.
+
+def fileFilter = [
+        '**/R.class',
+        '**/R$*.class',
+        '**/BuildConfig.*',
+        '**/Manifest*.*',
+        '**/*Test*.*',
+        'android/**/*.*',
+
+        //Autofactory
+        'com/jakewharton/**/*.*',
+]
+
+task androidTestCoverage(type: JacocoReport) {
+    group = 'Reporting'
+    description = "Generate Jacoco coverage reports for the debug build. Only unit tests."
+
+    //Make sure that tests from all modules are run before coverage report
+    dependsOn ":createDebugCoverageReport"
+    dependsOn ":createDebugAndroidTestCoverageReport"
+
+    classDirectories = files([
+            fileTree(dir: "$project.rootDir/frollo-android-sdk/build/tmp/kotlin-classes/debug", excludes: fileFilter),
+    ])
+
+    def coverageSourceDirs = [
+            "$project.rootDir/frollo-android-sdk/src/main/kotlin",
+    ]
+
+    sourceDirectories = files(coverageSourceDirs)
+    executionData = fileTree(dir: project.rootDir, includes: [
+            'frollo-android-sdk/build/jacoco/testDebugUnitTest.exec',
+            'frollo-android-sdk/build/outputs/code_coverage/**/*.ec',
+    ])
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}

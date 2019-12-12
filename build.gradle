@@ -4,6 +4,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'org.jetbrains.dokka-android'
 
 apply from: "ktlint.gradle"
+apply from: "jacoco.gradle"
 
 android {
     compileSdkVersion 28
@@ -28,6 +29,7 @@ android {
         }
         debug {
             debuggable true
+            testCoverageEnabled (project.hasProperty('coverage'))
         }
     }
     compileOptions {
@@ -93,6 +95,7 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version_internal"
         classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:0.9.17"
+        classpath "org.jacoco:org.jacoco.core:0.8.5"
     }
 }
 

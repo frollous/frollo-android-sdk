@@ -813,7 +813,7 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals(4, models?.size)
         }
 
-        wait(1)
+        wait(3)
 
         val testObserver2 = aggregation.fetchProviders().test()
         testObserver2.awaitValue()
@@ -2125,7 +2125,7 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals(111, models?.size)
         }
 
-        wait(1)
+        wait(3)
 
         val testObserver2 = aggregation.fetchMerchants().test()
         testObserver2.awaitValue()
@@ -2791,18 +2791,21 @@ class AggregationTest : BaseAndroidTest() {
     }
 
     @Test
-    fun testRefreshMerchants() {
+    fun testRefreshPaginatedMerchants() {
         initSetup()
 
         val signal = CountDownLatch(1)
 
-        val body = readStringFromJson(app, R.raw.merchants_valid)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == AggregationAPI.URL_MERCHANTS) {
+                if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?size=50") {
                     return MockResponse()
                             .setResponseCode(200)
-                            .setBody(body)
+                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_1))
+                } else if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?size=50&after=50") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_2))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -2816,15 +2819,14 @@ class AggregationTest : BaseAndroidTest() {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            assertEquals(1200, models?.size)
+            assertEquals(60, models?.size)
 
             signal.countDown()
         }
 
-        val request = mockServer.takeRequest()
-        assertEquals(AggregationAPI.URL_MERCHANTS, request.trimmedPath)
-
         signal.await(3, TimeUnit.SECONDS)
+
+        assertEquals(2, mockServer.requestCount)
 
         tearDown()
     }
@@ -2833,24 +2835,47 @@ class AggregationTest : BaseAndroidTest() {
     fun testRefreshCachedMerchants() {
         initSetup()
 
-        val signal = CountDownLatch(1)
+        val signal1 = CountDownLatch(1)
 
-        val data1 = testMerchantResponseData(merchantId = 238)
-        val data2 = testMerchantResponseData(merchantId = 686)
-        val list = mutableListOf(data1, data2)
-        database.merchants().insertAll(*list.map { it.toMerchant() }.toList().toTypedArray())
-
-        val body = readStringFromJson(app, R.raw.merchants_by_id)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?merchant_ids=238%2C686") {
+                if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?size=50") {
                     return MockResponse()
                             .setResponseCode(200)
-                            .setBody(body)
+                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_1))
+                } else if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?size=50&after=50") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_2))
+                } else if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?merchant_ids=1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9%2C10%2C11%2C12%2C13%2C14%2C15%2C16%2C17%2C18%2C19%2C20%2C21%2C22%2C23%2C24%2C25%2C26%2C27%2C28%2C29%2C30%2C31%2C32%2C33%2C34%2C35%2C36%2C37%2C38%2C39%2C40%2C41%2C42%2C43%2C44%2C45%2C46%2C47%2C48%2C49%2C50") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_1))
+                } else if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?merchant_ids=51%2C52%2C53%2C54%2C55%2C56%2C57%2C58%2C59%2C60") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_2))
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
+
+        aggregation.refreshMerchants { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchMerchants().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(60, models?.size)
+
+            signal1.countDown()
+        }
+
+        signal1.await(3, TimeUnit.SECONDS)
+
+        val signal2 = CountDownLatch(1)
 
         aggregation.refreshCachedMerchants { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
@@ -2860,17 +2885,19 @@ class AggregationTest : BaseAndroidTest() {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            assertEquals(2, models?.size)
+            assertEquals(60, models?.size)
 
             val merchant = models?.last()
-            assertEquals(686L, merchant?.merchantId)
-            assertEquals("Rent", merchant?.name)
+            assertEquals(60L, merchant?.merchantId)
+            assertEquals("Reversal of debit entry", merchant?.name)
             assertEquals(MerchantType.RETAILER, merchant?.merchantType)
 
-            signal.countDown()
+            signal2.countDown()
         }
 
-        signal.await(3, TimeUnit.SECONDS)
+        signal2.await(3, TimeUnit.SECONDS)
+
+        assertEquals(4, mockServer.requestCount)
 
         tearDown()
     }
@@ -2932,6 +2959,60 @@ class AggregationTest : BaseAndroidTest() {
         assertEquals("aggregation/merchants/197", request.trimmedPath)
 
         signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshPaginatedMerchantsById() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?merchant_ids=1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9%2C10%2C11%2C12%2C13%2C14%2C15%2C16%2C17%2C18%2C19%2C20%2C21%2C22%2C23%2C24%2C25%2C26%2C27%2C28%2C29%2C30%2C31%2C32%2C33%2C34%2C35%2C36%2C37%2C38%2C39%2C40%2C41%2C42%2C43%2C44%2C45%2C46%2C47%2C48%2C49%2C50") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_1))
+                } else if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?merchant_ids=51%2C52%2C53%2C54%2C55%2C56%2C57%2C58%2C59%2C60") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_2))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val merchantIds = longArrayOf(
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+                21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+                31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+                41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
+                51, 52, 53, 54, 55, 56, 57, 58, 59, 60)
+
+        aggregation.refreshMerchants(merchantIds = merchantIds) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchMerchants().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(60, models?.size)
+
+            val merchant = models?.last()
+            assertEquals(60L, merchant?.merchantId)
+            assertEquals("Reversal of debit entry", merchant?.name)
+            assertEquals(MerchantType.RETAILER, merchant?.merchantType)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        assertEquals(2, mockServer.requestCount)
 
         tearDown()
     }

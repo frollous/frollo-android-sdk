@@ -146,7 +146,7 @@ class EventsTest : BaseAndroidTest() {
             assertTrue(handled)
         }
 
-        wait(1)
+        wait(3)
 
         assertTrue(notifyFlag)
         assertTrue(transactionIds?.toList()?.containsAll(listOf(45123L, 986L, 7000072L)) == true)

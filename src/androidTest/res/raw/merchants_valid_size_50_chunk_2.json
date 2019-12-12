@@ -1,0 +1,65 @@
+{
+	"data": [
+		{
+			"id": 51,
+			"name": "Mac",
+			"merchant_type": "retailer"
+		},
+		{
+			"id": 52,
+			"name": "Nexus Venture Partners",
+			"merchant_type": "retailer"
+		},
+		{
+			"id": 53,
+			"name": "Kikki.K",
+			"merchant_type": "retailer",
+			"small_logo_url": "https://frollo-sandbox.s3.amazonaws.com/merchants/53/original/NedkwXhp.png?1519084284"
+		},
+		{
+			"id": 54,
+			"name": "women's ready to wear",
+			"merchant_type": "retailer"
+		},
+		{
+			"id": 55,
+			"name": "The Berkelouw Book",
+			"merchant_type": "retailer"
+		},
+		{
+			"id": 56,
+			"name": "Mitsubishi",
+			"merchant_type": "retailer"
+		},
+		{
+			"id": 57,
+			"name": "AGL",
+			"merchant_type": "retailer",
+			"small_logo_url": "https://frollo-sandbox.s3.amazonaws.com/merchants/57/original/AGL_Energy_logo.png?1519866340"
+		},
+		{
+			"id": 58,
+			"name": "Ink Station",
+			"merchant_type": "retailer"
+		},
+		{
+			"id": 59,
+			"name": "Hoyt's Cinemas",
+			"merchant_type": "retailer",
+			"small_logo_url": "https://frollo-sandbox.s3.amazonaws.com/merchants/59/original/hoyts.png?1519084218"
+		},
+		{
+			"id": 60,
+			"name": "Reversal of debit entry",
+			"merchant_type": "retailer"
+		}
+	],
+	"paging": {
+		"cursors": {
+			"before": 50,
+			"after": null
+		},
+		"previous": "https://api-sandbox.frollo.us/api/v2/aggregation/merchants/?before=50&size=50",
+		"next": "https://api-sandbox.frollo.us/api/v2/aggregation/merchants/?after=100&size=50"
+	}
+}

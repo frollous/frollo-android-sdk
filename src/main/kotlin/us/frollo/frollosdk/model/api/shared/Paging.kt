@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.aggregation.merchants
+package us.frollo.frollosdk.model.api.shared
 
 import com.google.gson.annotations.SerializedName
-import us.frollo.frollosdk.model.api.shared.Paging
-import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 
-internal data class MerchantsResponse(
-    @SerializedName("data") val data: List<MerchantResponse>,
-    @SerializedName("paging") val paging: Paging
+internal class Paging(
+    @SerializedName("cursors") val cursors: PagingCursors,
+    @SerializedName("previous") val previous: String,
+    @SerializedName("next") val next: String
 )
 
-internal data class MerchantResponse(
-    @SerializedName("id") val merchantId: Long,
-    @SerializedName("name") val name: String,
-    @SerializedName("merchant_type") val merchantType: MerchantType,
-    @SerializedName("small_logo_url") val smallLogoUrl: String?
+internal class PagingCursors(
+    @SerializedName("before") val before: Long?,
+    @SerializedName("after") val after: Long?
 )

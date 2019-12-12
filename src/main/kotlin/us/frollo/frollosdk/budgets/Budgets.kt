@@ -522,8 +522,8 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      *
      * @param budgetId Budget ID of the budget periods to fetch (optional)
      * @param trackingStatus Filter by the tracking status (optional)
-     * @param fromDate start date of budget from which you want to refresh budget (Optional) [BudgetPeriod.DATE_FORMAT_PATTERN]
-     * @param toDate start date of the budget up to which you wan to refresh a budget (Optional)[BudgetPeriod.DATE_FORMAT_PATTERN]
+     * @param fromDate (inclusive) start date of the budget from which you wan to refresh a budget (Optional) Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param toDate (inclusive) en date to fetch budgets up to which you wan to refresh a budget  (optional). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
      *
      * @return LiveData object of Resource<List<BudgetPeriod>> which can be observed using an Observer for future changes as well.
      */
@@ -538,9 +538,11 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
             }
 
     /**
-     * Fetch budget periods with relation from the cache
+     * Advanced method to fetch budget periods by SQL query from the cache
      *
-     * @param query SimpleSQLiteQuery: Select query which fetches goals from the cache
+     * @param query SimpleSQLiteQuery: Select query which fetches budget periods from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL querie
      *
      * @return LiveData object of Resource<List<BudgetPeriod>> which can be observed using an Observer for future changes as well.
      */
@@ -550,13 +552,13 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
             }
 
     /**
-     * Fetch budget periods by budget ID from the cache
+     * Fetch budget periods by budget ID from the cache with associated data
      *
-     * @param query SimpleSQLiteQuery: Select query which fetches goals from the cache
+     * @param query SimpleSQLiteQuery: Select query which fetches budgets from the cache
      *
      * @return LiveData object of Resource<List<BudgetPeriodRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchBudgetPeriodWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<BudgetPeriodRelation>>> =
+    fun fetchBudgetPeriodsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<BudgetPeriodRelation>>> =
             Transformations.map(db.budgetPeriods().loadByQueryWithRelation(query)) { models ->
                 Resource.success(models)
             }
@@ -565,22 +567,28 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * Fetch budget periods by budget ID from the cache
      *
      * @param budgetId id of the budget by which you want to fetch budget periods
+     * @param trackingStatus Filter by the tracking status (optional)
+     * @param fromDate (inclusive) start date of the budget from which you wan to refresh a budget (Optional) Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param toDate (inclusive) en date to fetch budgets up to which you wan to refresh a budget  (optional). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
      *
      * @return LiveData object of Resource<List<BudgetPeriodRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchBudgetPeriodsWithRelationByBudgetId(budgetId: Long): LiveData<Resource<List<BudgetPeriodRelation>>> =
-            Transformations.map(db.budgetPeriods().loadByBudgetIdWithRelation(budgetId)) { models ->
+    fun fetchBudgetPeriodsWithRelationByBudgetId(budgetId: Long? = null,
+                                                 trackingStatus: BudgetTrackingStatus? = null,
+                                                 fromDate: String? = null,
+                                                 toDate: String? = null): LiveData<Resource<List<BudgetPeriodRelation>>> =
+            Transformations.map(db.budgetPeriods().loadByQueryWithRelation(sqlForBudgetPeriods(budgetId,trackingStatus,fromDate,toDate))) { models ->
                 Resource.success(models)
             }
 
     /**
-     * Fetch budget periods by budget period ID from the cache
+     * Fetch budget periods from the cache with associated data
      *
      * @param budgetPeriodId id of the budget by which you want to fetch budget periods
      *
      * @return LiveData object of Resource<List<BudgetPeriodRelation>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchBudgetPeriodsWithRelationByBudgetPerodId(budgetPeriodId: Long): LiveData<Resource<BudgetPeriodRelation>> =
+    fun fetchBudgetPeriodsWithRelation(budgetPeriodId: Long): LiveData<Resource<BudgetPeriodRelation>> =
             Transformations.map(db.budgetPeriods().loadWithRelation(budgetPeriodId)) { models ->
                 Resource.success(models)
             }
@@ -610,8 +618,8 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * Refresh a budget periods by budget id from the host
      *
      * @param budgetId ID of the budget to fetch
-     * @param fromDate start date of budget from which you want to refresh budget (Optional)[BudgetPeriod.DATE_FORMAT_PATTERN]
-     * @param toDate start date of the budget up to which you wan to refresh a budget (Optional)[BudgetPeriod.DATE_FORMAT_PATTERN]
+     * @param fromDate Start date to refresh budget periods from (inclusive). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param toDate End date to refresh budget periods up to (inclusive). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
      * @param completion Optional completion handler with optional error if the request fails (Optional)
      */
     fun refreshBudgetPeriods(budgetId: Long, fromDate: String? = null, toDate: String? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {

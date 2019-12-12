@@ -465,12 +465,17 @@ internal fun sqlForBudgetPeriodIds(
 
 internal fun sqlForBudgetPeriods(
     budgetId: Long? = null,
-    trackingStatus: BudgetTrackingStatus? = null
+    trackingStatus: BudgetTrackingStatus? = null,
+    fromDate: String? = null,
+    toDate: String? = null
 ): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("budget_period")
 
     budgetId?.let { sqlQueryBuilder.appendSelection(selection = "budget_id = $it") }
     trackingStatus?.let { sqlQueryBuilder.appendSelection(selection = "tracking_status = '${ it.name }'") }
+    ifNotNull(fromDate, toDate) {
+        from, to -> sqlQueryBuilder.appendSelection(selection = "(start_date BETWEEN Date('$from') AND Date('$to'))")
+    }
 
     return sqlQueryBuilder.create()
 }

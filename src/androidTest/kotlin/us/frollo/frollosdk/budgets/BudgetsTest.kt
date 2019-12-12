@@ -20,6 +20,7 @@ import com.jraska.livedata.test
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -28,6 +29,7 @@ import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
+import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
@@ -82,7 +84,7 @@ class BudgetsTest : BaseAndroidTest() {
 
         testObserver.awaitValue()
         assertTrue(testObserver.value().data?.isNotEmpty() == true)
-        assertEquals(4, testObserver.value().data?.size)
+        assertEquals(6, testObserver.value().data?.size)
 
         tearDown()
     }
@@ -450,10 +452,10 @@ class BudgetsTest : BaseAndroidTest() {
     fun testFetchBudgetByIdWithRelation() {
         initSetup()
 
-        database.budgets().insert(testBudgetResponseData(budgetId = 4).toBudget())
-        database.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 4).toBudgetPeriod())
+        database.budgets().insert(testBudgetResponseData(budgetId = 6).toBudget())
+        database.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 6).toBudgetPeriod())
 
-        val testObserver = budgets.fetchBudgetWithRelation(4).test()
+        val testObserver = budgets.fetchBudgetWithRelation(6).test()
 
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
@@ -467,7 +469,7 @@ class BudgetsTest : BaseAndroidTest() {
     fun testRefreshBudgetPeriods() {
         initSetup()
 
-        val budgetId: Long = 4
+        val budgetId: Long = 6
         val requestPath = "budgets/$budgetId/periods"
 
         val body = readStringFromJson(app, R.raw.refresh_budget_periods)
@@ -517,7 +519,7 @@ class BudgetsTest : BaseAndroidTest() {
 
         clearLoggedInPreferences()
 
-        budgets.refreshBudgetPeriods(budgetId = 4) { result ->
+        budgets.refreshBudgetPeriods(budgetId = 6) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
@@ -533,7 +535,7 @@ class BudgetsTest : BaseAndroidTest() {
     fun testRefreshBudgetPeriodById() {
         initSetup()
 
-        val budgetId: Long = 4
+        val budgetId: Long = 6
         val periodId: Long = 85
         val requestPath = "budgets/$budgetId/periods/$periodId"
 
@@ -574,7 +576,7 @@ class BudgetsTest : BaseAndroidTest() {
 
         clearLoggedInPreferences()
 
-        budgets.refreshBudgetPeriod(budgetId = 4, periodId = 85) { result ->
+        budgets.refreshBudgetPeriod(budgetId = 6, periodId = 85) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
@@ -582,6 +584,51 @@ class BudgetsTest : BaseAndroidTest() {
         }
 
         wait(3)
+
+        tearDown()
+    }
+
+    @Test
+    fun testBudgetPeriodsLinkToBudgets() {
+        initSetup()
+
+        val budgetId: Long = 6
+        val requestPath = "budgets/$budgetId/periods"
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.refresh_budget_periods))
+                } else if (request?.trimmedPath == BudgetsAPI.URL_BUDGETS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.refresh_budget))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        budgets.refreshBudgets { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+        }
+
+        budgets.refreshBudgetPeriods(budgetId) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+        }
+
+        wait(3)
+
+        val testObserver = budgets.fetchBudgetWithRelation(9000).test()
+
+        testObserver.awaitValue()
+        val model = testObserver.value().data
+        assertNotNull(model)
+        assertEquals(9000L, model?.goalPeriod?.goalPeriodId)
+        assertEquals(model?.goalPeriod?.goalId, model?.goal?.goal?.goalId)
 
         tearDown()
     }

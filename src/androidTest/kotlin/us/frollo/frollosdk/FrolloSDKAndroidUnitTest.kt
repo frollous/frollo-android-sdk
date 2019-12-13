@@ -40,7 +40,8 @@ import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.testUserResponseData
 import us.frollo.frollosdk.preferences.Preferences
-import us.frollo.frollosdk.testutils.wait
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class FrolloSDKAndroidUnitTest {
 
@@ -298,6 +299,8 @@ class FrolloSDKAndroidUnitTest {
     fun testSDKResetSuccess() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         database.users().insert(testUserResponseData().toUser())
 
         val testObserver = database.users().load().test()
@@ -320,10 +323,12 @@ class FrolloSDKAndroidUnitTest {
                 val testObserver2 = database.users().load().test()
                 testObserver2.awaitValue()
                 assertNull(testObserver2.value())
+
+                signal.countDown()
             }
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }

@@ -306,6 +306,15 @@ class ModelExtensionTest {
     }
 
     @Test
+    fun testSQLForBudgetPeriod() {
+        var query = sqlForBudgetPeriods(123, BudgetTrackingStatus.ON_TRACK)
+        assertEquals("SELECT  *  FROM budget_period WHERE budget_id = 123 AND tracking_status = 'ON_TRACK' ", query.sql)
+
+        query = sqlForBudgetPeriods(123)
+        assertEquals("SELECT  *  FROM budget_period WHERE budget_id = 123 ", query.sql)
+    }
+
+    @Test
     fun testStringToBudgetCategory() {
         var category = "living".toBudgetCategory()
         assertEquals(BudgetCategory.LIVING, category)

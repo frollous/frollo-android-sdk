@@ -45,6 +45,7 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
+import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriodRelation
 import us.frollo.frollosdk.model.coredata.budgets.BudgetRelation
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
@@ -504,12 +505,10 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
 
     // Budget Periods
 
-    // Budget Period
-
     /**
-     * Fetch goal period by ID from the cache
+     * Fetch budget period by ID from the cache
      *
-     * @param budgetPeriodId Unique goal period ID to fetch
+     * @param budgetPeriodId Unique budget period ID to fetch
      *
      * @return LiveData object of Resource<BudgetPeriod> which can be observed using an Observer for future changes as well.
      */
@@ -519,18 +518,81 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
             }
 
     /**
-     * Fetch goal periods by budget ID from the cache
+     * Fetch budget periods from the cache
      *
-     * @param budgetId Goal ID of the goal periods to fetch (optional)
+     * @param budgetId Budget ID of the budget periods to fetch (optional)
      * @param trackingStatus Filter by the tracking status (optional)
+     * @param fromDate Start date (inclusive) to fetch budgets from (optional). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param toDate End date (inclusive) to fetch budgets up to (optional). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
      *
      * @return LiveData object of Resource<List<BudgetPeriod>> which can be observed using an Observer for future changes as well.
      */
     fun fetchBudgetPeriods(
         budgetId: Long? = null,
-        trackingStatus: BudgetTrackingStatus? = null
+        trackingStatus: BudgetTrackingStatus? = null,
+        fromDate: String? = null,
+        toDate: String? = null
     ): LiveData<Resource<List<BudgetPeriod>>> =
-            Transformations.map(db.budgetPeriods().loadByQuery(sqlForBudgetPeriods(budgetId, trackingStatus))) { models ->
+            Transformations.map(db.budgetPeriods().loadByQuery(sqlForBudgetPeriods(budgetId, trackingStatus, fromDate, toDate))) { models ->
+                Resource.success(models)
+            }
+
+    /**
+     * Advanced method to fetch budget periods by SQL query from the cache
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches budget periods from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL query
+     *
+     * @return LiveData object of Resource<List<BudgetPeriod>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchBudgetPeriods(query: SimpleSQLiteQuery): LiveData<Resource<List<BudgetPeriod>>> =
+            Transformations.map(db.budgetPeriods().loadByQuery(query)) { models ->
+                Resource.success(models)
+            }
+
+    /**
+     * Advanced method to fetch budget periods from cache by SQL query from the cache with associated data
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches budget periods from the cache
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL query
+     *
+     * @return LiveData object of Resource<List<BudgetPeriodRelation>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchBudgetPeriodsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<BudgetPeriodRelation>>> =
+            Transformations.map(db.budgetPeriods().loadByQueryWithRelation(query)) { models ->
+                Resource.success(models)
+            }
+
+    /**
+     * Fetch budget periods from cache with associated data
+     *
+     * @param budgetId id of the budget by which you want to fetch budget periods (Optional)
+     * @param trackingStatus Filter by the tracking status (optional)
+     * @param fromDate Start date (inclusive) to fetch budgets from (optional). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param toDate End date (inclusive) to fetch budgets up to (optional). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
+     *
+     * @return LiveData object of Resource<List<BudgetPeriodRelation>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchBudgetPeriodsWithRelation(
+        budgetId: Long? = null,
+        trackingStatus: BudgetTrackingStatus? = null,
+        fromDate: String? = null,
+        toDate: String? = null
+    ): LiveData<Resource<List<BudgetPeriodRelation>>> =
+            Transformations.map(db.budgetPeriods().loadByQueryWithRelation(sqlForBudgetPeriods(budgetId, trackingStatus, fromDate, toDate))) { models ->
+                Resource.success(models)
+            }
+
+    /**
+     * Fetch budget periods from the cache with associated data
+     *
+     * @param budgetPeriodId id of the budget by which you want to fetch budget periods
+     *
+     * @return LiveData object of Resource<List<BudgetPeriodRelation>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchBudgetPeriodsWithRelation(budgetPeriodId: Long): LiveData<Resource<BudgetPeriodRelation>> =
+            Transformations.map(db.budgetPeriods().loadWithRelation(budgetPeriodId)) { models ->
                 Resource.success(models)
             }
 
@@ -559,9 +621,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * Refresh a budget periods by budget id from the host
      *
      * @param budgetId ID of the budget to fetch
-     * @param fromDate start date of budget from which you want to refresh budget
-     * @param toDate start date of the budget up to which you wan to refresh a budget
-     * @param completion Optional completion handler with optional error if the request fails
+     * @param fromDate Start date to refresh budget periods from (inclusive). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param toDate End date to refresh budget periods up to (inclusive). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param completion Optional completion handler with optional error if the request fails (Optional)
      */
     fun refreshBudgetPeriods(budgetId: Long, fromDate: String? = null, toDate: String? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         budgetsAPI.fetchBudgetPeriods(budgetId, fromDate, toDate).enqueue { resource ->

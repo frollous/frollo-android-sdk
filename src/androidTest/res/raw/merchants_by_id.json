@@ -11,5 +11,13 @@
 			"name": "Rent",
 			"merchant_type": "retailer"
 		}
-	]
+	],
+	"paging": {
+		"cursors": {
+			"before": null,
+			"after": null
+		},
+		"previous": "https://api-sandbox.frollo.us/api/v2/aggregation/merchants/?before=&size=50",
+		"next": "https://api-sandbox.frollo.us/api/v2/aggregation/merchants/?after=&size=50"
+	}
 }

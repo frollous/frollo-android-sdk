@@ -43,6 +43,8 @@ import us.frollo.frollosdk.network.api.EventsAPI
 import us.frollo.frollosdk.model.testTransactionUpdatedNotificationPayload
 import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class EventsTest : BaseAndroidTest() {
 
@@ -69,6 +71,8 @@ class EventsTest : BaseAndroidTest() {
     fun testTriggerEvent() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == EventsAPI.URL_EVENT) {
@@ -82,12 +86,14 @@ class EventsTest : BaseAndroidTest() {
         events.triggerEvent("TEST_EVENT", 15) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(EventsAPI.URL_EVENT, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -96,6 +102,8 @@ class EventsTest : BaseAndroidTest() {
     fun testTriggerEventFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         events.triggerEvent("TEST_EVENT", 15) { result ->
@@ -103,9 +111,11 @@ class EventsTest : BaseAndroidTest() {
             Assert.assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -136,7 +146,7 @@ class EventsTest : BaseAndroidTest() {
             assertTrue(handled)
         }
 
-        wait(2)
+        wait(3)
 
         assertTrue(notifyFlag)
         assertTrue(transactionIds?.toList()?.containsAll(listOf(45123L, 986L, 7000072L)) == true)

@@ -20,7 +20,6 @@ import com.jraska.livedata.test
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -46,8 +45,9 @@ import us.frollo.frollosdk.model.testBudgetPeriodResponseData
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
-import us.frollo.frollosdk.testutils.wait
 import java.math.BigDecimal
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class BudgetsTest : BaseAndroidTest() {
 
@@ -84,7 +84,65 @@ class BudgetsTest : BaseAndroidTest() {
 
         testObserver.awaitValue()
         assertTrue(testObserver.value().data?.isNotEmpty() == true)
-        assertEquals(6, testObserver.value().data?.size)
+        assertEquals(4, testObserver.value().data?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshBudgetsFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        budgets.refreshBudgets { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    // TODO this needs to be redone
+    @Test
+    fun testRefreshBudgets() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val body = readStringFromJson(app, R.raw.budget_valid)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath?.contains(BudgetsAPI.URL_BUDGETS) == true) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        budgets.refreshBudgets { resource ->
+            val testObserver = budgets.fetchBudgets(current = true).test()
+            testObserver.awaitValue()
+            assertNotNull(testObserver.value().data)
+            assertEquals(1, testObserver.value().data?.size)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(BudgetsAPI.URL_BUDGETS, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -120,7 +178,7 @@ class BudgetsTest : BaseAndroidTest() {
         initSetup()
 
         val budgetId: Long = 6
-
+        val signal = CountDownLatch(1)
         val requestPath = "budgets/$budgetId"
 
         val body = readStringFromJson(app, R.raw.refresh_budget)
@@ -144,12 +202,13 @@ class BudgetsTest : BaseAndroidTest() {
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
             assertEquals(budgetId, testObserver.value().data?.budgetId)
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -158,6 +217,8 @@ class BudgetsTest : BaseAndroidTest() {
     fun testRefreshGoalByIdFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         clearLoggedInPreferences()
 
         budgets.refreshBudget(3211) { result ->
@@ -165,9 +226,10 @@ class BudgetsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -176,6 +238,7 @@ class BudgetsTest : BaseAndroidTest() {
     fun testCreateBudget() {
         initSetup()
 
+        val signal = CountDownLatch(1)
         val body = readStringFromJson(app, R.raw.refresh_budget)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -199,12 +262,14 @@ class BudgetsTest : BaseAndroidTest() {
             assertNotNull(testObserver.value().data)
             assertEquals(6L, testObserver.value().data?.budgetId)
             assertEquals(BudgetFrequency.MONTHLY, testObserver.value().data?.frequency)
+
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(BudgetsAPI.URL_BUDGETS, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -213,6 +278,7 @@ class BudgetsTest : BaseAndroidTest() {
     fun testCreateBudgetFailsIfLoggedOut() {
         initSetup()
 
+        val signal = CountDownLatch(1)
         clearLoggedInPreferences()
 
         budgets.createBudgetCategoryBudget(BudgetFrequency.MONTHLY, BigDecimal(1000), BudgetCategory.LIFESTYLE, null,
@@ -220,57 +286,10 @@ class BudgetsTest : BaseAndroidTest() {
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            signal.countDown()
         }
 
-        wait(3)
-
-        tearDown()
-    }
-
-    @Test
-    fun testRefreshBudgetsFailsIfLoggedOut() {
-        initSetup()
-
-        clearLoggedInPreferences()
-
-        budgets.refreshBudgets { result ->
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
-        }
-
-        wait(3)
-
-        tearDown()
-    }
-
-    // TODO this needs to be redone
-    @Test
-    fun testRefreshBudgets() {
-        initSetup()
-
-        val body = readStringFromJson(app, R.raw.budget_valid)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath?.contains(BudgetsAPI.URL_BUDGETS) == true) {
-                    return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        budgets.refreshBudgets { resource ->
-            val testObserver = budgets.fetchBudgets(current = true).test()
-            testObserver.awaitValue()
-            assertNotNull(testObserver.value().data)
-            assertEquals(1, testObserver.value().data?.size)
-        }
-
-        mockServer.takeRequest()
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -279,6 +298,7 @@ class BudgetsTest : BaseAndroidTest() {
     fun testUpdateBudget() {
         initSetup()
 
+        val signal = CountDownLatch(1)
         val budgetId: Long = 6
 
         val requestPath = "budgets/$budgetId"
@@ -310,12 +330,13 @@ class BudgetsTest : BaseAndroidTest() {
             assertNotNull(models)
             assertEquals(budgetId, models?.budgetId)
             assertEquals(BudgetTrackingStatus.BEHIND, models?.trackingStatus)
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -325,6 +346,7 @@ class BudgetsTest : BaseAndroidTest() {
         initSetup()
 
         clearLoggedInPreferences()
+        val signal = CountDownLatch(1)
 
         val budget = testBudgetResponseData(6).toBudget()
         budgets.updateBudget(budget) { result ->
@@ -332,9 +354,10 @@ class BudgetsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -343,6 +366,7 @@ class BudgetsTest : BaseAndroidTest() {
     fun testDeleteBudget() {
         initSetup()
 
+        val signal = CountDownLatch(1)
         val budgetId: Long = 6
 
         val requestPath = "budgets/$budgetId"
@@ -374,12 +398,13 @@ class BudgetsTest : BaseAndroidTest() {
 
             testObserver.awaitValue()
             assertNull(testObserver.value().data)
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -389,15 +414,17 @@ class BudgetsTest : BaseAndroidTest() {
         initSetup()
 
         clearLoggedInPreferences()
+        val signal = CountDownLatch(1)
 
         budgets.deleteBudget(6) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -469,6 +496,7 @@ class BudgetsTest : BaseAndroidTest() {
     fun testRefreshBudgetPeriods() {
         initSetup()
 
+        val signal = CountDownLatch(1)
         val budgetId: Long = 6
         val requestPath = "budgets/$budgetId/periods"
 
@@ -503,12 +531,13 @@ class BudgetsTest : BaseAndroidTest() {
             assertEquals("2019-11-21", period?.startDate)
             assertEquals(BigDecimal("15.62"), period?.targetAmount)
             assertEquals(BudgetTrackingStatus.BEHIND, period?.trackingStatus)
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -518,15 +547,17 @@ class BudgetsTest : BaseAndroidTest() {
         initSetup()
 
         clearLoggedInPreferences()
+        val signal = CountDownLatch(1)
 
         budgets.refreshBudgetPeriods(budgetId = 6) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -535,6 +566,7 @@ class BudgetsTest : BaseAndroidTest() {
     fun testRefreshBudgetPeriodById() {
         initSetup()
 
+        val signal = CountDownLatch(1)
         val budgetId: Long = 6
         val periodId: Long = 85
         val requestPath = "budgets/$budgetId/periods/$periodId"
@@ -560,12 +592,13 @@ class BudgetsTest : BaseAndroidTest() {
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
             assertEquals(85L, testObserver.value().data?.budgetPeriodId)
+            signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -573,7 +606,7 @@ class BudgetsTest : BaseAndroidTest() {
     @Test
     fun testRefreshBudgetPeriodByIdFailsIfLoggedOut() {
         initSetup()
-
+        val signal = CountDownLatch(1)
         clearLoggedInPreferences()
 
         budgets.refreshBudgetPeriod(budgetId = 6, periodId = 85) { result ->
@@ -581,9 +614,10 @@ class BudgetsTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }
@@ -592,6 +626,7 @@ class BudgetsTest : BaseAndroidTest() {
     fun testBudgetPeriodsLinkToBudgets() {
         initSetup()
 
+        val signal = CountDownLatch(2)
         val budgetId: Long = 6
         val requestPath = "budgets/$budgetId/periods"
 
@@ -613,22 +648,24 @@ class BudgetsTest : BaseAndroidTest() {
         budgets.refreshBudgets { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
+            signal.countDown()
         }
 
         budgets.refreshBudgetPeriods(budgetId) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
+            signal.countDown()
         }
 
-        wait(3)
+        signal.await(3, TimeUnit.SECONDS)
 
         val testObserver = budgets.fetchBudgetWithRelation(9000).test()
 
         testObserver.awaitValue()
         val model = testObserver.value().data
         assertNotNull(model)
-        assertEquals(9000L, model?.goalPeriod?.goalPeriodId)
-        assertEquals(model?.goalPeriod?.goalId, model?.goal?.goal?.goalId)
+        assertEquals(6, model?.budget?.budgetId)
+        assertEquals(model?.periods?.get(0)?.budgetPeriodId, 85L)
 
         tearDown()
     }

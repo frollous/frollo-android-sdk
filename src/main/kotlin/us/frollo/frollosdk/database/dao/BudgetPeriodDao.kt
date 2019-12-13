@@ -67,10 +67,6 @@ internal interface BudgetPeriodDao {
     fun loadWithRelation(budgetPeriodId: Long): LiveData<BudgetPeriodRelation?>
 
     @Transaction
-    @Query("SELECT * FROM budget_period WHERE budget_id = :budgetId")
-    fun loadByBudgetIdWithRelation(budgetId: Long): LiveData<List<BudgetPeriodRelation>>
-
-    @Transaction
     @RawQuery(observedEntities = [BudgetPeriodRelation::class])
     fun loadByQueryWithRelation(queryStr: SupportSQLiteQuery): LiveData<List<BudgetPeriodRelation>>
 }

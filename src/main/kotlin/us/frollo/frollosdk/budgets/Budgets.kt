@@ -552,9 +552,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
             }
 
     /**
-     * Advanced method to fetch budget periods by SQL query from the cache with associated data
+     * Advanced method to fetch budget periods from cache by SQL query from the cache with associated data
      *
-     * @param query SimpleSQLiteQuery: Select query which fetches budgets from the cache
+     * @param query SimpleSQLiteQuery: Select query which fetches budget periods from the cache
      * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL query
      *
      * @return LiveData object of Resource<List<BudgetPeriodRelation>> which can be observed using an Observer for future changes as well.
@@ -575,10 +575,12 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<BudgetPeriodRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchBudgetPeriodsWithRelation(
-            budgetId: Long? = null,
-            trackingStatus: BudgetTrackingStatus? = null,
-            fromDate: String? = null,
-            toDate: String? = null): LiveData<Resource<List<BudgetPeriodRelation>>> = Transformations.map(db.budgetPeriods().loadByQueryWithRelation(sqlForBudgetPeriods(budgetId,trackingStatus,fromDate,toDate))) { models ->
+        budgetId: Long? = null,
+        trackingStatus: BudgetTrackingStatus? = null,
+        fromDate: String? = null,
+        toDate: String? = null
+    ): LiveData<Resource<List<BudgetPeriodRelation>>> =
+            Transformations.map(db.budgetPeriods().loadByQueryWithRelation(sqlForBudgetPeriods(budgetId, trackingStatus, fromDate, toDate))) { models ->
                 Resource.success(models)
             }
 

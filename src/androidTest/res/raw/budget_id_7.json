@@ -1,8 +1,8 @@
 {
-  "id": 6,
+  "id": 7,
   "is_current": true,
-  "type": "category",
-  "type_value": "60",
+  "type": "merchant",
+  "type_value": "7",
   "user_id": 419,
   "status": "active",
   "tracking_status": "behind",
@@ -13,7 +13,7 @@
   "start_date": "2018-12-04",
   "periods_count": 14,
   "current_period": {
-    "budget_id": 6,
+    "budget_id": 7,
     "id": 126,
     "start_date": "2019-12-04",
     "end_date": "2020-01-03",

@@ -98,7 +98,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<Budget>> which can be observed using an Observer for future changes as well.
      *
      */
-    private fun fetchMerchantBudgets(
+    fun fetchMerchantBudgets(
         merchantId: Long,
         current: Boolean? = null,
         frequency: BudgetFrequency? = null,
@@ -120,7 +120,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<Budget>> which can be observed using an Observer for future changes as well.
      *
      */
-    private fun fetchBudgetCategoryBudgets(
+    fun fetchBudgetCategoryBudgets(
         budgetCategory: BudgetCategory,
         current: Boolean? = null,
         frequency: BudgetFrequency? = null,
@@ -141,7 +141,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<Budget>> which can be observed using an Observer for future changes as well.
      *
      */
-    private fun fetchCategoryBudgets(
+    fun fetchTransactionCategoryBudgets(
         categoryId: Long,
         current: Boolean? = null,
         frequency: BudgetFrequency? = null,
@@ -269,7 +269,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<BudgetRelation> which can be observed using an Observer for future changes as well.
      */
     fun fetchBudgetsWithRelation(
-        current: Boolean?,
+        current: Boolean? = null,
         frequency: BudgetFrequency? = null,
         status: BudgetStatus? = null,
         trackingStatus: BudgetTrackingStatus? = null,
@@ -701,7 +701,6 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         response?.let {
             doAsync {
                 val models = response.map { it.toBudgetPeriod() }
-                db.budgetPeriods().insertAll(*models.toTypedArray())
                 val apiIds = models.map { it.budgetPeriodId }.toHashSet()
                 val allPeriodIds = db.budgetPeriods().getIds(sqlForBudgetPeriodIds(budgetId, fromDate, toDate)).toHashSet()
                 val staleIds = allPeriodIds.minus(apiIds)
@@ -709,6 +708,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
                 if (staleIds.isNotEmpty()) {
                     removeCachedBudgetPeriods(staleIds.toLongArray())
                 }
+                db.budgetPeriods().insertAll(*models.toTypedArray())
 
                 uiThread { completion?.invoke(Result.success()) }
             }

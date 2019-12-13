@@ -1,0 +1,26 @@
+{
+  "id": 6,
+  "is_current": true,
+  "type": "budget_category",
+  "type_value": "living",
+  "user_id": 419,
+  "status": "active",
+  "tracking_status": "behind",
+  "frequency": "monthly",
+  "currency": "AUD",
+  "current_amount": "0.00",
+  "period_amount": "1000.00",
+  "start_date": "2018-12-04",
+  "periods_count": 14,
+  "current_period": {
+    "budget_id": 6,
+    "id": 126,
+    "start_date": "2019-12-04",
+    "end_date": "2020-01-03",
+    "target_amount": "71.43",
+    "current_amount": "0.00",
+    "required_amount": "0.00",
+    "tracking_status": "behind",
+    "index": 12
+  }
+}

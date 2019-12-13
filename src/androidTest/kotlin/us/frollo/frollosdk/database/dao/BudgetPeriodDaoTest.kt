@@ -300,8 +300,12 @@ class BudgetPeriodDaoTest {
         db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 4561, budgetId = 123).toBudgetPeriod())
 
         val testObserver = db.budgetPeriods().getIds(sqlForBudgetPeriodIds(123))
+        // test data start date 2019-02-01
+        val testObserver2 = db.budgetPeriods().getIds(sqlForBudgetPeriodIds(123, "2019-01-02", "2019-02-10"))
 
         assertEquals(2, testObserver.size)
         assertEquals(456, testObserver[0])
+        assertEquals(2, testObserver2.size)
+        assertEquals(4561, testObserver2[1])
     }
 }

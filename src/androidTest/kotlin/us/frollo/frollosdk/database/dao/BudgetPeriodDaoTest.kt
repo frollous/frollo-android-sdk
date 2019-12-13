@@ -31,6 +31,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.extensions.sqlForBudgetPeriodIds
 import us.frollo.frollosdk.mapping.toBudget
 import us.frollo.frollosdk.mapping.toBudgetPeriod
 import us.frollo.frollosdk.model.testBudgetPeriodResponseData
@@ -266,7 +267,7 @@ class BudgetPeriodDaoTest {
 
         val model = testObserver.value()[0]
 
-        model?.budgetPeriod
+        model.budgetPeriod
         assertEquals(123L, model.budget?.budget?.budgetId)
         assertEquals(123L, model.budgetPeriod?.budgetId)
         assertEquals(456L, model.budgetPeriod?.budgetPeriodId)
@@ -289,5 +290,17 @@ class BudgetPeriodDaoTest {
         assertEquals(123L, model.budget?.budget?.budgetId)
         assertEquals(123L, model.budgetPeriod?.budgetId)
         assertEquals(456L, model.budgetPeriod?.budgetPeriodId)
+    }
+
+    @Test
+    fun testBudgetPeriodGetIds() {
+
+        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 123).toBudgetPeriod())
+        db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 4561, budgetId = 123).toBudgetPeriod())
+
+        val testObserver = db.budgetPeriods().getIds(sqlForBudgetPeriodIds(123))
+
+        assertEquals(2, testObserver.size)
+        assertEquals(456, testObserver[0])
     }
 }

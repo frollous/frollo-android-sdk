@@ -39,6 +39,9 @@ internal interface BudgetPeriodDao {
     @RawQuery(observedEntities = [BudgetPeriod::class])
     fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<BudgetPeriod>>
 
+    @RawQuery
+    fun getIds(queryStr: SupportSQLiteQuery): LongArray
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: BudgetPeriod): LongArray
 
@@ -62,10 +65,6 @@ internal interface BudgetPeriodDao {
     @Transaction
     @Query("SELECT * FROM budget_period WHERE budget_period_id = :budgetPeriodId")
     fun loadWithRelation(budgetPeriodId: Long): LiveData<BudgetPeriodRelation?>
-
-    @Transaction
-    @Query("SELECT * FROM budget_period WHERE budget_id = :budgetId")
-    fun loadByBudgetIdWithRelation(budgetId: Long): LiveData<List<BudgetPeriodRelation>>
 
     @Transaction
     @RawQuery(observedEntities = [BudgetPeriodRelation::class])

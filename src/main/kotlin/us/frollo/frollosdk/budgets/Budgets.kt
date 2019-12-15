@@ -24,6 +24,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
+import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchBudgets
@@ -158,7 +159,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @param status Filter budgets by budget status (Optional)
      * @param trackingStatus Filter budgets by tracking status (Optional)
      * @param type Filter budgets by budget type (Optional)
-     * @param typeValue Filter budgets by budget type value (Optional)
+     * @param typeValue Filter budgets by budget type value (Optional). This can be transaction category ID or merchant ID or budget category raw string based on the Budget Type.
      *
      * @return LiveData object of Resource<List<Budget>> which can be observed using an Observer for future changes as well.
      *
@@ -238,7 +239,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
     /**
      * Fetch budgets with relation from the cache by transaction category
      *
-     * @param categoryId Filter budgets by specific merchant
+     * @param categoryId Filter budgets by specific transaction category ID
      * @param current Filter budgets by currently active budgets (Optional)
      * @param frequency Filter budgets by budget frequency (Optional)
      * @param status Filter budgets by budget status (Optional)
@@ -352,11 +353,10 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      *
      * @param budgetFrequency The frequency at which you want to split up this budget. Refer [BudgetFrequency]
      * @param periodAmount Amount allocated the Budget period
-     * @param budgetCategory Unique if of the category, based on which you create a budget
+     * @param budgetCategory Budget category for which you want to create a budget
      * @param startDate Start date of the budget. Defaults to today (Optional)
-     * @param imageUrl Image Url of the budget. Defaults to today (Optional)
+     * @param imageUrl Image Url of the budget (Optional)
      * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
-     * @param periodAmount Amount allocated the Budget period
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun createBudgetCategoryBudget(
@@ -374,11 +374,10 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      *
      * @param budgetFrequency The frequency at which you want to split up this budget. Refer [BudgetFrequency]
      * @param periodAmount Amount allocated the Budget period
-     * @param categoryId Unique if of the category, based on which you create a budget
+     * @param categoryId Unique ID of the transaction category, based on which you create a budget
      * @param startDate Start date of the budget. Defaults to today (Optional)
      * @param imageUrl Image Url of the budget. Defaults to today (Optional)
      * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
-     * @param periodAmount Amount allocated the Budget period
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun createCategoryBudget(
@@ -396,11 +395,10 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      *
      * @param budgetFrequency The frequency at which you want to split up this budget. Refer [BudgetFrequency]
      * @param periodAmount Amount allocated the Budget period
-     * @param merchantId Unique if of the merchant, based on which you create a budget
+     * @param merchantId Unique ID of the merchant, based on which you create a budget
      * @param startDate Start date of the budget. Defaults to today (Optional)
-     * @param imageUrl Image Url of the budget. Defaults to today (Optional)
+     * @param imageUrl Image Url of the budget (Optional)
      * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
-     * @param periodAmount Amount allocated the Budget period
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun createMerchantBudget(
@@ -421,9 +419,8 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @param type [BudgetType]
      * @param typedValue Budget category, categoryId or merchantId
      * @param startDate Start date of the budget. Defaults to today (Optional)
-     * @param imageUrl Image Url of the budget. Defaults to today (Optional)
+     * @param imageUrl Image Url of the budget (Optional)
      * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
-     * @param periodAmount Amount allocated the Budget period
      * @param completion Optional completion handler with optional error if the request fails
      */
     private fun createBudget(

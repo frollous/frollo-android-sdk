@@ -52,8 +52,6 @@ import java.util.concurrent.TimeUnit
 
 class BudgetsTest : BaseAndroidTest() {
 
-    // TODO why do the failed tests not work with takeRequest or succeess failure response given in the whole app??
-
     override fun initSetup() {
         super.initSetup()
 
@@ -376,7 +374,7 @@ class BudgetsTest : BaseAndroidTest() {
     }
 
     @Test
-    fun testFetchBudgetsById() {
+    fun testFetchBudgetById() {
         initSetup()
 
         val data1 = testBudgetResponseData(100, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
@@ -442,7 +440,7 @@ class BudgetsTest : BaseAndroidTest() {
     }
 
     @Test
-    fun testRefreshGoalByIdFailsIfLoggedOut() {
+    fun testRefreshBudgetByIdFailsIfLoggedOut() {
         initSetup()
 
         val signal = CountDownLatch(1)
@@ -626,7 +624,7 @@ class BudgetsTest : BaseAndroidTest() {
             }
         })
 
-        val budget = testBudgetResponseData(budgetId).toBudget()
+        val budget = testBudgetResponseData(budgetId, status = BudgetStatus.UNSTARTED).toBudget()
 
         database.budgets().insert(budget)
 

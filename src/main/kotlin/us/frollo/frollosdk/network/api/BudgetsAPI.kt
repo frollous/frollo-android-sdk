@@ -45,7 +45,7 @@ internal interface BudgetsAPI {
     fun fetchBudgets(@QueryMap queryParams: Map<String, String>): Call<List<BudgetResponse>>
 
     @POST(URL_BUDGETS)
-    fun createBudget(budgetCreateRequest: BudgetCreateRequest): Call<BudgetResponse>
+    fun createBudget(@Body budgetCreateRequest: BudgetCreateRequest): Call<BudgetResponse>
 
     @GET(URL_BUDGET)
     fun fetchBudget(@Path("budget_id") budgetId: Long): Call<BudgetResponse>

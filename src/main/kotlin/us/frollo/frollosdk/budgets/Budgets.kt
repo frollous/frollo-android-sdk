@@ -24,6 +24,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
+import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchBudgets
@@ -98,15 +99,15 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<Budget>> which can be observed using an Observer for future changes as well.
      *
      */
-    private fun fetchMerchantBudgets(
-        merchantId: Long,
+    fun fetchMerchantBudgets(
+        merchantId: Long? = null,
         current: Boolean? = null,
         frequency: BudgetFrequency? = null,
         status: BudgetStatus? = null,
         trackingStatus: BudgetTrackingStatus? = null
 
     ): LiveData<Resource<List<Budget>>> =
-            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.MERCHANT, merchantId.toString())
+            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.MERCHANT, merchantId?.toString())
 
     /**
      * Fetch budgets from the cache by Budget Category
@@ -120,19 +121,19 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<Budget>> which can be observed using an Observer for future changes as well.
      *
      */
-    private fun fetchBudgetCategoryBudgets(
-        budgetCategory: BudgetCategory,
+    fun fetchBudgetCategoryBudgets(
+        budgetCategory: BudgetCategory? = null,
         current: Boolean? = null,
         frequency: BudgetFrequency? = null,
         status: BudgetStatus? = null,
         trackingStatus: BudgetTrackingStatus? = null
     ): LiveData<Resource<List<Budget>>> =
-            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.BUDGET_CATEGORY, budgetCategory.toString())
+            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.BUDGET_CATEGORY, budgetCategory?.toString())
 
     /**
      * Fetch budgets from the cache by Category
      *
-     * @param categoryId Filter budgets by specific merchant
+     * @param categoryId Filter budgets by specific transaction category ID
      * @param current Filter budgets by currently active budgets (Optional)
      * @param frequency Filter budgets by budget frequency (Optional)
      * @param status Filter budgets by budget status (Optional)
@@ -141,14 +142,14 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<Budget>> which can be observed using an Observer for future changes as well.
      *
      */
-    private fun fetchCategoryBudgets(
-        categoryId: Long,
+    fun fetchTransactionCategoryBudgets(
+        categoryId: Long? = null,
         current: Boolean? = null,
         frequency: BudgetFrequency? = null,
         status: BudgetStatus? = null,
         trackingStatus: BudgetTrackingStatus? = null
     ): LiveData<Resource<List<Budget>>> =
-            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.TRANSACTION_CATEGORY, categoryId.toString())
+            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.TRANSACTION_CATEGORY, categoryId?.toString())
 
     /**
      * Fetch budgets from the cache
@@ -158,7 +159,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @param status Filter budgets by budget status (Optional)
      * @param trackingStatus Filter budgets by tracking status (Optional)
      * @param type Filter budgets by budget type (Optional)
-     * @param typeValue Filter budgets by budget type value (Optional)
+     * @param typeValue Filter budgets by budget type value (Optional). This can be transaction category ID or merchant ID or budget category raw string based on the Budget Type.
      *
      * @return LiveData object of Resource<List<Budget>> which can be observed using an Observer for future changes as well.
      *
@@ -238,7 +239,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
     /**
      * Fetch budgets with relation from the cache by transaction category
      *
-     * @param categoryId Filter budgets by specific merchant
+     * @param categoryId Filter budgets by specific transaction category ID
      * @param current Filter budgets by currently active budgets (Optional)
      * @param frequency Filter budgets by budget frequency (Optional)
      * @param status Filter budgets by budget status (Optional)
@@ -269,7 +270,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<BudgetRelation> which can be observed using an Observer for future changes as well.
      */
     fun fetchBudgetsWithRelation(
-        current: Boolean?,
+        current: Boolean? = null,
         frequency: BudgetFrequency? = null,
         status: BudgetStatus? = null,
         trackingStatus: BudgetTrackingStatus? = null,
@@ -352,11 +353,10 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      *
      * @param budgetFrequency The frequency at which you want to split up this budget. Refer [BudgetFrequency]
      * @param periodAmount Amount allocated the Budget period
-     * @param budgetCategory Unique if of the category, based on which you create a budget
+     * @param budgetCategory Budget category for which you want to create a budget
      * @param startDate Start date of the budget. Defaults to today (Optional)
-     * @param imageUrl Image Url of the budget. Defaults to today (Optional)
+     * @param imageUrl Image Url of the budget (Optional)
      * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
-     * @param periodAmount Amount allocated the Budget period
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun createBudgetCategoryBudget(
@@ -374,11 +374,10 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      *
      * @param budgetFrequency The frequency at which you want to split up this budget. Refer [BudgetFrequency]
      * @param periodAmount Amount allocated the Budget period
-     * @param categoryId Unique if of the category, based on which you create a budget
+     * @param categoryId Unique ID of the transaction category, based on which you create a budget
      * @param startDate Start date of the budget. Defaults to today (Optional)
-     * @param imageUrl Image Url of the budget. Defaults to today (Optional)
+     * @param imageUrl Image Url of the budget (Optional)
      * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
-     * @param periodAmount Amount allocated the Budget period
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun createCategoryBudget(
@@ -396,11 +395,10 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      *
      * @param budgetFrequency The frequency at which you want to split up this budget. Refer [BudgetFrequency]
      * @param periodAmount Amount allocated the Budget period
-     * @param merchantId Unique if of the merchant, based on which you create a budget
+     * @param merchantId Unique ID of the merchant, based on which you create a budget
      * @param startDate Start date of the budget. Defaults to today (Optional)
-     * @param imageUrl Image Url of the budget. Defaults to today (Optional)
+     * @param imageUrl Image Url of the budget (Optional)
      * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
-     * @param periodAmount Amount allocated the Budget period
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun createMerchantBudget(
@@ -421,9 +419,8 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @param type [BudgetType]
      * @param typedValue Budget category, categoryId or merchantId
      * @param startDate Start date of the budget. Defaults to today (Optional)
-     * @param imageUrl Image Url of the budget. Defaults to today (Optional)
+     * @param imageUrl Image Url of the budget (Optional)
      * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
-     * @param periodAmount Amount allocated the Budget period
      * @param completion Optional completion handler with optional error if the request fails
      */
     private fun createBudget(
@@ -700,8 +697,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
     private fun handleBudgetPeriodsResponse(response: List<BudgetPeriodResponse>?, budgetId: Long, fromDate: String? = null, toDate: String? = null, completion: ((Result) -> Unit)?) {
         response?.let {
             doAsync {
-                val models = response.map { it.toBudgetPeriod() }
 
+                val models = response.map { it.toBudgetPeriod() }
+                db.budgetPeriods().insertAll(*models.toTypedArray())
                 val apiIds = models.map { it.budgetPeriodId }.toHashSet()
                 val allPeriodIds = db.budgetPeriods().getIds(sqlForBudgetPeriodIds(budgetId, fromDate, toDate)).toHashSet()
                 val staleIds = allPeriodIds.minus(apiIds)

@@ -376,7 +376,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @param periodAmount Amount allocated the Budget period
      * @param categoryId Unique ID of the transaction category, based on which you create a budget
      * @param startDate Start date of the budget. Defaults to today (Optional)
-     * @param imageUrl Image Url of the budget. Defaults to today (Optional)
+     * @param imageUrl Image Url of the budget (Optional)
      * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */

@@ -100,14 +100,14 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      *
      */
     fun fetchMerchantBudgets(
-        merchantId: Long,
+        merchantId: Long? = null,
         current: Boolean? = null,
         frequency: BudgetFrequency? = null,
         status: BudgetStatus? = null,
         trackingStatus: BudgetTrackingStatus? = null
 
     ): LiveData<Resource<List<Budget>>> =
-            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.MERCHANT, merchantId.toString())
+            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.MERCHANT, merchantId?.toString())
 
     /**
      * Fetch budgets from the cache by Budget Category
@@ -122,18 +122,18 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      *
      */
     fun fetchBudgetCategoryBudgets(
-        budgetCategory: BudgetCategory,
+        budgetCategory: BudgetCategory? = null,
         current: Boolean? = null,
         frequency: BudgetFrequency? = null,
         status: BudgetStatus? = null,
         trackingStatus: BudgetTrackingStatus? = null
     ): LiveData<Resource<List<Budget>>> =
-            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.BUDGET_CATEGORY, budgetCategory.toString())
+            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.BUDGET_CATEGORY, budgetCategory?.toString())
 
     /**
      * Fetch budgets from the cache by Category
      *
-     * @param categoryId Filter budgets by specific merchant
+     * @param categoryId Filter budgets by specific transaction category ID
      * @param current Filter budgets by currently active budgets (Optional)
      * @param frequency Filter budgets by budget frequency (Optional)
      * @param status Filter budgets by budget status (Optional)
@@ -143,13 +143,13 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      *
      */
     fun fetchTransactionCategoryBudgets(
-        categoryId: Long,
+        categoryId: Long? = null,
         current: Boolean? = null,
         frequency: BudgetFrequency? = null,
         status: BudgetStatus? = null,
         trackingStatus: BudgetTrackingStatus? = null
     ): LiveData<Resource<List<Budget>>> =
-            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.TRANSACTION_CATEGORY, categoryId.toString())
+            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.TRANSACTION_CATEGORY, categoryId?.toString())
 
     /**
      * Fetch budgets from the cache
@@ -697,7 +697,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
     private fun handleBudgetPeriodsResponse(response: List<BudgetPeriodResponse>?, budgetId: Long, fromDate: String? = null, toDate: String? = null, completion: ((Result) -> Unit)?) {
         response?.let {
             doAsync {
+
                 val models = response.map { it.toBudgetPeriod() }
+                db.budgetPeriods().insertAll(*models.toTypedArray())
                 val apiIds = models.map { it.budgetPeriodId }.toHashSet()
                 val allPeriodIds = db.budgetPeriods().getIds(sqlForBudgetPeriodIds(budgetId, fromDate, toDate)).toHashSet()
                 val staleIds = allPeriodIds.minus(apiIds)
@@ -705,7 +707,6 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
                 if (staleIds.isNotEmpty()) {
                     removeCachedBudgetPeriods(staleIds.toLongArray())
                 }
-                db.budgetPeriods().insertAll(*models.toTypedArray())
 
                 uiThread { completion?.invoke(Result.success()) }
             }

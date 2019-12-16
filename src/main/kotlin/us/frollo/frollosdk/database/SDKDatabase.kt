@@ -344,8 +344,8 @@ abstract class SDKDatabase : RoomDatabase() {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `budget` (`budget_id` INTEGER NOT NULL, `is_current` INTEGER NOT NULL, `image_url` TEXT, `tracking_status` TEXT NOT NULL, `status` TEXT NOT NULL, `frequency` TEXT NOT NULL, `user_id` INTEGER NOT NULL, `currency` TEXT NOT NULL, `current_amount` TEXT NOT NULL, `period_amount` TEXT NOT NULL, `start_date` TEXT, `type` TEXT NOT NULL, `type_value` TEXT NOT NULL, `periods_count` INTEGER NOT NULL, `metadata` TEXT, `c_period_budget_period_id` INTEGER, `c_period_budget_id` INTEGER, `c_period_start_date` TEXT, `c_period_end_date` TEXT, `c_period_current_amount` TEXT, `c_period_target_amount` TEXT, `c_period_required_amount` TEXT, `c_period_tracking_status` TEXT, `c_period_index` INTEGER, PRIMARY KEY(`budget_id`))")
                 database.execSQL("CREATE  INDEX `index_budget_budget_id` ON `budget` (`budget_id`)")
                 database.execSQL("CREATE TABLE IF NOT EXISTS `budget_period` (`budget_period_id` INTEGER NOT NULL, `budget_id` INTEGER NOT NULL, `start_date` TEXT NOT NULL, `end_date` TEXT NOT NULL, `current_amount` TEXT NOT NULL, `target_amount` TEXT NOT NULL, `required_amount` TEXT NOT NULL, `tracking_status` TEXT NOT NULL, `index` INTEGER NOT NULL, PRIMARY KEY(`budget_period_id`))")
-                database.execSQL("CREATE  INDEX `index_budget_period_budget_id` ON `budget_period` (`budget_id`)")
                 database.execSQL("CREATE  INDEX `index_budget_period_budget_period_id` ON `budget_period` (`budget_period_id`)")
+                database.execSQL("CREATE  INDEX `index_budget_period_budget_id` ON `budget_period` (`budget_id`)")
             }
         }
     }

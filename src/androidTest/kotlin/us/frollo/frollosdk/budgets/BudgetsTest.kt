@@ -43,6 +43,8 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.testBudgetPeriodResponseData
 import us.frollo.frollosdk.model.testBudgetResponseData
+import us.frollo.frollosdk.model.testBudgetPeriodResponseData
+import us.frollo.frollosdk.model.testBudgetResponseData
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
@@ -75,10 +77,13 @@ class BudgetsTest : BaseAndroidTest() {
         database.budgets().insertAll(*list.map { it.toBudget() }.toList().toTypedArray())
 
         val testObserver = budgets.fetchMerchantBudgets(65L).test()
+        val testObserver2 = budgets.fetchMerchantBudgets().test()
 
         testObserver.awaitValue()
+        testObserver2.awaitValue()
         assertNotNull(testObserver.value().data)
         assertEquals(2, testObserver.value().data?.size)
+        assertEquals(5, testObserver2.value().data?.size)
 
         tearDown()
     }
@@ -119,10 +124,13 @@ class BudgetsTest : BaseAndroidTest() {
         database.budgets().insertAll(*list.map { it.toBudget() }.toList().toTypedArray())
 
         val testObserver = budgets.fetchTransactionCategoryBudgets(65L).test()
+        val testObserver2 = budgets.fetchTransactionCategoryBudgets().test()
 
         testObserver.awaitValue()
+        testObserver2.awaitValue()
         assertNotNull(testObserver.value().data)
         assertEquals(1, testObserver.value().data?.size)
+        assertEquals(2, testObserver2.value().data?.size)
 
         tearDown()
     }
@@ -163,10 +171,13 @@ class BudgetsTest : BaseAndroidTest() {
         database.budgets().insertAll(*list.map { it.toBudget() }.toList().toTypedArray())
 
         val testObserver = budgets.fetchBudgetCategoryBudgets(BudgetCategory.LIFESTYLE).test()
+        val testObserver2 = budgets.fetchBudgetCategoryBudgets().test()
 
         testObserver.awaitValue()
+        testObserver2.awaitValue()
         assertNotNull(testObserver.value().data)
         assertEquals(2, testObserver.value().data?.size)
+        assertEquals(3, testObserver2.value().data?.size)
 
         tearDown()
     }
@@ -244,7 +255,9 @@ class BudgetsTest : BaseAndroidTest() {
         val data13 = testBudgetPeriodResponseData(budgetPeriodId = 102, budgetId = 103, trackingStatus = BudgetTrackingStatus.ON_TRACK)
         val data14 = testBudgetPeriodResponseData(budgetPeriodId = 103, budgetId = 200, trackingStatus = BudgetTrackingStatus.ON_TRACK)
         val data15 = testBudgetPeriodResponseData(budgetPeriodId = 104, budgetId = 201, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val periods = mutableListOf(data11, data12, data13, data14, data15)
+        val data16 = testBudgetPeriodResponseData(budgetPeriodId = 105, budgetId = 100, trackingStatus = BudgetTrackingStatus.ON_TRACK)
+        val data17 = testBudgetPeriodResponseData(budgetPeriodId = 106, budgetId = 100, trackingStatus = BudgetTrackingStatus.ON_TRACK)
+        val periods = mutableListOf(data11, data12, data13, data14, data15, data16, data17)
 
         database.budgetPeriods().insertAll(*periods.map { it.toBudgetPeriod() }.toList().toTypedArray())
 
@@ -255,6 +268,7 @@ class BudgetsTest : BaseAndroidTest() {
         assertEquals(7, testObserver.value().data?.size)
         assertEquals(testObserver.value().data?.get(0)?.budget?.budgetId, testObserver.value().data?.get(0)?.periods?.get(0)?.budgetId)
         assertEquals(testObserver.value().data?.get(0)?.budget?.budgetId, 100L)
+        assertEquals(testObserver.value().data?.get(0)?.periods?.size, 3)
 
         tearDown()
     }
@@ -624,7 +638,7 @@ class BudgetsTest : BaseAndroidTest() {
             }
         })
 
-        val budget = testBudgetResponseData(budgetId, status = BudgetStatus.UNSTARTED).toBudget()
+        val budget = testBudgetResponseData(budgetId, status = BudgetStatus.UNSTARTED, trackingStatus = BudgetTrackingStatus.ON_TRACK).toBudget()
 
         database.budgets().insert(budget)
 
@@ -1194,6 +1208,80 @@ class BudgetsTest : BaseAndroidTest() {
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testLinkingRemoveCachedCascade() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val body = readStringFromJson(app, R.raw.budget_valid)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == BudgetsAPI.URL_BUDGETS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        database.budgets().insert(testBudgetResponseData(budgetId = 7).toBudget())
+        database.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 7).toBudgetPeriod())
+        database.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 457, budgetId = 7).toBudgetPeriod())
+
+        budgets.fetchBudget(budgetId = 7).test().apply {
+            awaitValue()
+
+            assertEquals(7L, value().data?.budgetId)
+        }
+
+        budgets.fetchBudgetPeriods(budgetId = 7).test().apply {
+            awaitValue()
+
+            assertEquals(2, value().data?.size)
+            assertEquals(456L, value().data?.get(0)?.budgetPeriodId)
+            assertEquals(457L, value().data?.get(1)?.budgetPeriodId)
+        }
+
+        budgets.refreshBudgets { resource ->
+            assertEquals(Result.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            budgets.fetchBudgets().test().apply {
+                awaitValue()
+                assertNotNull(value().data)
+                assertEquals(3, value().data?.size)
+            }
+
+            budgets.fetchBudget(budgetId = 7).test().apply {
+                awaitValue()
+                assertNull(value().data)
+            }
+
+            budgets.fetchBudgetPeriods(7L).test().apply {
+                awaitValue()
+                assertEquals(0, value().data?.size)
+            }
+
+            budgets.fetchBudgetPeriod(budgetPeriodId = 456).test().apply {
+                awaitValue()
+                assertNull(value().data)
+            }
+
+            budgets.fetchBudgetPeriod(budgetPeriodId = 457).test().apply {
+                awaitValue()
+                assertNull(value().data)
+            }
+
+            signal.countDown()
+        }
 
         signal.await(3, TimeUnit.SECONDS)
 

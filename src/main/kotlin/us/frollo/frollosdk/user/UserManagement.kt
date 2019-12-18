@@ -276,7 +276,7 @@ class UserManagement(
      * @param notificationToken Push notification token for the device (optional)
      * @param completion Completion handler with any error that occurred (optional)
      */
-    internal fun updateDevice(compliant: Boolean? = null, notificationToken: String? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun updateDevice(compliant: Boolean? = null, notificationToken: String? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val request = DeviceUpdateRequest(
                 deviceId = di.deviceId,
                 deviceType = di.deviceType,

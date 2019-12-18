@@ -1,0 +1,263 @@
+{
+	"data": [
+		{
+			"date": "2019-01-01",
+			"value": 740.0,
+			"income": false,
+			"groups": [
+				{
+					"id": 176,
+					"name": "rent",
+					"value": 740.0,
+					"income": false,
+					"transaction_ids": [
+						337748,
+						337746,
+						337744,
+						337742
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-02-01",
+			"value": 740.0,
+			"income": false,
+			"groups": [
+				{
+					"id": 176,
+					"name": "rent",
+					"value": 740.0,
+					"income": false,
+					"transaction_ids": [
+						337740,
+						337738,
+						337736,
+						337734
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-03-01",
+			"value": 740.0,
+			"income": false,
+			"groups": [
+				{
+					"id": 176,
+					"name": "rent",
+					"value": 740.0,
+					"income": false,
+					"transaction_ids": [
+						337732,
+						337730,
+						337728,
+						337726
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-04-01",
+			"value": 740.0,
+			"income": false,
+			"groups": [
+				{
+					"id": 176,
+					"name": "rent",
+					"value": 740.0,
+					"income": false,
+					"transaction_ids": [
+						337722,
+						337720,
+						337718,
+						337716
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-05-01",
+			"value": 740.0,
+			"income": false,
+			"groups": [
+				{
+					"id": 176,
+					"name": "rent",
+					"value": 740.0,
+					"income": false,
+					"transaction_ids": [
+						337714,
+						337712,
+						337710,
+						337708
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-06-01",
+			"value": 925.0,
+			"income": false,
+			"groups": [
+				{
+					"id": 176,
+					"name": "rent",
+					"value": 925.0,
+					"income": false,
+					"transaction_ids": [
+						337706,
+						337704,
+						337702,
+						337700,
+						337698
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-07-01",
+			"value": 740.0,
+			"income": false,
+			"groups": [
+				{
+					"id": 176,
+					"name": "rent",
+					"value": 740.0,
+					"income": false,
+					"transaction_ids": [
+						337696,
+						337694,
+						337692,
+						337690
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-08-01",
+			"value": 740.0,
+			"income": false,
+			"groups": [
+				{
+					"id": 176,
+					"name": "rent",
+					"value": 740.0,
+					"income": false,
+					"transaction_ids": [
+						337688,
+						337686,
+						337684,
+						337682
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-09-01",
+			"value": 925.0,
+			"income": false,
+			"groups": [
+				{
+					"id": 176,
+					"name": "rent",
+					"value": 925.0,
+					"income": false,
+					"transaction_ids": [
+						337680,
+						337678,
+						337676,
+						337674,
+						337672
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-10-01",
+			"value": 300.0,
+			"income": false,
+			"groups": [
+				{
+					"id": 176,
+					"name": "rent",
+					"value": 740.0,
+					"income": false,
+					"transaction_ids": [
+						337670,
+						337668,
+						337666,
+						337664
+					]
+				},
+				{
+					"id": 113,
+					"name": "savings",
+					"value": 440.0,
+					"income": true,
+					"transaction_ids": [
+						338170,
+						338168
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-11-01",
+			"value": 300.0,
+			"income": false,
+			"groups": [
+				{
+					"id": 176,
+					"name": "rent",
+					"value": 740.0,
+					"income": false,
+					"transaction_ids": [
+						337662,
+						337660,
+						337658,
+						337656
+					]
+				},
+				{
+					"id": 113,
+					"name": "savings",
+					"value": 440.0,
+					"income": true,
+					"transaction_ids": [
+						338166,
+						338164
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-12-01",
+			"value": 115.0,
+			"income": false,
+			"groups": [
+				{
+					"id": 176,
+					"name": "rent",
+					"value": 555.0,
+					"income": false,
+					"transaction_ids": [
+						337654,
+						337652,
+						337650
+					]
+				},
+				{
+					"id": 113,
+					"name": "savings",
+					"value": 440.0,
+					"income": true,
+					"transaction_ids": [
+						338162,
+						338160
+					]
+				}
+			]
+		}
+	]
+}

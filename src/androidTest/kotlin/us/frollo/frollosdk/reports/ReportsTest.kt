@@ -953,13 +953,222 @@ class ReportsTest : BaseAndroidTest() {
     }
 
     @Test
-    fun testFetchBudgetCategoryReportsGroupedByTransactionCategory() {
-        // TODO: to be implemented
+    fun testFetchLifestyleBudgetCategoryReportsGroupedByMerchant() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val fromDate = "2019-01-01"
+        val toDate = "2019-12-31"
+        val grouping = ReportGrouping.MERCHANT
+        val budgetCategory = BudgetCategory.LIFESTYLE
+        val period = TransactionReportPeriod.MONTHLY
+        val requestPath = "${ReportsAPI.URL_REPORTS_BUDGET_CATEGORIES}/${budgetCategory.budgetCategoryId}?period=$period&from_date=$fromDate&to_date=$toDate&grouping=$grouping"
+
+        val body = readStringFromJson(app, R.raw.transaction_reports_budget_category_lifestyle_grouped_by_merchant_monthly_2019_01_01_2019_12_31)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        reports.fetchBudgetCategoryReports(
+                period = period,
+                fromDate = fromDate,
+                toDate = toDate,
+                budgetCategory = budgetCategory,
+                grouping = grouping) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val models = resource.data
+            assertNotNull(models)
+
+            // Check for overall reports
+            val overallReports = models?.sortedBy { it.date }
+            assertEquals(12, overallReports?.size)
+
+            val report = overallReports?.get(5)!!
+            assertEquals("2019-06-01", report.date)
+            assertEquals(BigDecimal("1555.43"), report.value)
+            assertFalse(report.isIncome)
+            assertNotNull(report.groups)
+            assertEquals(15, report.groups.size)
+            assertEquals(ReportGrouping.MERCHANT, report.grouping)
+            assertEquals(period, report.period)
+
+            // Check for group reports
+            val groupReports = overallReports.filter { it.date == "2019-07-01" }[0].groups.sortedBy { it.linkedId }
+            assertEquals(15, groupReports.size)
+
+            val groupReport = groupReports.last()
+            assertEquals("2019-07-01", groupReport.date)
+            assertEquals(BigDecimal("127.0"), groupReport.value)
+            assertFalse(groupReport.isIncome)
+            assertEquals(292L, groupReport.linkedId)
+            assertEquals("SUSHI PTY. LTD.", groupReport.name)
+            assertEquals(2, groupReport.transactionIds?.size)
+            assertEquals(ReportGrouping.MERCHANT, groupReport.grouping)
+            assertEquals(period, groupReport.period)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
     }
 
     @Test
     fun testFetchTagReports() {
-        // TODO: to be implemented
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val fromDate = "2019-01-01"
+        val toDate = "2019-12-31"
+        val period = TransactionReportPeriod.MONTHLY
+        val requestPath = "${ReportsAPI.URL_REPORTS_TAGS}?period=$period&from_date=$fromDate&to_date=$toDate"
+
+        val body = readStringFromJson(app, R.raw.transaction_reports_tag_monthly_2019_01_01_2019_12_31)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        reports.fetchTagReports(
+                period = period,
+                fromDate = fromDate,
+                toDate = toDate) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val models = resource.data
+            assertNotNull(models)
+
+            // Check for overall reports
+            val overallReports = models?.sortedBy { it.date }
+            assertEquals(12, overallReports?.size)
+
+            val report = overallReports?.get(9)!!
+            assertEquals("2019-10-01", report.date)
+            assertEquals(BigDecimal("300.0"), report.value)
+            assertFalse(report.isIncome)
+            assertNotNull(report.groups)
+            assertEquals(2, report.groups.size)
+            assertEquals(ReportGrouping.TAG, report.grouping)
+            assertEquals(period, report.period)
+
+            // Check for group reports
+            val groupReports = overallReports.filter { it.date == "2019-11-01" }[0].groups.sortedBy { it.linkedId }
+            assertEquals(2, groupReports.size)
+
+            val groupReport = groupReports.first()
+            assertEquals("2019-11-01", groupReport.date)
+            assertEquals(BigDecimal("440.0"), groupReport.value)
+            assertTrue(groupReport.isIncome)
+            assertEquals(113L, groupReport.linkedId)
+            assertEquals("savings", groupReport.name)
+            assertEquals(2, groupReport.transactionIds?.size)
+            assertEquals(ReportGrouping.TAG, groupReport.grouping)
+            assertEquals(period, groupReport.period)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTagReportsByTag() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val fromDate = "2019-01-01"
+        val toDate = "2019-12-31"
+        val tag = "rent"
+        val period = TransactionReportPeriod.MONTHLY
+        val requestPath = "${ReportsAPI.URL_REPORTS_TAGS}/$tag?period=$period&from_date=$fromDate&to_date=$toDate"
+
+        val body = readStringFromJson(app, R.raw.transaction_reports_tag_rent_monthly_2019_01_01_2019_12_31)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        reports.fetchTagReports(
+                period = period,
+                fromDate = fromDate,
+                toDate = toDate,
+                transactionTag = tag) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val models = resource.data
+            assertNotNull(models)
+
+            // Check for overall reports
+            val overallReports = models?.sortedBy { it.date }
+            assertEquals(12, overallReports?.size)
+
+            val report = overallReports?.get(5)!!
+            assertEquals("2019-06-01", report.date)
+            assertEquals(BigDecimal("925.0"), report.value)
+            assertFalse(report.isIncome)
+            assertNotNull(report.groups)
+            assertEquals(1, report.groups.size)
+            assertEquals(ReportGrouping.TAG, report.grouping)
+            assertEquals(period, report.period)
+
+            // Check for group reports
+            val groupReports = overallReports.filter { it.date == "2019-07-01" }[0].groups.sortedBy { it.linkedId }
+            assertEquals(1, groupReports.size)
+
+            val groupReport = groupReports.last()
+            assertEquals("2019-07-01", groupReport.date)
+            assertEquals(BigDecimal("740.0"), groupReport.value)
+            assertFalse(groupReport.isIncome)
+            assertEquals(176L, groupReport.linkedId)
+            assertEquals("rent", groupReport.name)
+            assertEquals(4, groupReport.transactionIds?.size)
+            assertEquals(ReportGrouping.TAG, groupReport.grouping)
+            assertEquals(period, groupReport.period)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
     }
 
     @Test

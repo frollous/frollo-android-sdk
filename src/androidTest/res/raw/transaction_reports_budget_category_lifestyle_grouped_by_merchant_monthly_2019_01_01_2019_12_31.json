@@ -1,0 +1,2063 @@
+{
+	"data": [
+		{
+			"date": "2019-01-01",
+			"value": 1530.98,
+			"income": false,
+			"groups": [
+				{
+					"id": 107,
+					"name": "The Brew House Hotel",
+					"value": 65.0,
+					"income": false,
+					"transaction_ids": [
+						339160
+					]
+				},
+				{
+					"id": 204,
+					"name": "Uber",
+					"value": 330.0,
+					"income": false,
+					"transaction_ids": [
+						338438,
+						338436,
+						338432,
+						338434,
+						338430,
+						338428,
+						338426,
+						338424,
+						338422,
+						338420,
+						338418
+					]
+				},
+				{
+					"id": 125,
+					"name": "BIG W",
+					"value": 40.0,
+					"income": false,
+					"transaction_ids": [
+						339240
+					]
+				},
+				{
+					"id": 24,
+					"name": "Cash Withdrawal",
+					"value": 280.0,
+					"income": false,
+					"transaction_ids": [
+						338068,
+						338066,
+						338064,
+						338062,
+						338060,
+						338058,
+						338056
+					]
+				},
+				{
+					"id": 81,
+					"name": "McDonald's",
+					"value": 90.0,
+					"income": false,
+					"transaction_ids": [
+						339498,
+						339496,
+						339494,
+						339492,
+						339490,
+						339488,
+						339486,
+						339484,
+						339482,
+						339480,
+						339478
+					]
+				},
+				{
+					"id": 292,
+					"name": "SUSHI PTY. LTD.",
+					"value": 127.0,
+					"income": false,
+					"transaction_ids": [
+						339158,
+						339144
+					]
+				},
+				{
+					"id": 97,
+					"name": "Dan Murphy",
+					"value": 60.0,
+					"income": false,
+					"transaction_ids": [
+						339216
+					]
+				},
+				{
+					"id": 14,
+					"name": "Apple Inc",
+					"value": 11.99,
+					"income": false,
+					"transaction_ids": [
+						338520
+					]
+				},
+				{
+					"id": 72,
+					"name": "Bunnings",
+					"value": 30.0,
+					"income": false,
+					"transaction_ids": [
+						339192
+					]
+				},
+				{
+					"id": 249,
+					"name": "Burger Project",
+					"value": 85.0,
+					"income": false,
+					"transaction_ids": [
+						339152
+					]
+				},
+				{
+					"id": 238,
+					"name": "The Occidental Hotel",
+					"value": 219.0,
+					"income": false,
+					"transaction_ids": [
+						339150,
+						339148,
+						339146
+					]
+				},
+				{
+					"id": 148,
+					"name": "Charge/Fee",
+					"value": 25.0,
+					"income": false,
+					"transaction_ids": [
+						338228
+					]
+				},
+				{
+					"id": 1,
+					"name": "Unknown",
+					"value": 150.0,
+					"income": false,
+					"transaction_ids": [
+						339142
+					]
+				},
+				{
+					"id": 40,
+					"name": "Netflix",
+					"value": 17.99,
+					"income": false,
+					"transaction_ids": [
+						338542
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-02-01",
+			"value": 1685.43,
+			"income": false,
+			"groups": [
+				{
+					"id": 107,
+					"name": "The Brew House Hotel",
+					"value": 130.0,
+					"income": false,
+					"transaction_ids": [
+						339140,
+						339120
+					]
+				},
+				{
+					"id": 204,
+					"name": "Uber",
+					"value": 331.0,
+					"income": false,
+					"transaction_ids": [
+						338414,
+						338416,
+						338412,
+						338410,
+						338408,
+						338406,
+						338404,
+						338402,
+						338400,
+						338398
+					]
+				},
+				{
+					"id": 125,
+					"name": "BIG W",
+					"value": 80.0,
+					"income": false,
+					"transaction_ids": [
+						339238,
+						339236
+					]
+				},
+				{
+					"id": 24,
+					"name": "Cash Withdrawal",
+					"value": 300.0,
+					"income": false,
+					"transaction_ids": [
+						338052,
+						338050,
+						338048,
+						338044,
+						338046,
+						338042,
+						338040,
+						338038
+					]
+				},
+				{
+					"id": 81,
+					"name": "McDonald's",
+					"value": 90.0,
+					"income": false,
+					"transaction_ids": [
+						339476,
+						339474,
+						339472,
+						339470,
+						339468,
+						339466,
+						339464,
+						339462,
+						339460,
+						339458,
+						339456
+					]
+				},
+				{
+					"id": 292,
+					"name": "SUSHI PTY. LTD.",
+					"value": 127.0,
+					"income": false,
+					"transaction_ids": [
+						339138,
+						339124
+					]
+				},
+				{
+					"id": 97,
+					"name": "Dan Murphy",
+					"value": 60.0,
+					"income": false,
+					"transaction_ids": [
+						339214
+					]
+				},
+				{
+					"id": 31,
+					"name": "PayPal",
+					"value": 28.45,
+					"income": false,
+					"transaction_ids": [
+						338494,
+						338492
+					]
+				},
+				{
+					"id": 14,
+					"name": "Apple Inc",
+					"value": 11.99,
+					"income": false,
+					"transaction_ids": [
+						338518
+					]
+				},
+				{
+					"id": 72,
+					"name": "Bunnings",
+					"value": 30.0,
+					"income": false,
+					"transaction_ids": [
+						339190
+					]
+				},
+				{
+					"id": 249,
+					"name": "Burger Project",
+					"value": 85.0,
+					"income": false,
+					"transaction_ids": [
+						339132
+					]
+				},
+				{
+					"id": 238,
+					"name": "The Occidental Hotel",
+					"value": 219.0,
+					"income": false,
+					"transaction_ids": [
+						339130,
+						339128,
+						339126
+					]
+				},
+				{
+					"id": 148,
+					"name": "Charge/Fee",
+					"value": 25.0,
+					"income": false,
+					"transaction_ids": [
+						338226
+					]
+				},
+				{
+					"id": 1,
+					"name": "Unknown",
+					"value": 150.0,
+					"income": false,
+					"transaction_ids": [
+						338154,
+						338202,
+						339122
+					]
+				},
+				{
+					"id": 40,
+					"name": "Netflix",
+					"value": 17.99,
+					"income": false,
+					"transaction_ids": [
+						338540
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-03-01",
+			"value": 1471.43,
+			"income": false,
+			"groups": [
+				{
+					"id": 107,
+					"name": "The Brew House Hotel",
+					"value": 65.0,
+					"income": false,
+					"transaction_ids": [
+						339120
+					]
+				},
+				{
+					"id": 125,
+					"name": "BIG W",
+					"value": 40.0,
+					"income": false,
+					"transaction_ids": [
+						339236
+					]
+				},
+				{
+					"id": 204,
+					"name": "Uber",
+					"value": 242.0,
+					"income": false,
+					"transaction_ids": [
+						338398,
+						338396,
+						338394,
+						338392,
+						338388,
+						338390,
+						338386,
+						338384
+					]
+				},
+				{
+					"id": 24,
+					"name": "Cash Withdrawal",
+					"value": 280.0,
+					"income": false,
+					"transaction_ids": [
+						338036,
+						338034,
+						338032,
+						338030,
+						338028,
+						338026,
+						338024
+					]
+				},
+				{
+					"id": 81,
+					"name": "McDonald's",
+					"value": 90.0,
+					"income": false,
+					"transaction_ids": [
+						339454,
+						339452,
+						339450,
+						339448,
+						339446,
+						339444,
+						339442,
+						339440,
+						339438,
+						339436,
+						339434
+					]
+				},
+				{
+					"id": 292,
+					"name": "SUSHI PTY. LTD.",
+					"value": 127.0,
+					"income": false,
+					"transaction_ids": [
+						339118,
+						339104
+					]
+				},
+				{
+					"id": 97,
+					"name": "Dan Murphy",
+					"value": 60.0,
+					"income": false,
+					"transaction_ids": [
+						339212
+					]
+				},
+				{
+					"id": 31,
+					"name": "PayPal",
+					"value": 28.45,
+					"income": false,
+					"transaction_ids": [
+						338490,
+						338488
+					]
+				},
+				{
+					"id": 14,
+					"name": "Apple Inc",
+					"value": 11.99,
+					"income": false,
+					"transaction_ids": [
+						338516
+					]
+				},
+				{
+					"id": 72,
+					"name": "Bunnings",
+					"value": 30.0,
+					"income": false,
+					"transaction_ids": [
+						339188
+					]
+				},
+				{
+					"id": 1,
+					"name": "Unknown",
+					"value": 150.0,
+					"income": false,
+					"transaction_ids": [
+						338152,
+						338200,
+						339102
+					]
+				},
+				{
+					"id": 249,
+					"name": "Burger Project",
+					"value": 85.0,
+					"income": false,
+					"transaction_ids": [
+						339112
+					]
+				},
+				{
+					"id": 238,
+					"name": "The Occidental Hotel",
+					"value": 219.0,
+					"income": false,
+					"transaction_ids": [
+						339110,
+						339108,
+						339106
+					]
+				},
+				{
+					"id": 148,
+					"name": "Charge/Fee",
+					"value": 25.0,
+					"income": false,
+					"transaction_ids": [
+						338224
+					]
+				},
+				{
+					"id": 40,
+					"name": "Netflix",
+					"value": 17.99,
+					"income": false,
+					"transaction_ids": [
+						338538
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-04-01",
+			"value": 1526.43,
+			"income": false,
+			"groups": [
+				{
+					"id": 107,
+					"name": "The Brew House Hotel",
+					"value": 65.0,
+					"income": false,
+					"transaction_ids": [
+						339100
+					]
+				},
+				{
+					"id": 204,
+					"name": "Uber",
+					"value": 277.0,
+					"income": false,
+					"transaction_ids": [
+						338380,
+						338378,
+						338376,
+						338374,
+						338370,
+						338372,
+						338368,
+						338366,
+						338364
+					]
+				},
+				{
+					"id": 125,
+					"name": "BIG W",
+					"value": 40.0,
+					"income": false,
+					"transaction_ids": [
+						339234
+					]
+				},
+				{
+					"id": 1,
+					"name": "Unknown",
+					"value": 150.0,
+					"income": false,
+					"transaction_ids": [
+						338150,
+						338198,
+						338148,
+						338156,
+						338196,
+						338204,
+						339082
+					]
+				},
+				{
+					"id": 24,
+					"name": "Cash Withdrawal",
+					"value": 300.0,
+					"income": false,
+					"transaction_ids": [
+						338020,
+						338018,
+						338016,
+						338014,
+						338012,
+						338010,
+						338008,
+						338006
+					]
+				},
+				{
+					"id": 81,
+					"name": "McDonald's",
+					"value": 90.0,
+					"income": false,
+					"transaction_ids": [
+						339432,
+						339430,
+						339428,
+						339426,
+						339424,
+						339422,
+						339420,
+						339418,
+						339416,
+						339414,
+						339412
+					]
+				},
+				{
+					"id": 31,
+					"name": "PayPal",
+					"value": 28.45,
+					"income": false,
+					"transaction_ids": [
+						338486,
+						338484
+					]
+				},
+				{
+					"id": 292,
+					"name": "SUSHI PTY. LTD.",
+					"value": 127.0,
+					"income": false,
+					"transaction_ids": [
+						339098,
+						339084
+					]
+				},
+				{
+					"id": 97,
+					"name": "Dan Murphy",
+					"value": 60.0,
+					"income": false,
+					"transaction_ids": [
+						339210
+					]
+				},
+				{
+					"id": 14,
+					"name": "Apple Inc",
+					"value": 11.99,
+					"income": false,
+					"transaction_ids": [
+						338514
+					]
+				},
+				{
+					"id": 72,
+					"name": "Bunnings",
+					"value": 30.0,
+					"income": false,
+					"transaction_ids": [
+						339186
+					]
+				},
+				{
+					"id": 249,
+					"name": "Burger Project",
+					"value": 85.0,
+					"income": false,
+					"transaction_ids": [
+						339092
+					]
+				},
+				{
+					"id": 238,
+					"name": "The Occidental Hotel",
+					"value": 219.0,
+					"income": false,
+					"transaction_ids": [
+						339090,
+						339088,
+						339086
+					]
+				},
+				{
+					"id": 148,
+					"name": "Charge/Fee",
+					"value": 25.0,
+					"income": false,
+					"transaction_ids": [
+						338222
+					]
+				},
+				{
+					"id": 40,
+					"name": "Netflix",
+					"value": 17.99,
+					"income": false,
+					"transaction_ids": [
+						338536
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-05-01",
+			"value": 1429.93,
+			"income": false,
+			"groups": [
+				{
+					"id": 107,
+					"name": "The Brew House Hotel",
+					"value": 65.0,
+					"income": false,
+					"transaction_ids": [
+						339080
+					]
+				},
+				{
+					"id": 125,
+					"name": "BIG W",
+					"value": 40.0,
+					"income": false,
+					"transaction_ids": [
+						339232
+					]
+				},
+				{
+					"id": 31,
+					"name": "PayPal",
+					"value": 40.95,
+					"income": false,
+					"transaction_ids": [
+						338482,
+						338480,
+						338478
+					]
+				},
+				{
+					"id": 24,
+					"name": "Cash Withdrawal",
+					"value": 280.0,
+					"income": false,
+					"transaction_ids": [
+						338004,
+						338002,
+						338000,
+						337998,
+						337996,
+						337994,
+						337992
+					]
+				},
+				{
+					"id": 81,
+					"name": "McDonald's",
+					"value": 90.0,
+					"income": false,
+					"transaction_ids": [
+						339410,
+						339408,
+						339406,
+						339404,
+						339402,
+						339400,
+						339398,
+						339396,
+						339394,
+						339392,
+						339390
+					]
+				},
+				{
+					"id": 292,
+					"name": "SUSHI PTY. LTD.",
+					"value": 127.0,
+					"income": false,
+					"transaction_ids": [
+						339078,
+						339064
+					]
+				},
+				{
+					"id": 204,
+					"name": "Uber",
+					"value": 188.0,
+					"income": false,
+					"transaction_ids": [
+						338362,
+						338360,
+						338358,
+						338356,
+						338354,
+						338352
+					]
+				},
+				{
+					"id": 97,
+					"name": "Dan Murphy",
+					"value": 60.0,
+					"income": false,
+					"transaction_ids": [
+						339208
+					]
+				},
+				{
+					"id": 14,
+					"name": "Apple Inc",
+					"value": 11.99,
+					"income": false,
+					"transaction_ids": [
+						338512
+					]
+				},
+				{
+					"id": 72,
+					"name": "Bunnings",
+					"value": 30.0,
+					"income": false,
+					"transaction_ids": [
+						339184
+					]
+				},
+				{
+					"id": 249,
+					"name": "Burger Project",
+					"value": 85.0,
+					"income": false,
+					"transaction_ids": [
+						339072
+					]
+				},
+				{
+					"id": 1,
+					"name": "Unknown",
+					"value": 150.0,
+					"income": false,
+					"transaction_ids": [
+						338146,
+						338194,
+						338144,
+						339062,
+						338192
+					]
+				},
+				{
+					"id": 238,
+					"name": "The Occidental Hotel",
+					"value": 219.0,
+					"income": false,
+					"transaction_ids": [
+						339070,
+						339068,
+						339066
+					]
+				},
+				{
+					"id": 148,
+					"name": "Charge/Fee",
+					"value": 25.0,
+					"income": false,
+					"transaction_ids": [
+						338220
+					]
+				},
+				{
+					"id": 40,
+					"name": "Netflix",
+					"value": 17.99,
+					"income": false,
+					"transaction_ids": [
+						338534
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-06-01",
+			"value": 1555.43,
+			"income": false,
+			"groups": [
+				{
+					"id": 107,
+					"name": "The Brew House Hotel",
+					"value": 65.0,
+					"income": false,
+					"transaction_ids": [
+						339060
+					]
+				},
+				{
+					"id": 204,
+					"name": "Uber",
+					"value": 306.0,
+					"income": false,
+					"transaction_ids": [
+						338348,
+						338344,
+						338346,
+						338342,
+						338340,
+						338338,
+						338336,
+						338334,
+						338332,
+						338330
+					]
+				},
+				{
+					"id": 125,
+					"name": "BIG W",
+					"value": 40.0,
+					"income": false,
+					"transaction_ids": [
+						339230
+					]
+				},
+				{
+					"id": 24,
+					"name": "Cash Withdrawal",
+					"value": 300.0,
+					"income": false,
+					"transaction_ids": [
+						337988,
+						337986,
+						337984,
+						337982,
+						337980,
+						337978,
+						337976,
+						337974
+					]
+				},
+				{
+					"id": 81,
+					"name": "McDonald's",
+					"value": 90.0,
+					"income": false,
+					"transaction_ids": [
+						339388,
+						339386,
+						339384,
+						339382,
+						339380,
+						339378,
+						339376,
+						339374,
+						339372,
+						339370,
+						339368
+					]
+				},
+				{
+					"id": 292,
+					"name": "SUSHI PTY. LTD.",
+					"value": 127.0,
+					"income": false,
+					"transaction_ids": [
+						339058,
+						339044
+					]
+				},
+				{
+					"id": 97,
+					"name": "Dan Murphy",
+					"value": 60.0,
+					"income": false,
+					"transaction_ids": [
+						339206
+					]
+				},
+				{
+					"id": 14,
+					"name": "Apple Inc",
+					"value": 11.99,
+					"income": false,
+					"transaction_ids": [
+						338510
+					]
+				},
+				{
+					"id": 72,
+					"name": "Bunnings",
+					"value": 30.0,
+					"income": false,
+					"transaction_ids": [
+						339182
+					]
+				},
+				{
+					"id": 249,
+					"name": "Burger Project",
+					"value": 85.0,
+					"income": false,
+					"transaction_ids": [
+						339052
+					]
+				},
+				{
+					"id": 238,
+					"name": "The Occidental Hotel",
+					"value": 219.0,
+					"income": false,
+					"transaction_ids": [
+						339050,
+						339048,
+						339046
+					]
+				},
+				{
+					"id": 148,
+					"name": "Charge/Fee",
+					"value": 25.0,
+					"income": false,
+					"transaction_ids": [
+						338218
+					]
+				},
+				{
+					"id": 1,
+					"name": "Unknown",
+					"value": 150.0,
+					"income": false,
+					"transaction_ids": [
+						338142,
+						338190,
+						339042
+					]
+				},
+				{
+					"id": 31,
+					"name": "PayPal",
+					"value": 28.45,
+					"income": false,
+					"transaction_ids": [
+						338476,
+						338474
+					]
+				},
+				{
+					"id": 40,
+					"name": "Netflix",
+					"value": 17.99,
+					"income": false,
+					"transaction_ids": [
+						338532
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-07-01",
+			"value": 1780.43,
+			"income": false,
+			"groups": [
+				{
+					"id": 107,
+					"name": "The Brew House Hotel",
+					"value": 65.0,
+					"income": false,
+					"transaction_ids": [
+						339040
+					]
+				},
+				{
+					"id": 204,
+					"name": "Uber",
+					"value": 331.0,
+					"income": false,
+					"transaction_ids": [
+						338326,
+						338328,
+						338324,
+						338322,
+						338320,
+						338318,
+						338316,
+						338314,
+						338312,
+						338310
+					]
+				},
+				{
+					"id": 125,
+					"name": "BIG W",
+					"value": 40.0,
+					"income": false,
+					"transaction_ids": [
+						339228
+					]
+				},
+				{
+					"id": 24,
+					"name": "Cash Withdrawal",
+					"value": 280.0,
+					"income": false,
+					"transaction_ids": [
+						337972,
+						337970,
+						337968,
+						337966,
+						337964,
+						337962,
+						337960
+					]
+				},
+				{
+					"id": 81,
+					"name": "McDonald's",
+					"value": 90.0,
+					"income": false,
+					"transaction_ids": [
+						339366,
+						339364,
+						339362,
+						339360,
+						339358,
+						339356,
+						339354,
+						339352,
+						339350,
+						339348,
+						339346
+					]
+				},
+				{
+					"id": 292,
+					"name": "SUSHI PTY. LTD.",
+					"value": 127.0,
+					"income": false,
+					"transaction_ids": [
+						339038,
+						339024
+					]
+				},
+				{
+					"id": 97,
+					"name": "Dan Murphy",
+					"value": 60.0,
+					"income": false,
+					"transaction_ids": [
+						339204
+					]
+				},
+				{
+					"id": 1,
+					"name": "Unknown",
+					"value": 370.0,
+					"income": false,
+					"transaction_ids": [
+						338140,
+						338188,
+						339620,
+						339022,
+						338138,
+						338186
+					]
+				},
+				{
+					"id": 14,
+					"name": "Apple Inc",
+					"value": 11.99,
+					"income": false,
+					"transaction_ids": [
+						338508
+					]
+				},
+				{
+					"id": 72,
+					"name": "Bunnings",
+					"value": 30.0,
+					"income": false,
+					"transaction_ids": [
+						339180
+					]
+				},
+				{
+					"id": 249,
+					"name": "Burger Project",
+					"value": 85.0,
+					"income": false,
+					"transaction_ids": [
+						339032
+					]
+				},
+				{
+					"id": 238,
+					"name": "The Occidental Hotel",
+					"value": 219.0,
+					"income": false,
+					"transaction_ids": [
+						339030,
+						339028,
+						339026
+					]
+				},
+				{
+					"id": 148,
+					"name": "Charge/Fee",
+					"value": 25.0,
+					"income": false,
+					"transaction_ids": [
+						338216
+					]
+				},
+				{
+					"id": 31,
+					"name": "PayPal",
+					"value": 28.45,
+					"income": false,
+					"transaction_ids": [
+						338472,
+						338470
+					]
+				},
+				{
+					"id": 40,
+					"name": "Netflix",
+					"value": 17.99,
+					"income": false,
+					"transaction_ids": [
+						338530
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-08-01",
+			"value": 1691.43,
+			"income": false,
+			"groups": [
+				{
+					"id": 107,
+					"name": "The Brew House Hotel",
+					"value": 65.0,
+					"income": false,
+					"transaction_ids": [
+						339020
+					]
+				},
+				{
+					"id": 125,
+					"name": "BIG W",
+					"value": 40.0,
+					"income": false,
+					"transaction_ids": [
+						339226
+					]
+				},
+				{
+					"id": 24,
+					"name": "Cash Withdrawal",
+					"value": 280.0,
+					"income": false,
+					"transaction_ids": [
+						337956,
+						337954,
+						337952,
+						337950,
+						337948,
+						337946,
+						337944
+					]
+				},
+				{
+					"id": 81,
+					"name": "McDonald's",
+					"value": 90.0,
+					"income": false,
+					"transaction_ids": [
+						339344,
+						339342,
+						339340,
+						339338,
+						339336,
+						339334,
+						339332,
+						339330,
+						339328,
+						339326,
+						339324
+					]
+				},
+				{
+					"id": 292,
+					"name": "SUSHI PTY. LTD.",
+					"value": 127.0,
+					"income": false,
+					"transaction_ids": [
+						339018,
+						339004
+					]
+				},
+				{
+					"id": 97,
+					"name": "Dan Murphy",
+					"value": 60.0,
+					"income": false,
+					"transaction_ids": [
+						339202
+					]
+				},
+				{
+					"id": 14,
+					"name": "Apple Inc",
+					"value": 11.99,
+					"income": false,
+					"transaction_ids": [
+						338506
+					]
+				},
+				{
+					"id": 72,
+					"name": "Bunnings",
+					"value": 30.0,
+					"income": false,
+					"transaction_ids": [
+						339178
+					]
+				},
+				{
+					"id": 249,
+					"name": "Burger Project",
+					"value": 85.0,
+					"income": false,
+					"transaction_ids": [
+						339012
+					]
+				},
+				{
+					"id": 204,
+					"name": "Uber",
+					"value": 242.0,
+					"income": false,
+					"transaction_ids": [
+						338306,
+						338304,
+						338300,
+						338302,
+						338298,
+						338296,
+						338294,
+						338292
+					]
+				},
+				{
+					"id": 238,
+					"name": "The Occidental Hotel",
+					"value": 219.0,
+					"income": false,
+					"transaction_ids": [
+						339010,
+						339008,
+						339006
+					]
+				},
+				{
+					"id": 31,
+					"name": "PayPal",
+					"value": 28.45,
+					"income": false,
+					"transaction_ids": [
+						338468,
+						338466
+					]
+				},
+				{
+					"id": 148,
+					"name": "Charge/Fee",
+					"value": 25.0,
+					"income": false,
+					"transaction_ids": [
+						338214
+					]
+				},
+				{
+					"id": 1,
+					"name": "Unknown",
+					"value": 370.0,
+					"income": false,
+					"transaction_ids": [
+						339618,
+						338136,
+						338184,
+						339002
+					]
+				},
+				{
+					"id": 40,
+					"name": "Netflix",
+					"value": 17.99,
+					"income": false,
+					"transaction_ids": [
+						338528
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-09-01",
+			"value": 1723.43,
+			"income": false,
+			"groups": [
+				{
+					"id": 107,
+					"name": "The Brew House Hotel",
+					"value": 65.0,
+					"income": false,
+					"transaction_ids": [
+						339000
+					]
+				},
+				{
+					"id": 125,
+					"name": "BIG W",
+					"value": 40.0,
+					"income": false,
+					"transaction_ids": [
+						339224
+					]
+				},
+				{
+					"id": 24,
+					"name": "Cash Withdrawal",
+					"value": 300.0,
+					"income": false,
+					"transaction_ids": [
+						337940,
+						337938,
+						337936,
+						337934,
+						337932,
+						337930,
+						337928,
+						337926
+					]
+				},
+				{
+					"id": 81,
+					"name": "McDonald's",
+					"value": 90.0,
+					"income": false,
+					"transaction_ids": [
+						339322,
+						339320,
+						339318,
+						339316,
+						339314,
+						339312,
+						339310,
+						339308,
+						339306,
+						339304,
+						339302
+					]
+				},
+				{
+					"id": 204,
+					"name": "Uber",
+					"value": 254.0,
+					"income": false,
+					"transaction_ids": [
+						338290,
+						338288,
+						338286,
+						338282,
+						338284,
+						338280,
+						338278,
+						338276
+					]
+				},
+				{
+					"id": 292,
+					"name": "SUSHI PTY. LTD.",
+					"value": 127.0,
+					"income": false,
+					"transaction_ids": [
+						338998,
+						338984
+					]
+				},
+				{
+					"id": 97,
+					"name": "Dan Murphy",
+					"value": 60.0,
+					"income": false,
+					"transaction_ids": [
+						339200
+					]
+				},
+				{
+					"id": 14,
+					"name": "Apple Inc",
+					"value": 11.99,
+					"income": false,
+					"transaction_ids": [
+						338504
+					]
+				},
+				{
+					"id": 72,
+					"name": "Bunnings",
+					"value": 30.0,
+					"income": false,
+					"transaction_ids": [
+						339176
+					]
+				},
+				{
+					"id": 249,
+					"name": "Burger Project",
+					"value": 85.0,
+					"income": false,
+					"transaction_ids": [
+						338992
+					]
+				},
+				{
+					"id": 31,
+					"name": "PayPal",
+					"value": 28.45,
+					"income": false,
+					"transaction_ids": [
+						338464,
+						338462
+					]
+				},
+				{
+					"id": 1,
+					"name": "Unknown",
+					"value": 370.0,
+					"income": false,
+					"transaction_ids": [
+						338134,
+						338182,
+						339616,
+						338982
+					]
+				},
+				{
+					"id": 238,
+					"name": "The Occidental Hotel",
+					"value": 219.0,
+					"income": false,
+					"transaction_ids": [
+						338990,
+						338988,
+						338986
+					]
+				},
+				{
+					"id": 148,
+					"name": "Charge/Fee",
+					"value": 25.0,
+					"income": false,
+					"transaction_ids": [
+						338212
+					]
+				},
+				{
+					"id": 40,
+					"name": "Netflix",
+					"value": 17.99,
+					"income": false,
+					"transaction_ids": [
+						338526
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-10-01",
+			"value": 1247.43,
+			"income": false,
+			"groups": [
+				{
+					"id": 107,
+					"name": "The Brew House Hotel",
+					"value": 65.0,
+					"income": false,
+					"transaction_ids": [
+						338980
+					]
+				},
+				{
+					"id": 125,
+					"name": "BIG W",
+					"value": 40.0,
+					"income": false,
+					"transaction_ids": [
+						339222
+					]
+				},
+				{
+					"id": 24,
+					"name": "Cash Withdrawal",
+					"value": 280.0,
+					"income": false,
+					"transaction_ids": [
+						337924,
+						337922,
+						337920,
+						337918,
+						337916,
+						337914,
+						337912
+					]
+				},
+				{
+					"id": 204,
+					"name": "Uber",
+					"value": 238.0,
+					"income": false,
+					"transaction_ids": [
+						338274,
+						338272,
+						338270,
+						338268,
+						338266,
+						338264,
+						338262,
+						338260
+					]
+				},
+				{
+					"id": 81,
+					"name": "McDonald's",
+					"value": 90.0,
+					"income": false,
+					"transaction_ids": [
+						339300,
+						339298,
+						339296,
+						339294,
+						339292,
+						339290,
+						339288,
+						339286,
+						339284,
+						339282,
+						339280
+					]
+				},
+				{
+					"id": 292,
+					"name": "SUSHI PTY. LTD.",
+					"value": 127.0,
+					"income": false,
+					"transaction_ids": [
+						338978,
+						338964
+					]
+				},
+				{
+					"id": 1,
+					"name": "Unknown",
+					"value": 70.0,
+					"income": true,
+					"transaction_ids": [
+						338132,
+						338180,
+						338170,
+						339614,
+						338168,
+						338130,
+						338178,
+						338962
+					]
+				},
+				{
+					"id": 97,
+					"name": "Dan Murphy",
+					"value": 60.0,
+					"income": false,
+					"transaction_ids": [
+						339198
+					]
+				},
+				{
+					"id": 14,
+					"name": "Apple Inc",
+					"value": 11.99,
+					"income": false,
+					"transaction_ids": [
+						338502
+					]
+				},
+				{
+					"id": 72,
+					"name": "Bunnings",
+					"value": 30.0,
+					"income": false,
+					"transaction_ids": [
+						339174
+					]
+				},
+				{
+					"id": 31,
+					"name": "PayPal",
+					"value": 28.45,
+					"income": false,
+					"transaction_ids": [
+						338460,
+						338458
+					]
+				},
+				{
+					"id": 249,
+					"name": "Burger Project",
+					"value": 85.0,
+					"income": false,
+					"transaction_ids": [
+						338972
+					]
+				},
+				{
+					"id": 238,
+					"name": "The Occidental Hotel",
+					"value": 219.0,
+					"income": false,
+					"transaction_ids": [
+						338970,
+						338968,
+						338966
+					]
+				},
+				{
+					"id": 148,
+					"name": "Charge/Fee",
+					"value": 25.0,
+					"income": false,
+					"transaction_ids": [
+						338210
+					]
+				},
+				{
+					"id": 40,
+					"name": "Netflix",
+					"value": 17.99,
+					"income": false,
+					"transaction_ids": [
+						338524
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-11-01",
+			"value": 1375.43,
+			"income": false,
+			"groups": [
+				{
+					"id": 107,
+					"name": "The Brew House Hotel",
+					"value": 65.0,
+					"income": false,
+					"transaction_ids": [
+						338960
+					]
+				},
+				{
+					"id": 204,
+					"name": "Uber",
+					"value": 346.0,
+					"income": false,
+					"transaction_ids": [
+						338256,
+						338258,
+						338254,
+						338252,
+						338250,
+						338248,
+						338246,
+						338244,
+						338242,
+						338238
+					]
+				},
+				{
+					"id": 125,
+					"name": "BIG W",
+					"value": 40.0,
+					"income": false,
+					"transaction_ids": [
+						339220
+					]
+				},
+				{
+					"id": 24,
+					"name": "Cash Withdrawal",
+					"value": 300.0,
+					"income": false,
+					"transaction_ids": [
+						337908,
+						337906,
+						337904,
+						337902,
+						337900,
+						337898,
+						337896,
+						337894
+					]
+				},
+				{
+					"id": 81,
+					"name": "McDonald's",
+					"value": 90.0,
+					"income": false,
+					"transaction_ids": [
+						339278,
+						339276,
+						339274,
+						339272,
+						339270,
+						339268,
+						339266,
+						339264,
+						339262,
+						339260,
+						339258
+					]
+				},
+				{
+					"id": 292,
+					"name": "SUSHI PTY. LTD.",
+					"value": 127.0,
+					"income": false,
+					"transaction_ids": [
+						338958,
+						338944
+					]
+				},
+				{
+					"id": 1,
+					"name": "Unknown",
+					"value": 70.0,
+					"income": true,
+					"transaction_ids": [
+						338166,
+						338128,
+						338176,
+						339612,
+						338164,
+						338942,
+						338126,
+						338174
+					]
+				},
+				{
+					"id": 97,
+					"name": "Dan Murphy",
+					"value": 60.0,
+					"income": false,
+					"transaction_ids": [
+						339196
+					]
+				},
+				{
+					"id": 31,
+					"name": "PayPal",
+					"value": 28.45,
+					"income": false,
+					"transaction_ids": [
+						338456,
+						338454
+					]
+				},
+				{
+					"id": 14,
+					"name": "Apple Inc",
+					"value": 11.99,
+					"income": false,
+					"transaction_ids": [
+						338500
+					]
+				},
+				{
+					"id": 72,
+					"name": "Bunnings",
+					"value": 30.0,
+					"income": false,
+					"transaction_ids": [
+						339172
+					]
+				},
+				{
+					"id": 249,
+					"name": "Burger Project",
+					"value": 85.0,
+					"income": false,
+					"transaction_ids": [
+						338952
+					]
+				},
+				{
+					"id": 238,
+					"name": "The Occidental Hotel",
+					"value": 219.0,
+					"income": false,
+					"transaction_ids": [
+						338950,
+						338948,
+						338946
+					]
+				},
+				{
+					"id": 148,
+					"name": "Charge/Fee",
+					"value": 25.0,
+					"income": false,
+					"transaction_ids": [
+						338208
+					]
+				},
+				{
+					"id": 40,
+					"name": "Netflix",
+					"value": 17.99,
+					"income": false,
+					"transaction_ids": [
+						338522
+					]
+				}
+			]
+		},
+		{
+			"date": "2019-12-01",
+			"value": 366.56,
+			"income": true,
+			"groups": [
+				{
+					"id": 107,
+					"name": "The Brew House Hotel",
+					"value": 65.0,
+					"income": false,
+					"transaction_ids": [
+						338940
+					]
+				},
+				{
+					"id": 204,
+					"name": "Uber",
+					"value": 138.0,
+					"income": false,
+					"transaction_ids": [
+						338240,
+						338236,
+						338234,
+						338232,
+						338230
+					]
+				},
+				{
+					"id": 125,
+					"name": "BIG W",
+					"value": 40.0,
+					"income": false,
+					"transaction_ids": [
+						339218
+					]
+				},
+				{
+					"id": 24,
+					"name": "Cash Withdrawal",
+					"value": 110.0,
+					"income": false,
+					"transaction_ids": [
+						337892,
+						337890,
+						337888,
+						337886
+					]
+				},
+				{
+					"id": 81,
+					"name": "McDonald's",
+					"value": 66.0,
+					"income": false,
+					"transaction_ids": [
+						339256,
+						339254,
+						339252,
+						339250,
+						339248,
+						339246,
+						339244,
+						339242
+					]
+				},
+				{
+					"id": 1,
+					"name": "Unknown",
+					"value": 1220.0,
+					"income": true,
+					"transaction_ids": [
+						338162,
+						338172,
+						339610,
+						338160
+					]
+				},
+				{
+					"id": 292,
+					"name": "SUSHI PTY. LTD.",
+					"value": 74.0,
+					"income": false,
+					"transaction_ids": [
+						338938
+					]
+				},
+				{
+					"id": 31,
+					"name": "PayPal",
+					"value": 28.45,
+					"income": false,
+					"transaction_ids": [
+						338452,
+						338450
+					]
+				},
+				{
+					"id": 97,
+					"name": "Dan Murphy",
+					"value": 60.0,
+					"income": false,
+					"transaction_ids": [
+						339194
+					]
+				},
+				{
+					"id": 14,
+					"name": "Apple Inc",
+					"value": 11.99,
+					"income": false,
+					"transaction_ids": [
+						338498
+					]
+				},
+				{
+					"id": 72,
+					"name": "Bunnings",
+					"value": 30.0,
+					"income": false,
+					"transaction_ids": [
+						339170
+					]
+				},
+				{
+					"id": 249,
+					"name": "Burger Project",
+					"value": 85.0,
+					"income": false,
+					"transaction_ids": [
+						338932
+					]
+				},
+				{
+					"id": 238,
+					"name": "The Occidental Hotel",
+					"value": 120.0,
+					"income": false,
+					"transaction_ids": [
+						338930
+					]
+				},
+				{
+					"id": 148,
+					"name": "Charge/Fee",
+					"value": 25.0,
+					"income": false,
+					"transaction_ids": [
+						338206
+					]
+				}
+			]
+		}
+	]
+}

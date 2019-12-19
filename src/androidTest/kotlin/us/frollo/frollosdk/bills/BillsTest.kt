@@ -23,11 +23,13 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
+import us.frollo.frollosdk.base.PaginatedResult
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
@@ -617,9 +619,10 @@ class BillsTest : BaseAndroidTest() {
             }
         })
 
-        aggregation.refreshMerchants { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        aggregation.refreshMerchantsWithPagination { result ->
+            assertTrue(result is PaginatedResult.Success)
+            assertNull((result as PaginatedResult.Success).after)
+            assertNull(result.before)
 
             signal.countDown()
         }

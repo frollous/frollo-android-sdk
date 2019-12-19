@@ -6,6 +6,7 @@
 
 - Generic metadata support and additional properties for surveys
 - Refactor and Remodel Transaction Reports
+- Merchants Pagination
 - Budgets & Budget Periods
 
 ### 3.3.0

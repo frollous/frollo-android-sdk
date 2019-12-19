@@ -26,6 +26,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.sqlite.db.SimpleSQLiteQuery
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import us.frollo.frollosdk.base.PaginatedResult
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
@@ -43,7 +44,6 @@ import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.compareToFindMissingItems
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchMerchants
-import us.frollo.frollosdk.extensions.fetchMerchantsByIDs
 import us.frollo.frollosdk.extensions.fetchSuggestedTags
 import us.frollo.frollosdk.extensions.fetchTransactionsByIDs
 import us.frollo.frollosdk.extensions.fetchTransactionsByQuery
@@ -52,6 +52,7 @@ import us.frollo.frollosdk.extensions.fetchTransactionsSummaryByQuery
 import us.frollo.frollosdk.extensions.fetchUserTags
 import us.frollo.frollosdk.extensions.sqlForAccounts
 import us.frollo.frollosdk.extensions.sqlForMerchants
+import us.frollo.frollosdk.extensions.sqlForMerchantsIds
 import us.frollo.frollosdk.extensions.sqlForProviderAccounts
 import us.frollo.frollosdk.extensions.sqlForProviders
 import us.frollo.frollosdk.extensions.sqlForTransactionCategories
@@ -118,8 +119,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
     companion object {
         private const val TAG = "Aggregation"
-        private const val TRANSACTION_BATCH_SIZE = 200
-        private const val MERCHANT_BATCH_SIZE = 50 // DO NOT INCREASE THIS. API MAX SIZE IS 50.
+        private const val TRANSACTION_BATCH_SIZE = 200 // API MAX SIZE IS 500.
+        private const val MERCHANT_BATCH_SIZE = 500 // DO NOT INCREASE THIS. API MAX SIZE IS 500.
     }
 
     private val aggregationAPI: AggregationAPI = network.create(AggregationAPI::class.java)
@@ -1783,119 +1784,142 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     /**
      * Refresh all merchants by IDs from the host
      *
+     * Note: SDK takes care of the pagination
+     *
      * @param merchantIds IDs of the merchants to fetch
+     * @param batchSize Batch size of merchants to returned by API (optional); Defaults to 500
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun refreshMerchants(merchantIds: LongArray, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun refreshMerchantsByIds(
+        merchantIds: LongArray,
+        batchSize: Long? = MERCHANT_BATCH_SIZE.toLong(),
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
         if (merchantIds.isEmpty()) {
             completion?.invoke(Result.success())
             return
         }
 
         doAsync {
-            refreshNextMerchantsByIds(merchantIds.toList().chunked(MERCHANT_BATCH_SIZE), 0, completion)
+            refreshNextMerchantsByIds(merchantIds = merchantIds, batchSize = batchSize, completion = completion)
         }
     }
 
     private fun refreshNextMerchantsByIds(
-        chunkedMerchantIds: List<List<Long>>,
-        offset: Int,
+        merchantIds: LongArray,
+        after: Long? = null,
+        batchSize: Long? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
-        val merchantIds = chunkedMerchantIds[offset].toLongArray()
-
-        aggregationAPI.fetchMerchantsByIDs(merchantIds).enqueue { resource ->
+        aggregationAPI.fetchMerchants(merchantIds = merchantIds, after = after, size = batchSize).enqueue { resource ->
             when (resource.status) {
-                Resource.Status.SUCCESS -> {
-                    val response = resource.data
-
-                    response?.let {
-                        insertMerchants(response.data)
-
-                        val nextOffset = offset + 1
-                        if (nextOffset < chunkedMerchantIds.size) {
-                            refreshNextMerchantsByIds(chunkedMerchantIds, nextOffset, completion)
-                        } else {
-                            completion?.invoke(Result.success())
-                        }
-                    } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
-                }
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#refreshMerchantsByIds", resource.error?.localizedDescription)
                     completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    val response = resource.data
+                    response?.let {
+                        handleMerchantsResponseByIds(response.data)
+
+                        response.paging.cursors.after?.let { newAfter ->
+                            refreshNextMerchantsByIds(
+                                    merchantIds = merchantIds,
+                                    after = newAfter,
+                                    batchSize = batchSize,
+                                    completion = completion)
+                        } ?: run {
+                            // Invoke completion callback when after is returned null
+                            // which indicats that we have completed paginating
+                            completion?.invoke(Result.success())
+                        }
+                    } ?: run {
+                        // Explicitly invoke completion callback if response is null.
+                        completion?.invoke(Result.success())
+                    }
                 }
             }
         }
     }
 
     /**
-     * Refresh all merchants from the host
+     * Refresh all merchants by IDs from the host with pagination
      *
-     * @param completion Optional completion handler with optional error if the request fails
+     * @param merchantIds IDs of the merchants to fetch
+     * @param before Merchant ID to fetch before this merchant (optional)
+     * @param after Merchant ID to fetch upto this merchant (optional)
+     * @param batchSize Batch size of merchants to returned by API (optional); Defaults to 500
+     * @param completion Optional completion handler with optional error if the request fails and pagination cursors if success
      */
-    fun refreshMerchants(completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        doAsync {
-            refreshNextMerchants(completion = completion)
-        }
-    }
-
-    private fun refreshNextMerchants(
+    fun refreshMerchantsByIdsWithPagination(
+        merchantIds: LongArray,
+        before: Long? = null,
         after: Long? = null,
-        updatedMerchantIds: LongArray = longArrayOf(),
-        completion: OnFrolloSDKCompletionListener<Result>? = null
+        batchSize: Long? = MERCHANT_BATCH_SIZE.toLong(),
+        completion: OnFrolloSDKCompletionListener<PaginatedResult>? = null
     ) {
-        aggregationAPI.fetchMerchants(after = after, size = MERCHANT_BATCH_SIZE.toLong()).enqueue { resource ->
+        if (merchantIds.isEmpty()) {
+            completion?.invoke(PaginatedResult.Success())
+            return
+        }
+
+        aggregationAPI.fetchMerchants(merchantIds = merchantIds, before = before, after = after, size = batchSize).enqueue { resource ->
             when (resource.status) {
-                Resource.Status.SUCCESS -> {
-                    val response = resource.data
-
-                    response?.let {
-                        val updatedIds = insertMerchants(response.data).plus(updatedMerchantIds)
-
-                        response.paging.cursors.after?.let { nextAfter ->
-                            refreshNextMerchants(
-                                    after = nextAfter,
-                                    updatedMerchantIds = updatedIds,
-                                    completion = completion)
-                        } ?: run {
-                            removeMerchants(updatedIds, completion)
-                        }
-                    } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
-                }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshMerchants", resource.error?.localizedDescription)
-                    completion?.invoke(Result.error(resource.error))
+                    Log.e("$TAG#refreshMerchantsByIdsWithPagination", resource.error?.localizedDescription)
+                    completion?.invoke(PaginatedResult.Error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    resource.data?.let { response ->
+                        doAsync {
+                            handleMerchantsResponseByIds(response = response.data)
+
+                            uiThread {
+                                completion?.invoke(PaginatedResult.Success(
+                                        before = response.paging.cursors.before,
+                                        after = response.paging.cursors.after))
+                            }
+                        }
+                    } ?: run {
+                        // Explicitly invoke completion callback if response is null.
+                        completion?.invoke(PaginatedResult.Success())
+                    }
                 }
             }
         }
     }
 
-    // Do not call this method from main thread. Call this asynchronously.
-    private fun insertMerchants(response: List<MerchantResponse>): LongArray {
-        val models = response.map { it.toMerchant() }
-        db.merchants().insertAll(*models.toTypedArray())
-
-        val apiIds = response.map { it.merchantId }.toList()
-        refreshingMerchantIDs = refreshingMerchantIDs.minus(apiIds)
-
-        return response.map { it.merchantId }.toLongArray()
-    }
-
-    // Do not call this method from main thread. Call this asynchronously.
-    private fun removeMerchants(
-        excludingIds: LongArray,
-        completion: OnFrolloSDKCompletionListener<Result>? = null
+    /**
+     * Refresh all merchants from the host with pagination
+     *
+     * @param before Merchant ID to fetch before this merchant (optional)
+     * @param after Merchant ID to fetch upto this merchant (optional)
+     * @param batchSize Batch size of merchants to returned by API (optional); Defaults to 500
+     * @param completion Optional completion handler with optional error if the request fails and pagination cursors if success
+     */
+    fun refreshMerchantsWithPagination(
+        before: Long? = null,
+        after: Long? = null,
+        batchSize: Long? = MERCHANT_BATCH_SIZE.toLong(),
+        completion: OnFrolloSDKCompletionListener<PaginatedResult>? = null
     ) {
-        val apiIds = excludingIds.sorted()
-        val staleIds = ArrayList(db.merchants().getIds().sorted())
 
-        staleIds.removeAll(apiIds)
-
-        if (staleIds.isNotEmpty()) {
-            db.merchants().deleteMany(staleIds.toLongArray())
+        aggregationAPI.fetchMerchants(before = before, after = after, size = batchSize).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshMerchantsWithPagination", resource.error?.localizedDescription)
+                    completion?.invoke(PaginatedResult.Error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    val response = resource.data
+                    handleMerchantsResponse(
+                            response = response?.data,
+                            before = response?.paging?.cursors?.before,
+                            after = response?.paging?.cursors?.after,
+                            completion = completion)
+                }
+            }
         }
-
-        completion?.invoke(Result.success())
     }
 
     /**
@@ -1916,7 +1940,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     private fun refreshCachedMerchants(merchantsCount: Long, offset: Int, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val ids = db.merchants().getIdsByOffset(limit = MERCHANT_BATCH_SIZE, offset = offset)
 
-        refreshMerchants(ids.toLongArray()) { result ->
+        refreshMerchantsByIds(ids.toLongArray()) { result ->
             when (result.status) {
                 Result.Status.SUCCESS -> {
                     val nextOffset = offset + MERCHANT_BATCH_SIZE
@@ -1932,6 +1956,53 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 }
             }
         }
+    }
+
+    // WARNING: Do not call this method on the main thread
+    private fun handleMerchantsResponseByIds(response: List<MerchantResponse>) {
+        // Insert all merchants from API response
+        val models = response.map { it.toMerchant() }
+        db.merchants().insertAll(*models.toTypedArray())
+
+        // Fetch IDs from API response
+        val apiIds = response.map { it.merchantId }.toHashSet().sorted()
+
+        // Remove IDs that are recently refreshed from the global tracking list of Merchants IDs being refreshed
+        refreshingMerchantIDs = refreshingMerchantIDs.minus(apiIds)
+    }
+
+    private fun handleMerchantsResponse(
+        response: List<MerchantResponse>?,
+        before: Long?,
+        after: Long?,
+        completion: OnFrolloSDKCompletionListener<PaginatedResult>? = null
+    ) {
+        response?.let {
+            doAsync {
+                // Insert all merchants from API response
+                val models = response.map { it.toMerchant() }
+                db.merchants().insertAll(*models.toTypedArray())
+
+                // Fetch IDs from API response
+                val apiIds = response.map { it.merchantId }.toHashSet()
+
+                // Remove IDs that are recently refreshed from the global tracking list of Mercahnts IDs being refreshed
+                refreshingMerchantIDs = refreshingMerchantIDs.minus(apiIds)
+
+                // Get IDs from database
+                val merchantIds = db.merchants().getIds(sqlForMerchantsIds(before = before, after = after)).toHashSet()
+
+                // Get stale IDs that are not present in the API response
+                val staleIds = merchantIds.minus(apiIds)
+
+                // Delete the entries for these stale IDs from database if they exist
+                if (staleIds.isNotEmpty()) {
+                    db.merchants().deleteMany(staleIds.toLongArray())
+                }
+
+                uiThread { completion?.invoke(PaginatedResult.Success(before = before, after = after)) }
+            }
+        } ?: run { completion?.invoke(PaginatedResult.Success()) } // Explicitly invoke completion callback if response is null.
     }
 
     private fun handleMerchantResponse(response: MerchantResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
@@ -1965,7 +2036,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
             val missingMerchantIds = merchantIds.compareToFindMissingItems(existingMerchantIds).minus(refreshingMerchantIDs)
             if (missingMerchantIds.isNotEmpty()) {
                 refreshingMerchantIDs = refreshingMerchantIDs.plus(missingMerchantIds)
-                refreshMerchants(missingMerchantIds.toLongArray())
+                refreshMerchantsByIds(missingMerchantIds.toLongArray())
             }
         }
     }

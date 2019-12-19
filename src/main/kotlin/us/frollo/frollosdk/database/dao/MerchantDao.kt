@@ -49,6 +49,9 @@ internal interface MerchantDao {
     @Query("SELECT merchant_id FROM merchant")
     fun getIds(): List<Long>
 
+    @RawQuery
+    fun getIds(queryStr: SupportSQLiteQuery): List<Long>
+
     @Query("SELECT merchant_id FROM merchant LIMIT :limit OFFSET :offset")
     fun getIdsByOffset(limit: Int, offset: Int): List<Long>
 

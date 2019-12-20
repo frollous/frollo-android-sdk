@@ -252,6 +252,15 @@ class ModelExtensionTest {
     }
 
     @Test
+    fun testSQLForMerchantIds() {
+        var query = sqlForMerchantsIds(before = 100, after = 200)
+        assertEquals("SELECT merchant_id  FROM merchant WHERE merchant_id > 100 AND merchant_id <= 200 ", query.sql)
+
+        query = sqlForMerchantsIds()
+        assertEquals("SELECT merchant_id  FROM merchant", query.sql)
+    }
+
+    @Test
     fun testSQLForGoals() {
         var query = sqlForGoals(frequency = GoalFrequency.MONTHLY, trackingStatus = GoalTrackingStatus.ON_TRACK, status = GoalStatus.ACTIVE, accountId = 12345, trackingType = GoalTrackingType.CREDIT, target = GoalTarget.OPEN_ENDED)
         assertEquals("SELECT  *  FROM goal WHERE frequency = 'MONTHLY' AND status = 'ACTIVE' AND target = 'OPEN_ENDED' AND tracking_status = 'ON_TRACK' AND tracking_type = 'CREDIT' AND account_id = 12345 ", query.sql)

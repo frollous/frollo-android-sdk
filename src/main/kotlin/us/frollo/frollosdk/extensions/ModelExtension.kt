@@ -331,6 +331,16 @@ internal fun sqlForMerchants(type: MerchantType? = null): SimpleSQLiteQuery {
     return sqlQueryBuilder.create()
 }
 
+internal fun sqlForMerchantsIds(before: Long? = null, after: Long? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("merchant")
+
+    sqlQueryBuilder.columns(arrayOf("merchant_id"))
+    before?.let { sqlQueryBuilder.appendSelection(selection = "merchant_id > $it") }
+    after?.let { sqlQueryBuilder.appendSelection(selection = "merchant_id <= $it") }
+
+    return sqlQueryBuilder.create()
+}
+
 internal fun sqlForGoals(
     frequency: GoalFrequency? = null,
     status: GoalStatus? = null,

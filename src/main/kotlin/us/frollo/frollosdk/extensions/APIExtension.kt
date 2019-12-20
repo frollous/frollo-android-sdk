@@ -87,12 +87,12 @@ internal fun AggregationAPI.fetchTransactionsSummaryByQuery(
 internal fun AggregationAPI.fetchTransactionsSummaryByIDs(transactionIds: LongArray): Call<TransactionsSummaryResponse> =
         fetchTransactionsSummary(mapOf("transaction_ids" to transactionIds.joinToString(",")))
 
-internal fun AggregationAPI.fetchMerchantsByIDs(merchantIds: LongArray): Call<MerchantsResponse> =
-        fetchMerchantsByIds(mapOf("merchant_ids" to merchantIds.joinToString(",")))
-
-internal fun AggregationAPI.fetchMerchants(after: Long? = null, size: Long): Call<MerchantsResponse> {
-    val queryMap = mutableMapOf("size" to size)
-    after?.let { queryMap.put("after", it) }
+internal fun AggregationAPI.fetchMerchants(before: Long? = null, after: Long? = null, size: Long? = null, merchantIds: LongArray? = null): Call<MerchantsResponse> {
+    val queryMap = mutableMapOf<String, String>()
+    before?.let { queryMap.put("before", it.toString()) }
+    after?.let { queryMap.put("after", it.toString()) }
+    size?.let { queryMap.put("size", it.toString()) }
+    merchantIds?.let { queryMap.put("merchant_ids", it.joinToString(",")) }
     return fetchMerchants(queryMap)
 }
 

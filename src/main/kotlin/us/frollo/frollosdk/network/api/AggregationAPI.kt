@@ -142,14 +142,10 @@ internal interface AggregationAPI {
 
     // Query parameters: {before, after, size}
     @GET(URL_MERCHANTS)
-    fun fetchMerchants(@QueryMap queryParams: Map<String, Long>): Call<MerchantsResponse>
+    fun fetchMerchants(@QueryMap queryParams: Map<String, String>): Call<MerchantsResponse>
 
     @GET(URL_MERCHANT)
     fun fetchMerchant(@Path("merchant_id") merchantId: Long): Call<MerchantResponse>
-
-    // Query parameters: {merchant_ids, before, after, size}
-    @GET(URL_MERCHANTS)
-    fun fetchMerchantsByIds(@QueryMap queryParams: Map<String, String>): Call<MerchantsResponse>
 
     // Tags
 

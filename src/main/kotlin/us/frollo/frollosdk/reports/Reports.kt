@@ -48,6 +48,7 @@ import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.ReportsResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.reports.Report
+import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalance
 import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalanceRelation
 import us.frollo.frollosdk.model.coredata.reports.ReportDateFormat
 import us.frollo.frollosdk.model.coredata.reports.ReportDateFormat.Companion.DAILY
@@ -319,10 +320,9 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         try {
             // Sort by id
             reportsResponse.sortBy { it.id }
-
-            // Fetch existing reports for updating
             val reportAccountsIds = reportsResponse.map { it.id }.toLongArray()
 
+            // Fetch existing reports for updating
             val existingReports = db.reportsAccountBalance().find(sqlForExistingAccountBalanceReports(date, period, reportAccountsIds, accountId, accountType))
 
             // Sort by date
@@ -330,6 +330,8 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
 
             var index = 0
 
+            val modelsToInsert = mutableListOf<ReportAccountBalance>()
+            val modelsToUpdate = mutableListOf<ReportAccountBalance>()
             reportsResponse.forEach { response ->
                 val report = response.toReportAccountBalance(date, period)
 
@@ -337,14 +339,17 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                     // Update
                     report.reportId = existingReports[index].reportId
 
-                    db.reportsAccountBalance().update(report)
+                    modelsToUpdate.add(report)
 
                     index += 1
                 } else {
                     // Insert
-                    db.reportsAccountBalance().insert(report)
+                    modelsToInsert.add(report)
                 }
             }
+
+            db.reportsAccountBalance().update(*modelsToUpdate.toTypedArray())
+            db.reportsAccountBalance().insert(*modelsToInsert.toTypedArray())
 
             // Fetch and delete any leftovers
             val staleIds = db.reportsAccountBalance().findStaleIds(sqlForStaleIdsAccountBalanceReports(date, period, reportAccountsIds, accountId, accountType))

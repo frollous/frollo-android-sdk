@@ -48,6 +48,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
 import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.model.loginFormFilledData
@@ -224,6 +225,70 @@ class AggregationTest : BaseAndroidTest() {
         }
 
         signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshProvidersUpdatesAndDoesNotOverwrite() {
+        initSetup()
+
+        val signal1 = CountDownLatch(1)
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == AggregationAPI.URL_PROVIDERS) {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.providers_valid))
+                } else if (request?.trimmedPath == "aggregation/providers/8069") {
+                    return MockResponse()
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.provider_id_8069))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshProvider(8069L) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchProvider(8069L).test()
+            testObserver.awaitValue()
+            val model = testObserver.value().data
+            assertNotNull(model)
+            assertEquals(8069L, model?.providerId)
+            assertEquals(ProviderStatus.BETA, model?.providerStatus)
+            assertEquals("https://example.com/australiansuper-logo600pxw.png", model?.largeLogoUrl)
+
+            signal1.countDown()
+        }
+
+        signal1.await(3, TimeUnit.SECONDS)
+
+        val signal2 = CountDownLatch(1)
+
+        aggregation.refreshProviders { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchProviders().test()
+            testObserver.awaitValue()
+            val models = testObserver.value().data
+            assertNotNull(models)
+            assertEquals(311, models?.size)
+            val model = models?.find { it.providerId == 8069L }
+            assertEquals(8069L, model?.providerId)
+            assertEquals(ProviderStatus.BETA, model?.providerStatus)
+            assertEquals("https://example.com/australiansuper-logo600pxw.png", models?.find { it.providerId == 8069L }?.largeLogoUrl)
+
+            signal2.countDown()
+        }
+
+        signal2.await(3, TimeUnit.SECONDS)
+
+        assertEquals(2, mockServer.requestCount)
 
         tearDown()
     }

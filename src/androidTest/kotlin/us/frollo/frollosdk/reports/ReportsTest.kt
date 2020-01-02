@@ -146,31 +146,34 @@ class ReportsTest : BaseAndroidTest() {
             }
         })
 
-        reports.refreshAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            val testObserver = reports.fetchAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate).test()
-            testObserver.awaitValue()
-            val models = testObserver.value().data
-            assertNotNull(models)
-
-            // Check for overall reports
-            val fetchedReports = models?.sortedBy { it.report?.accountId }
-            assertEquals(661, fetchedReports?.size)
-
-            val report = fetchedReports?.first()
-            assertEquals("2018-10-28", report?.report?.date)
-            assertEquals(542L, report?.report?.accountId)
-            assertEquals("AUD", report?.report?.currency)
-            assertEquals(period, report?.report?.period)
-            assertEquals(BigDecimal("-1191.45"), report?.report?.value)
+        var result = Result.error(null)
+        reports.refreshAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate) {
+            result = it
         }
+
+        wait(5)
+
+        assertEquals(Result.Status.SUCCESS, result.status)
+        assertNull(result.error)
+
+        val testObserver = reports.fetchAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate).test()
+        testObserver.awaitValue()
+        val models = testObserver.value().data
+        assertNotNull(models)
+
+        // Check for overall reports
+        val fetchedReports = models?.sortedBy { it.report?.accountId }
+        assertEquals(661, fetchedReports?.size)
+
+        val report = fetchedReports?.first()
+        assertEquals("2018-10-28", report?.report?.date)
+        assertEquals(542L, report?.report?.accountId)
+        assertEquals("AUD", report?.report?.currency)
+        assertEquals(period, report?.report?.period)
+        assertEquals(BigDecimal("-1191.45"), report?.report?.value)
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
-
-        wait(5)
 
         tearDown()
     }
@@ -250,31 +253,34 @@ class ReportsTest : BaseAndroidTest() {
             }
         })
 
-        reports.refreshAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            val testObserver = reports.fetchAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate).test()
-            testObserver.awaitValue()
-            val models = testObserver.value().data
-            assertNotNull(models)
-
-            // Check for overall reports
-            val fetchedReports = models?.sortedBy { it.report?.accountId }
-            assertEquals(122, fetchedReports?.size)
-
-            val report = fetchedReports?.first()
-            assertEquals("2018-10-4", report?.report?.date)
-            assertEquals(542L, report?.report?.accountId)
-            assertEquals("AUD", report?.report?.currency)
-            assertEquals(period, report?.report?.period)
-            assertEquals(BigDecimal("-1191.45"), report?.report?.value)
+        var result = Result.error(null)
+        reports.refreshAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate) {
+            result = it
         }
+
+        wait(5)
+
+        assertEquals(Result.Status.SUCCESS, result.status)
+        assertNull(result.error)
+
+        val testObserver = reports.fetchAccountBalanceReports(period = period, fromDate = fromDate, toDate = toDate).test()
+        testObserver.awaitValue()
+        val models = testObserver.value().data
+        assertNotNull(models)
+
+        // Check for overall reports
+        val fetchedReports = models?.sortedBy { it.report?.accountId }
+        assertEquals(122, fetchedReports?.size)
+
+        val report = fetchedReports?.first()
+        assertEquals("2018-10-4", report?.report?.date)
+        assertEquals(542L, report?.report?.accountId)
+        assertEquals("AUD", report?.report?.currency)
+        assertEquals(period, report?.report?.period)
+        assertEquals(BigDecimal("-1191.45"), report?.report?.value)
 
         val request = mockServer.takeRequest()
         assertEquals(requestPath, request.trimmedPath)
-
-        wait(5)
 
         tearDown()
     }

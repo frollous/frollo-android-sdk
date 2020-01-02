@@ -20,6 +20,7 @@ import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
+import us.frollo.frollosdk.model.api.aggregation.providers.ProvidersResponse
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
@@ -55,6 +56,18 @@ internal fun ProviderResponse.toProvider(): Provider =
                 loginHelpMessage = loginHelpMessage,
                 loginForm = loginForm,
                 encryption = encryption)
+
+internal fun Provider.toProvidersResponse(): ProvidersResponse =
+        ProvidersResponse(
+                providerId = providerId,
+                providerName = providerName,
+                smallLogoUrl = smallLogoUrl,
+                smallLogoRevision = smallLogoRevision,
+                providerStatus = providerStatus,
+                popular = popular,
+                containerNames = containerNames,
+                loginUrl = loginUrl
+        )
 
 internal fun ProviderAccountResponse.toProviderAccount(): ProviderAccount =
         ProviderAccount(

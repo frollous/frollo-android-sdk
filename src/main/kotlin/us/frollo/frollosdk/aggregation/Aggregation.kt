@@ -66,6 +66,7 @@ import us.frollo.frollosdk.mapping.toAccount
 import us.frollo.frollosdk.mapping.toMerchant
 import us.frollo.frollosdk.mapping.toProvider
 import us.frollo.frollosdk.mapping.toProviderAccount
+import us.frollo.frollosdk.mapping.toProvidersResponse
 import us.frollo.frollosdk.mapping.toTransaction
 import us.frollo.frollosdk.mapping.toTransactionCategory
 import us.frollo.frollosdk.mapping.toTransactionTag
@@ -263,15 +264,25 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     private fun handleProvidersResponse(response: List<ProviderResponse>?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         response?.let {
             doAsync {
+                val existingIds = db.providers().getIdsByStatus().toHashSet() // These are providers with status BETA & SUPPORTED
                 val models = mapProviderResponse(response)
-                db.providers().insertAll(*models.toTypedArray())
+
+                val modelsToInsert = models.filter { it.providerId !in existingIds }
+                if (modelsToInsert.isNotEmpty()) {
+                    db.providers().insertAll(*modelsToInsert.toTypedArray())
+                }
+
+                // As fetchAllProviders() response has lesser fields we have to use update() specific columns in DB
+                // instead of conflict insert. Otherwise it will remove the extra data fetched by the fetchProvider() response.
+                val modelsToUpdate = models.filter { it.providerId in existingIds }
+                if (modelsToUpdate.isNotEmpty()) {
+                    db.providers().update(*modelsToUpdate.map { it.toProvidersResponse() }.toTypedArray())
+                }
 
                 val apiIds = response.map { it.providerId }.toHashSet()
-                val betaAndSupportedProviderIds = db.providers().getIdsByStatus().toHashSet()
-                val staleIds = betaAndSupportedProviderIds.minus(apiIds)
-
-                if (staleIds.isNotEmpty()) {
-                    removeCachedProviders(staleIds.toLongArray())
+                val modelsToDelete = existingIds.minus(apiIds)
+                if (modelsToDelete.isNotEmpty()) {
+                    removeCachedProviders(modelsToDelete.toLongArray())
                 }
 
                 uiThread { completion?.invoke(Result.success()) }

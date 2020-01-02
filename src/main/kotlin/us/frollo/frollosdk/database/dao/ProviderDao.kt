@@ -22,8 +22,9 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
-import androidx.room.Transaction
+import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
+import us.frollo.frollosdk.model.api.aggregation.providers.ProvidersResponse
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderRelation
 
@@ -44,6 +45,9 @@ internal interface ProviderDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(model: Provider): Long
+
+    @Update(entity = Provider::class)
+    fun update(vararg models: ProvidersResponse)
 
     @Query("SELECT provider_id FROM provider")
     fun getIds(): List<Long>

@@ -68,7 +68,7 @@ internal val Response.clonedBodyString: String?
     get() {
         val source = this.body()?.source()
         source?.request(Long.MAX_VALUE) // Request the entire body.
-        val buffer = source?.buffer()
+        val buffer = source?.buffer
 
         // Clone buffer before reading from it as if this is called second time from elsewhere,
         // the network stream has already been consumed and is no longer available and results

@@ -34,6 +34,6 @@ class BudgetMappingTest {
     fun testBudgetPeriodResponseToBudgetPeriod() {
         val response = testBudgetPeriodResponseData(budgetPeriodId = 12345)
         val model = response.toBudgetPeriod()
-        Assert.assertEquals(12345L, model?.budgetPeriodId)
+        Assert.assertEquals(12345L, model.budgetPeriodId)
     }
 }

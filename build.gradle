@@ -96,6 +96,11 @@ buildscript {
     }
 }
 
+repositories {
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -145,7 +150,4 @@ dependencies {
 
     // AppAuth
     implementation "net.openid:appauth:0.7.1"
-}
-repositories {
-    mavenCentral()
 }

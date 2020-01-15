@@ -299,7 +299,7 @@ internal fun sqlForTransactions(
         sb.append("(")
         userTags.forEachIndexed { index, str ->
             sb.append("(user_tags LIKE '%|$str|%')")
-            if (index < userTags.size - 1) sb.append(" AND ")
+            if (index < userTags.size - 1) sb.append(" OR ")
         }
         sb.append(")")
         sqlQueryBuilder.appendSelection(selection = sb.toString())

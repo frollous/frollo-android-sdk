@@ -1381,10 +1381,10 @@ class AggregationTest : BaseAndroidTest() {
 
         val data1 = testTransactionResponseData(transactionId = 100, userTags = listOf("abc", "def"))
         val data2 = testTransactionResponseData(transactionId = 101, userTags = listOf("abc2", "def2"))
-        val data3 = testTransactionResponseData(transactionId = 102, userTags = listOf("hello", "how"))
-        val data4 = testTransactionResponseData(transactionId = 103, userTags = listOf("why", "are"))
+        val data3 = testTransactionResponseData(transactionId = 102, userTags = listOf("abc2", "are"))
+        val data4 = testTransactionResponseData(transactionId = 103, userTags = listOf("hello", "are"))
         val data5 = testTransactionResponseData(transactionId = 104, userTags = listOf("why", "are"))
-        val data6 = testTransactionResponseData(transactionId = 105, userTags = listOf("why", "are"))
+        val data6 = testTransactionResponseData(transactionId = 105, userTags = listOf("why", "abc"))
         val list = mutableListOf(data1, data2, data3, data4, data5, data6)
 
         database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
@@ -1394,7 +1394,7 @@ class AggregationTest : BaseAndroidTest() {
         val transactionList = liveDataObj.value()
         assertNotNull(transactionList.data)
         assert(transactionList.data?.isNotEmpty()!!)
-        assertEquals(3, transactionList.data?.size!!)
+        assertEquals(4, transactionList.data?.size!!)
 
         tearDown()
     }
@@ -1403,8 +1403,8 @@ class AggregationTest : BaseAndroidTest() {
     fun testFetchTransactionsByUserTagsWithRelation() {
         initSetup()
 
-        database.transactions().insert(testTransactionResponseData(transactionId = 122, accountId = 234, categoryId = 567, merchantId = 678, userTags = listOf("why", "are")).toTransaction())
-        database.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678, userTags = listOf("why", "are")).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 122, accountId = 234, categoryId = 567, merchantId = 678, userTags = listOf("why", "how")).toTransaction())
+        database.transactions().insert(testTransactionResponseData(transactionId = 123, accountId = 234, categoryId = 567, merchantId = 678, userTags = listOf("how", "are")).toTransaction())
         database.transactions().insert(testTransactionResponseData(transactionId = 124, accountId = 235, categoryId = 567, merchantId = 678, userTags = listOf("why", "are")).toTransaction())
         database.transactions().insert(testTransactionResponseData(transactionId = 125, accountId = 235, categoryId = 567, merchantId = 678, userTags = listOf("whyasdas", "areasdasd")).toTransaction())
         database.accounts().insert(testAccountResponseData(accountId = 234, providerAccountId = 345).toAccount())

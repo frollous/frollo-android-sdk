@@ -227,7 +227,7 @@ class ModelExtensionTest {
                 fromDate = "2019-03-01",
                 toDate = "2019-03-31",
                 externalId = "208")
-        assertEquals("SELECT  *  FROM transaction_model WHERE account_id = 123 AND ((user_tags LIKE '%|pub|%') AND (user_tags LIKE '%|holiday|%') AND (user_tags LIKE '%|shopping|%')) AND base_type = 'CREDIT' AND budget_category = 'INCOME' AND status = 'PENDING' AND included = 0 AND external_id = '208' AND (transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
+        assertEquals("SELECT  *  FROM transaction_model WHERE account_id = 123 AND ((user_tags LIKE '%|pub|%') OR (user_tags LIKE '%|holiday|%') OR (user_tags LIKE '%|shopping|%')) AND base_type = 'CREDIT' AND budget_category = 'INCOME' AND status = 'PENDING' AND included = 0 AND external_id = '208' AND (transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
 
         query = sqlForTransactions()
         assertEquals("SELECT  *  FROM transaction_model", query.sql)

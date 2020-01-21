@@ -3,7 +3,7 @@
 	"name": "AustralianSuper",
 	"small_logo_url": "https://example.com/australiansuper-small.png",
 	"small_logo_revision": 2,
-	"status": "beta",
+	"status": "supported",
 	"popular": false,
 	"large_logo_url": "https://example.com/australiansuper-logo600pxw.png",
 	"container_names": ["investment", "insurance"],

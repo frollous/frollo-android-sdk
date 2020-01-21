@@ -31,7 +31,7 @@ object ARGUMENT {
     /**
      * Key for transaction IDs sent with [ACTION.ACTION_REFRESH_TRANSACTIONS] broadcast.
      */
-    internal const val ARG_TRANSACTION_IDS = "arg_transaction_ids"
+    const val ARG_TRANSACTION_IDS = "arg_transaction_ids"
 }
 
 /** Intent Actions */
@@ -44,9 +44,9 @@ object ACTION {
 
     /**
      * Local Broadcast triggered when ever the Transactions need to be refreshed.
-     * Internal Only.
+     * Listen to this to detect the updates to Transactions
      */
-    internal const val ACTION_REFRESH_TRANSACTIONS = "us.frollo.frollosdk.ACTION_REFRESH_TRANSACTIONS"
+    const val ACTION_REFRESH_TRANSACTIONS = "us.frollo.frollosdk.ACTION_REFRESH_TRANSACTIONS"
 
     /**
      * Local Broadcast triggered when ever the authentication status of the SDK changes.

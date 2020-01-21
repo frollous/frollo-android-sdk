@@ -32,11 +32,13 @@ import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
+import us.frollo.frollosdk.model.coredata.aggregation.providers.AggregatorType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderAuthType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderEncryptionType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderMFAType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderPermission
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategoryType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
@@ -190,6 +192,18 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromListOfProviderContainerName(value: List<ProviderContainerName>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|", postfix = "|")
+
+    @TypeConverter
+    fun stringToAggregatorType(value: String?): AggregatorType? = if (value == null) AggregatorType.YODLEE else AggregatorType.valueOf(value)
+
+    @TypeConverter
+    fun stringFromAggregatorType(value: AggregatorType?): String? = value?.name ?: AggregatorType.YODLEE.name
+
+    @TypeConverter
+    fun stringToListOfProviderPermission(value: String?): List<ProviderPermission>? = if (value == null) null else value.split("|").filter { it.isNotBlank() }.map { ProviderPermission.valueOf(it.toUpperCase()) }.toList()
+
+    @TypeConverter
+    fun stringFromListOfProviderPermission(value: List<ProviderPermission>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|", postfix = "|")
 
     // ProviderAccount
     @TypeConverter

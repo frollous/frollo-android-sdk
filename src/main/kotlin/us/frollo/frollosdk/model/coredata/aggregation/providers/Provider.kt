@@ -62,6 +62,12 @@ data class Provider(
     /** Large Logo Revision */
     @ColumnInfo(name = "large_logo_revision") val largeLogoRevision: Int?,
 
+    /** Specifies the aggregator with which this Provider get its data from */
+    @ColumnInfo(name = "aggregator_type") val aggregatorType: AggregatorType,
+
+    /** The permission groups that are supported by this Provider */
+    @ColumnInfo(name = "permissions") val permissions: List<ProviderPermission>?,
+
     /** Base URL of the provider's website */
     @ColumnInfo(name = "base_url") val baseUrl: String?,
 

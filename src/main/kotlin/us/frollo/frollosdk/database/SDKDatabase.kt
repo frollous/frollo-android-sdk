@@ -330,6 +330,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 // 3) Delete table report_group_transaction_history
                 // 4) Create table budget
                 // 5) Create table budget_period
+                // 6) Alter provider table - add column aggregator_type, permissions
 
                 database.execSQL("DROP INDEX IF EXISTS `index_report_transaction_current_report_id`")
                 database.execSQL("DROP INDEX IF EXISTS `index_report_transaction_current_linked_id_day_filtered_budget_category_report_grouping`")
@@ -346,6 +347,9 @@ abstract class SDKDatabase : RoomDatabase() {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `budget_period` (`budget_period_id` INTEGER NOT NULL, `budget_id` INTEGER NOT NULL, `start_date` TEXT NOT NULL, `end_date` TEXT NOT NULL, `current_amount` TEXT NOT NULL, `target_amount` TEXT NOT NULL, `required_amount` TEXT NOT NULL, `tracking_status` TEXT NOT NULL, `index` INTEGER NOT NULL, PRIMARY KEY(`budget_period_id`))")
                 database.execSQL("CREATE  INDEX `index_budget_period_budget_period_id` ON `budget_period` (`budget_period_id`)")
                 database.execSQL("CREATE  INDEX `index_budget_period_budget_id` ON `budget_period` (`budget_id`)")
+
+                database.execSQL("ALTER TABLE `provider` ADD COLUMN `aggregator_type` TEXT NOT NULL DEFAULT ''")
+                database.execSQL("ALTER TABLE `provider` ADD COLUMN `permissions` TEXT")
             }
         }
     }

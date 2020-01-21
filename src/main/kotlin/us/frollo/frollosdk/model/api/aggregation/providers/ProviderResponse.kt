@@ -17,6 +17,7 @@
 package us.frollo.frollosdk.model.api.aggregation.providers
 
 import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.model.coredata.aggregation.providers.AggregatorType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderAuthType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderEncryption
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
@@ -34,6 +35,8 @@ internal data class ProviderResponse(
     @SerializedName("login_url") val loginUrl: String?,
     @SerializedName("large_logo_url") val largeLogoUrl: String?,
     @SerializedName("large_logo_revision") val largeLogoRevision: Int?,
+    @SerializedName("aggregator_type") val aggregatorType: AggregatorType,
+    @SerializedName("permissions") val permissions: List<String>?,
 
     @SerializedName("base_url") val baseUrl: String?,
     @SerializedName("forget_password_url") val forgetPasswordUrl: String?,

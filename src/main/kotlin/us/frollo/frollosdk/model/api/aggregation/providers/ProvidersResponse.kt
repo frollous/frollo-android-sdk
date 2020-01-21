@@ -18,7 +18,9 @@ package us.frollo.frollosdk.model.api.aggregation.providers
 
 import androidx.room.ColumnInfo
 import androidx.room.PrimaryKey
+import us.frollo.frollosdk.model.coredata.aggregation.providers.AggregatorType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderPermission
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 
 /**
@@ -37,5 +39,7 @@ internal data class ProvidersResponse(
     @ColumnInfo(name = "container_names") val containerNames: List<ProviderContainerName>,
     @ColumnInfo(name = "login_url") val loginUrl: String?,
     @ColumnInfo(name = "large_logo_url") val largeLogoUrl: String?,
-    @ColumnInfo(name = "large_logo_revision") val largeLogoRevision: Int?
+    @ColumnInfo(name = "large_logo_revision") val largeLogoRevision: Int?,
+    @ColumnInfo(name = "aggregator_type") val aggregatorType: AggregatorType,
+    @ColumnInfo(name = "permissions") val permissions: List<ProviderPermission>?
 )

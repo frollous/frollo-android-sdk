@@ -30,6 +30,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderPermission
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionsSummary
@@ -55,7 +56,9 @@ internal fun ProviderResponse.toProvider(): Provider =
                 helpMessage = helpMessage,
                 loginHelpMessage = loginHelpMessage,
                 loginForm = loginForm,
-                encryption = encryption)
+                encryption = encryption,
+                aggregatorType = aggregatorType,
+                permissions = permissions?.map { ProviderPermission.valueOf(it.toUpperCase()) }?.toList())
 
 internal fun Provider.toProvidersResponse(): ProvidersResponse =
         ProvidersResponse(
@@ -68,7 +71,9 @@ internal fun Provider.toProvidersResponse(): ProvidersResponse =
                 containerNames = containerNames,
                 loginUrl = loginUrl,
                 largeLogoUrl = largeLogoUrl,
-                largeLogoRevision = largeLogoRevision
+                largeLogoRevision = largeLogoRevision,
+                aggregatorType = aggregatorType,
+                permissions = permissions
         )
 
 internal fun ProviderAccountResponse.toProviderAccount(): ProviderAccount =

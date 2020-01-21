@@ -17,6 +17,7 @@
 package us.frollo.frollosdk.model
 
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
+import us.frollo.frollosdk.model.coredata.aggregation.providers.AggregatorType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderAuthType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderEncryption
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderEncryptionType
@@ -87,5 +88,7 @@ internal fun testProviderResponseData(providerId: Long? = null): ProviderRespons
             mfaType = ProviderMFAType.TOKEN,
             oAuthSite = false,
             smallLogoUrl = "https://example.com/small_logo.png",
-            smallLogoRevision = 1)
+            smallLogoRevision = 1,
+            aggregatorType = AggregatorType.YODLEE,
+            permissions = null)
 }

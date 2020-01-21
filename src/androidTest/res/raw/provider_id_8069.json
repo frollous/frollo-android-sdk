@@ -8,6 +8,7 @@
 	"large_logo_url": "https://example.com/australiansuper-logo600pxw.png",
 	"container_names": ["investment", "insurance"],
 	"large_logo_revision": 2,
+    "aggregator_type": "yodlee",
 	"help_message": "test",
 	"login_help_message": "login here",
 	"login_url": "https://www.australiansuper.com/login.aspx",

@@ -66,7 +66,9 @@ internal fun Provider.toProvidersResponse(): ProvidersResponse =
                 providerStatus = providerStatus,
                 popular = popular,
                 containerNames = containerNames,
-                loginUrl = loginUrl
+                loginUrl = loginUrl,
+                largeLogoUrl = largeLogoUrl,
+                largeLogoRevision = largeLogoRevision
         )
 
 internal fun ProviderAccountResponse.toProviderAccount(): ProviderAccount =

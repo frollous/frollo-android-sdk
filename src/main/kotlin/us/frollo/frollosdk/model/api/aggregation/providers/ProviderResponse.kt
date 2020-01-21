@@ -32,9 +32,9 @@ internal data class ProviderResponse(
     @SerializedName("popular") val popular: Boolean,
     @SerializedName("container_names") val containerNames: List<String>,
     @SerializedName("login_url") val loginUrl: String?,
-
     @SerializedName("large_logo_url") val largeLogoUrl: String?,
     @SerializedName("large_logo_revision") val largeLogoRevision: Int?,
+
     @SerializedName("base_url") val baseUrl: String?,
     @SerializedName("forget_password_url") val forgetPasswordUrl: String?,
     @SerializedName("o_auth_site") val oAuthSite: Boolean?,

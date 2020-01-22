@@ -35,12 +35,14 @@ import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshSubStatus
+import us.frollo.frollosdk.model.coredata.aggregation.providers.AggregatorType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderAuthType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderEncryptionType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderFormType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderMFAType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderPermission
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategoryType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
@@ -352,6 +354,42 @@ class ConvertersTest {
         val list = mutableListOf(ProviderContainerName.BANK, ProviderContainerName.CREDIT_CARD, ProviderContainerName.BILL)
         val string = Converters.instance.stringFromListOfProviderContainerName(list)
         assertEquals("|bank|credit_card|bill|", string)
+    }
+
+    @Test
+    fun testStringToAggregatorType() {
+        val status = Converters.instance.stringToAggregatorType("CDR")
+        assertEquals(AggregatorType.CDR, status)
+
+        assertEquals(AggregatorType.YODLEE, Converters.instance.stringToAggregatorType(null))
+    }
+
+    @Test
+    fun testStringFromAggregatorType() {
+        val str = Converters.instance.stringFromAggregatorType(AggregatorType.CDR)
+        assertEquals("CDR", str)
+
+        assertEquals("YODLEE", Converters.instance.stringFromAggregatorType(null))
+    }
+
+    @Test
+    fun testStringToListOfProviderPermission() {
+        val string = "|customer_details|transaction_details|account_details|"
+        val list = Converters.instance.stringToListOfProviderPermission(string)
+        assertNotNull(list)
+        assertTrue(list?.size == 3)
+        assertEquals(ProviderPermission.CUSTOMER_DETAILS, list?.get(0))
+        assertEquals(ProviderPermission.TRANSACTION_DETAILS, list?.get(1))
+        assertEquals(ProviderPermission.ACCOUNT_DETAILS, list?.get(2))
+
+        assertNull(Converters.instance.stringToListOfProviderPermission(null))
+    }
+
+    @Test
+    fun testStringFromListOfProviderPermission() {
+        val list = mutableListOf(ProviderPermission.CUSTOMER_DETAILS, ProviderPermission.TRANSACTION_DETAILS, ProviderPermission.ACCOUNT_DETAILS)
+        val string = Converters.instance.stringFromListOfProviderPermission(list)
+        assertEquals("|customer_details|transaction_details|account_details|", string)
     }
 
     @Test

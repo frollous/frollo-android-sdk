@@ -194,7 +194,7 @@ class AggregationTest : BaseAndroidTest() {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            assertEquals(311, models?.size)
+            assertEquals(431, models?.size)
 
             signal.countDown()
         }
@@ -259,7 +259,7 @@ class AggregationTest : BaseAndroidTest() {
             val model = testObserver.value().data
             assertNotNull(model)
             assertEquals(8069L, model?.providerId)
-            assertEquals(ProviderStatus.BETA, model?.providerStatus)
+            assertEquals(ProviderStatus.SUPPORTED, model?.providerStatus)
             assertEquals("https://example.com/australiansuper-logo600pxw.png", model?.largeLogoUrl)
 
             signal1.countDown()
@@ -277,10 +277,10 @@ class AggregationTest : BaseAndroidTest() {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            assertEquals(311, models?.size)
+            assertEquals(431, models?.size)
             val model = models?.find { it.providerId == 8069L }
             assertEquals(8069L, model?.providerId)
-            assertEquals(ProviderStatus.BETA, model?.providerStatus)
+            assertEquals(ProviderStatus.SUPPORTED, model?.providerStatus)
             assertEquals("https://example.com/australiansuper-logo600pxw.png", models?.find { it.providerId == 8069L }?.largeLogoUrl)
 
             signal2.countDown()
@@ -3302,7 +3302,7 @@ class AggregationTest : BaseAndroidTest() {
             testObserver5.awaitValue()
             val models = testObserver5.value().data
             assertNotNull(models)
-            assertEquals(311, models?.size)
+            assertEquals(431, models?.size)
 
             val testObserver6 = aggregation.fetchProvider(providerId = 123).test()
             testObserver6.awaitValue()

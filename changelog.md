@@ -9,6 +9,11 @@
 - Merchants Pagination
 - Budgets & Budget Periods
 
+#### Changes
+
+- Update Frollo Host API version to 2.7
+- Add properties - 'aggregator_type' & 'permissions' to Provider model
+
 ### 3.3.0
 
 #### Features

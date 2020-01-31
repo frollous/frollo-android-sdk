@@ -1,0 +1,85 @@
+{
+	"data": [
+		{
+			"id": 10,
+			"account_id": 939,
+			"base_type": "debit",
+			"status": "posted",
+			"included": true,
+			"transaction_date": "2018-08-01",
+			"post_date": "2018-07-27",
+			"amount": {
+				"amount": "-20.00",
+				"currency": "AUD"
+			},
+			"description": {
+				"original": "COLES 693 Grocery Stores and Supermarkets",
+				"simple": "Coles"
+			},
+			"budget_category": "living",
+			"category_id": 66,
+			"merchant": {
+				"id": 44,
+				"name": "Coles",
+				"phone": "(02) 8912 3400",
+				"website": "https://www.coles.com.au"
+			}
+		},
+		{
+			"id": 9,
+			"account_id": 542,
+			"base_type": "debit",
+			"status": "posted",
+			"included": true,
+			"transaction_date": "2018-08-01",
+			"post_date": "2018-01-02",
+			"amount": {
+				"amount": "-100.00",
+				"currency": "AUD"
+			},
+			"description": {
+				"original": "ATM ANZ ATM NSW 243895 AUS",
+				"simple": "Cash Withdrawal"
+			},
+			"budget_category": "one_off",
+			"category_id": 80,
+			"merchant": {
+				"id": 24,
+				"name": "Cash Withdrawal"
+			}
+		},{
+			"id": 8,
+			"account_id": 939,
+			"base_type": "debit",
+			"status": "posted",
+			"included": true,
+			"transaction_date": "2018-08-01",
+			"post_date": "2018-07-28",
+			"amount": {
+				"amount": "-23.00",
+				"currency": "AUD"
+			},
+			"description": {
+				"original": "ROMEOS FOODHALL IGA Grocery Stores and Supermarkets",
+				"simple": "IGA grocery stores"
+			},
+			"budget_category": "living",
+			"category_id": 66,
+			"merchant": {
+				"id": 23,
+				"name": "IGA grocery stores",
+				"phone": "(03) 5257 3127",
+				"website": "https://www.iga.com.au"
+			}
+		}
+	],
+	"paging": {
+		"cursors": {
+			"before": null,
+			"after": "1217548800000_7"
+		},
+		"previous": null,
+		"next": "api/v2/aggregation/transactions/?after=1217548800000_7",
+		"total": 10
+	}
+}

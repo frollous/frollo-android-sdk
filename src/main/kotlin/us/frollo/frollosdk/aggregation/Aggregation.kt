@@ -47,6 +47,7 @@ import us.frollo.frollosdk.extensions.fetchMerchants
 import us.frollo.frollosdk.extensions.fetchSuggestedTags
 import us.frollo.frollosdk.extensions.fetchTransactionsByIDs
 import us.frollo.frollosdk.extensions.fetchTransactionsByQuery
+import us.frollo.frollosdk.extensions.fetchTransactionsNew
 import us.frollo.frollosdk.extensions.fetchTransactionsSummaryByIDs
 import us.frollo.frollosdk.extensions.fetchTransactionsSummaryByQuery
 import us.frollo.frollosdk.extensions.fetchUserTags
@@ -57,6 +58,7 @@ import us.frollo.frollosdk.extensions.sqlForProviderAccounts
 import us.frollo.frollosdk.extensions.sqlForProviders
 import us.frollo.frollosdk.extensions.sqlForTransactionCategories
 import us.frollo.frollosdk.extensions.sqlForTransactionStaleIds
+import us.frollo.frollosdk.extensions.sqlForTransactionStaleIdsNew
 import us.frollo.frollosdk.extensions.sqlForTransactions
 import us.frollo.frollosdk.extensions.sqlForUpdateAccount
 import us.frollo.frollosdk.extensions.sqlForUserTags
@@ -84,6 +86,7 @@ import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagUpdateReques
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
+import us.frollo.frollosdk.model.api.shared.Paging
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountRelation
@@ -1061,6 +1064,88 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         }
     }
 
+    /**
+     * Refresh transactions from a certain period from the host
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun refreshTransactionsWithPagination(
+        after: String? = null,
+        searchTerm: String? = null,
+        merchantIds: List<Long>? = null,
+        accountIds: List<Long>? = null,
+        transactionCategoryIds: List<Long>? = null,
+        transactionIds: List<Long>? = null,
+        budgetCategory: BudgetCategory? = null,
+        minAmount: Long? = null,
+        maxAmount: Long? = null,
+        baseType: TransactionBaseType? = null,
+        status: TransactionStatus? = null,
+        tags: List<String>? = null,
+        transactionIncluded: Boolean? = null,
+        fromDate: String? = null,
+        toDate: String? = null,
+        completion: OnFrolloSDKCompletionListener<Resource<Paging?>>? = null
+    ) {
+        aggregationAPI.fetchTransactionsNew(after).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.SUCCESS -> {
+                    val response = resource.data
+
+                    response?.let { transactionResponseWrapper ->
+
+                        val transactions = transactionResponseWrapper.transactions
+                        val apiIds = insertTransactions(transactions)
+
+                        val beforeDateForLocal: String?
+                        if (transactionResponseWrapper.paging.cursors.before == null) {
+                            beforeDateForLocal = null
+                        } else {
+                            beforeDateForLocal = "${transactions[0].transactionDate}_${transactions[0].transactionId}"
+                        }
+                        val afterDateLocal: String?
+                        if (transactionResponseWrapper.paging.cursors.after == null) {
+                            afterDateLocal = null
+                        } else {
+                            afterDateLocal = "${transactions[transactions.size - 1].transactionDate}_${transactions[transactions.size - 1].transactionId}"
+                        }
+
+                        val localIds = db.transactions().getIdsQuery(
+                                sqlForTransactionStaleIdsNew(
+                                        beforeDateForLocal,
+                                        afterDateLocal,
+                                        searchTerm,
+                                        merchantIds,
+                                        accountIds,
+                                        transactionCategoryIds,
+                                        transactionIds,
+                                        budgetCategory,
+                                        minAmount,
+                                        maxAmount,
+                                        baseType,
+                                        status,
+                                        tags,
+                                        transactionIncluded,
+                                        fromDate,
+                                        toDate
+                                )
+                        )
+
+                        val staleIds = localIds.toHashSet().minus(apiIds.toHashSet())
+                        val merchantIdsX = transactions.map { model -> model.merchant.id }.toLongArray()
+                        removeCachedTransactions(staleIds.toLongArray())
+                        fetchMissingMerchants(merchantIdsX.toSet())
+                        completion?.invoke(Resource.success(transactionResponseWrapper.paging))
+                    } ?: run { completion?.invoke(Resource.success(null)) } // Explicitly invoke completion callback if response is null.
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshTransactions", resource.error?.localizedDescription)
+                    completion?.invoke(Resource.error(resource.error))
+                }
+            }
+        }
+    }
+
     private fun refreshNextTransactions(
         fromDate: String,
         toDate: String,
@@ -1836,7 +1921,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                         response.paging.cursors.after?.let { newAfter ->
                             refreshNextMerchantsByIds(
                                     merchantIds = merchantIds,
-                                    after = newAfter,
+                                    after = newAfter.toLong(),
                                     batchSize = batchSize,
                                     completion = completion)
                         } ?: run {
@@ -1887,8 +1972,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
                             uiThread {
                                 completion?.invoke(PaginatedResult.Success(
-                                        before = response.paging.cursors.before,
-                                        after = response.paging.cursors.after))
+                                        before = response.paging.cursors.before?.toLong(),
+                                        after = response.paging.cursors.after?.toLong()))
                             }
                         }
                     } ?: run {
@@ -1925,8 +2010,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     val response = resource.data
                     handleMerchantsResponse(
                             response = response?.data,
-                            before = response?.paging?.cursors?.before,
-                            after = response?.paging?.cursors?.after,
+                            before = response?.paging?.cursors?.before?.toLong(),
+                            after = response?.paging?.cursors?.after?.toLong(),
                             completion = completion)
                 }
             }

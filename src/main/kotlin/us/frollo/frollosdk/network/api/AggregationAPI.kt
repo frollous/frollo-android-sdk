@@ -38,6 +38,7 @@ import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
+import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponseWrapper
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
 
@@ -118,6 +119,10 @@ internal interface AggregationAPI {
     // Query parameters: {transaction_ids, account_ids, from_date, to_date, account_included, transaction_included, skip, count}
     @GET(URL_TRANSACTIONS)
     fun fetchTransactions(@QueryMap queryParams: Map<String, String>): Call<List<TransactionResponse>>
+    // Query parameters: {transaction_ids, account_ids, from_date, to_date, account_included, transaction_included, skip, count}
+
+    @GET(URL_TRANSACTIONS)
+    fun fetchTransactionsNew(@QueryMap queryParams: Map<String, String>): Call<TransactionResponseWrapper>
 
     @GET(URL_TRANSACTION)
     fun fetchTransaction(@Path("transaction_id") transactionId: Long): Call<TransactionResponse>

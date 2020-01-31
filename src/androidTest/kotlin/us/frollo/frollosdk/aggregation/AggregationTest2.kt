@@ -29,11 +29,16 @@ import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.mapping.toTransaction
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionDescription
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
+import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.testTransactionResponseData
 import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
+import java.math.BigDecimal
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -77,7 +82,7 @@ class AggregationTest2 : BaseAndroidTest() {
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
             assertNotNull(resource.data)
-            val testObserver = aggregation.fetchTransactions().test()
+            val testObserver = aggregation.fetchTransactionsNew().test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
@@ -122,7 +127,7 @@ class AggregationTest2 : BaseAndroidTest() {
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
             assertNotNull(resource.data)
-            val testObserver = aggregation.fetchTransactions().test()
+            val testObserver = aggregation.fetchTransactionsNew().test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
@@ -168,7 +173,7 @@ class AggregationTest2 : BaseAndroidTest() {
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
             assertNotNull(resource.data)
-            val testObserver = aggregation.fetchTransactions().test()
+            val testObserver = aggregation.fetchTransactionsNew().test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
@@ -177,6 +182,205 @@ class AggregationTest2 : BaseAndroidTest() {
 
             signal.countDown()
         }
+
+        signal.await(3, TimeUnit.SECONDS)
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionsWithFilterNew() {
+        initSetup()
+
+        val data0 = testTransactionResponseData(transactionId = 5, transactionDate = "2008-08-01")
+        val data1 = testTransactionResponseData(transactionId = 6, transactionDate = "2008-08-01")
+        val data2 = testTransactionResponseData(transactionId = 7, transactionDate = "2008-08-01")
+        val data3 = testTransactionResponseData(transactionId = 8, transactionDate = "2008-08-01")
+        val data4 = testTransactionResponseData(transactionId = 9, transactionDate = "2008-08-01")
+        val data5 = testTransactionResponseData(transactionId = 10, transactionDate = "2008-08-01")
+
+        val data6 = testTransactionResponseData(amount = BigDecimal(200))
+        val data7 = testTransactionResponseData(amount = BigDecimal(565))
+
+        val data8 = testTransactionResponseData(description = TransactionDescription("hello", "hi", "hey"))
+        val data9 = testTransactionResponseData(description = TransactionDescription("jnkjk", "hkjnjki", "nice work man"))
+
+        val data10 = testTransactionResponseData(merchantId = 1)
+        val data11 = testTransactionResponseData(merchantId = 2)
+
+        val data12 = testTransactionResponseData(accountId = 1)
+        val data13 = testTransactionResponseData(accountId = 2)
+
+        val data14 = testTransactionResponseData(categoryId = 1)
+        val data15 = testTransactionResponseData(categoryId = 2)
+
+        val data16 = testTransactionResponseData(budgetCategory = BudgetCategory.LIVING)
+        val data17 = testTransactionResponseData(baseType = TransactionBaseType.DEBIT)
+        val data18 = testTransactionResponseData(status = TransactionStatus.POSTED)
+        val data19 = testTransactionResponseData(userTags = listOf("hi", "hello", "how are you"))
+        val data20 = testTransactionResponseData(included = true)
+
+        val list = mutableListOf(data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11, data12, data13, data14, data15, data16, data17, data18, data19, data20)
+
+        database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+
+        val signal = CountDownLatch(1)
+
+        var testObserver = aggregation.fetchTransactionsNew(transactionIds = listOf(7, 8, 9)).test()
+        testObserver.awaitValue()
+        var models = testObserver.value().data
+        assertEquals(3, models?.size)
+
+        testObserver = aggregation.fetchTransactionsNew(fromDate = "2008-07-31", toDate = "2008-08-02", transactionIds = listOf(5, 6, 7)).test()
+        testObserver.awaitValue()
+        models = testObserver.value().data
+        assertEquals(3, models?.size)
+
+        testObserver = aggregation.fetchTransactionsNew(fromDate = "2008-07-31", toDate = "2008-08-02", transactionIds = listOf(5, 6, 7)).test()
+        testObserver.awaitValue()
+        models = testObserver.value().data
+        assertEquals(3, models?.size)
+
+        signal.countDown()
+
+        signal.await(3, TimeUnit.SECONDS)
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionsWithFilterNew2() {
+        initSetup()
+        database.clearAllTables()
+
+        val data0 = testTransactionResponseData(transactionId = 5, transactionDate = "2008-08-01")
+        val data1 = testTransactionResponseData(transactionId = 6, transactionDate = "2008-08-01")
+        val data2 = testTransactionResponseData(transactionId = 7, transactionDate = "2008-08-01")
+        val data3 = testTransactionResponseData(transactionId = 8, transactionDate = "2008-08-01")
+        val data4 = testTransactionResponseData(transactionId = 9, transactionDate = "2008-08-01")
+        val data5 = testTransactionResponseData(transactionId = 10, transactionDate = "2008-08-01")
+
+        val data6 = testTransactionResponseData(amount = BigDecimal(200))
+        val data7 = testTransactionResponseData(amount = BigDecimal(565))
+
+        val data8 = testTransactionResponseData(description = TransactionDescription("hello", "hi", "hey"))
+        val data9 = testTransactionResponseData(description = TransactionDescription("jnkjk", "hkjnjki", "nice work man"))
+
+        val data10 = testTransactionResponseData(merchantId = 1)
+        val data11 = testTransactionResponseData(merchantId = 2)
+
+        val data12 = testTransactionResponseData(accountId = 1)
+        val data13 = testTransactionResponseData(accountId = 2)
+
+        val data14 = testTransactionResponseData(categoryId = 1)
+        val data15 = testTransactionResponseData(categoryId = 2)
+
+        val data16 = testTransactionResponseData(budgetCategory = BudgetCategory.LIVING)
+        val data17 = testTransactionResponseData(baseType = TransactionBaseType.DEBIT)
+        val data18 = testTransactionResponseData(status = TransactionStatus.POSTED)
+        val data19 = testTransactionResponseData(userTags = listOf("hi", "hello", "how are you"))
+        val data20 = testTransactionResponseData(included = true)
+
+        val list = mutableListOf(data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11, data12, data13, data14, data15, data16, data17, data18, data19, data20)
+
+        database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+
+        val signal = CountDownLatch(1)
+
+        var testObserver = aggregation.fetchTransactionsNew(budgetCategory = BudgetCategory.LIVING).test()
+        testObserver.awaitValue()
+        var models = testObserver.value().data
+        assertEquals(1, models?.size)
+
+        testObserver = aggregation.fetchTransactionsNew(baseType = TransactionBaseType.DEBIT).test()
+        testObserver.awaitValue()
+        models = testObserver.value().data
+        assertEquals(1, models?.size)
+
+        testObserver = aggregation.fetchTransactionsNew(status = TransactionStatus.POSTED).test()
+        testObserver.awaitValue()
+        models = testObserver.value().data
+        assertEquals(1, models?.size)
+
+        testObserver = aggregation.fetchTransactionsNew(tags = listOf("hello")).test()
+        testObserver.awaitValue()
+        models = testObserver.value().data
+        assertEquals(1, models?.size)
+
+        testObserver = aggregation.fetchTransactionsNew(transactionIncluded = true).test()
+        testObserver.awaitValue()
+        models = testObserver.value().data
+        assertEquals(1, models?.size)
+
+        signal.countDown()
+
+        signal.await(3, TimeUnit.SECONDS)
+        tearDown()
+    }
+
+    @Test
+    fun testFetchTransactionsWithFilterNew3() {
+        initSetup()
+        database.clearAllTables()
+
+        val data0 = testTransactionResponseData(transactionId = 5, transactionDate = "2008-08-01")
+        val data1 = testTransactionResponseData(transactionId = 6, transactionDate = "2008-08-01")
+        val data2 = testTransactionResponseData(transactionId = 7, transactionDate = "2008-08-01")
+        val data3 = testTransactionResponseData(transactionId = 8, transactionDate = "2008-08-01")
+        val data4 = testTransactionResponseData(transactionId = 9, transactionDate = "2008-08-01")
+        val data5 = testTransactionResponseData(transactionId = 10, transactionDate = "2008-08-01")
+
+        val data6 = testTransactionResponseData(amount = BigDecimal(200))
+        val data7 = testTransactionResponseData(amount = BigDecimal(565))
+
+        val data8 = testTransactionResponseData(description = TransactionDescription("hello", "hi", "hey"))
+        val data9 = testTransactionResponseData(description = TransactionDescription("jnkjk", "hkjnjki", "nice work man"))
+
+        val data10 = testTransactionResponseData(merchantId = 1)
+        val data11 = testTransactionResponseData(merchantId = 2)
+
+        val data12 = testTransactionResponseData(accountId = 1)
+        val data13 = testTransactionResponseData(accountId = 2)
+
+        val data14 = testTransactionResponseData(categoryId = 1)
+        val data15 = testTransactionResponseData(categoryId = 2)
+
+        val data16 = testTransactionResponseData(budgetCategory = BudgetCategory.LIVING)
+        val data17 = testTransactionResponseData(baseType = TransactionBaseType.DEBIT)
+        val data18 = testTransactionResponseData(status = TransactionStatus.POSTED)
+        val data19 = testTransactionResponseData(userTags = listOf("hi", "hello", "how are you"))
+        val data20 = testTransactionResponseData(included = true)
+
+        val list = mutableListOf(data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11, data12, data13, data14, data15, data16, data17, data18, data19, data20)
+
+        database.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
+
+        val signal = CountDownLatch(1)
+
+        var testObserver = aggregation.fetchTransactionsNew(minAmount = 500, maxAmount = 1000).test()
+        testObserver.awaitValue()
+        var models = testObserver.value().data
+        assertEquals(1, models?.size)
+
+        testObserver = aggregation.fetchTransactionsNew(searchTerm = " work ").test()
+        testObserver.awaitValue()
+        models = testObserver.value().data
+        assertEquals(1, models?.size)
+
+        testObserver = aggregation.fetchTransactionsNew(merchantIds = listOf(1, 2)).test()
+        testObserver.awaitValue()
+        models = testObserver.value().data
+        assertEquals(2, models?.size)
+
+        testObserver = aggregation.fetchTransactionsNew(accountIds = listOf(1, 2)).test()
+        testObserver.awaitValue()
+        models = testObserver.value().data
+        assertEquals(2, models?.size)
+
+        testObserver = aggregation.fetchTransactionsNew(transactionCategoryIds = listOf(1, 2)).test()
+        testObserver.awaitValue()
+        models = testObserver.value().data
+        assertEquals(2, models?.size)
+
+        signal.countDown()
 
         signal.await(3, TimeUnit.SECONDS)
         tearDown()

@@ -60,6 +60,7 @@ import us.frollo.frollosdk.extensions.sqlForTransactionCategories
 import us.frollo.frollosdk.extensions.sqlForTransactionStaleIds
 import us.frollo.frollosdk.extensions.sqlForTransactionStaleIdsNew
 import us.frollo.frollosdk.extensions.sqlForTransactions
+import us.frollo.frollosdk.extensions.sqlForTransactionsNew
 import us.frollo.frollosdk.extensions.sqlForUpdateAccount
 import us.frollo.frollosdk.extensions.sqlForUserTags
 import us.frollo.frollosdk.extensions.transactionSearch
@@ -924,6 +925,56 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     toDate = toDate,
                     externalId = externalId
             ))) { models ->
+                Resource.success(models)
+            }
+
+    /**
+     * Fetch transactions from the cache
+     *
+     * @param accountId Filter by Account ID of the transactions (Optional)
+     * @param userTags Filter by list of tags that are linked to a transaction (Optional)
+     * @param baseType Filter by base type of the transaction (Optional)
+     * @param budgetCategory Filter by budget category of the transaction (Optional)
+     * @param status Filter by the status of the transaction (Optional)
+     * @param included Filter by transactions included in the budget (Optional)
+     * @param fromDate Start date to fetch transactions from (inclusive) (Optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param toDate End date to fetch transactions up to (inclusive) (Optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param externalId External aggregator ID of the transactions to fetch (Optional)
+     *
+     * @return LiveData object of Resource<List<Transaction>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchTransactionsNew(
+        searchTerm: String? = null,
+        merchantIds: List<Long>? = null,
+        accountIds: List<Long>? = null,
+        transactionCategoryIds: List<Long>? = null,
+        transactionIds: List<Long>? = null,
+        budgetCategory: BudgetCategory? = null,
+        minAmount: Long? = null,
+        maxAmount: Long? = null,
+        baseType: TransactionBaseType? = null,
+        status: TransactionStatus? = null,
+        tags: List<String>? = null,
+        transactionIncluded: Boolean? = null,
+        fromDate: String? = null,
+        toDate: String? = null
+    ): LiveData<Resource<List<Transaction>>> =
+            Transformations.map(db.transactions().loadByQuery(sqlForTransactionsNew(
+                    searchTerm,
+                    merchantIds,
+                    accountIds,
+                    transactionCategoryIds,
+                    transactionIds,
+                    budgetCategory,
+                    minAmount,
+                    maxAmount,
+                    baseType,
+                    status,
+                    tags,
+                    transactionIncluded,
+                    fromDate,
+                    toDate
+    ))) { models ->
                 Resource.success(models)
             }
 

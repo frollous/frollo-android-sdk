@@ -239,7 +239,7 @@ internal fun sqlForTransactionStaleIdsNew(
     returnStringBuilder.append(dateQuery)
 
     searchTerm?.let {
-        val query = " ( description_original LIKE '%$it%' or description_original LIKE '%$it%' or description_original LIKE '%$it%' ) "
+        val query = " ( description_original LIKE '%$it%' or description_user LIKE '%$it%' or description_simple LIKE '%$it%' ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
             containsWhere = true
@@ -249,7 +249,7 @@ internal fun sqlForTransactionStaleIdsNew(
         returnStringBuilder.append(query)
     }
     merchantIds?.let {
-        val query = " ( merchant_id in ($it) ) "
+        val query = " ( CAST(merchant_id as long) in (${it.joinToString("','","'","'")}) ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
             containsWhere = true
@@ -259,7 +259,7 @@ internal fun sqlForTransactionStaleIdsNew(
         returnStringBuilder.append(query)
     }
     accountIds?.let {
-        val query = " ( account_id in ($it) ) "
+        val query = " ( CAST(account_id as long) in (${it.joinToString("','","'","'")}) ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
             containsWhere = true
@@ -269,7 +269,7 @@ internal fun sqlForTransactionStaleIdsNew(
         returnStringBuilder.append(query)
     }
     transactionCategoryIds?.let {
-        val query = " ( category_id in ($it) ) "
+        val query = " ( CAST(category_id as long) in (${it.joinToString("','","'","'")}) ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
             containsWhere = true
@@ -279,7 +279,7 @@ internal fun sqlForTransactionStaleIdsNew(
         returnStringBuilder.append(query)
     }
     transactionIds?.let {
-        val query = " ( transaction_id in ($it) ) "
+        val query = " ( transaction_id in (${it.joinToString("','","'","'")}) ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
             containsWhere = true
@@ -289,7 +289,7 @@ internal fun sqlForTransactionStaleIdsNew(
         returnStringBuilder.append(query)
     }
     budgetCategory?.let {
-        val query = " budget_category = $it ) "
+        val query = " ( budget_category = '${it.name}' ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
             containsWhere = true
@@ -299,7 +299,7 @@ internal fun sqlForTransactionStaleIdsNew(
         returnStringBuilder.append(query)
     }
     minAmount?.let {
-        val query = " ( amount_amount >= $it ) "
+        val query = " ( CAST(amount_amount as decimal)  >= $it ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
             containsWhere = true
@@ -309,7 +309,7 @@ internal fun sqlForTransactionStaleIdsNew(
         returnStringBuilder.append(query)
     }
     maxAmount?.let {
-        val query = " ( amount_amount <= $it ) "
+        val query = " ( CAST(amount_amount as decimal)  <= $it ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
             containsWhere = true
@@ -319,7 +319,7 @@ internal fun sqlForTransactionStaleIdsNew(
         returnStringBuilder.append(query)
     }
     baseType?.let {
-        val query = " ( base_type = '$baseType' ) "
+        val query = " ( base_type = '${baseType.name}' ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
             containsWhere = true
@@ -329,7 +329,7 @@ internal fun sqlForTransactionStaleIdsNew(
         returnStringBuilder.append(query)
     }
     status?.let {
-        val query = " status = '$it' ) "
+        val query = " ( status = '${it.name}' ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
             containsWhere = true
@@ -339,7 +339,18 @@ internal fun sqlForTransactionStaleIdsNew(
         returnStringBuilder.append(query)
     }
     tags?.let {
-        val query = " tags in ($it) "
+
+        var query = ""
+        if (it.isNotEmpty()) {
+            val sb = StringBuilder()
+            sb.append("(")
+            it.forEachIndexed { index, str ->
+                sb.append("(user_tags LIKE '%|$str|%')")
+                if (index < it.size - 1) sb.append(" OR ")
+            }
+            sb.append(")")
+            query = sb.toString()
+        }
         if (!containsWhere) {
             returnStringBuilder.append(where)
             containsWhere = true
@@ -350,7 +361,7 @@ internal fun sqlForTransactionStaleIdsNew(
     }
 
     transactionIncluded?.let {
-        val query = " included = $it ) "
+        val query = " ( included = ${it.toInt()} ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
             containsWhere = true
@@ -360,7 +371,7 @@ internal fun sqlForTransactionStaleIdsNew(
         returnStringBuilder.append(query)
     }
     fromDate?.let {
-        val query = " transaction_date >= '$it' ) "
+        val query = " ( transaction_date >= '$it' ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
             containsWhere = true
@@ -370,7 +381,192 @@ internal fun sqlForTransactionStaleIdsNew(
         returnStringBuilder.append(query)
     }
     toDate?.let {
-        val query = " transaction_date <= '$it' ) "
+        val query = " ( transaction_date <= '$it' ) "
+        if (!containsWhere) {
+            returnStringBuilder.append(where)
+            containsWhere = true
+        } else {
+            returnStringBuilder.append(" and  ")
+        }
+        returnStringBuilder.append(query)
+    }
+
+    // just for compiler, should never come here
+    return SimpleSQLiteQuery(returnStringBuilder.toString())
+}
+
+internal fun sqlForTransactionsNew(
+    searchTerm: String? = null,
+    merchantIds: List<Long>? = null,
+    accountIds: List<Long>? = null,
+    transactionCategoryIds: List<Long>? = null,
+    transactionIds: List<Long>? = null,
+    budgetCategory: BudgetCategory? = null,
+    minAmount: Long? = null,
+    maxAmount: Long? = null,
+    baseType: TransactionBaseType? = null,
+    status: TransactionStatus? = null,
+    tags: List<String>? = null,
+    transactionIncluded: Boolean? = null,
+    fromDate: String? = null,
+    toDate: String? = null
+): SimpleSQLiteQuery {
+
+    val dateQueryBuilder = StringBuilder()
+    dateQueryBuilder.append("SELECT * FROM transaction_model  ")
+
+    val where = " where "
+
+    var dateQuery = dateQueryBuilder.toString()
+    var containsWhere = false
+
+    val returnStringBuilder = StringBuilder()
+    returnStringBuilder.append(dateQuery)
+
+    searchTerm?.let {
+        val query = " ( description_original LIKE '%$it%' or description_user LIKE '%$it%' or description_simple LIKE '%$it%' ) "
+        if (!containsWhere) {
+            returnStringBuilder.append(where)
+            containsWhere = true
+        } else {
+            returnStringBuilder.append(" and  ")
+        }
+        returnStringBuilder.append(query)
+    }
+    merchantIds?.let {
+        val query = " ( CAST(merchant_id as long) in (${it.joinToString("','","'","'")}) ) "
+        if (!containsWhere) {
+            returnStringBuilder.append(where)
+            containsWhere = true
+        } else {
+            returnStringBuilder.append(" and  ")
+        }
+        returnStringBuilder.append(query)
+    }
+    accountIds?.let {
+        val query = " ( CAST(account_id as long) in (${it.joinToString("','","'","'")}) ) "
+        if (!containsWhere) {
+            returnStringBuilder.append(where)
+            containsWhere = true
+        } else {
+            returnStringBuilder.append(" and  ")
+        }
+        returnStringBuilder.append(query)
+    }
+    transactionCategoryIds?.let {
+        val query = " ( CAST(category_id as long) in (${it.joinToString("','","'","'")}) ) "
+        if (!containsWhere) {
+            returnStringBuilder.append(where)
+            containsWhere = true
+        } else {
+            returnStringBuilder.append(" and  ")
+        }
+        returnStringBuilder.append(query)
+    }
+    transactionIds?.let {
+        val query = " ( transaction_id in (${it.joinToString("','","'","'")}) ) "
+        if (!containsWhere) {
+            returnStringBuilder.append(where)
+            containsWhere = true
+        } else {
+            returnStringBuilder.append(" and  ")
+        }
+        returnStringBuilder.append(query)
+    }
+    budgetCategory?.let {
+        val query = " ( budget_category = '${it.name}' ) "
+        if (!containsWhere) {
+            returnStringBuilder.append(where)
+            containsWhere = true
+        } else {
+            returnStringBuilder.append(" and  ")
+        }
+        returnStringBuilder.append(query)
+    }
+    minAmount?.let {
+        val query = " ( CAST(amount_amount as decimal)  >= $it ) "
+        if (!containsWhere) {
+            returnStringBuilder.append(where)
+            containsWhere = true
+        } else {
+            returnStringBuilder.append(" and  ")
+        }
+        returnStringBuilder.append(query)
+    }
+    maxAmount?.let {
+        val query = " ( CAST(amount_amount as decimal)  <= $it ) "
+        if (!containsWhere) {
+            returnStringBuilder.append(where)
+            containsWhere = true
+        } else {
+            returnStringBuilder.append(" and  ")
+        }
+        returnStringBuilder.append(query)
+    }
+    baseType?.let {
+        val query = " ( base_type = '${baseType.name}' ) "
+        if (!containsWhere) {
+            returnStringBuilder.append(where)
+            containsWhere = true
+        } else {
+            returnStringBuilder.append(" and  ")
+        }
+        returnStringBuilder.append(query)
+    }
+    status?.let {
+        val query = " ( status = '${it.name}' ) "
+        if (!containsWhere) {
+            returnStringBuilder.append(where)
+            containsWhere = true
+        } else {
+            returnStringBuilder.append(" and  ")
+        }
+        returnStringBuilder.append(query)
+    }
+    tags?.let {
+
+        var query = ""
+        if (it.isNotEmpty()) {
+            val sb = StringBuilder()
+            sb.append("(")
+            it.forEachIndexed { index, str ->
+                sb.append("(user_tags LIKE '%|$str|%')")
+                if (index < it.size - 1) sb.append(" OR ")
+            }
+            sb.append(")")
+            query = sb.toString()
+        }
+        if (!containsWhere) {
+            returnStringBuilder.append(where)
+            containsWhere = true
+        } else {
+            returnStringBuilder.append(" and  ")
+        }
+        returnStringBuilder.append(query)
+    }
+
+    transactionIncluded?.let {
+        val query = " ( included = ${it.toInt()} ) "
+        if (!containsWhere) {
+            returnStringBuilder.append(where)
+            containsWhere = true
+        } else {
+            returnStringBuilder.append(" and  ")
+        }
+        returnStringBuilder.append(query)
+    }
+    fromDate?.let {
+        val query = " ( transaction_date >= '$it' ) "
+        if (!containsWhere) {
+            returnStringBuilder.append(where)
+            containsWhere = true
+        } else {
+            returnStringBuilder.append(" and  ")
+        }
+        returnStringBuilder.append(query)
+    }
+    toDate?.let {
+        val query = " ( transaction_date <= '$it' ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
             containsWhere = true

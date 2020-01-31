@@ -1198,17 +1198,15 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                         val transactions = transactionResponseWrapper.transactions
                         val apiIds = insertTransactions(transactions)
 
-                        val beforeDateForLocal: String?
-                        if (transactionResponseWrapper.paging.cursors.before == null) {
-                            beforeDateForLocal = null
+                        val beforeDateForLocal = if (transactionResponseWrapper.paging.cursors.before == null) {
+                            null
                         } else {
-                            beforeDateForLocal = "${transactions[0].transactionDate}_${transactions[0].transactionId}"
+                            "${transactions[0].transactionDate}_${transactions[0].transactionId}"
                         }
-                        val afterDateLocal: String?
-                        if (transactionResponseWrapper.paging.cursors.after == null) {
-                            afterDateLocal = null
+                        val afterDateLocal = if (transactionResponseWrapper.paging.cursors.after == null) {
+                            null
                         } else {
-                            afterDateLocal = "${transactions[transactions.size - 1].transactionDate}_${transactions[transactions.size - 1].transactionId}"
+                            "${transactions[transactions.size - 1].transactionDate}_${transactions[transactions.size - 1].transactionId}"
                         }
 
                         val localIds = db.transactions().getIdsQuery(

@@ -1,0 +1,124 @@
+{
+	"data": [
+		{
+			"id": 7,
+			"account_id": 542,
+			"base_type": "debit",
+			"status": "posted",
+			"included": true,
+			"transaction_date": "2008-08-01",
+			"post_date": "2018-01-02",
+			"amount": {
+				"amount": "-100.00",
+				"currency": "AUD"
+			},
+			"description": {
+				"original": "ATM ANZ ATM NSW 243895 AUS",
+				"simple": "Cash Withdrawal"
+			},
+			"budget_category": "one_off",
+			"category_id": 80,
+			"merchant": {
+				"id": 24,
+				"name": "Cash Withdrawal"
+			}
+		},
+		{
+			"id": 6,
+			"account_id": 939,
+			"base_type": "debit",
+			"status": "posted",
+			"included": true,
+			"transaction_date": "2008-08-01",
+			"post_date": "2018-07-28",
+			"amount": {
+				"amount": "-23.00",
+				"currency": "AUD"
+			},
+			"description": {
+				"original": "ROMEOS FOODHALL IGA Grocery Stores and Supermarkets",
+				"simple": "IGA grocery stores"
+			},
+			"budget_category": "living",
+			"category_id": 66,
+			"merchant": {
+				"id": 23,
+				"name": "IGA grocery stores",
+				"phone": "(03) 5257 3127",
+				"website": "https://www.iga.com.au"
+			}
+		},{
+			"id": 4,
+			"account_id": 939,
+			"base_type": "debit",
+			"status": "posted",
+			"included": false,
+			"transaction_date": "2008-08-01",
+			"post_date": "2018-07-29",
+			"amount": {
+				"amount": "-40.00",
+				"currency": "AUD"
+			},
+			"description": {
+				"original": "THE OCCIDENTAL HOTEL SYDNEY",
+				"simple": "The Occidental Hotel"
+			},
+			"budget_category": "lifestyle",
+			"category_id": 77,
+			"merchant": {
+				"id": 238,
+				"name": "The Occidental Hotel",
+				"phone": "(02) 9299 2531",
+				"website": "https://www.theoccidental.com"
+			}
+		},
+		{
+			"id": 1,
+			"account_id": 939,
+			"base_type": "debit",
+			"status": "posted",
+			"included": false,
+			"transaction_date": "2008-08-1",
+			"post_date": "2018-07-29",
+			"amount": {
+				"amount": "-59.00",
+				"currency": "AUD"
+			},
+			"description": {
+				"original": "THE OCCIDENTAL HOTEL SYDNEY",
+				"simple": "The Occidental Hotel",
+				"user": "Occi"
+			},
+			"budget_category": "lifestyle",
+			"category_id": 77,
+			"memo": "Remind me",
+			"merchant": {
+				"id": 238,
+				"name": "The Occidental Hotel",
+				"phone": "(02) 9299 2531",
+				"website": "https://www.theoccidental.com",
+				"location": {
+					"formatted_address": "10 Falcon St, Crows Nest NSW 2065, Australia",
+					"line_1": "10 Falcon St",
+					"line_2": "Suite 2 Level 3",
+					"line_3": "Building 2 MLC",
+					"suburb": "Crows Nest",
+					"state": "NSW",
+					"postcode": "2065",
+					"country": "Australia",
+					"latitude": -33.827499,
+					"longitude": 151.201699
+				}
+			}
+		}
+	],
+	"paging": {
+		"cursors": {
+			"before": "1217548800000_5",
+			"after": null
+		},
+		"previous": "api/v2/aggregation/transactions/?before=1217548800000_5",
+		"next": null,
+		"total": 10
+	}
+}

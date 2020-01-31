@@ -180,13 +180,14 @@ internal fun sqlForTransactionStaleIdsNew(
         val daysInBetween = ChronoUnit.DAYS.between(beforeDate, afterDate)
         when (daysInBetween.absoluteValue) {
             0L -> {
+                // this is same day so we need a and
                 dateQueryBuilder.append("(transaction_date = '${beforeDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id <= $beforeId) ")
                 dateQueryBuilder.append("and (transaction_date = '${afterDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id >= $afterId) ")
             }
             1L -> {
-                // same as above only date changes
+                // this is 2 different dates , so we need a or
                 dateQueryBuilder.append("(transaction_date = '${beforeDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id <= $beforeId) ")
-                dateQueryBuilder.append("and (transaction_date = '${afterDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id >= $afterId) ")
+                dateQueryBuilder.append("or (transaction_date = '${afterDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id >= $afterId) ")
             }
             2L -> {
                 dateQueryBuilder.append("(transaction_date = '${beforeDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id <= $beforeId) ")
@@ -195,9 +196,9 @@ internal fun sqlForTransactionStaleIdsNew(
             }
             else -> {
                 dateQueryBuilder.append("((transaction_date >= '${afterDate.plusDays(1).toString(Transaction.DATE_FORMAT_PATTERN)}')  ")
-                dateQueryBuilder.append("AND (transaction_date <= '${beforeDate.minusDays(1).toString(Transaction.DATE_FORMAT_PATTERN)}')) ")
-                dateQueryBuilder.append("OR ((transaction_date = '${beforeDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id <= $beforeId) ")
-                dateQueryBuilder.append("and (transaction_date = '${afterDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id >= $afterId)) ")
+                dateQueryBuilder.append("and (transaction_date <= '${beforeDate.minusDays(1).toString(Transaction.DATE_FORMAT_PATTERN)}')) ")
+                dateQueryBuilder.append("or ((transaction_date = '${beforeDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id <= $beforeId) ")
+                dateQueryBuilder.append("or (transaction_date = '${afterDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id >= $afterId)) ")
             }
         }
     }
@@ -210,7 +211,7 @@ internal fun sqlForTransactionStaleIdsNew(
 
         // no more transactions in future, so u take first transaction in before and get every after that
         dateQueryBuilder.append(where)
-        dateQueryBuilder.append(" (transaction_date >= '${beforeDate.plusDays(1).toString(Transaction.DATE_FORMAT_PATTERN)}') ")
+        dateQueryBuilder.append(" (transaction_date <= '${beforeDate.minusDays(1).toString(Transaction.DATE_FORMAT_PATTERN)}') ")
         dateQueryBuilder.append("or (transaction_date = '${beforeDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id <= $beforeId) ")
     }
 

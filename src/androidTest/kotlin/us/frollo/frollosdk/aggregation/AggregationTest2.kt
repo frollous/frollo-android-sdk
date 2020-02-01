@@ -67,26 +67,25 @@ class AggregationTest2 : BaseAndroidTest() {
 
         val signal = CountDownLatch(1)
         val body = readStringFromJson(app, R.raw.transactions_same_day_pagination_1)
-        mockServer.setDispatcher(object : Dispatcher() {
+        mockServer.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}") {
+                if (request?.trimmedPath == AggregationAPI.URL_TRANSACTIONS) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
-        })
+        }
 
         aggregation.refreshTransactionsWithPagination { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
             assertNotNull(resource.data)
-            val testObserver = aggregation.fetchTransactionsNew().test()
+            val testObserver = aggregation.fetchTransactions().test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            val ids = models?.map { it.transactionId }
             assertEquals(3, models?.size)
 
             signal.countDown()
@@ -112,7 +111,7 @@ class AggregationTest2 : BaseAndroidTest() {
 
         val signal = CountDownLatch(1)
         val body2 = readStringFromJson(app, R.raw.transactions_same_day_pagination_2)
-        mockServer.setDispatcher(object : Dispatcher() {
+        mockServer.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?after=1217548800000_7") {
                     return MockResponse()
@@ -121,17 +120,16 @@ class AggregationTest2 : BaseAndroidTest() {
                 }
                 return MockResponse().setResponseCode(404)
             }
-        })
+        }
 
         aggregation.refreshTransactionsWithPagination(after = "1217548800000_7") { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
             assertNotNull(resource.data)
-            val testObserver = aggregation.fetchTransactionsNew().test()
+            val testObserver = aggregation.fetchTransactions().test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            val ids = models?.map { it.transactionId }
             assertEquals(6, models?.size)
 
             signal.countDown()
@@ -158,7 +156,7 @@ class AggregationTest2 : BaseAndroidTest() {
 
         val signal = CountDownLatch(1)
         val body2 = readStringFromJson(app, R.raw.transactions_same_day_pagination_3)
-        mockServer.setDispatcher(object : Dispatcher() {
+        mockServer.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?after=1217548800000_4") {
                     return MockResponse()
@@ -167,17 +165,16 @@ class AggregationTest2 : BaseAndroidTest() {
                 }
                 return MockResponse().setResponseCode(404)
             }
-        })
+        }
 
         aggregation.refreshTransactionsWithPagination(after = "1217548800000_4") { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
             assertNotNull(resource.data)
-            val testObserver = aggregation.fetchTransactionsNew().test()
+            val testObserver = aggregation.fetchTransactions().test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            val ids = models?.map { it.transactionId }
             assertEquals(10, models?.size)
 
             signal.countDown()
@@ -225,17 +222,17 @@ class AggregationTest2 : BaseAndroidTest() {
 
         val signal = CountDownLatch(1)
 
-        var testObserver = aggregation.fetchTransactionsNew(transactionIds = listOf(7, 8, 9)).test()
+        var testObserver = aggregation.fetchTransactions(transactionIds = listOf(7, 8, 9)).test()
         testObserver.awaitValue()
         var models = testObserver.value().data
         assertEquals(3, models?.size)
 
-        testObserver = aggregation.fetchTransactionsNew(fromDate = "2008-07-31", toDate = "2008-08-02", transactionIds = listOf(5, 6, 7)).test()
+        testObserver = aggregation.fetchTransactions(fromDate = "2008-07-31", toDate = "2008-08-02", transactionIds = listOf(5, 6, 7)).test()
         testObserver.awaitValue()
         models = testObserver.value().data
         assertEquals(3, models?.size)
 
-        testObserver = aggregation.fetchTransactionsNew(fromDate = "2008-07-31", toDate = "2008-08-02", transactionIds = listOf(5, 6, 7)).test()
+        testObserver = aggregation.fetchTransactions(fromDate = "2008-07-31", toDate = "2008-08-02", transactionIds = listOf(5, 6, 7)).test()
         testObserver.awaitValue()
         models = testObserver.value().data
         assertEquals(3, models?.size)
@@ -285,27 +282,27 @@ class AggregationTest2 : BaseAndroidTest() {
 
         val signal = CountDownLatch(1)
 
-        var testObserver = aggregation.fetchTransactionsNew(budgetCategory = BudgetCategory.LIVING).test()
+        var testObserver = aggregation.fetchTransactions(budgetCategory = BudgetCategory.LIVING).test()
         testObserver.awaitValue()
         var models = testObserver.value().data
         assertEquals(1, models?.size)
 
-        testObserver = aggregation.fetchTransactionsNew(baseType = TransactionBaseType.DEBIT).test()
+        testObserver = aggregation.fetchTransactions(baseType = TransactionBaseType.DEBIT).test()
         testObserver.awaitValue()
         models = testObserver.value().data
         assertEquals(1, models?.size)
 
-        testObserver = aggregation.fetchTransactionsNew(status = TransactionStatus.POSTED).test()
+        testObserver = aggregation.fetchTransactions(status = TransactionStatus.POSTED).test()
         testObserver.awaitValue()
         models = testObserver.value().data
         assertEquals(1, models?.size)
 
-        testObserver = aggregation.fetchTransactionsNew(tags = listOf("hello")).test()
+        testObserver = aggregation.fetchTransactions(tags = listOf("hello")).test()
         testObserver.awaitValue()
         models = testObserver.value().data
         assertEquals(1, models?.size)
 
-        testObserver = aggregation.fetchTransactionsNew(transactionIncluded = true).test()
+        testObserver = aggregation.fetchTransactions(transactionIncluded = true).test()
         testObserver.awaitValue()
         models = testObserver.value().data
         assertEquals(1, models?.size)
@@ -355,27 +352,27 @@ class AggregationTest2 : BaseAndroidTest() {
 
         val signal = CountDownLatch(1)
 
-        var testObserver = aggregation.fetchTransactionsNew(minAmount = 500, maxAmount = 1000).test()
+        var testObserver = aggregation.fetchTransactions(minAmount = 500, maxAmount = 1000).test()
         testObserver.awaitValue()
         var models = testObserver.value().data
         assertEquals(1, models?.size)
 
-        testObserver = aggregation.fetchTransactionsNew(searchTerm = " work ").test()
+        testObserver = aggregation.fetchTransactions(searchTerm = " work ").test()
         testObserver.awaitValue()
         models = testObserver.value().data
         assertEquals(1, models?.size)
 
-        testObserver = aggregation.fetchTransactionsNew(merchantIds = listOf(1, 2)).test()
+        testObserver = aggregation.fetchTransactions(merchantIds = listOf(1, 2)).test()
         testObserver.awaitValue()
         models = testObserver.value().data
         assertEquals(2, models?.size)
 
-        testObserver = aggregation.fetchTransactionsNew(accountIds = listOf(1, 2)).test()
+        testObserver = aggregation.fetchTransactions(accountIds = listOf(1, 2)).test()
         testObserver.awaitValue()
         models = testObserver.value().data
         assertEquals(2, models?.size)
 
-        testObserver = aggregation.fetchTransactionsNew(transactionCategoryIds = listOf(1, 2)).test()
+        testObserver = aggregation.fetchTransactions(transactionCategoryIds = listOf(1, 2)).test()
         testObserver.awaitValue()
         models = testObserver.value().data
         assertEquals(2, models?.size)
@@ -400,26 +397,25 @@ class AggregationTest2 : BaseAndroidTest() {
 
         val signal = CountDownLatch(1)
         val body = readStringFromJson(app, R.raw.transactions_two_days_pagination_1)
-        mockServer.setDispatcher(object : Dispatcher() {
+        mockServer.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}") {
+                if (request?.trimmedPath == AggregationAPI.URL_TRANSACTIONS) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
-        })
+        }
 
         aggregation.refreshTransactionsWithPagination { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
             assertNotNull(resource.data)
-            val testObserver = aggregation.fetchTransactionsNew().test()
+            val testObserver = aggregation.fetchTransactions().test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            val ids = models?.map { it.transactionId }
             assertEquals(3, models?.size)
 
             signal.countDown()
@@ -446,7 +442,7 @@ class AggregationTest2 : BaseAndroidTest() {
 
         val signal = CountDownLatch(1)
         val body = readStringFromJson(app, R.raw.transactions_two_days_pagination_2)
-        mockServer.setDispatcher(object : Dispatcher() {
+        mockServer.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?after=1217548800000_7") {
                     return MockResponse()
@@ -455,17 +451,16 @@ class AggregationTest2 : BaseAndroidTest() {
                 }
                 return MockResponse().setResponseCode(404)
             }
-        })
+        }
 
         aggregation.refreshTransactionsWithPagination(after = "1217548800000_7") { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
             assertNotNull(resource.data)
-            val testObserver = aggregation.fetchTransactionsNew().test()
+            val testObserver = aggregation.fetchTransactions().test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            val ids = models?.map { it.transactionId }
             assertEquals(6, models?.size)
 
             signal.countDown()
@@ -496,7 +491,7 @@ class AggregationTest2 : BaseAndroidTest() {
 
         val signal = CountDownLatch(1)
         val body = readStringFromJson(app, R.raw.transactions_two_days_pagination_3)
-        mockServer.setDispatcher(object : Dispatcher() {
+        mockServer.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?after=1217548800000_7") {
                     return MockResponse()
@@ -505,17 +500,16 @@ class AggregationTest2 : BaseAndroidTest() {
                 }
                 return MockResponse().setResponseCode(404)
             }
-        })
+        }
 
         aggregation.refreshTransactionsWithPagination(after = "1217548800000_7") { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
             assertNotNull(resource.data)
-            val testObserver = aggregation.fetchTransactionsNew().test()
+            val testObserver = aggregation.fetchTransactions().test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            val ids = models?.map { it.transactionId }
             assertEquals(10, models?.size)
 
             signal.countDown()
@@ -539,26 +533,25 @@ class AggregationTest2 : BaseAndroidTest() {
 
         val signal = CountDownLatch(1)
         val body = readStringFromJson(app, R.raw.transactions_n_days_pagination_1)
-        mockServer.setDispatcher(object : Dispatcher() {
+        mockServer.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}") {
+                if (request?.trimmedPath == AggregationAPI.URL_TRANSACTIONS) {
                     return MockResponse()
                             .setResponseCode(200)
                             .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
-        })
+        }
 
         aggregation.refreshTransactionsWithPagination { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
             assertNotNull(resource.data)
-            val testObserver = aggregation.fetchTransactionsNew().test()
+            val testObserver = aggregation.fetchTransactions().test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            val ids = models?.map { it.transactionId }
             assertEquals(3, models?.size)
 
             signal.countDown()
@@ -588,7 +581,7 @@ class AggregationTest2 : BaseAndroidTest() {
 
         val signal = CountDownLatch(1)
         val body = readStringFromJson(app, R.raw.transactions_n_days_pagination_2)
-        mockServer.setDispatcher(object : Dispatcher() {
+        mockServer.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?after=1217548800000_7") {
                     return MockResponse()
@@ -597,17 +590,16 @@ class AggregationTest2 : BaseAndroidTest() {
                 }
                 return MockResponse().setResponseCode(404)
             }
-        })
+        }
 
         aggregation.refreshTransactionsWithPagination(after = "1217548800000_7") { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
             assertNotNull(resource.data)
-            val testObserver = aggregation.fetchTransactionsNew().test()
+            val testObserver = aggregation.fetchTransactions().test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            val ids = models?.map { it.transactionId }
             assertEquals(6, models?.size)
 
             signal.countDown()
@@ -642,7 +634,7 @@ class AggregationTest2 : BaseAndroidTest() {
 
         val signal = CountDownLatch(1)
         val body = readStringFromJson(app, R.raw.transactions_n_days_pagination_3)
-        mockServer.setDispatcher(object : Dispatcher() {
+        mockServer.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}?after=1217548800000_7") {
                     return MockResponse()
@@ -651,17 +643,16 @@ class AggregationTest2 : BaseAndroidTest() {
                 }
                 return MockResponse().setResponseCode(404)
             }
-        })
+        }
 
         aggregation.refreshTransactionsWithPagination(after = "1217548800000_7") { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
             assertNotNull(resource.data)
-            val testObserver = aggregation.fetchTransactionsNew().test()
+            val testObserver = aggregation.fetchTransactions().test()
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            val ids = models?.map { it.transactionId }
             assertEquals(11, models?.size)
 
             signal.countDown()

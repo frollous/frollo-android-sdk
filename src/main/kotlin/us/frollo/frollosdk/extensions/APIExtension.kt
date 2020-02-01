@@ -48,27 +48,7 @@ import us.frollo.frollosdk.network.api.SurveysAPI
 
 // Aggregation
 
-internal fun AggregationAPI.fetchTransactionsByQuery(
-    fromDate: String, // yyyy-MM-dd
-    toDate: String, // yyyy-MM-dd
-    accountIds: LongArray? = null,
-    accountIncluded: Boolean? = null, // TODO: not using this currently as this requires refactoring handleTransactionsResponse
-    transactionIncluded: Boolean? = null,
-    skip: Int? = null,
-    count: Int? = null
-): Call<List<TransactionResponse>> {
-
-    val queryMap = mutableMapOf("from_date" to fromDate, "to_date" to toDate)
-    skip?.let { queryMap.put("skip", it.toString()) }
-    count?.let { queryMap.put("count", it.toString()) }
-    accountIncluded?.let { queryMap.put("account_included", it.toString()) }
-    transactionIncluded?.let { queryMap.put("transaction_included", it.toString()) }
-    accountIds?.let { queryMap.put("account_ids", it.joinToString(",")) }
-
-    return fetchTransactions(queryMap)
-}
-
-internal fun AggregationAPI.fetchTransactionsNew(
+internal fun AggregationAPI.fetchTransactions(
     // before: String? = null,
     after: String? = null,
     searchTerm: String? = null,
@@ -112,11 +92,8 @@ internal fun AggregationAPI.fetchTransactionsNew(
     beforeMerchant?.let { queryMap.put("before", it.toString()) }
     afterMerchant?.let { queryMap.put("after", it.toString()) }
     size?.let { queryMap.put("size", it.toString()) }
-    return fetchTransactionsNew(queryMap)
+    return fetchTransactions(queryMap)
 }
-
-internal fun AggregationAPI.fetchTransactionsByIDs(transactionIds: LongArray): Call<List<TransactionResponse>> =
-        fetchTransactions(mapOf("transaction_ids" to transactionIds.joinToString(",")))
 
 internal fun AggregationAPI.fetchTransactionsSummaryByQuery(
     fromDate: String, // yyyy-MM-dd

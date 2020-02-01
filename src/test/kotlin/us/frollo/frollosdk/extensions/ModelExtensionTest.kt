@@ -84,8 +84,8 @@ class ModelExtensionTest {
 
     @Test
     fun testSQLForTransactionStaleIds() {
-        val query = sqlForTransactionStaleIds(fromDate = "2019-01-03", toDate = "2019-02-03", accountIds = longArrayOf(123, 456), transactionIncluded = false)
-        assertEquals("SELECT transaction_id FROM transaction_model WHERE ((transaction_date BETWEEN Date('2019-01-03') AND Date('2019-02-03'))  AND account_id IN (123,456)  AND included = 0 )", query.sql)
+        val query = sqlForTransactionStaleIds(fromDate = "2019-01-03", toDate = "2019-02-03", accountIds = listOf(123, 456), transactionIncluded = false)
+        assertEquals("SELECT transaction_id FROM transaction_model   where  ( CAST(account_id as long) in ('123','456') )  and   ( included = 0 )  and   ( transaction_date >= '2019-01-03' )  and   ( transaction_date <= '2019-02-03' ) ", query.sql)
     }
 
     @Test
@@ -218,19 +218,18 @@ class ModelExtensionTest {
     @Test
     fun testSQLForTransactions() {
         var query = sqlForTransactions(
-                accountId = 123,
-                userTags = listOf("pub", "holiday", "shopping"),
+                accountIds = listOf(123),
+                tags = listOf("pub", "holiday", "shopping"),
                 baseType = TransactionBaseType.CREDIT,
                 budgetCategory = BudgetCategory.INCOME,
                 status = TransactionStatus.PENDING,
-                included = false,
+                transactionIncluded = false,
                 fromDate = "2019-03-01",
-                toDate = "2019-03-31",
-                externalId = "208")
-        assertEquals("SELECT  *  FROM transaction_model WHERE account_id = 123 AND ((user_tags LIKE '%|pub|%') OR (user_tags LIKE '%|holiday|%') OR (user_tags LIKE '%|shopping|%')) AND base_type = 'CREDIT' AND budget_category = 'INCOME' AND status = 'PENDING' AND included = 0 AND external_id = '208' AND (transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
+                toDate = "2019-03-31")
+        assertEquals("SELECT * FROM transaction_model   where  ( CAST(account_id as long) in ('123') )  and   ( budget_category = 'INCOME' )  and   ( base_type = 'CREDIT' )  and   ( status = 'PENDING' )  and  ((user_tags LIKE '%|pub|%') OR (user_tags LIKE '%|holiday|%') OR (user_tags LIKE '%|shopping|%')) and   ( included = 0 )  and   ( transaction_date >= '2019-03-01' )  and   ( transaction_date <= '2019-03-31' ) ", query.sql)
 
         query = sqlForTransactions()
-        assertEquals("SELECT  *  FROM transaction_model", query.sql)
+        assertEquals("SELECT * FROM transaction_model  ", query.sql)
     }
 
     @Test

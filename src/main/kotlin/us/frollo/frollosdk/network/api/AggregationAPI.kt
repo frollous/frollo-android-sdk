@@ -116,13 +116,8 @@ internal interface AggregationAPI {
 
     // Transaction API
 
-    // Query parameters: {transaction_ids, account_ids, from_date, to_date, account_included, transaction_included, skip, count}
     @GET(URL_TRANSACTIONS)
-    fun fetchTransactions(@QueryMap queryParams: Map<String, String>): Call<List<TransactionResponse>>
-    // Query parameters: {transaction_ids, account_ids, from_date, to_date, account_included, transaction_included, skip, count}
-
-    @GET(URL_TRANSACTIONS)
-    fun fetchTransactionsNew(@QueryMap queryParams: Map<String, String>): Call<TransactionResponseWrapper>
+    fun fetchTransactions(@QueryMap queryParams: Map<String, String>): Call<TransactionResponseWrapper>
 
     @GET(URL_TRANSACTION)
     fun fetchTransaction(@Path("transaction_id") transactionId: Long): Call<TransactionResponse>

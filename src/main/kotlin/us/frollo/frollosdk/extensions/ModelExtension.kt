@@ -123,22 +123,9 @@ internal fun sqlForMessagesCount(messageTypes: List<String>? = null, read: Boole
     return sqlQueryBuilder.create()
 }
 
-internal fun sqlForTransactionStaleIds(fromDate: String, toDate: String, accountIds: LongArray? = null, transactionIncluded: Boolean? = null): SimpleSQLiteQuery {
-    val sb = StringBuilder()
-
-    accountIds?.let { sb.append(" AND account_id IN (${accountIds.joinToString(",")}) ") }
-
-    transactionIncluded?.let { sb.append(" AND included = ${ it.toInt() } ") }
-
-    val query = "SELECT transaction_id FROM transaction_model " +
-                "WHERE ((transaction_date BETWEEN Date('$fromDate') AND Date('$toDate')) $sb)"
-
-    return SimpleSQLiteQuery(query)
-}
-
-internal fun sqlForTransactionStaleIdsNew(
-    before: String?,
-    after: String?,
+internal fun sqlForTransactionStaleIds(
+    before: String? = null,
+    after: String? = null,
     searchTerm: String? = null,
     merchantIds: List<Long>? = null,
     accountIds: List<Long>? = null,
@@ -233,7 +220,80 @@ internal fun sqlForTransactionStaleIdsNew(
         // no where here
     }
 
-    var dateQuery = dateQueryBuilder.toString()
+    val dateQuery = dateQueryBuilder.toString()
+    return SimpleSQLiteQuery(whereClauseForTransactions(dateQuery,
+            searchTerm,
+            merchantIds,
+            accountIds,
+            transactionCategoryIds,
+            transactionIds,
+            budgetCategory,
+            minAmount,
+            maxAmount,
+            baseType,
+            status,
+            tags,
+            transactionIncluded,
+            fromDate,
+            toDate))
+}
+
+internal fun sqlForTransactions(
+    searchTerm: String? = null,
+    merchantIds: List<Long>? = null,
+    accountIds: List<Long>? = null,
+    transactionCategoryIds: List<Long>? = null,
+    transactionIds: List<Long>? = null,
+    budgetCategory: BudgetCategory? = null,
+    minAmount: Long? = null,
+    maxAmount: Long? = null,
+    baseType: TransactionBaseType? = null,
+    status: TransactionStatus? = null,
+    tags: List<String>? = null,
+    transactionIncluded: Boolean? = null,
+    fromDate: String? = null,
+    toDate: String? = null
+): SimpleSQLiteQuery {
+
+    val dateQuery = "SELECT * FROM transaction_model  "
+    // just for compiler, should never come here
+    return SimpleSQLiteQuery(
+            whereClauseForTransactions(dateQuery,
+            searchTerm,
+            merchantIds,
+            accountIds,
+            transactionCategoryIds,
+            transactionIds,
+            budgetCategory,
+            minAmount,
+            maxAmount,
+            baseType,
+            status,
+            tags,
+            transactionIncluded,
+            fromDate,
+            toDate))
+}
+
+private fun whereClauseForTransactions(
+    dateQuery: String,
+    searchTerm: String? = null,
+    merchantIds: List<Long>? = null,
+    accountIds: List<Long>? = null,
+    transactionCategoryIds: List<Long>? = null,
+    transactionIds: List<Long>? = null,
+    budgetCategory: BudgetCategory? = null,
+    minAmount: Long? = null,
+    maxAmount: Long? = null,
+    baseType: TransactionBaseType? = null,
+    status: TransactionStatus? = null,
+    tags: List<String>? = null,
+    transactionIncluded: Boolean? = null,
+    fromDate: String? = null,
+    toDate: String? = null
+): String {
+
+    val where = " where "
     var containsWhere = dateQuery.contains(where)
 
     val returnStringBuilder = StringBuilder()
@@ -392,193 +452,7 @@ internal fun sqlForTransactionStaleIdsNew(
         returnStringBuilder.append(query)
     }
 
-    // just for compiler, should never come here
-    return SimpleSQLiteQuery(returnStringBuilder.toString())
-}
-
-internal fun sqlForTransactionsNew(
-    searchTerm: String? = null,
-    merchantIds: List<Long>? = null,
-    accountIds: List<Long>? = null,
-    transactionCategoryIds: List<Long>? = null,
-    transactionIds: List<Long>? = null,
-    budgetCategory: BudgetCategory? = null,
-    minAmount: Long? = null,
-    maxAmount: Long? = null,
-    baseType: TransactionBaseType? = null,
-    status: TransactionStatus? = null,
-    tags: List<String>? = null,
-    transactionIncluded: Boolean? = null,
-    fromDate: String? = null,
-    toDate: String? = null
-): SimpleSQLiteQuery {
-
-    val dateQueryBuilder = StringBuilder()
-    dateQueryBuilder.append("SELECT * FROM transaction_model  ")
-
-    val where = " where "
-
-    var dateQuery = dateQueryBuilder.toString()
-    var containsWhere = false
-
-    val returnStringBuilder = StringBuilder()
-    returnStringBuilder.append(dateQuery)
-
-    searchTerm?.let {
-        val query = " ( description_original LIKE '%$it%' or description_user LIKE '%$it%' or description_simple LIKE '%$it%' ) "
-        if (!containsWhere) {
-            returnStringBuilder.append(where)
-            containsWhere = true
-        } else {
-            returnStringBuilder.append(" and  ")
-        }
-        returnStringBuilder.append(query)
-    }
-    merchantIds?.let {
-        val query = " ( CAST(merchant_id as long) in (${it.joinToString("','","'","'")}) ) "
-        if (!containsWhere) {
-            returnStringBuilder.append(where)
-            containsWhere = true
-        } else {
-            returnStringBuilder.append(" and  ")
-        }
-        returnStringBuilder.append(query)
-    }
-    accountIds?.let {
-        val query = " ( CAST(account_id as long) in (${it.joinToString("','","'","'")}) ) "
-        if (!containsWhere) {
-            returnStringBuilder.append(where)
-            containsWhere = true
-        } else {
-            returnStringBuilder.append(" and  ")
-        }
-        returnStringBuilder.append(query)
-    }
-    transactionCategoryIds?.let {
-        val query = " ( CAST(category_id as long) in (${it.joinToString("','","'","'")}) ) "
-        if (!containsWhere) {
-            returnStringBuilder.append(where)
-            containsWhere = true
-        } else {
-            returnStringBuilder.append(" and  ")
-        }
-        returnStringBuilder.append(query)
-    }
-    transactionIds?.let {
-        val query = " ( transaction_id in (${it.joinToString("','","'","'")}) ) "
-        if (!containsWhere) {
-            returnStringBuilder.append(where)
-            containsWhere = true
-        } else {
-            returnStringBuilder.append(" and  ")
-        }
-        returnStringBuilder.append(query)
-    }
-    budgetCategory?.let {
-        val query = " ( budget_category = '${it.name}' ) "
-        if (!containsWhere) {
-            returnStringBuilder.append(where)
-            containsWhere = true
-        } else {
-            returnStringBuilder.append(" and  ")
-        }
-        returnStringBuilder.append(query)
-    }
-    minAmount?.let {
-        val query = " ( CAST(amount_amount as decimal)  >= $it ) "
-        if (!containsWhere) {
-            returnStringBuilder.append(where)
-            containsWhere = true
-        } else {
-            returnStringBuilder.append(" and  ")
-        }
-        returnStringBuilder.append(query)
-    }
-    maxAmount?.let {
-        val query = " ( CAST(amount_amount as decimal)  <= $it ) "
-        if (!containsWhere) {
-            returnStringBuilder.append(where)
-            containsWhere = true
-        } else {
-            returnStringBuilder.append(" and  ")
-        }
-        returnStringBuilder.append(query)
-    }
-    baseType?.let {
-        val query = " ( base_type = '${baseType.name}' ) "
-        if (!containsWhere) {
-            returnStringBuilder.append(where)
-            containsWhere = true
-        } else {
-            returnStringBuilder.append(" and  ")
-        }
-        returnStringBuilder.append(query)
-    }
-    status?.let {
-        val query = " ( status = '${it.name}' ) "
-        if (!containsWhere) {
-            returnStringBuilder.append(where)
-            containsWhere = true
-        } else {
-            returnStringBuilder.append(" and  ")
-        }
-        returnStringBuilder.append(query)
-    }
-    tags?.let {
-
-        var query = ""
-        if (it.isNotEmpty()) {
-            val sb = StringBuilder()
-            sb.append("(")
-            it.forEachIndexed { index, str ->
-                sb.append("(user_tags LIKE '%|$str|%')")
-                if (index < it.size - 1) sb.append(" OR ")
-            }
-            sb.append(")")
-            query = sb.toString()
-        }
-        if (!containsWhere) {
-            returnStringBuilder.append(where)
-            containsWhere = true
-        } else {
-            returnStringBuilder.append(" and  ")
-        }
-        returnStringBuilder.append(query)
-    }
-
-    transactionIncluded?.let {
-        val query = " ( included = ${it.toInt()} ) "
-        if (!containsWhere) {
-            returnStringBuilder.append(where)
-            containsWhere = true
-        } else {
-            returnStringBuilder.append(" and  ")
-        }
-        returnStringBuilder.append(query)
-    }
-    fromDate?.let {
-        val query = " ( transaction_date >= '$it' ) "
-        if (!containsWhere) {
-            returnStringBuilder.append(where)
-            containsWhere = true
-        } else {
-            returnStringBuilder.append(" and  ")
-        }
-        returnStringBuilder.append(query)
-    }
-    toDate?.let {
-        val query = " ( transaction_date <= '$it' ) "
-        if (!containsWhere) {
-            returnStringBuilder.append(where)
-            containsWhere = true
-        } else {
-            returnStringBuilder.append(" and  ")
-        }
-        returnStringBuilder.append(query)
-    }
-
-    // just for compiler, should never come here
-    return SimpleSQLiteQuery(returnStringBuilder.toString())
+    return returnStringBuilder.toString()
 }
 
 internal fun sqlForExistingAccountBalanceReports(date: String, period: ReportPeriod, reportAccountIds: LongArray, accountId: Long? = null, accountType: AccountType? = null): SimpleSQLiteQuery {
@@ -727,40 +601,6 @@ internal fun sqlForUpdateAccount(
     sb.append("WHERE account_id = $accountId ")
 
     return SimpleSQLiteQuery(sb.toString())
-}
-
-internal fun sqlForTransactions(
-    accountId: Long? = null,
-    userTags: List<String>? = null,
-    baseType: TransactionBaseType? = null,
-    budgetCategory: BudgetCategory? = null,
-    status: TransactionStatus? = null,
-    included: Boolean? = null,
-    fromDate: String? = null,
-    toDate: String? = null,
-    externalId: String? = null
-): SimpleSQLiteQuery {
-    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("transaction_model")
-
-    accountId?.let { sqlQueryBuilder.appendSelection(selection = "account_id = $it") }
-    if (userTags != null && userTags.isNotEmpty()) {
-        val sb = StringBuilder()
-        sb.append("(")
-        userTags.forEachIndexed { index, str ->
-            sb.append("(user_tags LIKE '%|$str|%')")
-            if (index < userTags.size - 1) sb.append(" OR ")
-        }
-        sb.append(")")
-        sqlQueryBuilder.appendSelection(selection = sb.toString())
-    }
-    baseType?.let { sqlQueryBuilder.appendSelection(selection = "base_type = '${ it.name }'") }
-    budgetCategory?.let { sqlQueryBuilder.appendSelection(selection = "budget_category = '${ it.name }'") }
-    status?.let { sqlQueryBuilder.appendSelection(selection = "status = '${ it.name }'") }
-    included?.let { sqlQueryBuilder.appendSelection(selection = "included = ${ it.toInt() }") }
-    externalId?.let { sqlQueryBuilder.appendSelection(selection = "external_id = '$it'") }
-    ifNotNull(fromDate, toDate) { from, to -> sqlQueryBuilder.appendSelection(selection = "(transaction_date BETWEEN Date('$from') AND Date('$to'))") }
-
-    return sqlQueryBuilder.create()
 }
 
 internal fun sqlForTransactionCategories(defaultBudgetCategory: BudgetCategory? = null, type: TransactionCategoryType? = null): SimpleSQLiteQuery {

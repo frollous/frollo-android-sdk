@@ -74,7 +74,7 @@ internal fun AggregationAPI.fetchTransactions(
 
     val queryMap = mutableMapOf<String, String>()
     after?.let { queryMap.put("after", after) }
-    searchTerm?.let { queryMap.put("searchTerm", it) }
+    searchTerm?.let { queryMap.put("search_term", it) }
     merchantIds?.let { queryMap.put("merchant_ids", it.joinToString(",")) }
     accountIds?.let { queryMap.put("account_ids", it.joinToString(",")) }
     transactionCategoryIds?.let { queryMap.put("transaction_category_ids", it.joinToString(",")) }

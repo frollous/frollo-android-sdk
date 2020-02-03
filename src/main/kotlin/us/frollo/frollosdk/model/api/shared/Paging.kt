@@ -19,10 +19,10 @@ package us.frollo.frollosdk.model.api.shared
 import com.google.gson.annotations.SerializedName
 
 class Paging(
-    @SerializedName("cursors") val cursors: PagingCursors,
-    @SerializedName("previous") val previous: String,
-    @SerializedName("next") val next: String,
-    @SerializedName("total") val total: Long
+    @SerializedName("cursors") val cursors: PagingCursors?,
+    @SerializedName("previous") val previous: String?,
+    @SerializedName("next") val next: String?,
+    @SerializedName("total") val total: Long?
 )
 
 class PagingCursors(

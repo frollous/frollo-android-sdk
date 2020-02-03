@@ -1099,11 +1099,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                         var afterDate: String? = null
                         var beforeId: Long = -1
                         var afterId: Long = -1
-                        if (transactionResponseWrapper.paging.cursors.before != null) {
+                        transactionResponseWrapper.paging.cursors?.before?.let {
                             beforeDate = transactions[0].transactionDate
                             beforeId = transactions[0].transactionId
                         }
-                        if (transactionResponseWrapper.paging.cursors.after != null) {
+                        transactionResponseWrapper.paging.cursors?.after?.let {
                             afterDate = transactions[transactions.size - 1].transactionDate
                             afterId = transactions[transactions.size - 1].transactionId
                         }
@@ -1859,7 +1859,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     response?.let {
                         handleMerchantsResponseByIds(response.data)
 
-                        response.paging.cursors.after?.let { newAfter ->
+                        response.paging.cursors?.after?.let { newAfter ->
                             refreshNextMerchantsByIds(
                                     merchantIds = merchantIds,
                                     after = newAfter.toLong(),
@@ -1913,8 +1913,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
                             uiThread {
                                 completion?.invoke(PaginatedResult.Success(
-                                        before = response.paging.cursors.before?.toLong(),
-                                        after = response.paging.cursors.after?.toLong()))
+                                        before = response.paging.cursors?.before?.toLong(),
+                                        after = response.paging.cursors?.after?.toLong()))
                             }
                         }
                     } ?: run {

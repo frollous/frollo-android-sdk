@@ -75,16 +75,16 @@ internal fun AggregationAPI.fetchTransactions(
     val queryMap = mutableMapOf<String, String>()
     after?.let { queryMap.put("after", after) }
     searchTerm?.let { queryMap.put("searchTerm", it) }
-    merchantIds?.let { queryMap.put("merchant_ids", it.toString()) }
-    accountIds?.let { queryMap.put("account_ids", it.toString()) }
-    transactionCategoryIds?.let { queryMap.put("transaction_category_ids", it.toString()) }
-    transactionIds?.let { queryMap.put("transaction_ids", it.toString()) }
+    merchantIds?.let { queryMap.put("merchant_ids", it.joinToString(",")) }
+    accountIds?.let { queryMap.put("account_ids", it.joinToString(",")) }
+    transactionCategoryIds?.let { queryMap.put("transaction_category_ids", it.joinToString(",")) }
+    transactionIds?.let { queryMap.put("transaction_ids", it.joinToString(",")) }
     budgetCategory?.let { queryMap.put("budget_category", it.toString()) }
     minAmount?.let { queryMap.put("min_amount", it.toString()) }
     maxAmount?.let { queryMap.put("max_amount", it.toString()) }
     baseType?.let { queryMap.put("base_type", it.toString()) }
     status?.let { queryMap.put("status", it.toString()) }
-    tags?.let { queryMap.put("tags", it.toString()) }
+    tags?.let { queryMap.put("tags", it.joinToString(",")) }
     accountIncluded?.let { queryMap.put("account_included", it.toString()) }
     transactionIncluded?.let { queryMap.put("transaction_included", it.toString()) }
     fromDate?.let { queryMap.put("from_date", it) }

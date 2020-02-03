@@ -124,8 +124,10 @@ internal fun sqlForMessagesCount(messageTypes: List<String>? = null, read: Boole
 }
 
 internal fun sqlForTransactionStaleIds(
-    before: String? = null,
-    after: String? = null,
+    beforeDateString: String? = null,
+    afterDateString: String? = null,
+    beforeId: Long = -1L,
+    afterId: Long = -1L,
     searchTerm: String? = null,
     merchantIds: List<Long>? = null,
     accountIds: List<Long>? = null,
@@ -145,24 +147,13 @@ internal fun sqlForTransactionStaleIds(
     val dateQueryBuilder = StringBuilder()
     dateQueryBuilder.append("SELECT transaction_id FROM transaction_model  ")
 
-    lateinit var beforeDate: LocalDate
-    lateinit var afterDate: LocalDate
-    lateinit var array: List<String>
-    var beforeId = -1L
-    var afterId = -1L
+    val beforeDate = beforeDateString?.toLocalDate(Transaction.DATE_FORMAT_PATTERN)
+    val afterDate = afterDateString?.toLocalDate(Transaction.DATE_FORMAT_PATTERN)
     val where = " where "
 
-    if (before != null && after != null) {
+    if (beforeDate != null && afterDate != null) {
 
         dateQueryBuilder.append(where)
-
-        array = before.split("_")
-        beforeDate = array[0].toLocalDate(Transaction.DATE_FORMAT_PATTERN)
-        beforeId = array[1].toLong()
-
-        array = after.split("_")
-        afterDate = array[0].toLocalDate(Transaction.DATE_FORMAT_PATTERN)
-        afterId = array[1].toLong()
 
         val daysInBetween = ChronoUnit.DAYS.between(beforeDate, afterDate)
         when (daysInBetween.absoluteValue) {
@@ -190,11 +181,7 @@ internal fun sqlForTransactionStaleIds(
         }
     }
 
-    if (before != null && after == null) {
-
-        array = before.split("_")
-        beforeDate = array[0].toLocalDate(Transaction.DATE_FORMAT_PATTERN)
-        beforeId = array[1].toLong()
+    if (beforeDate != null && afterDate == null) {
 
         // no more transactions in future, so u take first transaction in before and get every after that
         dateQueryBuilder.append(where)
@@ -202,11 +189,7 @@ internal fun sqlForTransactionStaleIds(
         dateQueryBuilder.append("or (transaction_date = '${beforeDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id <= $beforeId) ")
     }
 
-    if (before == null && after != null) {
-
-        array = after.split("_")
-        afterDate = array[0].toLocalDate(Transaction.DATE_FORMAT_PATTERN)
-        afterId = array[1].toLong()
+    if (beforeDate == null && afterDate != null) {
 
         // querying for the first time, i have no transactions before, so before date is today. as u are fetching from top
         dateQueryBuilder.append(where)
@@ -216,7 +199,7 @@ internal fun sqlForTransactionStaleIds(
     }
 
     // i opened my account today, there are barely any transactions
-    if (before == null && after == null) {
+    if (beforeDate == null && afterDate == null) {
         // no where here
     }
 

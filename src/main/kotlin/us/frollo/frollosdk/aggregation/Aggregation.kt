@@ -1071,7 +1071,21 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         toDate: String? = null,
         completion: OnFrolloSDKCompletionListener<Resource<Paging?>>? = null
     ) {
-        aggregationAPI.fetchTransactions(after).enqueue { resource ->
+        aggregationAPI.fetchTransactions(after = after,
+                searchTerm = searchTerm,
+                merchantIds = merchantIds,
+                accountIds = accountIds,
+                transactionCategoryIds = transactionCategoryIds,
+                transactionIds = transactionIds,
+                budgetCategory = budgetCategory,
+                minAmount = minAmount,
+                maxAmount = maxAmount,
+                baseType = baseType,
+                status = status,
+                tags = tags,
+                transactionIncluded = transactionIncluded,
+                fromDate = fromDate,
+                toDate = toDate).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     val response = resource.data
@@ -1081,21 +1095,25 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                         val transactions = transactionResponseWrapper.transactions
                         val apiIds = insertTransactions(transactions)
 
-                        val beforeDateForLocal = if (transactionResponseWrapper.paging.cursors.before == null) {
-                            null
-                        } else {
-                            "${transactions[0].transactionDate}_${transactions[0].transactionId}"
+                        var beforeDate: String? = null
+                        var afterDate: String? = null
+                        var beforeId: Long = -1
+                        var afterId: Long = -1
+                        if (transactionResponseWrapper.paging.cursors.before != null) {
+                            beforeDate = transactions[0].transactionDate
+                            beforeId = transactions[0].transactionId
                         }
-                        val afterDateLocal = if (transactionResponseWrapper.paging.cursors.after == null) {
-                            null
-                        } else {
-                            "${transactions[transactions.size - 1].transactionDate}_${transactions[transactions.size - 1].transactionId}"
+                        if (transactionResponseWrapper.paging.cursors.after != null) {
+                            afterDate = transactions[transactions.size - 1].transactionDate
+                            afterId = transactions[transactions.size - 1].transactionId
                         }
 
                         val localIds = db.transactions().getIdsQuery(
                                 sqlForTransactionStaleIds(
-                                        beforeDateForLocal,
-                                        afterDateLocal,
+                                        beforeDate,
+                                        afterDate,
+                                        beforeId,
+                                        afterId,
                                         searchTerm,
                                         merchantIds,
                                         accountIds,

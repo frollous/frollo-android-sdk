@@ -45,8 +45,7 @@ import us.frollo.frollosdk.extensions.compareToFindMissingItems
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchMerchants
 import us.frollo.frollosdk.extensions.fetchSuggestedTags
-import us.frollo.frollosdk.extensions.fetchTransactionsByIDs
-import us.frollo.frollosdk.extensions.fetchTransactionsByQuery
+import us.frollo.frollosdk.extensions.fetchTransactions
 import us.frollo.frollosdk.extensions.fetchTransactionsSummaryByIDs
 import us.frollo.frollosdk.extensions.fetchTransactionsSummaryByQuery
 import us.frollo.frollosdk.extensions.fetchUserTags
@@ -84,6 +83,7 @@ import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagUpdateReques
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
+import us.frollo.frollosdk.model.api.shared.Paging
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountRelation
@@ -133,7 +133,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         override fun onReceive(context: Context, intent: Intent) {
 
             val transactionIds = intent.getBundleExtra(ARG_DATA).getLongArray(ARG_TRANSACTION_IDS)
-            transactionIds?.let { refreshTransactions(it) }
+            transactionIds?.let { refreshTransactionsWithPagination(transactionIds = it.toList()) }
         }
     }
 
@@ -873,14 +873,52 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
             }
 
     /**
-     * Fetch transactions by IDs from the cache
+     * Fetch transactions from the cache
      *
-     * @param transactionIds Unique list of IDs of the transactions to fetch
+     * @param accountId Filter by Account ID of the transactions (Optional)
+     * @param userTags Filter by list of tags that are linked to a transaction (Optional)
+     * @param baseType Filter by base type of the transaction (Optional)
+     * @param budgetCategory Filter by budget category of the transaction (Optional)
+     * @param status Filter by the status of the transaction (Optional)
+     * @param included Filter by transactions included in the budget (Optional)
+     * @param fromDate Start date to fetch transactions from (inclusive) (Optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param toDate End date to fetch transactions up to (inclusive) (Optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param externalId External aggregator ID of the transactions to fetch (Optional)
      *
      * @return LiveData object of Resource<List<Transaction>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchTransactions(transactionIds: LongArray): LiveData<Resource<List<Transaction>>> =
-            Transformations.map(db.transactions().load(transactionIds)) { models ->
+    fun fetchTransactions(
+        searchTerm: String? = null,
+        merchantIds: List<Long>? = null,
+        accountIds: List<Long>? = null,
+        transactionCategoryIds: List<Long>? = null,
+        transactionIds: List<Long>? = null,
+        budgetCategory: BudgetCategory? = null,
+        minAmount: Long? = null,
+        maxAmount: Long? = null,
+        baseType: TransactionBaseType? = null,
+        status: TransactionStatus? = null,
+        tags: List<String>? = null,
+        transactionIncluded: Boolean? = null,
+        fromDate: String? = null,
+        toDate: String? = null
+    ): LiveData<Resource<List<Transaction>>> =
+            Transformations.map(db.transactions().loadByQuery(sqlForTransactions(
+                    searchTerm,
+                    merchantIds,
+                    accountIds,
+                    transactionCategoryIds,
+                    transactionIds,
+                    budgetCategory,
+                    minAmount,
+                    maxAmount,
+                    baseType,
+                    status,
+                    tags,
+                    transactionIncluded,
+                    fromDate,
+                    toDate
+    ))) { models ->
                 Resource.success(models)
             }
 
@@ -899,27 +937,37 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      *
      * @return LiveData object of Resource<List<Transaction>> which can be observed using an Observer for future changes as well.
      */
-    fun fetchTransactions(
-        accountId: Long? = null,
-        userTags: List<String>? = null,
-        baseType: TransactionBaseType? = null,
+    fun fetchTransactionsWithRelation(
+        searchTerm: String? = null,
+        merchantIds: List<Long>? = null,
+        accountIds: List<Long>? = null,
+        transactionCategoryIds: List<Long>? = null,
+        transactionIds: List<Long>? = null,
         budgetCategory: BudgetCategory? = null,
+        minAmount: Long? = null,
+        maxAmount: Long? = null,
+        baseType: TransactionBaseType? = null,
         status: TransactionStatus? = null,
-        included: Boolean? = null,
+        tags: List<String>? = null,
+        transactionIncluded: Boolean? = null,
         fromDate: String? = null,
-        toDate: String? = null,
-        externalId: String? = null
-    ): LiveData<Resource<List<Transaction>>> =
-            Transformations.map(db.transactions().loadByQuery(sqlForTransactions(
-                    accountId = accountId,
-                    userTags = userTags,
-                    baseType = baseType,
-                    budgetCategory = budgetCategory,
-                    status = status,
-                    included = included,
-                    fromDate = fromDate,
-                    toDate = toDate,
-                    externalId = externalId
+        toDate: String? = null
+    ): LiveData<Resource<List<TransactionRelation>>> =
+            Transformations.map(db.transactions().loadByQueryWithRelation(sqlForTransactions(
+                    searchTerm,
+                    merchantIds,
+                    accountIds,
+                    transactionCategoryIds,
+                    transactionIds,
+                    budgetCategory,
+                    minAmount,
+                    maxAmount,
+                    baseType,
+                    status,
+                    tags,
+                    transactionIncluded,
+                    fromDate,
+                    toDate
             ))) { models ->
                 Resource.success(models)
             }
@@ -967,46 +1015,6 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     /**
-     * Fetch transactions from the cache along with other associated data.
-     *
-     * @param accountId Filter by Account ID of the transactions (Optional)
-     * @param userTags Filter by list of tags that are linked to a transaction (Optional)
-     * @param baseType Filter by base type of the transaction (Optional)
-     * @param budgetCategory Filter by budget category of the transaction (Optional)
-     * @param status Filter by the status of the transaction (Optional)
-     * @param included Filter by transactions included in the budget (Optional)
-     * @param fromDate Start date to fetch transactions from (inclusive) (Optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
-     * @param toDate End date to fetch transactions up to (inclusive) (Optional). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
-     * @param externalId External aggregator ID of the transactions to fetch (Optional)
-     *
-     * @return LiveData object of Resource<List<TransactionRelation>> which can be observed using an Observer for future changes as well.
-     */
-    fun fetchTransactionsWithRelation(
-        accountId: Long? = null,
-        userTags: List<String>? = null,
-        baseType: TransactionBaseType? = null,
-        budgetCategory: BudgetCategory? = null,
-        status: TransactionStatus? = null,
-        included: Boolean? = null,
-        fromDate: String? = null,
-        toDate: String? = null,
-        externalId: String? = null
-    ): LiveData<Resource<List<TransactionRelation>>> =
-            Transformations.map(db.transactions().loadByQueryWithRelation(sqlForTransactions(
-                    accountId = accountId,
-                    userTags = userTags,
-                    baseType = baseType,
-                    budgetCategory = budgetCategory,
-                    status = status,
-                    included = included,
-                    fromDate = fromDate,
-                    toDate = toDate,
-                    externalId = externalId
-            ))) { models ->
-                Resource.success(models)
-            }
-
-    /**
      * Advanced method to fetch transactions by SQL query from the cache with other associated data.
      *
      * @param query SimpleSQLiteQuery: Select query which fetches transactions from the cache
@@ -1043,78 +1051,96 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     /**
      * Refresh transactions from a certain period from the host
      *
-     * @param fromDate Start date to fetch transactions from (inclusive). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
-     * @param toDate End date to fetch transactions up to (inclusive). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
-     * @param accountIds Specific account IDs of the transactions to fetch (optional)
-     * @param transactionIncluded Boolean flag to indicate to fetch only those transactions that are excluded/included in budget (optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun refreshTransactions(
-        fromDate: String,
-        toDate: String,
-        accountIds: LongArray? = null,
+    fun refreshTransactionsWithPagination(
+        after: String? = null,
+        searchTerm: String? = null,
+        merchantIds: List<Long>? = null,
+        accountIds: List<Long>? = null,
+        transactionCategoryIds: List<Long>? = null,
+        transactionIds: List<Long>? = null,
+        budgetCategory: BudgetCategory? = null,
+        minAmount: Long? = null,
+        maxAmount: Long? = null,
+        baseType: TransactionBaseType? = null,
+        status: TransactionStatus? = null,
+        tags: List<String>? = null,
         transactionIncluded: Boolean? = null,
-        completion: OnFrolloSDKCompletionListener<Result>? = null
+        fromDate: String? = null,
+        toDate: String? = null,
+        completion: OnFrolloSDKCompletionListener<Resource<Paging?>>? = null
     ) {
-        doAsync {
-            refreshNextTransactions(fromDate, toDate, accountIds, transactionIncluded, 0, longArrayOf(), longArrayOf(), completion)
-        }
-    }
-
-    private fun refreshNextTransactions(
-        fromDate: String,
-        toDate: String,
-        accountIds: LongArray? = null,
-        transactionIncluded: Boolean? = null,
-        skip: Int,
-        updatedTransactionIds: LongArray,
-        updatedMerchantIds: LongArray,
-        completion: OnFrolloSDKCompletionListener<Result>? = null
-    ) {
-
-        aggregationAPI.fetchTransactionsByQuery(fromDate = fromDate, toDate = toDate,
-                accountIds = accountIds, transactionIncluded = transactionIncluded,
-                count = TRANSACTION_BATCH_SIZE, skip = skip).enqueue { resource ->
-
+        aggregationAPI.fetchTransactions(after = after,
+                searchTerm = searchTerm,
+                merchantIds = merchantIds,
+                accountIds = accountIds,
+                transactionCategoryIds = transactionCategoryIds,
+                transactionIds = transactionIds,
+                budgetCategory = budgetCategory,
+                minAmount = minAmount,
+                maxAmount = maxAmount,
+                baseType = baseType,
+                status = status,
+                tags = tags,
+                transactionIncluded = transactionIncluded,
+                fromDate = fromDate,
+                toDate = toDate).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     val response = resource.data
-                    response?.let {
-                        val updatedIds = insertTransactions(response).plus(updatedTransactionIds)
-                        val merchantIds = it.map { model -> model.merchant.id }.toLongArray().plus(updatedMerchantIds)
 
-                        if (it.size >= TRANSACTION_BATCH_SIZE) {
-                            refreshNextTransactions(fromDate, toDate, accountIds, transactionIncluded,
-                                    skip + TRANSACTION_BATCH_SIZE, updatedIds, merchantIds, completion)
-                        } else {
-                            fetchMissingMerchants(merchantIds.toSet())
-                            removeTransactions(fromDate, toDate, accountIds, transactionIncluded, updatedIds, completion)
+                    response?.let { transactionResponseWrapper ->
+
+                        val transactions = transactionResponseWrapper.transactions
+                        val apiIds = insertTransactions(transactions)
+
+                        var beforeDate: String? = null
+                        var afterDate: String? = null
+                        var beforeId: Long = -1
+                        var afterId: Long = -1
+                        transactionResponseWrapper.paging.cursors?.before?.let {
+                            beforeDate = transactions[0].transactionDate
+                            beforeId = transactions[0].transactionId
                         }
-                    } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
-                }
-                Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshNextTransactions", resource.error?.localizedDescription)
-                    completion?.invoke(Result.error(resource.error))
-                }
-            }
-        }
-    }
+                        transactionResponseWrapper.paging.cursors?.after?.let {
+                            afterDate = transactions[transactions.size - 1].transactionDate
+                            afterId = transactions[transactions.size - 1].transactionId
+                        }
 
-    /**
-     * Refresh specific transactions by IDs from the host
-     *
-     * @param transactionIds List of transaction IDs to fetch
-     * @param completion Optional completion handler with optional error if the request fails
-     */
-    fun refreshTransactions(transactionIds: LongArray, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        aggregationAPI.fetchTransactionsByIDs(transactionIds).enqueue { resource ->
-            when (resource.status) {
-                Resource.Status.SUCCESS -> {
-                    handleTransactionsByIDsResponse(response = resource.data, completion = completion)
+                        val localIds = db.transactions().getIdsQuery(
+                                sqlForTransactionStaleIds(
+                                        beforeDate,
+                                        afterDate,
+                                        beforeId,
+                                        afterId,
+                                        searchTerm,
+                                        merchantIds,
+                                        accountIds,
+                                        transactionCategoryIds,
+                                        transactionIds,
+                                        budgetCategory,
+                                        minAmount,
+                                        maxAmount,
+                                        baseType,
+                                        status,
+                                        tags,
+                                        transactionIncluded,
+                                        fromDate,
+                                        toDate
+                                )
+                        )
+
+                        val staleIds = localIds.toHashSet().minus(apiIds.toHashSet())
+                        val merchantIdsX = transactions.map { model -> model.merchant.id }.toLongArray()
+                        removeCachedTransactions(staleIds.toLongArray())
+                        fetchMissingMerchants(merchantIdsX.toSet())
+                        completion?.invoke(Resource.success(transactionResponseWrapper.paging))
+                    } ?: run { completion?.invoke(Resource.success(null)) } // Explicitly invoke completion callback if response is null.
                 }
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshTransactionsByIDs", resource.error?.localizedDescription)
-                    completion?.invoke(Result.error(resource.error))
+                    Log.e("$TAG#refreshTransactions", resource.error?.localizedDescription)
+                    completion?.invoke(Resource.error(resource.error))
                 }
             }
         }
@@ -1400,7 +1426,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         val apiIds = excludingIds.sorted()
         val staleIds = ArrayList(db.transactions().getIdsQuery(
                 sqlForTransactionStaleIds(fromDate = fromDate, toDate = toDate,
-                        accountIds = accountIds, transactionIncluded = transactionIncluded)).sorted())
+                        accountIds = accountIds?.toList(), transactionIncluded = transactionIncluded)).sorted())
 
         staleIds.removeAll(apiIds)
 
@@ -1833,10 +1859,10 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     response?.let {
                         handleMerchantsResponseByIds(response.data)
 
-                        response.paging.cursors.after?.let { newAfter ->
+                        response.paging.cursors?.after?.let { newAfter ->
                             refreshNextMerchantsByIds(
                                     merchantIds = merchantIds,
-                                    after = newAfter,
+                                    after = newAfter.toLong(),
                                     batchSize = batchSize,
                                     completion = completion)
                         } ?: run {
@@ -1887,8 +1913,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
                             uiThread {
                                 completion?.invoke(PaginatedResult.Success(
-                                        before = response.paging.cursors.before,
-                                        after = response.paging.cursors.after))
+                                        before = response.paging.cursors?.before?.toLong(),
+                                        after = response.paging.cursors?.after?.toLong()))
                             }
                         }
                     } ?: run {
@@ -1925,8 +1951,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     val response = resource.data
                     handleMerchantsResponse(
                             response = response?.data,
-                            before = response?.paging?.cursors?.before,
-                            after = response?.paging?.cursors?.after,
+                            before = response?.paging?.cursors?.before?.toLong(),
+                            after = response?.paging?.cursors?.after?.toLong(),
                             completion = completion)
                 }
             }

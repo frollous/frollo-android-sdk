@@ -23,6 +23,9 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import okhttp3.Response
+import org.threeten.bp.LocalDate
+import org.threeten.bp.format.DateTimeFormatterBuilder
+import org.threeten.bp.temporal.ChronoField
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.core.ARGUMENT.ARG_DATA
 import java.nio.charset.Charset
@@ -103,4 +106,12 @@ internal fun Set<Long>.compareToFindMissingItems(s2: Set<Long>): Set<Long> {
     }
 
     return missingElements
+}
+
+fun String.toLocalDate(pattern: String): LocalDate {
+    val formatter = DateTimeFormatterBuilder()
+            .appendPattern(pattern)
+            .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+            .toFormatter()
+    return LocalDate.parse(this, formatter)
 }

@@ -24,7 +24,6 @@ import com.jakewharton.threetenabp.AndroidThreeTen
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
-import org.threeten.bp.temporal.TemporalAdjusters
 import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.authentication.AuthenticationStatus
 import us.frollo.frollosdk.authentication.AuthenticationType.Custom
@@ -51,7 +50,6 @@ import us.frollo.frollosdk.goals.Goals
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.messages.Messages
-import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
 import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.notifications.Notifications
@@ -378,9 +376,7 @@ object FrolloSDK {
     private fun refreshPrimary() {
         aggregation.refreshProviderAccounts()
         aggregation.refreshAccounts()
-        aggregation.refreshTransactions(
-                fromDate = LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth()).toString(Transaction.DATE_FORMAT_PATTERN),
-                toDate = LocalDate.now().toString(Transaction.DATE_FORMAT_PATTERN))
+        aggregation.refreshTransactionsWithPagination()
         userManagement.refreshUser()
         messages.refreshUnreadMessages()
         budgets.refreshBudgets()

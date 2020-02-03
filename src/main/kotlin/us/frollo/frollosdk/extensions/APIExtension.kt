@@ -21,6 +21,7 @@ import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantsResponse
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
+import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponseWrapper
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.api.bills.BillPaymentResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetPeriodResponse
@@ -30,6 +31,8 @@ import us.frollo.frollosdk.model.api.goals.GoalResponse
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.ReportsResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
@@ -45,28 +48,52 @@ import us.frollo.frollosdk.network.api.SurveysAPI
 
 // Aggregation
 
-internal fun AggregationAPI.fetchTransactionsByQuery(
-    fromDate: String, // yyyy-MM-dd
-    toDate: String, // yyyy-MM-dd
-    accountIds: LongArray? = null,
-    accountIncluded: Boolean? = null, // TODO: not using this currently as this requires refactoring handleTransactionsResponse
+internal fun AggregationAPI.fetchTransactions(
+    // before: String? = null,
+    after: String? = null,
+    searchTerm: String? = null,
+    merchantIds: List<Long>? = null,
+    accountIds: List<Long>? = null,
+    transactionCategoryIds: List<Long>? = null,
+    transactionIds: List<Long>? = null,
+    budgetCategory: BudgetCategory? = null,
+    minAmount: Long? = null,
+    maxAmount: Long? = null,
+    baseType: TransactionBaseType? = null,
+    status: TransactionStatus? = null,
+    tags: List<String>? = null,
+    accountIncluded: Boolean? = null,
     transactionIncluded: Boolean? = null,
-    skip: Int? = null,
-    count: Int? = null
-): Call<List<TransactionResponse>> {
+    fromDate: String? = null,
+    toDate: String? = null,
+    beforeMerchant: Long? = null,
+    afterMerchant: Long? = null,
+    size: Long? = null
 
-    val queryMap = mutableMapOf("from_date" to fromDate, "to_date" to toDate)
-    skip?.let { queryMap.put("skip", it.toString()) }
-    count?.let { queryMap.put("count", it.toString()) }
+): Call<TransactionResponseWrapper> {
+
+    val queryMap = mutableMapOf<String, String>()
+    after?.let { queryMap.put("after", after) }
+    searchTerm?.let { queryMap.put("search_term", it) }
+    merchantIds?.let { queryMap.put("merchant_ids", it.joinToString(",")) }
+    accountIds?.let { queryMap.put("account_ids", it.joinToString(",")) }
+    transactionCategoryIds?.let { queryMap.put("transaction_category_ids", it.joinToString(",")) }
+    transactionIds?.let { queryMap.put("transaction_ids", it.joinToString(",")) }
+    budgetCategory?.let { queryMap.put("budget_category", it.toString()) }
+    minAmount?.let { queryMap.put("min_amount", it.toString()) }
+    maxAmount?.let { queryMap.put("max_amount", it.toString()) }
+    baseType?.let { queryMap.put("base_type", it.toString()) }
+    status?.let { queryMap.put("status", it.toString()) }
+    tags?.let { queryMap.put("tags", it.joinToString(",")) }
     accountIncluded?.let { queryMap.put("account_included", it.toString()) }
     transactionIncluded?.let { queryMap.put("transaction_included", it.toString()) }
-    accountIds?.let { queryMap.put("account_ids", it.joinToString(",")) }
-
+    fromDate?.let { queryMap.put("from_date", it) }
+    toDate?.let { queryMap.put("to_date", it) }
+    beforeMerchant?.let { queryMap.put("before", it.toString()) }
+    afterMerchant?.let { queryMap.put("after", it.toString()) }
+    size?.let { queryMap.put("size", it.toString()) }
     return fetchTransactions(queryMap)
 }
-
-internal fun AggregationAPI.fetchTransactionsByIDs(transactionIds: LongArray): Call<List<TransactionResponse>> =
-        fetchTransactions(mapOf("transaction_ids" to transactionIds.joinToString(",")))
 
 internal fun AggregationAPI.fetchTransactionsSummaryByQuery(
     fromDate: String, // yyyy-MM-dd

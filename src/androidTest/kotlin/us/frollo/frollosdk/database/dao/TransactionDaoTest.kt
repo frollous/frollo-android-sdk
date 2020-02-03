@@ -165,7 +165,7 @@ class TransactionDaoTest {
 
         db.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
 
-        val query = sqlForTransactionStaleIds(fromDate = "2019-01-03", toDate = "2019-02-03", accountIds = longArrayOf(1), transactionIncluded = false)
+        val query = sqlForTransactionStaleIds(fromDate = "2019-01-03", toDate = "2019-02-03", accountIds = listOf(1), transactionIncluded = false)
 
         val ids = db.transactions().getIdsQuery(query)
 

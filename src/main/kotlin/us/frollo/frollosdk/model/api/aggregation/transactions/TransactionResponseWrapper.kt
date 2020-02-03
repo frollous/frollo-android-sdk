@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Frollo
+ * Copyright 2020 Frollo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.shared
+package us.frollo.frollosdk.model.api.aggregation.transactions
 
 import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.model.api.shared.Paging
 
-class Paging(
-    @SerializedName("cursors") val cursors: PagingCursors?,
-    @SerializedName("previous") val previous: String?,
-    @SerializedName("next") val next: String?,
-    @SerializedName("total") val total: Long?
-)
-
-class PagingCursors(
-    @SerializedName("before") var before: String?,
-    @SerializedName("after") var after: String?
+internal data class TransactionResponseWrapper(
+    @SerializedName("data") val transactions: List<TransactionResponse>,
+    @SerializedName("paging") val paging: Paging
 )

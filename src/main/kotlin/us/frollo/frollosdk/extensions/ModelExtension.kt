@@ -126,8 +126,8 @@ internal fun sqlForMessagesCount(messageTypes: List<String>? = null, read: Boole
 internal fun sqlForTransactionStaleIds(
     beforeDateString: String? = null,
     afterDateString: String? = null,
-    beforeId: Long = -1L,
-    afterId: Long = -1L,
+    beforeId: Long? = null,
+    afterId: Long? = null,
     searchTerm: String? = null,
     merchantIds: List<Long>? = null,
     accountIds: List<Long>? = null,

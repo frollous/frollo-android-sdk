@@ -26,6 +26,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.sqlite.db.SimpleSQLiteQuery
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import org.threeten.bp.LocalDate
 import us.frollo.frollosdk.base.PaginatedResult
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
@@ -59,6 +60,7 @@ import us.frollo.frollosdk.extensions.sqlForTransactionStaleIds
 import us.frollo.frollosdk.extensions.sqlForTransactions
 import us.frollo.frollosdk.extensions.sqlForUpdateAccount
 import us.frollo.frollosdk.extensions.sqlForUserTags
+import us.frollo.frollosdk.extensions.toLocalDate
 import us.frollo.frollosdk.extensions.transactionSearch
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toAccount
@@ -81,9 +83,9 @@ import us.frollo.frollosdk.model.coredata.aggregation.tags.SuggestedTagsSortType
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
+import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionPagingResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
-import us.frollo.frollosdk.model.api.shared.Paging
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountRelation
@@ -1069,7 +1071,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         transactionIncluded: Boolean? = null,
         fromDate: String? = null,
         toDate: String? = null,
-        completion: OnFrolloSDKCompletionListener<Resource<Paging?>>? = null
+        completion: OnFrolloSDKCompletionListener<Resource<TransactionPagingResponse?>>? = null
     ) {
         aggregationAPI.fetchTransactions(after = after,
                 searchTerm = searchTerm,
@@ -1097,8 +1099,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
                         var beforeDate: String? = null
                         var afterDate: String? = null
-                        var beforeId: Long = -1
-                        var afterId: Long = -1
+                        var beforeId: Long? = null
+                        var afterId: Long? = null
                         transactionResponseWrapper.paging.cursors?.before?.let {
                             beforeDate = transactions[0].transactionDate
                             beforeId = transactions[0].transactionId
@@ -1106,6 +1108,17 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                         transactionResponseWrapper.paging.cursors?.after?.let {
                             afterDate = transactions[transactions.size - 1].transactionDate
                             afterId = transactions[transactions.size - 1].transactionId
+                        }
+
+                        var beforeDateForDevice: LocalDate? = null
+                        var afterDateForDevice: LocalDate? = null
+                        var beforeIdForDevice: Long? = null
+                        var afterIdForDevice: Long? = null
+                        if (transactions.isNotEmpty()) {
+                            beforeDateForDevice = transactions[0].transactionDate.toLocalDate(Transaction.DATE_FORMAT_PATTERN)
+                            beforeIdForDevice = transactions[0].transactionId
+                            afterDateForDevice = transactions[transactions.size - 1].transactionDate.toLocalDate(Transaction.DATE_FORMAT_PATTERN)
+                            afterIdForDevice = transactions[transactions.size - 1].transactionId
                         }
 
                         val localIds = db.transactions().getIdsQuery(
@@ -1135,7 +1148,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                         val merchantIdsX = transactions.map { model -> model.merchant.id }.toLongArray()
                         removeCachedTransactions(staleIds.toLongArray())
                         fetchMissingMerchants(merchantIdsX.toSet())
-                        completion?.invoke(Resource.success(transactionResponseWrapper.paging))
+                        completion?.invoke(Resource.success(TransactionPagingResponse(transactionResponseWrapper.paging,
+                                beforeDateForDevice,
+                                beforeIdForDevice,
+                                afterDateForDevice,
+                                afterIdForDevice)))
                     } ?: run { completion?.invoke(Resource.success(null)) } // Explicitly invoke completion callback if response is null.
                 }
                 Resource.Status.ERROR -> {

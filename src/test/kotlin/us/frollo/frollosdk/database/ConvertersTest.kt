@@ -369,6 +369,7 @@ class ConvertersTest {
         val str = Converters.instance.stringFromAggregatorType(AggregatorType.CDR)
         assertEquals("CDR", str)
 
+        assertEquals("YODLEE", Converters.instance.stringFromAggregatorType(AggregatorType.YODLEE))
         assertEquals("YODLEE", Converters.instance.stringFromAggregatorType(null))
     }
 

@@ -1071,6 +1071,8 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         transactionIncluded: Boolean? = null,
         fromDate: String? = null,
         toDate: String? = null,
+        accountIncluded: Boolean? = null,
+        size: Long? = null,
         completion: OnFrolloSDKCompletionListener<Resource<TransactionPagingResponse?>>? = null
     ) {
         aggregationAPI.fetchTransactions(after = after,
@@ -1087,7 +1089,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 tags = tags,
                 transactionIncluded = transactionIncluded,
                 fromDate = fromDate,
-                toDate = toDate).enqueue { resource ->
+                toDate = toDate,
+                accountIncluded = accountIncluded,
+                size = size).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     val response = resource.data

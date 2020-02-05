@@ -194,7 +194,7 @@ internal class Converters {
     fun stringFromListOfProviderContainerName(value: List<ProviderContainerName>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|", postfix = "|")
 
     @TypeConverter
-    fun stringToAggregatorType(value: String?): AggregatorType? = if (value == null) AggregatorType.YODLEE else AggregatorType.valueOf(value)
+    fun stringToAggregatorType(value: String?): AggregatorType? = if (value == null || value.isEmpty() || value.isBlank()) AggregatorType.YODLEE else AggregatorType.valueOf(value)
 
     @TypeConverter
     fun stringFromAggregatorType(value: AggregatorType?): String? = value?.name ?: AggregatorType.YODLEE.name

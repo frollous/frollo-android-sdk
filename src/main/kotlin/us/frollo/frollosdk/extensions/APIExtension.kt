@@ -49,7 +49,6 @@ import us.frollo.frollosdk.network.api.SurveysAPI
 // Aggregation
 
 internal fun AggregationAPI.fetchTransactions(
-    // before: String? = null,
     after: String? = null,
     searchTerm: String? = null,
     merchantIds: List<Long>? = null,
@@ -66,8 +65,6 @@ internal fun AggregationAPI.fetchTransactions(
     transactionIncluded: Boolean? = null,
     fromDate: String? = null,
     toDate: String? = null,
-    beforeMerchant: Long? = null,
-    afterMerchant: Long? = null,
     size: Long? = null
 
 ): Call<TransactionResponseWrapper> {
@@ -89,8 +86,6 @@ internal fun AggregationAPI.fetchTransactions(
     transactionIncluded?.let { queryMap.put("transaction_included", it.toString()) }
     fromDate?.let { queryMap.put("from_date", it) }
     toDate?.let { queryMap.put("to_date", it) }
-    beforeMerchant?.let { queryMap.put("before", it.toString()) }
-    afterMerchant?.let { queryMap.put("after", it.toString()) }
     size?.let { queryMap.put("size", it.toString()) }
     return fetchTransactions(queryMap)
 }

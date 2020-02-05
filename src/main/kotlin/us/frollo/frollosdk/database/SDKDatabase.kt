@@ -348,7 +348,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 database.execSQL("CREATE  INDEX `index_budget_period_budget_period_id` ON `budget_period` (`budget_period_id`)")
                 database.execSQL("CREATE  INDEX `index_budget_period_budget_id` ON `budget_period` (`budget_id`)")
 
-                database.execSQL("ALTER TABLE `provider` ADD COLUMN `aggregator_type` TEXT NOT NULL DEFAULT ''")
+                database.execSQL("ALTER TABLE `provider` ADD COLUMN `aggregator_type` TEXT NOT NULL DEFAULT 'YODLEE'")
                 database.execSQL("ALTER TABLE `provider` ADD COLUMN `permissions` TEXT")
             }
         }

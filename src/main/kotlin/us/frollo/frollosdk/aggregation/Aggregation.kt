@@ -127,6 +127,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     private val aggregationAPI: AggregationAPI = network.create(AggregationAPI::class.java)
+    private val SQLITE_MAX_VARIABLE_NUMBER = 999
 
     private var refreshingMerchantIDs = setOf<Long>()
     private var refreshingProviderIDs = setOf<Long>()
@@ -920,7 +921,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     transactionIncluded,
                     fromDate,
                     toDate
-    ))) { models ->
+            ))) { models ->
                 Resource.success(models)
             }
 
@@ -1150,7 +1151,26 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
                         val staleIds = localIds.toHashSet().minus(apiIds.toHashSet())
                         val merchantIdsX = transactions.map { model -> model.merchant.id }.toLongArray()
-                        removeCachedTransactions(staleIds.toLongArray())
+
+                        if (staleIds.size> SQLITE_MAX_VARIABLE_NUMBER) {
+                            val staleIdsList = staleIds.toList()
+
+                            val iterations = staleIdsList.size / SQLITE_MAX_VARIABLE_NUMBER
+                            for (i in 0 until (iterations - 1)) {
+                                if (i == 0) {
+
+                                    removeCachedTransactions(staleIdsList.subList(0, ((i*SQLITE_MAX_VARIABLE_NUMBER) - 1)).toLongArray())
+                                }
+                                if (i == iterations - 1) {
+                                    removeCachedTransactions(staleIdsList.subList(i*SQLITE_MAX_VARIABLE_NUMBER, staleIdsList.size - 1).toLongArray())
+                                } else {
+                                    removeCachedTransactions(staleIdsList.subList(i*SQLITE_MAX_VARIABLE_NUMBER, ((i*SQLITE_MAX_VARIABLE_NUMBER) + SQLITE_MAX_VARIABLE_NUMBER - 1)).toLongArray())
+                                }
+                            }
+                        } else {
+                            removeCachedTransactions(staleIds.toLongArray())
+                        }
+
                         fetchMissingMerchants(merchantIdsX.toSet())
                         completion?.invoke(Resource.success(TransactionPagingResponse(transactionResponseWrapper.paging,
                                 beforeDateForDevice,

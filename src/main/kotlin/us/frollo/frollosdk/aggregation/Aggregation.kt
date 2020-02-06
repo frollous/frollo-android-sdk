@@ -127,7 +127,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     private val aggregationAPI: AggregationAPI = network.create(AggregationAPI::class.java)
-    private val SQLITE_MAX_VARIABLE_NUMBER = 999
+    private val SQLITE_MAX_VARIABLE_NUMBER = 998
 
     private var refreshingMerchantIDs = setOf<Long>()
     private var refreshingProviderIDs = setOf<Long>()

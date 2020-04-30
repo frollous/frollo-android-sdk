@@ -125,10 +125,6 @@ internal interface AggregationAPI {
     @PUT(URL_TRANSACTION)
     fun updateTransaction(@Path("transaction_id") transactionId: Long, @Body request: TransactionUpdateRequest): Call<TransactionResponse>
 
-    // Query parameters: {search_term, from_date, to_date, transaction_ids, account_ids, account_included, transaction_included, skip, count}
-    @GET(URL_TRANSACTIONS_SEARCH)
-    fun transactionSearch(@QueryMap queryParams: Map<String, String>): Call<List<TransactionResponse>>
-
     // Query parameters: {transaction_ids, account_ids, from_date, to_date, account_included, transaction_included}
     @GET(URL_TRANSACTIONS_SUMMARY)
     fun fetchTransactionsSummary(@QueryMap queryParams: Map<String, String>): Call<TransactionsSummaryResponse>

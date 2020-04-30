@@ -87,3 +87,11 @@ internal fun getWeekInMonth(dayOfMonth: Int): Int {
         else -> 5
     }
 }
+
+fun String.toLocalDate(pattern: String): LocalDate {
+    val formatter = DateTimeFormatterBuilder()
+            .appendPattern(pattern)
+            .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+            .toFormatter()
+    return LocalDate.parse(this, formatter)
+}

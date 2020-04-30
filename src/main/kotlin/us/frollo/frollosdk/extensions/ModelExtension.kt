@@ -16,6 +16,7 @@
 
 package us.frollo.frollosdk.extensions
 
+import TransactionFilter
 import android.os.Bundle
 import androidx.sqlite.db.SimpleSQLiteQuery
 import org.threeten.bp.LocalDate
@@ -54,6 +55,7 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.model.coredata.user.User
 import us.frollo.frollosdk.notifications.NotificationPayloadNames
+import java.math.BigDecimal
 import kotlin.math.absoluteValue
 
 internal fun User.updateRequest(): UserUpdateRequest =
@@ -128,55 +130,42 @@ internal fun sqlForTransactionStaleIds(
     afterDateString: String? = null,
     beforeId: Long? = null,
     afterId: Long? = null,
-    searchTerm: String? = null,
-    merchantIds: List<Long>? = null,
-    accountIds: List<Long>? = null,
-    transactionCategoryIds: List<Long>? = null,
-    transactionIds: List<Long>? = null,
-    budgetCategory: BudgetCategory? = null,
-    minAmount: Long? = null,
-    maxAmount: Long? = null,
-    baseType: TransactionBaseType? = null,
-    status: TransactionStatus? = null,
-    tags: List<String>? = null,
-    transactionIncluded: Boolean? = null,
-    fromDate: String? = null,
-    toDate: String? = null
+    transactionFilter: TransactionFilter
 ): SimpleSQLiteQuery {
 
     val dateQueryBuilder = StringBuilder()
     dateQueryBuilder.append("SELECT transaction_id FROM transaction_model  ")
 
-    val beforeDate = beforeDateString?.toLocalDate(Transaction.DATE_FORMAT_PATTERN)
-    val afterDate = afterDateString?.toLocalDate(Transaction.DATE_FORMAT_PATTERN)
+    val beforeDate = beforeDateString
+    val afterDate = afterDateString
     val where = " where "
 
     if (beforeDate != null && afterDate != null) {
 
         dateQueryBuilder.append(where)
 
-        val daysInBetween = ChronoUnit.DAYS.between(beforeDate, afterDate)
+        val daysInBetween = ChronoUnit.DAYS.between(beforeDate.toLocalDate(Transaction.DATE_FORMAT_PATTERN), afterDate.toLocalDate(Transaction.DATE_FORMAT_PATTERN))
         when (daysInBetween.absoluteValue) {
             0L -> {
                 // this is same day so we need a and
-                dateQueryBuilder.append("(transaction_date = '${beforeDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id <= $beforeId) ")
-                dateQueryBuilder.append("and (transaction_date = '${afterDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id >= $afterId) ")
+                dateQueryBuilder.append("(transaction_date = '${beforeDate}' AND transaction_id <= $beforeId) ")
+                dateQueryBuilder.append("and (transaction_date = '${afterDate}' AND transaction_id >= $afterId) ")
             }
             1L -> {
                 // this is 2 different dates , so we need a or
-                dateQueryBuilder.append("(transaction_date = '${beforeDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id <= $beforeId) ")
-                dateQueryBuilder.append("or (transaction_date = '${afterDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id >= $afterId) ")
+                dateQueryBuilder.append("(transaction_date = '${beforeDate}' AND transaction_id <= $beforeId) ")
+                dateQueryBuilder.append("or (transaction_date = '${afterDate}' AND transaction_id >= $afterId) ")
             }
             2L -> {
-                dateQueryBuilder.append("(transaction_date = '${beforeDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id <= $beforeId) ")
-                dateQueryBuilder.append("and ((transaction_date = '${afterDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id >= $afterId) ")
-                dateQueryBuilder.append("or transaction_date = '${afterDate.plusDays(1).toString(Transaction.DATE_FORMAT_PATTERN)}') ")
+                dateQueryBuilder.append("(transaction_date = '${beforeDate}' AND transaction_id <= $beforeId) ")
+                dateQueryBuilder.append("and ((transaction_date = '${afterDate}' AND transaction_id >= $afterId) ")
+                dateQueryBuilder.append("or transaction_date = '${afterDate.toLocalDate(Transaction.DATE_FORMAT_PATTERN).plusDays(1)}') ")
             }
             else -> {
-                dateQueryBuilder.append("((transaction_date >= '${afterDate.plusDays(1).toString(Transaction.DATE_FORMAT_PATTERN)}')  ")
-                dateQueryBuilder.append("and (transaction_date <= '${beforeDate.minusDays(1).toString(Transaction.DATE_FORMAT_PATTERN)}')) ")
-                dateQueryBuilder.append("or ((transaction_date = '${beforeDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id <= $beforeId) ")
-                dateQueryBuilder.append("or (transaction_date = '${afterDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id >= $afterId)) ")
+                dateQueryBuilder.append("((transaction_date >= '${afterDate.toLocalDate(Transaction.DATE_FORMAT_PATTERN).plusDays(1)}')  ")
+                dateQueryBuilder.append("and (transaction_date <= '${beforeDate.toLocalDate(Transaction.DATE_FORMAT_PATTERN).minusDays(1)}')) ")
+                dateQueryBuilder.append("or ((transaction_date = '${beforeDate}' AND transaction_id <= $beforeId) ")
+                dateQueryBuilder.append("or (transaction_date = '${afterDate}' AND transaction_id >= $afterId)) ")
             }
         }
     }
@@ -185,8 +174,8 @@ internal fun sqlForTransactionStaleIds(
 
         // no more transactions in future, so u take first transaction in before and get every after that
         dateQueryBuilder.append(where)
-        dateQueryBuilder.append(" (transaction_date <= '${beforeDate.minusDays(1).toString(Transaction.DATE_FORMAT_PATTERN)}') ")
-        dateQueryBuilder.append("or (transaction_date = '${beforeDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id <= $beforeId) ")
+        dateQueryBuilder.append(" (transaction_date <= '${beforeDate.toLocalDate(Transaction.DATE_FORMAT_PATTERN).minusDays(1)}') ")
+        dateQueryBuilder.append("or (transaction_date = '${beforeDate}' AND transaction_id <= $beforeId) ")
     }
 
     if (beforeDate == null && afterDate != null) {
@@ -194,8 +183,8 @@ internal fun sqlForTransactionStaleIds(
         // querying for the first time, i have no transactions before, so before date is today. as u are fetching from top
         dateQueryBuilder.append(where)
         dateQueryBuilder.append("(transaction_date <= '${LocalDate.now().toString(Transaction.DATE_FORMAT_PATTERN)}') ")
-        dateQueryBuilder.append("or transaction_date >= '${afterDate.plusDays(1).toString(Transaction.DATE_FORMAT_PATTERN)}'  ") // 2018-08-02
-        dateQueryBuilder.append("OR (transaction_date = '${afterDate.toString(Transaction.DATE_FORMAT_PATTERN)}' AND transaction_id >= $afterId) ") // 2018-08-01 5
+        dateQueryBuilder.append("or transaction_date >= '${afterDate.toLocalDate(Transaction.DATE_FORMAT_PATTERN).plusDays(1)}'  ") // 2018-08-02
+        dateQueryBuilder.append("OR (transaction_date = '${afterDate}' AND transaction_id >= $afterId) ") // 2018-08-01 5
     }
 
     // i opened my account today, there are barely any transactions
@@ -204,76 +193,53 @@ internal fun sqlForTransactionStaleIds(
     }
 
     val dateQuery = dateQueryBuilder.toString()
-    return SimpleSQLiteQuery(whereClauseForTransactions(dateQuery,
-            searchTerm,
-            merchantIds,
-            accountIds,
-            transactionCategoryIds,
-            transactionIds,
-            budgetCategory,
-            minAmount,
-            maxAmount,
-            baseType,
-            status,
-            tags,
-            transactionIncluded,
-            fromDate,
-            toDate))
+    return SimpleSQLiteQuery(whereClauseForTransactions(
+            dateQuery,transactionFilter
+            ))
 }
 
-internal fun sqlForTransactions(
-    searchTerm: String? = null,
-    merchantIds: List<Long>? = null,
-    accountIds: List<Long>? = null,
-    transactionCategoryIds: List<Long>? = null,
-    transactionIds: List<Long>? = null,
-    budgetCategory: BudgetCategory? = null,
-    minAmount: Long? = null,
-    maxAmount: Long? = null,
-    baseType: TransactionBaseType? = null,
-    status: TransactionStatus? = null,
-    tags: List<String>? = null,
-    transactionIncluded: Boolean? = null,
-    fromDate: String? = null,
-    toDate: String? = null
-): SimpleSQLiteQuery {
+internal fun sqlForTransactions(transactionFilter: TransactionFilter, isCredit:Boolean? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("transaction_model")
+    whereClauseForTransactions(sqlQueryBuilder, transactionFilter, isCredit)
+    return sqlQueryBuilder.create()
+}
 
-    val dateQuery = "SELECT * FROM transaction_model  "
-    // just for compiler, should never come here
-    return SimpleSQLiteQuery(
-            whereClauseForTransactions(dateQuery,
-            searchTerm,
-            merchantIds,
-            accountIds,
-            transactionCategoryIds,
-            transactionIds,
-            budgetCategory,
-            minAmount,
-            maxAmount,
-            baseType,
-            status,
-            tags,
-            transactionIncluded,
-            fromDate,
-            toDate))
+private fun whereClauseForTransactions(sqLiteQueryBuilder: SimpleSQLiteQueryBuilder, transactionFilter: TransactionFilter, isCredit: Boolean? = null){
+    transactionFilter.accountIds?.let { sqLiteQueryBuilder.appendSelection(selection = "account_id IN (${transactionFilter.accountIds.joinToString(",")})") }
+    transactionFilter.merchantIds?.let { sqLiteQueryBuilder.appendSelection(selection = "merchant_id IN (${transactionFilter.merchantIds.joinToString(",")})") }
+    transactionFilter.transactionCategoryIds?.let { sqLiteQueryBuilder.appendSelection(selection = "category_id IN (${transactionFilter.transactionCategoryIds.joinToString(",")})") }
+    transactionFilter.transactionIds?.let { sqLiteQueryBuilder.appendSelection(selection = "transaction_id IN (${transactionFilter.transactionIds.joinToString(",")})") }
+    transactionFilter.budgetCategory?.let { sqLiteQueryBuilder.appendSelection(selection = "budget_category = '${ it.name }'") }
+    if (transactionFilter.tags != null && transactionFilter.tags.isNotEmpty()) {
+        val sb = StringBuilder()
+        sb.append("(")
+        transactionFilter.tags.forEachIndexed { index, str ->
+            sb.append("(user_tags LIKE '%|$str|%')")
+            if (index < transactionFilter.tags.size - 1) sb.append(" OR ")
+        }
+        sb.append(")")
+        sqLiteQueryBuilder.appendSelection(selection = sb.toString())
+    }
+    ifNotNull(transactionFilter.fromDate, transactionFilter.toDate) { from, to -> sqLiteQueryBuilder.appendSelection(selection = "(transaction_date BETWEEN Date('$from') AND Date('$to'))") }
+    isCredit?.let {
+        if (isCredit) sqLiteQueryBuilder.appendSelection(selection = "CAST(amount_amount AS DECIMAL) >= 0")
+        else sqLiteQueryBuilder.appendSelection(selection = "CAST(amount_amount AS DECIMAL) <= 0")
+    }
+    transactionFilter.minAmount?.let { sqLiteQueryBuilder.appendSelection(selection = "ABS(CAST(amount_amount AS DECIMAL)) >= $it") }
+    transactionFilter.maxAmount?.let { sqLiteQueryBuilder.appendSelection(selection = "ABS(CAST(amount_amount AS DECIMAL)) <= $it") }
+    transactionFilter.baseType?.let { sqLiteQueryBuilder.appendSelection(selection = "base_type = '${ it.name }'") }
+    transactionFilter.status?.let{sqLiteQueryBuilder.appendSelection(selection = "status = '${ it.name}'") }
+    transactionFilter.accountIncluded?.let { sqLiteQueryBuilder.appendSelection(selection = "account_included = ${ it.toInt() }") }
+    transactionFilter.transactionIncluded?.let { sqLiteQueryBuilder.appendSelection(selection = "transaction_included = ${ it.toInt() }") }
+    transactionFilter.searchTerm?.let {
+        sqLiteQueryBuilder.appendSelection(selection = " ( description_original LIKE '%$it%' or description_user LIKE '%$it%' or description_simple LIKE '%$it%' ) ")
+    }
+
 }
 
 private fun whereClauseForTransactions(
     dateQuery: String,
-    searchTerm: String? = null,
-    merchantIds: List<Long>? = null,
-    accountIds: List<Long>? = null,
-    transactionCategoryIds: List<Long>? = null,
-    transactionIds: List<Long>? = null,
-    budgetCategory: BudgetCategory? = null,
-    minAmount: Long? = null,
-    maxAmount: Long? = null,
-    baseType: TransactionBaseType? = null,
-    status: TransactionStatus? = null,
-    tags: List<String>? = null,
-    transactionIncluded: Boolean? = null,
-    fromDate: String? = null,
-    toDate: String? = null
+    transactionFilter: TransactionFilter
 ): String {
 
     val where = " where "
@@ -282,7 +248,7 @@ private fun whereClauseForTransactions(
     val returnStringBuilder = StringBuilder()
     returnStringBuilder.append(dateQuery)
 
-    searchTerm?.let {
+    transactionFilter.searchTerm?.let {
         val query = " ( description_original LIKE '%$it%' or description_user LIKE '%$it%' or description_simple LIKE '%$it%' ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
@@ -292,7 +258,7 @@ private fun whereClauseForTransactions(
         }
         returnStringBuilder.append(query)
     }
-    merchantIds?.let {
+    transactionFilter.merchantIds?.let {
         val query = " ( CAST(merchant_id as long) in (${it.joinToString("','","'","'")}) ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
@@ -302,7 +268,7 @@ private fun whereClauseForTransactions(
         }
         returnStringBuilder.append(query)
     }
-    accountIds?.let {
+    transactionFilter.accountIds?.let {
         val query = " ( CAST(account_id as long) in (${it.joinToString("','","'","'")}) ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
@@ -312,7 +278,7 @@ private fun whereClauseForTransactions(
         }
         returnStringBuilder.append(query)
     }
-    transactionCategoryIds?.let {
+    transactionFilter.transactionCategoryIds?.let {
         val query = " ( CAST(category_id as long) in (${it.joinToString("','","'","'")}) ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
@@ -322,7 +288,7 @@ private fun whereClauseForTransactions(
         }
         returnStringBuilder.append(query)
     }
-    transactionIds?.let {
+    transactionFilter.transactionIds?.let {
         val query = " ( transaction_id in (${it.joinToString("','","'","'")}) ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
@@ -332,7 +298,7 @@ private fun whereClauseForTransactions(
         }
         returnStringBuilder.append(query)
     }
-    budgetCategory?.let {
+    transactionFilter.budgetCategory?.let {
         val query = " ( budget_category = '${it.name}' ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
@@ -342,7 +308,7 @@ private fun whereClauseForTransactions(
         }
         returnStringBuilder.append(query)
     }
-    minAmount?.let {
+    transactionFilter.minAmount?.let {
         val query = " ( CAST(amount_amount as decimal)  >= $it ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
@@ -352,7 +318,7 @@ private fun whereClauseForTransactions(
         }
         returnStringBuilder.append(query)
     }
-    maxAmount?.let {
+    transactionFilter.maxAmount?.let {
         val query = " ( CAST(amount_amount as decimal)  <= $it ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
@@ -362,8 +328,8 @@ private fun whereClauseForTransactions(
         }
         returnStringBuilder.append(query)
     }
-    baseType?.let {
-        val query = " ( base_type = '${baseType.name}' ) "
+    transactionFilter.baseType?.let {
+        val query = " ( base_type = '${transactionFilter.baseType.name}' ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
             containsWhere = true
@@ -372,7 +338,7 @@ private fun whereClauseForTransactions(
         }
         returnStringBuilder.append(query)
     }
-    status?.let {
+    transactionFilter.status?.let {
         val query = " ( status = '${it.name}' ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
@@ -382,7 +348,7 @@ private fun whereClauseForTransactions(
         }
         returnStringBuilder.append(query)
     }
-    tags?.let {
+    transactionFilter.tags?.let {
 
         var query = ""
         if (it.isNotEmpty()) {
@@ -404,7 +370,7 @@ private fun whereClauseForTransactions(
         returnStringBuilder.append(query)
     }
 
-    transactionIncluded?.let {
+    transactionFilter.transactionIncluded?.let {
         val query = " ( included = ${it.toInt()} ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
@@ -414,7 +380,7 @@ private fun whereClauseForTransactions(
         }
         returnStringBuilder.append(query)
     }
-    fromDate?.let {
+    transactionFilter.fromDate?.let {
         val query = " ( transaction_date >= '$it' ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)
@@ -424,7 +390,7 @@ private fun whereClauseForTransactions(
         }
         returnStringBuilder.append(query)
     }
-    toDate?.let {
+    transactionFilter.toDate?.let {
         val query = " ( transaction_date <= '$it' ) "
         if (!containsWhere) {
             returnStringBuilder.append(where)

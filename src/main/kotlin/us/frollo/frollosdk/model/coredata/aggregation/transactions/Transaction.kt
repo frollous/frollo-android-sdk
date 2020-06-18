@@ -30,11 +30,15 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 // implementing a database migration, as the column name would not change.
 
 // Since `transaction` is a reserved keyword for SQLite, use `transaction_model` instead
-@Entity(tableName = "transaction_model",
-        indices = [Index("transaction_id"),
-            Index("account_id"),
-            Index("category_id"),
-            Index("merchant_id")])
+@Entity(
+    tableName = "transaction_model",
+    indices = [
+        Index("transaction_id"),
+        Index("account_id"),
+        Index("category_id"),
+        Index("merchant_id")
+    ]
+)
 
 /** Data representation of a Transaction */
 data class Transaction(

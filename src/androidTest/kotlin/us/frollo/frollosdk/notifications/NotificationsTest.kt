@@ -20,16 +20,15 @@ import com.jraska.livedata.test
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
-import org.junit.Test
-
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
-import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.model.testEventNotificationBundle
 import us.frollo.frollosdk.model.testMessageNotificationBundle
+import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
@@ -54,7 +53,7 @@ class NotificationsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == DeviceAPI.URL_DEVICE) {
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -90,8 +89,8 @@ class NotificationsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "messages/12345") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }

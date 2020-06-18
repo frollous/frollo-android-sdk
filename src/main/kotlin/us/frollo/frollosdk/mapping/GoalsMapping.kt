@@ -22,38 +22,40 @@ import us.frollo.frollosdk.model.coredata.goals.Goal
 import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
 
 internal fun GoalResponse.toGoal(): Goal =
-        Goal(
-                goalId = goalId,
-                name = name,
-                description = description,
-                imageUrl = imageUrl,
-                accountId = accountId,
-                trackingStatus = trackingStatus,
-                trackingType = trackingType,
-                status = status,
-                frequency = frequency,
-                target = target,
-                currency = currency,
-                currentAmount = currentAmount,
-                periodAmount = periodAmount,
-                startAmount = startAmount,
-                targetAmount = targetAmount,
-                startDate = startDate,
-                endDate = endDate,
-                estimatedEndDate = estimatedEndDate,
-                estimatedTargetAmount = estimatedTargetAmount,
-                periodsCount = periodsCount,
-                currentPeriod = currentPeriod?.toGoalPeriod(),
-                metadata = metadata)
+    Goal(
+        goalId = goalId,
+        name = name,
+        description = description,
+        imageUrl = imageUrl,
+        accountId = accountId,
+        trackingStatus = trackingStatus,
+        trackingType = trackingType,
+        status = status,
+        frequency = frequency,
+        target = target,
+        currency = currency,
+        currentAmount = currentAmount,
+        periodAmount = periodAmount,
+        startAmount = startAmount,
+        targetAmount = targetAmount,
+        startDate = startDate,
+        endDate = endDate,
+        estimatedEndDate = estimatedEndDate,
+        estimatedTargetAmount = estimatedTargetAmount,
+        periodsCount = periodsCount,
+        currentPeriod = currentPeriod?.toGoalPeriod(),
+        metadata = metadata
+    )
 
 internal fun GoalPeriodResponse.toGoalPeriod(): GoalPeriod =
-        GoalPeriod(
-                goalPeriodId = goalPeriodId,
-                goalId = goalId,
-                startDate = startDate,
-                endDate = endDate,
-                trackingStatus = trackingStatus,
-                currentAmount = currentAmount,
-                targetAmount = targetAmount,
-                requiredAmount = requiredAmount,
-                index = index)
+    GoalPeriod(
+        goalPeriodId = goalPeriodId,
+        goalId = goalId,
+        startDate = startDate,
+        endDate = endDate,
+        trackingStatus = trackingStatus,
+        currentAmount = currentAmount,
+        targetAmount = targetAmount,
+        requiredAmount = requiredAmount,
+        index = index
+    )

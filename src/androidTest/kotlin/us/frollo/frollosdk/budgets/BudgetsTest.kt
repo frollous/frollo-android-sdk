@@ -28,7 +28,6 @@ import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
-import us.frollo.frollosdk.network.api.BudgetsAPI
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
@@ -43,8 +42,7 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.testBudgetPeriodResponseData
 import us.frollo.frollosdk.model.testBudgetResponseData
-import us.frollo.frollosdk.model.testBudgetPeriodResponseData
-import us.frollo.frollosdk.model.testBudgetResponseData
+import us.frollo.frollosdk.network.api.BudgetsAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
@@ -222,9 +220,10 @@ class BudgetsTest : BaseAndroidTest() {
         database.budgets().insertAll(*list.map { it.toBudget() }.toList().toTypedArray())
 
         val testObserver = budgets.fetchBudgets(
-                frequency = BudgetFrequency.MONTHLY,
-                status = BudgetStatus.ACTIVE,
-                trackingStatus = BudgetTrackingStatus.ON_TRACK).test()
+            frequency = BudgetFrequency.MONTHLY,
+            status = BudgetStatus.ACTIVE,
+            trackingStatus = BudgetTrackingStatus.ON_TRACK
+        ).test()
 
         testObserver.awaitValue()
         assertTrue(testObserver.value().data?.isNotEmpty() == true)
@@ -306,8 +305,8 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath?.contains(BudgetsAPI.URL_BUDGETS) == true) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -343,8 +342,8 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -426,8 +425,8 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -484,15 +483,17 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BudgetsAPI.URL_BUDGETS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
-        budgets.createBudgetCategoryBudget(BudgetFrequency.MONTHLY, BigDecimal(1000), BudgetCategory.LIVING, null,
-                "https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg") { result ->
+        budgets.createBudgetCategoryBudget(
+            BudgetFrequency.MONTHLY, BigDecimal(1000), BudgetCategory.LIVING, null,
+            "https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg"
+        ) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -525,15 +526,17 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BudgetsAPI.URL_BUDGETS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
-        budgets.createMerchantBudget(BudgetFrequency.MONTHLY, BigDecimal(1000), 7, null,
-                "https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg") { result ->
+        budgets.createMerchantBudget(
+            BudgetFrequency.MONTHLY, BigDecimal(1000), 7, null,
+            "https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg"
+        ) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -566,15 +569,17 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BudgetsAPI.URL_BUDGETS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
-        budgets.createCategoryBudget(BudgetFrequency.MONTHLY, BigDecimal(1000), 8L, null,
-                "https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg") { result ->
+        budgets.createCategoryBudget(
+            BudgetFrequency.MONTHLY, BigDecimal(1000), 8L, null,
+            "https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg"
+        ) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -604,8 +609,10 @@ class BudgetsTest : BaseAndroidTest() {
         val signal = CountDownLatch(1)
         clearLoggedInPreferences()
 
-        budgets.createBudgetCategoryBudget(BudgetFrequency.MONTHLY, BigDecimal(1000), BudgetCategory.LIFESTYLE, null,
-                "https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg") { result ->
+        budgets.createBudgetCategoryBudget(
+            BudgetFrequency.MONTHLY, BigDecimal(1000), BudgetCategory.LIFESTYLE, null,
+            "https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg"
+        ) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
@@ -631,8 +638,8 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -698,7 +705,7 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -828,8 +835,8 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -899,8 +906,8 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -957,12 +964,12 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.budget_periods_daily))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.budget_periods_daily))
                 } else if (request?.trimmedPath == BudgetsAPI.URL_BUDGETS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.budget_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.budget_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1018,8 +1025,8 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1080,8 +1087,8 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1140,8 +1147,8 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1188,8 +1195,8 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1225,8 +1232,8 @@ class BudgetsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BudgetsAPI.URL_BUDGETS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }

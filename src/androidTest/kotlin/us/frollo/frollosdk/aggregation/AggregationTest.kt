@@ -179,8 +179,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_PROVIDERS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -239,12 +239,12 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_PROVIDERS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.providers_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.providers_valid))
                 } else if (request?.trimmedPath == "aggregation/providers/8069") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.provider_id_8069))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.provider_id_8069))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -304,8 +304,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/providers/12345") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -507,8 +507,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_PROVIDER_ACCOUNTS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -547,8 +547,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath?.contains(AggregationAPI.URL_PROVIDER_ACCOUNTS) == true) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(if (request.method == "PUT") syncBody else refreshBody)
+                        .setResponseCode(200)
+                        .setBody(if (request.method == "PUT") syncBody else refreshBody)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -613,8 +613,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/provideraccounts/123") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -674,8 +674,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_PROVIDER_ACCOUNTS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -736,7 +736,7 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/provideraccounts/12345") {
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -798,8 +798,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/provideraccounts/123") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -857,12 +857,12 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_PROVIDER_ACCOUNTS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.provider_accounts_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.provider_accounts_valid))
                 } else if (request?.trimmedPath == "aggregation/providers/12345") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.provider_id_12345))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.provider_id_12345))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1047,8 +1047,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_ACCOUNTS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1108,8 +1108,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/accounts/542") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1169,20 +1169,21 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/accounts/542") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
         aggregation.updateAccount(
-                accountId = 542,
-                hidden = false,
-                included = true,
-                favourite = randomBoolean(),
-                accountSubType = AccountSubType.SAVINGS,
-                nickName = randomUUID()) { result ->
+            accountId = 542,
+            hidden = false,
+            included = true,
+            favourite = randomBoolean(),
+            accountSubType = AccountSubType.SAVINGS,
+            nickName = randomUUID()
+        ) { result ->
 
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
@@ -1215,12 +1216,13 @@ class AggregationTest : BaseAndroidTest() {
         clearLoggedInPreferences()
 
         aggregation.updateAccount(
-                accountId = 542,
-                hidden = false,
-                included = true,
-                favourite = randomBoolean(),
-                accountSubType = AccountSubType.SAVINGS,
-                nickName = randomUUID()) { result ->
+            accountId = 542,
+            hidden = false,
+            included = true,
+            favourite = randomBoolean(),
+            accountSubType = AccountSubType.SAVINGS,
+            nickName = randomUUID()
+        ) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
@@ -1245,20 +1247,21 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/accounts/542") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
         aggregation.updateAccount(
-                accountId = 542,
-                hidden = true,
-                included = true,
-                favourite = randomBoolean(),
-                accountSubType = AccountSubType.SAVINGS,
-                nickName = randomUUID()) { result ->
+            accountId = 542,
+            hidden = true,
+            included = true,
+            favourite = randomBoolean(),
+            accountSubType = AccountSubType.SAVINGS,
+            nickName = randomUUID()
+        ) { result ->
 
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
@@ -1612,8 +1615,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/transactions/194630") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1673,8 +1676,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/transactions/194630") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1742,8 +1745,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/transactions/194630") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1811,8 +1814,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/transactions/194630") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1878,8 +1881,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.transactions_2018_08_01_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.transactions_2018_08_01_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1946,12 +1949,12 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath1) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.transactions_2018_12_04_count_200_skip_0))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.transactions_2018_12_04_count_200_skip_0))
                 } else if (request?.trimmedPath == requestPath2) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.transactions_2018_12_04_count_200_skip_200))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.transactions_2018_12_04_count_200_skip_200))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -2013,8 +2016,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?from_date=2018-06-01&to_date=2018-08-08") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -2072,8 +2075,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS_SUMMARY}?transaction_ids=1%2C2%2C3%2C4%2C5") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -2133,8 +2136,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}/12345/tags") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -2190,7 +2193,7 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}/12345/tags") {
                     return MockResponse()
-                            .setResponseCode(200)
+                        .setResponseCode(200)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -2200,10 +2203,11 @@ class AggregationTest : BaseAndroidTest() {
         database.transactions().insert(data.toTransaction())
 
         val tagPairs = arrayOf(
-                TagApplyAllPair("tagone", true),
-                TagApplyAllPair("tagtwo", true),
-                TagApplyAllPair("tagthree", true),
-                TagApplyAllPair("tagfour", true))
+            TagApplyAllPair("tagone", true),
+            TagApplyAllPair("tagtwo", true),
+            TagApplyAllPair("tagthree", true),
+            TagApplyAllPair("tagfour", true)
+        )
 
         aggregation.addTagsToTransaction(transactionId = 12345, tagApplyAllPairs = tagPairs) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
@@ -2278,7 +2282,7 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_TRANSACTIONS}/12345/tags") {
                     return MockResponse()
-                            .setResponseCode(200)
+                        .setResponseCode(200)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -2288,10 +2292,11 @@ class AggregationTest : BaseAndroidTest() {
         database.transactions().insert(data.toTransaction())
 
         val tagPairs = arrayOf(
-                TagApplyAllPair("tagone", true),
-                TagApplyAllPair("tagtwo", true),
-                TagApplyAllPair("tagthree", true),
-                TagApplyAllPair("tagfour", true))
+            TagApplyAllPair("tagone", true),
+            TagApplyAllPair("tagtwo", true),
+            TagApplyAllPair("tagthree", true),
+            TagApplyAllPair("tagfour", true)
+        )
 
         aggregation.removeTagsFromTransaction(transactionId = 12345, tagApplyAllPairs = tagPairs) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
@@ -2410,8 +2415,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_USER_TAGS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -2471,8 +2476,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath!!.contains(AggregationAPI.URL_SUGGESTED_TAGS)) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -2565,8 +2570,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_TRANSACTION_CATEGORIES) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -2663,24 +2668,25 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?size=50&merchant_ids=1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9%2C10%2C11%2C12%2C13%2C14%2C15%2C16%2C17%2C18%2C19%2C20%2C21%2C22%2C23%2C24%2C25%2C26%2C27%2C28%2C29%2C30%2C31%2C32%2C33%2C34%2C35%2C36%2C37%2C38%2C39%2C40%2C41%2C42%2C43%2C44%2C45%2C46%2C47%2C48%2C49%2C50%2C51%2C52%2C53%2C54%2C55%2C56%2C57%2C58%2C59%2C60") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_1))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_1))
                 } else if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?after=50&size=50&merchant_ids=1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9%2C10%2C11%2C12%2C13%2C14%2C15%2C16%2C17%2C18%2C19%2C20%2C21%2C22%2C23%2C24%2C25%2C26%2C27%2C28%2C29%2C30%2C31%2C32%2C33%2C34%2C35%2C36%2C37%2C38%2C39%2C40%2C41%2C42%2C43%2C44%2C45%2C46%2C47%2C48%2C49%2C50%2C51%2C52%2C53%2C54%2C55%2C56%2C57%2C58%2C59%2C60") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_2))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_2))
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
         val merchantIds = longArrayOf(
-                1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-                11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-                21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-                31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-                41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-                51, 52, 53, 54, 55, 56, 57, 58, 59, 60)
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+            11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+            21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+            31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+            41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
+            51, 52, 53, 54, 55, 56, 57, 58, 59, 60
+        )
 
         aggregation.refreshMerchantsByIdsWithPagination(merchantIds = merchantIds, batchSize = 50) { result1 ->
             assertTrue(result1 is PaginatedResult.Success)
@@ -2719,12 +2725,12 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?size=50") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_1))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_1))
                 } else if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?after=50&size=50") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_2))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_2))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -2798,20 +2804,20 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?size=500") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_500_chunk_1))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.merchants_valid_size_500_chunk_1))
                 } else if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?after=500&size=500") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_500_chunk_2))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.merchants_valid_size_500_chunk_2))
                 } else if (request?.trimmedPath?.contains("${AggregationAPI.URL_MERCHANTS}?size=500&merchant_ids=1%2C2%2C3") == true) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.merchants_valid_1_to_500))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.merchants_valid_1_to_500))
                 } else if (request?.trimmedPath?.contains("${AggregationAPI.URL_MERCHANTS}?size=500&merchant_ids=501%2C502%2C503") == true) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.merchants_valid_500_to_664))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.merchants_valid_500_to_664))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -2877,8 +2883,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "aggregation/merchants/197") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -2915,24 +2921,25 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?size=50&merchant_ids=1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9%2C10%2C11%2C12%2C13%2C14%2C15%2C16%2C17%2C18%2C19%2C20%2C21%2C22%2C23%2C24%2C25%2C26%2C27%2C28%2C29%2C30%2C31%2C32%2C33%2C34%2C35%2C36%2C37%2C38%2C39%2C40%2C41%2C42%2C43%2C44%2C45%2C46%2C47%2C48%2C49%2C50%2C51%2C52%2C53%2C54%2C55%2C56%2C57%2C58%2C59%2C60") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_1))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_1))
                 } else if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?after=50&size=50&merchant_ids=1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9%2C10%2C11%2C12%2C13%2C14%2C15%2C16%2C17%2C18%2C19%2C20%2C21%2C22%2C23%2C24%2C25%2C26%2C27%2C28%2C29%2C30%2C31%2C32%2C33%2C34%2C35%2C36%2C37%2C38%2C39%2C40%2C41%2C42%2C43%2C44%2C45%2C46%2C47%2C48%2C49%2C50%2C51%2C52%2C53%2C54%2C55%2C56%2C57%2C58%2C59%2C60") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_2))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.merchants_valid_size_50_chunk_2))
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
         val merchantIds = longArrayOf(
-                1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-                11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-                21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-                31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-                41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-                51, 52, 53, 54, 55, 56, 57, 58, 59, 60)
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+            11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+            21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+            31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+            41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
+            51, 52, 53, 54, 55, 56, 57, 58, 59, 60
+        )
 
         aggregation.refreshMerchantsByIds(merchantIds = merchantIds, batchSize = 50) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
@@ -2992,8 +2999,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "${AggregationAPI.URL_MERCHANTS}?size=500&merchant_ids=22%2C30%2C31%2C106%2C691") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -3053,8 +3060,8 @@ class AggregationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == AggregationAPI.URL_PROVIDERS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }

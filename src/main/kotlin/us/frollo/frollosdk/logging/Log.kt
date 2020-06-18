@@ -62,13 +62,13 @@ internal object Log {
     }
 
     internal fun d(tag: String, message: String?) =
-            message?.let { debugLog(String.format("%s : %s", tag, it)) }
+        message?.let { debugLog(String.format("%s : %s", tag, it)) }
 
     internal fun i(tag: String, message: String?) =
-            message?.let { infoLog(String.format("%s : %s", tag, it)) }
+        message?.let { infoLog(String.format("%s : %s", tag, it)) }
 
     internal fun e(tag: String, message: String?) =
-            message?.let { errorLog(String.format("%s : %s", tag, it)) }
+        message?.let { errorLog(String.format("%s : %s", tag, it)) }
 
     private fun debugLog(message: String) {
         debugLoggers.forEach { logger ->

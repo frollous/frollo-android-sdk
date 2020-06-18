@@ -46,41 +46,45 @@ internal fun testTransactionResponseData(
     status: TransactionStatus? = null
 ): TransactionResponse {
     return TransactionResponse(
-            transactionId = transactionId ?: randomNumber(10000..20000).toLong(),
-            accountId = accountId ?: randomNumber(10000..20000).toLong(),
-            amount = if (amount != null) Balance(amount, "AUD") else Balance(amount = BigDecimal(1111), currency = "AUD"),
-            baseType = baseType ?: TransactionBaseType.UNKNOWN,
-            billId = randomNumber().toLong(),
-            billPaymentId = randomNumber().toLong(),
-            categoryId = categoryId ?: randomNumber(10000..20000).toLong(),
-            merchant = testMerchantDetails(merchantId),
-            budgetCategory = budgetCategory ?: BudgetCategory.ONE_OFF,
-            description = description ?: TransactionDescription(original = randomUUID(), user = null, simple = null),
-            included = included ?: false,
-            memo = randomUUID(),
-            postDate = "2019-01-01",
-            status = status ?: TransactionStatus.SCHEDULED,
-            transactionDate = transactionDate ?: "2019-01-01",
-            userTags = userTags,
-            externalId = randomString(8))
+        transactionId = transactionId ?: randomNumber(10000..20000).toLong(),
+        accountId = accountId ?: randomNumber(10000..20000).toLong(),
+        amount = if (amount != null) Balance(amount, "AUD") else Balance(amount = BigDecimal(1111), currency = "AUD"),
+        baseType = baseType ?: TransactionBaseType.UNKNOWN,
+        billId = randomNumber().toLong(),
+        billPaymentId = randomNumber().toLong(),
+        categoryId = categoryId ?: randomNumber(10000..20000).toLong(),
+        merchant = testMerchantDetails(merchantId),
+        budgetCategory = budgetCategory ?: BudgetCategory.ONE_OFF,
+        description = description ?: TransactionDescription(original = randomUUID(), user = null, simple = null),
+        included = included ?: false,
+        memo = randomUUID(),
+        postDate = "2019-01-01",
+        status = status ?: TransactionStatus.SCHEDULED,
+        transactionDate = transactionDate ?: "2019-01-01",
+        userTags = userTags,
+        externalId = randomString(8)
+    )
 }
 
 internal fun testMerchantDetails(merchantId: Long? = null): MerchantDetails =
-        MerchantDetails(
-                id = merchantId ?: randomNumber(10000..20000).toLong(),
-                name = randomUUID(),
-                phone = randomUUID(),
-                website = randomUUID(),
-                location = null)
+    MerchantDetails(
+        id = merchantId ?: randomNumber(10000..20000).toLong(),
+        name = randomUUID(),
+        phone = randomUUID(),
+        website = randomUUID(),
+        location = null
+    )
 
 internal fun testTransactionsSummaryResponseData(count: Long? = null, sum: BigDecimal? = null): TransactionsSummaryResponse =
-        TransactionsSummaryResponse(
-                count = count ?: randomNumber().toLong(),
-                sum = sum ?: randomNumber().toBigDecimal())
+    TransactionsSummaryResponse(
+        count = count ?: randomNumber().toLong(),
+        sum = sum ?: randomNumber().toBigDecimal()
+    )
 
 internal fun testTransactionTagData(name: String? = null, createdAt: String? = null, lastUsedAt: String? = null): TransactionTag =
-        TransactionTag(
-                name = name ?: randomString(8),
-                createdAt = createdAt ?: Date().toString(),
-                lastUsedAt = lastUsedAt ?: Date().toString(),
-                count = randomNumber().toLong())
+    TransactionTag(
+        name = name ?: randomString(8),
+        createdAt = createdAt ?: Date().toString(),
+        lastUsedAt = lastUsedAt ?: Date().toString(),
+        count = randomNumber().toLong()
+    )

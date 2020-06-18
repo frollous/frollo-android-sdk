@@ -16,9 +16,9 @@
 
 package us.frollo.frollosdk.extensions
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.threeten.bp.LocalDate
 import org.threeten.bp.Month

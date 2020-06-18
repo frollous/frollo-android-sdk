@@ -71,14 +71,14 @@ data class ProviderLoginFormDisplay(
         }
 
         return ProviderLoginForm(
-                formId = formId,
-                forgetPasswordUrl = forgetPasswordUrl,
-                help = help,
-                mfaInfoTitle = mfaInfoTitle,
-                mfaInfoText = mfaInfoText,
-                mfaTimeout = mfaTimeout,
-                formType = formType,
-                rows = rows
+            formId = formId,
+            forgetPasswordUrl = forgetPasswordUrl,
+            help = help,
+            mfaInfoTitle = mfaInfoTitle,
+            mfaInfoText = mfaInfoText,
+            mfaTimeout = mfaTimeout,
+            formType = formType,
+            rows = rows
         )
     }
 
@@ -144,13 +144,13 @@ fun ProviderLoginForm.toDisplay(): ProviderLoginFormDisplay {
     }
 
     return ProviderLoginFormDisplay(
-            formId = formId,
-            forgetPasswordUrl = forgetPasswordUrl,
-            help = help,
-            mfaInfoTitle = mfaInfoTitle,
-            mfaInfoText = mfaInfoText,
-            mfaTimeout = mfaTimeout,
-            formType = formType,
-            containers = containers
+        formId = formId,
+        forgetPasswordUrl = forgetPasswordUrl,
+        help = help,
+        mfaInfoTitle = mfaInfoTitle,
+        mfaInfoText = mfaInfoText,
+        mfaTimeout = mfaTimeout,
+        formType = formType,
+        containers = containers
     )
 }

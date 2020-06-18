@@ -181,16 +181,17 @@ class ModelExtensionTest {
     @Test
     fun testSQLForAccounts() {
         var query = sqlForAccounts(
-                providerAccountId = 123,
-                accountStatus = AccountStatus.ACTIVE,
-                accountSubType = AccountSubType.BANK_ACCOUNT,
-                accountType = AccountType.BANK,
-                accountClassification = AccountClassification.CORPORATE,
-                favourite = true,
-                hidden = false,
-                included = true,
-                refreshStatus = AccountRefreshStatus.NEEDS_ACTION,
-                externalId = "208")
+            providerAccountId = 123,
+            accountStatus = AccountStatus.ACTIVE,
+            accountSubType = AccountSubType.BANK_ACCOUNT,
+            accountType = AccountType.BANK,
+            accountClassification = AccountClassification.CORPORATE,
+            favourite = true,
+            hidden = false,
+            included = true,
+            refreshStatus = AccountRefreshStatus.NEEDS_ACTION,
+            externalId = "208"
+        )
         assertEquals("SELECT  *  FROM account WHERE provider_account_id = 123 AND account_status = 'ACTIVE' AND attr_account_sub_type = 'BANK_ACCOUNT' AND attr_account_type = 'BANK' AND attr_account_classification = 'CORPORATE' AND favourite = 1 AND hidden = 0 AND included = 1 AND r_status_status = 'NEEDS_ACTION' AND external_id = '208' ", query.sql)
 
         query = sqlForAccounts()
@@ -200,32 +201,35 @@ class ModelExtensionTest {
     @Test
     fun testSQLForUpdateAccount() {
         var query = sqlForUpdateAccount(
-                accountId = 123,
-                hidden = false,
-                included = true,
-                favourite = true,
-                accountSubType = AccountSubType.BANK_ACCOUNT,
-                nickName = "CBA")
+            accountId = 123,
+            hidden = false,
+            included = true,
+            favourite = true,
+            accountSubType = AccountSubType.BANK_ACCOUNT,
+            nickName = "CBA"
+        )
         assertEquals("UPDATE account SET hidden = 0 , included = 1 , favourite = 1 , attr_account_sub_type = 'BANK_ACCOUNT' , nick_name = 'CBA' WHERE account_id = 123 ", query.sql)
 
         query = sqlForUpdateAccount(
-                accountId = 123,
-                hidden = false,
-                included = true)
+            accountId = 123,
+            hidden = false,
+            included = true
+        )
         assertEquals("UPDATE account SET hidden = 0 , included = 1 WHERE account_id = 123 ", query.sql)
     }
 
     @Test
     fun testSQLForTransactions() {
         var query = sqlForTransactions(
-                accountIds = listOf(123),
-                tags = listOf("pub", "holiday", "shopping"),
-                baseType = TransactionBaseType.CREDIT,
-                budgetCategory = BudgetCategory.INCOME,
-                status = TransactionStatus.PENDING,
-                transactionIncluded = false,
-                fromDate = "2019-03-01",
-                toDate = "2019-03-31")
+            accountIds = listOf(123),
+            tags = listOf("pub", "holiday", "shopping"),
+            baseType = TransactionBaseType.CREDIT,
+            budgetCategory = BudgetCategory.INCOME,
+            status = TransactionStatus.PENDING,
+            transactionIncluded = false,
+            fromDate = "2019-03-01",
+            toDate = "2019-03-31"
+        )
         assertEquals("SELECT * FROM transaction_model   where  ( CAST(account_id as long) in ('123') )  and   ( budget_category = 'INCOME' )  and   ( base_type = 'CREDIT' )  and   ( status = 'PENDING' )  and  ((user_tags LIKE '%|pub|%') OR (user_tags LIKE '%|holiday|%') OR (user_tags LIKE '%|shopping|%')) and   ( included = 0 )  and   ( transaction_date >= '2019-03-01' )  and   ( transaction_date <= '2019-03-31' ) ", query.sql)
 
         query = sqlForTransactions()

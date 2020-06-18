@@ -78,9 +78,9 @@ class UserManagement(
      * @return LiveData object of Resource<User> which can be observed using an Observer for future changes as well.
      */
     fun fetchUser(): LiveData<Resource<User>> =
-            Transformations.map(db.users().load()) {
-                Resource.success(it)
-            }
+        Transformations.map(db.users().load()) {
+            Resource.success(it)
+        }
 
     /**
      * Refreshes the latest details of the user from the server. This should be called on app launch and resuming after a set period of time if the user is already logged in. This returns the same data as login and register.
@@ -125,14 +125,15 @@ class UserManagement(
     ) {
         // Create the user on the server and at the authorization endpoint
         val request = UserRegisterRequest(
-                firstName = firstName,
-                lastName = lastName,
-                email = email,
-                password = password,
-                currentAddress = if (postcode?.isNotBlank() == true) Address(postcode = postcode) else null,
-                mobileNumber = mobileNumber,
-                dateOfBirth = dateOfBirth?.toString("yyyy-MM"),
-                clientId = clientId)
+            firstName = firstName,
+            lastName = lastName,
+            email = email,
+            password = password,
+            currentAddress = if (postcode?.isNotBlank() == true) Address(postcode = postcode) else null,
+            mobileNumber = mobileNumber,
+            dateOfBirth = dateOfBirth?.toString("yyyy-MM"),
+            clientId = clientId
+        )
 
         userAPI.register(request).enqueue { userResource ->
             when (userResource.status) {
@@ -213,8 +214,9 @@ class UserManagement(
      */
     fun changePassword(currentPassword: String?, newPassword: String, completion: OnFrolloSDKCompletionListener<Result>) {
         val request = UserChangePasswordRequest(
-                currentPassword = currentPassword, // currentPassword can be for Facebook login only
-                newPassword = newPassword)
+            currentPassword = currentPassword, // currentPassword can be for Facebook login only
+            newPassword = newPassword
+        )
 
         if (request.valid()) {
             userAPI.changePassword(request).enqueue { resource ->
@@ -243,10 +245,12 @@ class UserManagement(
      * @param completion A completion handler once the API has returned and the cache has been updated. Returns any error that occurred during the process.
      */
     fun resetPassword(email: String, completion: OnFrolloSDKCompletionListener<Result>) {
-        userAPI.resetPassword(UserResetPasswordRequest(
+        userAPI.resetPassword(
+            UserResetPasswordRequest(
                 email = email,
                 clientId = clientId
-        )).enqueue { resource ->
+            )
+        ).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#resetPassword", resource.error?.localizedDescription)
@@ -278,12 +282,13 @@ class UserManagement(
      */
     fun updateDevice(compliant: Boolean? = null, notificationToken: String? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val request = DeviceUpdateRequest(
-                deviceId = di.deviceId,
-                deviceType = di.deviceType,
-                deviceName = di.deviceName,
-                notificationToken = notificationToken,
-                timezone = TimeZone.getDefault().id,
-                compliant = compliant)
+            deviceId = di.deviceId,
+            deviceType = di.deviceType,
+            deviceName = di.deviceName,
+            notificationToken = notificationToken,
+            timezone = TimeZone.getDefault().id,
+            compliant = compliant
+        )
 
         deviceAPI.updateDevice(request).enqueue { resource ->
             when (resource.status) {
@@ -346,7 +351,7 @@ class UserManagement(
      * @param request URL Request to be authenticated and provided the access token
      */
     fun authenticateRequest(request: Request) =
-            network.authenticateRequest(request)
+        network.authenticateRequest(request)
 
     private fun handleUserResponse(userResponse: UserResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         userResponse?.let {

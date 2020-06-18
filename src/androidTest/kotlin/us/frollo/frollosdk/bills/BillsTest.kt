@@ -20,9 +20,9 @@ import com.jraska.livedata.test
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.threeten.bp.LocalDate
@@ -181,8 +181,8 @@ class BillsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BillsAPI.URL_BILLS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -248,8 +248,8 @@ class BillsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BillsAPI.URL_BILLS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -294,7 +294,7 @@ class BillsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -362,8 +362,8 @@ class BillsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BillsAPI.URL_BILLS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -427,8 +427,8 @@ class BillsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -494,8 +494,8 @@ class BillsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -560,12 +560,12 @@ class BillsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BillsAPI.URL_BILLS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.bills_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.bills_valid))
                 } else if (request?.trimmedPath == AggregationAPI.URL_ACCOUNTS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.accounts_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.accounts_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -608,12 +608,12 @@ class BillsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BillsAPI.URL_BILLS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.bills_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.bills_valid))
                 } else if (request?.trimmedPath?.contains(AggregationAPI.URL_MERCHANTS) == true) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.merchants_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.merchants_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -657,12 +657,12 @@ class BillsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BillsAPI.URL_BILLS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.bills_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.bills_valid))
                 } else if (request?.trimmedPath == AggregationAPI.URL_TRANSACTION_CATEGORIES) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.transaction_categories_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.transaction_categories_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -733,10 +733,11 @@ class BillsTest : BaseAndroidTest() {
         database.billPayments().insertAll(*list.map { it.toBillPayment() }.toList().toTypedArray())
 
         val testObserver = bills.fetchBillPayments(
-                fromDate = "2019-02-06",
-                toDate = "2019-04-30",
-                frequency = BillFrequency.MONTHLY,
-                paymentStatus = BillPaymentStatus.DUE).test()
+            fromDate = "2019-02-06",
+            toDate = "2019-04-30",
+            frequency = BillFrequency.MONTHLY,
+            paymentStatus = BillPaymentStatus.DUE
+        ).test()
 
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
@@ -873,7 +874,7 @@ class BillsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -945,8 +946,8 @@ class BillsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1010,8 +1011,8 @@ class BillsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1080,12 +1081,12 @@ class BillsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.bill_payments_2018_12_01_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.bill_payments_2018_12_01_valid))
                 } else if (request?.trimmedPath == BillsAPI.URL_BILLS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.bills_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.bills_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1129,8 +1130,8 @@ class BillsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == BillsAPI.URL_BILLS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }

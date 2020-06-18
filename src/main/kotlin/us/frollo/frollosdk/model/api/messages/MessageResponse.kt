@@ -30,8 +30,10 @@ import us.frollo.frollosdk.model.coredata.messages.ContentType
  * Declaring the column info allows for the renaming of variables without implementing a
  * database migration, as the column name would not change.
  */
-@Entity(tableName = "message",
-        indices = [Index("msg_id")])
+@Entity(
+    tableName = "message",
+    indices = [Index("msg_id")]
+)
 internal data class MessageResponse(
     @PrimaryKey @ColumnInfo(name = "msg_id") @SerializedName("id") val messageId: Long,
     @ColumnInfo(name = "event") @SerializedName("event") val event: String,

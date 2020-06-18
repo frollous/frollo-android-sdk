@@ -31,7 +31,6 @@ import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchBillPayments
 import us.frollo.frollosdk.extensions.sqlForBillPayments
 import us.frollo.frollosdk.extensions.sqlForBills
-import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toBill
 import us.frollo.frollosdk.mapping.toBillPayment
@@ -50,6 +49,7 @@ import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.model.coredata.bills.BillRelation
 import us.frollo.frollosdk.model.coredata.bills.BillStatus
 import us.frollo.frollosdk.model.coredata.bills.BillType
+import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.BillsAPI
 import java.math.BigDecimal
 
@@ -72,9 +72,9 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @return LiveData object of Resource<Bill> which can be observed using an Observer for future changes as well.
      */
     fun fetchBill(billId: Long): LiveData<Resource<Bill>> =
-            Transformations.map(db.bills().load(billId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.bills().load(billId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch bills from the cache
@@ -92,9 +92,9 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         status: BillStatus? = null,
         type: BillType? = null
     ): LiveData<Resource<List<Bill>>> =
-            Transformations.map(db.bills().loadByQuery(sqlForBills(frequency, paymentStatus, status, type))) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.bills().loadByQuery(sqlForBills(frequency, paymentStatus, status, type))) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch bills by SQL query from the cache
@@ -106,9 +106,9 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @return LiveData object of Resource<List<Bill>> which can be observed using an Observer for future changes as well.
      */
     fun fetchBills(query: SimpleSQLiteQuery): LiveData<Resource<List<Bill>>> =
-            Transformations.map(db.bills().loadByQuery(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.bills().loadByQuery(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch bill by ID from the cache along with other associated data.
@@ -118,9 +118,9 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @return LiveData object of Resource<BillRelation> which can be observed using an Observer for future changes as well.
      */
     fun fetchBillWithRelation(billId: Long): LiveData<Resource<BillRelation>> =
-            Transformations.map(db.bills().loadWithRelation(billId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.bills().loadWithRelation(billId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch bills from the cache along with other associated data.
@@ -138,9 +138,9 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         status: BillStatus? = null,
         type: BillType? = null
     ): LiveData<Resource<List<BillRelation>>> =
-            Transformations.map(db.bills().loadByQueryWithRelation(sqlForBills(frequency, paymentStatus, status, type))) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.bills().loadByQueryWithRelation(sqlForBills(frequency, paymentStatus, status, type))) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch bills by SQL query from the cache along with other associated data.
@@ -152,9 +152,9 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @return LiveData object of Resource<List<BillRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchBillsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<BillRelation>>> =
-            Transformations.map(db.bills().loadByQueryWithRelation(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.bills().loadByQueryWithRelation(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Create a new bill on the host from a transaction
@@ -175,12 +175,13 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
         val request = BillCreateRequest(
-                transactionId = transactionId,
-                dueAmount = null,
-                name = name,
-                frequency = frequency,
-                nextPaymentDate = nextPaymentDate,
-                notes = notes)
+            transactionId = transactionId,
+            dueAmount = null,
+            name = name,
+            frequency = frequency,
+            nextPaymentDate = nextPaymentDate,
+            notes = notes
+        )
 
         createBill(request, completion)
     }
@@ -204,12 +205,13 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
         val request = BillCreateRequest(
-                transactionId = null,
-                dueAmount = dueAmount,
-                name = name,
-                frequency = frequency,
-                nextPaymentDate = nextPaymentDate,
-                notes = notes)
+            transactionId = null,
+            dueAmount = dueAmount,
+            name = name,
+            frequency = frequency,
+            nextPaymentDate = nextPaymentDate,
+            notes = notes
+        )
 
         createBill(request, completion)
     }
@@ -298,13 +300,14 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      */
     fun updateBill(bill: Bill, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val request = BillUpdateRequest(
-                name = bill.name,
-                billType = bill.billType,
-                status = bill.status,
-                frequency = bill.frequency,
-                nextPaymentDate = bill.nextPaymentDate,
-                dueAmount = bill.dueAmount,
-                notes = bill.notes)
+            name = bill.name,
+            billType = bill.billType,
+            status = bill.status,
+            frequency = bill.frequency,
+            nextPaymentDate = bill.nextPaymentDate,
+            dueAmount = bill.dueAmount,
+            notes = bill.notes
+        )
 
         billsAPI.updateBill(bill.billId, request).enqueue { resource ->
             when (resource.status) {
@@ -329,9 +332,9 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @return LiveData object of Resource<BillPayment> which can be observed using an Observer for future changes as well.
      */
     fun fetchBillPayment(billPaymentId: Long): LiveData<Resource<BillPayment>> =
-            Transformations.map(db.billPayments().load(billPaymentId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.billPayments().load(billPaymentId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch bill payments by bill ID from the cache
@@ -351,9 +354,9 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         frequency: BillFrequency? = null,
         paymentStatus: BillPaymentStatus? = null
     ): LiveData<Resource<List<BillPayment>>> =
-            Transformations.map(db.billPayments().loadByQuery(sqlForBillPayments(billId, fromDate, toDate, frequency, paymentStatus))) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.billPayments().loadByQuery(sqlForBillPayments(billId, fromDate, toDate, frequency, paymentStatus))) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch bill payments by SQL query from the cache
@@ -365,9 +368,9 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @return LiveData object of Resource<List<BillPayment>> which can be observed using an Observer for future changes as well.
      */
     fun fetchBillPayments(query: SimpleSQLiteQuery): LiveData<Resource<List<BillPayment>>> =
-            Transformations.map(db.billPayments().loadByQuery(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.billPayments().loadByQuery(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch bill payment by ID from the cache with associated data
@@ -377,9 +380,9 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @return LiveData object of Resource<BillPaymentRelation> which can be observed using an Observer for future changes as well.
      */
     fun fetchBillPaymentWithRelation(billPaymentId: Long): LiveData<Resource<BillPaymentRelation>> =
-            Transformations.map(db.billPayments().loadWithRelation(billPaymentId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.billPayments().loadWithRelation(billPaymentId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch bill payments from the cache with associated data
@@ -399,9 +402,9 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
         frequency: BillFrequency? = null,
         paymentStatus: BillPaymentStatus? = null
     ): LiveData<Resource<List<BillPaymentRelation>>> =
-            Transformations.map(db.billPayments().loadByQueryWithRelation(sqlForBillPayments(billId, fromDate, toDate, frequency, paymentStatus))) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.billPayments().loadByQueryWithRelation(sqlForBillPayments(billId, fromDate, toDate, frequency, paymentStatus))) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch bill payments by SQL query from the cache with associated data
@@ -413,9 +416,9 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
      * @return LiveData object of Resource<List<BillPaymentRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchBillPaymentsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<BillPaymentRelation>>> =
-            Transformations.map(db.billPayments().loadByQueryWithRelation(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.billPayments().loadByQueryWithRelation(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Delete a specific bill payment by ID from the host
@@ -566,10 +569,10 @@ class Bills(network: NetworkService, private val db: SDKDatabase, private val ag
     }
 
     private fun mapBillResponse(models: List<BillResponse>): List<Bill> =
-            models.map { it.toBill() }.toList()
+        models.map { it.toBill() }.toList()
 
     private fun mapBillPaymentResponse(models: List<BillPaymentResponse>): List<BillPayment> =
-            models.map { it.toBillPayment() }.toList()
+        models.map { it.toBillPayment() }.toList()
 
     // WARNING: Do not call this method on the main thread
     private fun removeCachedBills(billIds: LongArray) {

@@ -58,20 +58,22 @@ class Keystore {
     }
 
     internal fun encrypt(plainText: String?) =
-            if (plainText?.isNotEmpty() == true) aesEncrypt(plainText) else null
+        if (plainText?.isNotEmpty() == true) aesEncrypt(plainText) else null
 
     internal fun decrypt(cipherText: String?) =
-            if (cipherText?.isNotEmpty() == true) aesDecrypt(cipherText) else null
+        if (cipherText?.isNotEmpty() == true) aesDecrypt(cipherText) else null
 
     private fun aesKey() {
         try {
-            val spec = KeyGenParameterSpec.Builder(KEY_ALIAS,
-                    KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
-                    .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
-                    // Turn off use of random IV every time
-                    .setRandomizedEncryptionRequired(false)
-                    .build()
+            val spec = KeyGenParameterSpec.Builder(
+                KEY_ALIAS,
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            )
+                .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+                // Turn off use of random IV every time
+                .setRandomizedEncryptionRequired(false)
+                .build()
 
             // Initialize a Key generator using the the AES algorithm and KeyStore.
             val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, KEYSTORE_PROVIDER)

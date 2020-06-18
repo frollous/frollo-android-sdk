@@ -27,9 +27,13 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginFor
 // Declaring the ColumnInfo allows for the renaming of variables without
 // implementing a database migration, as the column name would not change.
 
-@Entity(tableName = "provider_account",
-        indices = [Index("provider_account_id"),
-            Index("provider_id")])
+@Entity(
+    tableName = "provider_account",
+    indices = [
+        Index("provider_account_id"),
+        Index("provider_id")
+    ]
+)
 
 /**
  * Data representation of Provider Account

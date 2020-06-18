@@ -20,10 +20,10 @@ import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
-import us.frollo.frollosdk.network.NetworkHelper.Companion.HEADER_AUTHORIZATION
 import us.frollo.frollosdk.error.APIError
 import us.frollo.frollosdk.error.APIErrorType
 import us.frollo.frollosdk.extensions.clonedBodyString
+import us.frollo.frollosdk.network.NetworkHelper.Companion.HEADER_AUTHORIZATION
 
 /**
  * Responds to an authentication challenge from the web server.
@@ -62,8 +62,8 @@ internal class NetworkAuthenticator(private val network: NetworkService) : Authe
                         val newAccessToken = network.accessTokenProvider?.accessToken?.token
                         if (newAccessToken != null) {
                             newRequest = response.request().newBuilder()
-                                    .header(HEADER_AUTHORIZATION, "Bearer $newAccessToken")
-                                    .build()
+                                .header(HEADER_AUTHORIZATION, "Bearer $newAccessToken")
+                                .build()
                         }
 
                         // NOTE: No need for force logout in this block if newToken == null

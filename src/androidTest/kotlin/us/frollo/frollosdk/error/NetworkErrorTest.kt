@@ -18,10 +18,9 @@ package us.frollo.frollosdk.error
 
 import android.app.Application
 import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-
-import org.junit.Assert.assertEquals
 import us.frollo.frollosdk.FrolloSDK
 import javax.net.ssl.SSLException
 

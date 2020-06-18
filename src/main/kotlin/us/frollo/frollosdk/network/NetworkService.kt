@@ -19,21 +19,21 @@ package us.frollo.frollosdk.network
 import android.os.Build
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
+import okhttp3.CertificatePinner
+import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import us.frollo.frollosdk.base.LiveDataCallAdapterFactory
-import us.frollo.frollosdk.keystore.Keystore
-import okhttp3.CertificatePinner
-import okhttp3.Dispatcher
 import us.frollo.frollosdk.BuildConfig
 import us.frollo.frollosdk.authentication.AccessTokenProvider
 import us.frollo.frollosdk.authentication.AuthToken
 import us.frollo.frollosdk.authentication.AuthenticationCallback
 import us.frollo.frollosdk.authentication.AuthenticationType.OAuth2
 import us.frollo.frollosdk.authentication.OAuth2Helper
+import us.frollo.frollosdk.base.LiveDataCallAdapterFactory
 import us.frollo.frollosdk.core.AppInfo
+import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.preferences.Preferences
 
 class NetworkService internal constructor(
@@ -78,27 +78,29 @@ class NetworkService internal constructor(
 
     private fun createRetrofit(baseUrl: String, isTokenEndpoint: Boolean): Retrofit {
         val gson = GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .enableComplexMapKeySerialization()
-                .create()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .enableComplexMapKeySerialization()
+            .create()
 
         val httpClientBuilder = OkHttpClient.Builder()
-                .addInterceptor(
-                        if (isTokenEndpoint)
-                            tokenInterceptor
-                        else
-                            serverInterceptor)
-                .authenticator(
-                        if (isTokenEndpoint)
-                            TokenAuthenticator(this)
-                        else
-                            NetworkAuthenticator(this))
+            .addInterceptor(
+                if (isTokenEndpoint)
+                    tokenInterceptor
+                else
+                    serverInterceptor
+            )
+            .authenticator(
+                if (isTokenEndpoint)
+                    TokenAuthenticator(this)
+                else
+                    NetworkAuthenticator(this)
+            )
 
         if (!BuildConfig.DEBUG && Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             val certPinner = CertificatePinner.Builder()
-                    .add(PINNING_PATTERN, PublicKey.ACTIVE)
-                    .add(PINNING_PATTERN, PublicKey.BACKUP)
-                    .build()
+                .add(PINNING_PATTERN, PublicKey.ACTIVE)
+                .add(PINNING_PATTERN, PublicKey.BACKUP)
+                .build()
             httpClientBuilder.certificatePinner(certPinner)
         }
         val httpClient = httpClientBuilder.build()
@@ -108,10 +110,10 @@ class NetworkService internal constructor(
             dispatcher = httpClient.dispatcher()
 
         val builder = Retrofit.Builder()
-                .client(httpClient)
-                .baseUrl(baseUrl)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .addCallAdapterFactory(LiveDataCallAdapterFactory)
+            .client(httpClient)
+            .baseUrl(baseUrl)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .addCallAdapterFactory(LiveDataCallAdapterFactory)
 
         return builder.build()
     }

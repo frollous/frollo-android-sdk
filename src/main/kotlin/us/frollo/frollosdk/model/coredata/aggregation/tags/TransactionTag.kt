@@ -22,8 +22,10 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import us.frollo.frollosdk.model.IAdapterModel
 
-@Entity(tableName = "transaction_user_tags",
-        indices = [Index("name")])
+@Entity(
+    tableName = "transaction_user_tags",
+    indices = [Index("name")]
+)
 
 /** Data representation of a TransactionTag */
 data class TransactionTag(

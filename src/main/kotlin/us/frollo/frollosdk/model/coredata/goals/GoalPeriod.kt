@@ -26,10 +26,13 @@ import java.math.BigDecimal
 // Declaring the ColumnInfo allows for the renaming of variables without
 // implementing a database migration, as the column name would not change.
 
-@Entity(tableName = "goal_period",
-        indices = [
-            Index("goal_period_id"),
-            Index("goal_id")])
+@Entity(
+    tableName = "goal_period",
+    indices = [
+        Index("goal_period_id"),
+        Index("goal_id")
+    ]
+)
 
 /** Data representation of a Goal Period */
 data class GoalPeriod(

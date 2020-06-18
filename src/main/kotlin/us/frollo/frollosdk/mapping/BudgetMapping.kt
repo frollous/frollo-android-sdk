@@ -22,30 +22,32 @@ import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
 
 internal fun BudgetResponse.toBudget(): Budget = Budget(
-        budgetId = budgetId,
-        isCurrent = isCurrent,
-        imageUrl = imageUrl,
-        trackingStatus = trackingStatus,
-        status = status,
-        frequency = frequency,
-        userId = userId,
-        currency = currency,
-        currentAmount = currentAmount,
-        periodAmount = periodAmount,
-        startDate = startDate,
-        type = type,
-        typeValue = typeValue,
-        periodsCount = periodsCount,
-        metadata = metadata,
-        currentPeriod = currentPeriod?.toBudgetPeriod())
+    budgetId = budgetId,
+    isCurrent = isCurrent,
+    imageUrl = imageUrl,
+    trackingStatus = trackingStatus,
+    status = status,
+    frequency = frequency,
+    userId = userId,
+    currency = currency,
+    currentAmount = currentAmount,
+    periodAmount = periodAmount,
+    startDate = startDate,
+    type = type,
+    typeValue = typeValue,
+    periodsCount = periodsCount,
+    metadata = metadata,
+    currentPeriod = currentPeriod?.toBudgetPeriod()
+)
 
 internal fun BudgetPeriodResponse.toBudgetPeriod(): BudgetPeriod = BudgetPeriod(
-        budgetPeriodId = budgetPeriodId,
-        budgetId = budgetId,
-        startDate = startDate,
-        endDate = endDate,
-        currentAmount = currentAmount,
-        targetAmount = targetAmount,
-        requiredAmount = requiredAmount,
-        trackingStatus = trackingStatus,
-        index = index)
+    budgetPeriodId = budgetPeriodId,
+    budgetId = budgetId,
+    startDate = startDate,
+    endDate = endDate,
+    currentAmount = currentAmount,
+    targetAmount = targetAmount,
+    requiredAmount = requiredAmount,
+    trackingStatus = trackingStatus,
+    index = index
+)

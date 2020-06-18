@@ -26,7 +26,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
-
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.AccessToken
 import us.frollo.frollosdk.authentication.AccessTokenProvider
@@ -74,9 +73,10 @@ class ZAuthenticationTest {
 
         authentication = TestCustomAuthentication()
         val config = testSDKCustomConfig(
-                accessTokenProvider = authentication,
-                authenticationCallback = authentication,
-                serverUrl = baseUrl.toString())
+            accessTokenProvider = authentication,
+            authenticationCallback = authentication,
+            serverUrl = baseUrl.toString()
+        )
         if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
 
         keystore = Keystore()
@@ -140,7 +140,8 @@ class TestCustomAuthentication : AccessTokenProvider, AuthenticationCallback {
 
     private fun refreshToken() {
         accessToken = AccessToken(
-                token = randomUUID(),
-                expiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 3600)
+            token = randomUUID(),
+            expiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 3600
+        )
     }
 }

@@ -26,9 +26,13 @@ import java.math.BigDecimal
 // Declaring the ColumnInfo allows for the renaming of variables without
 // implementing a database migration, as the column name would not change.
 
-@Entity(tableName = "report_account_balance",
-        indices = [Index("report_id"),
-            Index(value = ["account_id", "date", "period"], unique = true)])
+@Entity(
+    tableName = "report_account_balance",
+    indices = [
+        Index("report_id"),
+        Index(value = ["account_id", "date", "period"], unique = true)
+    ]
+)
 
 /** Data representation of account balance report */
 data class ReportAccountBalance(

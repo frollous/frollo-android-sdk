@@ -26,11 +26,12 @@ class ModelExtensionAndroidTest {
     @Test
     fun testBundleToNotificationPayload() {
         val bundle = bundleOf(
-                Pair("event", "TEST_EVENT"),
-                Pair("link", "frollo://"),
-                Pair("transaction_ids", "[1,2,3]"),
-                Pair("user_event_id", "1234"),
-                Pair("user_message_id", "5678"))
+            Pair("event", "TEST_EVENT"),
+            Pair("link", "frollo://"),
+            Pair("transaction_ids", "[1,2,3]"),
+            Pair("user_event_id", "1234"),
+            Pair("user_message_id", "5678")
+        )
 
         val payload = bundle.toNotificationPayload()
 
@@ -46,11 +47,12 @@ class ModelExtensionAndroidTest {
     @Test
     fun testMapToNotificationPayload() {
         val map = mutableMapOf(
-                Pair("event", "TEST_EVENT"),
-                Pair("link", "frollo://"),
-                Pair("transaction_ids", "[1,2,3]"),
-                Pair("user_event_id", "1234"),
-                Pair("user_message_id", "5678"))
+            Pair("event", "TEST_EVENT"),
+            Pair("link", "frollo://"),
+            Pair("transaction_ids", "[1,2,3]"),
+            Pair("user_event_id", "1234"),
+            Pair("user_message_id", "5678")
+        )
 
         val payload = map.toNotificationPayload()
 

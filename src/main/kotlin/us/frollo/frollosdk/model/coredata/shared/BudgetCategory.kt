@@ -44,9 +44,9 @@ enum class BudgetCategory(val budgetCategoryId: Long) {
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =
-    // Try to get the annotation value if available instead of using plain .toString()
-    // Fallback to super.toString() in case annotation is not present/available
-            serializedName() ?: super.toString()
+        // Try to get the annotation value if available instead of using plain .toString()
+        // Fallback to super.toString() in case annotation is not present/available
+        serializedName() ?: super.toString()
 
     companion object {
         /**
@@ -56,6 +56,6 @@ enum class BudgetCategory(val budgetCategoryId: Long) {
          * @return Returns BudgetCategory or null if no match
          */
         fun getById(budgetCategoryId: Long): BudgetCategory? =
-                values().find { it.budgetCategoryId == budgetCategoryId }
+            values().find { it.budgetCategoryId == budgetCategoryId }
     }
 }

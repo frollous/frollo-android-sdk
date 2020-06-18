@@ -28,10 +28,10 @@ import java.util.Date
 import java.util.Locale
 
 internal fun LocalDate.toString(formatPattern: String): String =
-        DateTimeFormatter.ofPattern(formatPattern).format(this)
+    DateTimeFormatter.ofPattern(formatPattern).format(this)
 
 internal fun Date.toString(formatPattern: String): String =
-        SimpleDateFormat(formatPattern, Locale.getDefault()).format(this)
+    SimpleDateFormat(formatPattern, Locale.getDefault()).format(this)
 
 internal fun String.isValidFormat(formatPattern: String): Boolean {
     val formatter = DateTimeFormatter.ofPattern(formatPattern)
@@ -50,9 +50,9 @@ internal fun String.changeDateFormat(from: String, to: String): String {
 
     try {
         val sourceFormatter = DateTimeFormatterBuilder()
-                .appendPattern(from)
-                .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
-                .toFormatter()
+            .appendPattern(from)
+            .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+            .toFormatter()
         val date = LocalDate.parse(this, sourceFormatter)
         dateStr = date.toString(to)
     } catch (e: Exception) {

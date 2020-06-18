@@ -19,10 +19,10 @@ package us.frollo.frollosdk.model
 import com.google.gson.JsonObject
 import us.frollo.frollosdk.model.api.budgets.BudgetPeriodResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
-import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
+import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.testutils.randomElement
 import us.frollo.frollosdk.testutils.randomNumber
 import us.frollo.frollosdk.testutils.randomString
@@ -38,24 +38,25 @@ internal fun testBudgetResponseData(
     typeValue: String? = null
 ): BudgetResponse {
     return BudgetResponse(
-            budgetId = budgetId ?: randomNumber().toLong(),
-            isCurrent = isCurrent,
-            imageUrl = "https://example.com/image.png",
-            trackingStatus = trackingStatus ?: BudgetTrackingStatus.values().randomElement(),
-            status = status ?: BudgetStatus.values().randomElement(),
-            frequency = frequency ?: BudgetFrequency.values().randomElement(),
-            userId = randomNumber(IntRange(0, 1000)).toLong(),
-            currency = "AUD",
-            currentAmount = BigDecimal("7500.0"),
-            periodAmount = BigDecimal("300.0"),
-            startDate = "2019-01-02",
-            type = type ?: BudgetType.values().randomElement(),
-            typeValue = typeValue ?: randomString(5),
-            periodsCount = 52,
-            currentPeriod = testBudgetPeriodResponseData(),
-            metadata = JsonObject().apply {
-                addProperty("seen", true)
-            })
+        budgetId = budgetId ?: randomNumber().toLong(),
+        isCurrent = isCurrent,
+        imageUrl = "https://example.com/image.png",
+        trackingStatus = trackingStatus ?: BudgetTrackingStatus.values().randomElement(),
+        status = status ?: BudgetStatus.values().randomElement(),
+        frequency = frequency ?: BudgetFrequency.values().randomElement(),
+        userId = randomNumber(IntRange(0, 1000)).toLong(),
+        currency = "AUD",
+        currentAmount = BigDecimal("7500.0"),
+        periodAmount = BigDecimal("300.0"),
+        startDate = "2019-01-02",
+        type = type ?: BudgetType.values().randomElement(),
+        typeValue = typeValue ?: randomString(5),
+        periodsCount = 52,
+        currentPeriod = testBudgetPeriodResponseData(),
+        metadata = JsonObject().apply {
+            addProperty("seen", true)
+        }
+    )
 }
 
 internal fun testBudgetPeriodResponseData(
@@ -66,13 +67,14 @@ internal fun testBudgetPeriodResponseData(
     toDate: String? = null
 ): BudgetPeriodResponse {
     return BudgetPeriodResponse(
-            budgetPeriodId = budgetPeriodId ?: randomNumber().toLong(),
-            budgetId = budgetId ?: randomNumber().toLong(),
-            startDate = fromDate ?: "2019-02-01",
-            endDate = toDate ?: "2020-01-31",
-            trackingStatus = trackingStatus ?: BudgetTrackingStatus.values().randomElement(),
-            currentAmount = BigDecimal("243.11"),
-            targetAmount = BigDecimal("300.0"),
-            requiredAmount = BigDecimal("355.0"),
-            index = 0)
+        budgetPeriodId = budgetPeriodId ?: randomNumber().toLong(),
+        budgetId = budgetId ?: randomNumber().toLong(),
+        startDate = fromDate ?: "2019-02-01",
+        endDate = toDate ?: "2020-01-31",
+        trackingStatus = trackingStatus ?: BudgetTrackingStatus.values().randomElement(),
+        currentAmount = BigDecimal("243.11"),
+        targetAmount = BigDecimal("300.0"),
+        requiredAmount = BigDecimal("355.0"),
+        index = 0
+    )
 }

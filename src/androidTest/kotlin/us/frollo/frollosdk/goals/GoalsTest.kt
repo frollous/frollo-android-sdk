@@ -103,10 +103,11 @@ class GoalsTest : BaseAndroidTest() {
         database.goals().insertAll(*list.map { it.toGoal() }.toList().toTypedArray())
 
         val testObserver = goals.fetchGoals(
-                accountId = 200,
-                frequency = GoalFrequency.MONTHLY,
-                status = GoalStatus.ACTIVE,
-                trackingStatus = GoalTrackingStatus.ON_TRACK).test()
+            accountId = 200,
+            frequency = GoalFrequency.MONTHLY,
+            status = GoalStatus.ACTIVE,
+            trackingStatus = GoalTrackingStatus.ON_TRACK
+        ).test()
 
         testObserver.awaitValue()
         assertTrue(testObserver.value().data?.isNotEmpty() == true)
@@ -130,8 +131,8 @@ class GoalsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -191,8 +192,8 @@ class GoalsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == GoalsAPI.URL_GOALS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -240,8 +241,8 @@ class GoalsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -313,26 +314,26 @@ class GoalsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == GoalsAPI.URL_GOALS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
         goals.createGoal(
-                name = "My test goal",
-                description = "The bestest test goal",
-                imageUrl = "https://example.com/image.png",
-                target = GoalTarget.AMOUNT,
-                trackingType = GoalTrackingType.CREDIT,
-                frequency = GoalFrequency.WEEKLY,
-                startDate = null,
-                endDate = "2019-07-15",
-                periodAmount = BigDecimal(700),
-                startAmount = BigDecimal(0),
-                targetAmount = BigDecimal(20000),
-                accountId = 123
+            name = "My test goal",
+            description = "The bestest test goal",
+            imageUrl = "https://example.com/image.png",
+            target = GoalTarget.AMOUNT,
+            trackingType = GoalTrackingType.CREDIT,
+            frequency = GoalFrequency.WEEKLY,
+            startDate = null,
+            endDate = "2019-07-15",
+            periodAmount = BigDecimal(700),
+            startAmount = BigDecimal(0),
+            targetAmount = BigDecimal(20000),
+            accountId = 123
         ) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
@@ -366,26 +367,26 @@ class GoalsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == GoalsAPI.URL_GOALS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
         goals.createGoal(
-                name = "My test goal",
-                description = "The bestest test goal",
-                imageUrl = "https://example.com/image.png",
-                target = GoalTarget.DATE,
-                trackingType = GoalTrackingType.CREDIT,
-                frequency = GoalFrequency.WEEKLY,
-                startDate = null,
-                endDate = "2019-07-15",
-                periodAmount = BigDecimal(700),
-                startAmount = BigDecimal(0),
-                targetAmount = BigDecimal(20000),
-                accountId = 123
+            name = "My test goal",
+            description = "The bestest test goal",
+            imageUrl = "https://example.com/image.png",
+            target = GoalTarget.DATE,
+            trackingType = GoalTrackingType.CREDIT,
+            frequency = GoalFrequency.WEEKLY,
+            startDate = null,
+            endDate = "2019-07-15",
+            periodAmount = BigDecimal(700),
+            startAmount = BigDecimal(0),
+            targetAmount = BigDecimal(20000),
+            accountId = 123
         ) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
@@ -419,26 +420,26 @@ class GoalsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == GoalsAPI.URL_GOALS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
         goals.createGoal(
-                name = "My test goal",
-                description = "The bestest test goal",
-                imageUrl = "https://example.com/image.png",
-                target = GoalTarget.OPEN_ENDED,
-                trackingType = GoalTrackingType.CREDIT,
-                frequency = GoalFrequency.WEEKLY,
-                startDate = null,
-                endDate = "2019-07-15",
-                periodAmount = BigDecimal(700),
-                startAmount = BigDecimal(0),
-                targetAmount = BigDecimal(20000),
-                accountId = 123
+            name = "My test goal",
+            description = "The bestest test goal",
+            imageUrl = "https://example.com/image.png",
+            target = GoalTarget.OPEN_ENDED,
+            trackingType = GoalTrackingType.CREDIT,
+            frequency = GoalFrequency.WEEKLY,
+            startDate = null,
+            endDate = "2019-07-15",
+            periodAmount = BigDecimal(700),
+            startAmount = BigDecimal(0),
+            targetAmount = BigDecimal(20000),
+            accountId = 123
         ) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
@@ -470,18 +471,18 @@ class GoalsTest : BaseAndroidTest() {
         clearLoggedInPreferences()
 
         goals.createGoal(
-                name = "My test goal",
-                description = "The bestest test goal",
-                imageUrl = "https://example.com/image.png",
-                target = GoalTarget.AMOUNT,
-                trackingType = GoalTrackingType.CREDIT,
-                frequency = GoalFrequency.WEEKLY,
-                startDate = null,
-                endDate = "2019-07-15",
-                periodAmount = BigDecimal(700),
-                startAmount = BigDecimal(0),
-                targetAmount = BigDecimal(20000),
-                accountId = 123
+            name = "My test goal",
+            description = "The bestest test goal",
+            imageUrl = "https://example.com/image.png",
+            target = GoalTarget.AMOUNT,
+            trackingType = GoalTrackingType.CREDIT,
+            frequency = GoalFrequency.WEEKLY,
+            startDate = null,
+            endDate = "2019-07-15",
+            periodAmount = BigDecimal(700),
+            startAmount = BigDecimal(0),
+            targetAmount = BigDecimal(20000),
+            accountId = 123
         ) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
@@ -503,18 +504,18 @@ class GoalsTest : BaseAndroidTest() {
         val signal = CountDownLatch(1)
 
         goals.createGoal(
-                name = "My test goal",
-                description = "The bestest test goal",
-                imageUrl = "https://example.com/image.png",
-                target = GoalTarget.AMOUNT,
-                trackingType = GoalTrackingType.CREDIT,
-                frequency = GoalFrequency.WEEKLY,
-                startDate = null,
-                endDate = "2019-07-15",
-                periodAmount = BigDecimal(700),
-                startAmount = BigDecimal(0),
-                targetAmount = null,
-                accountId = 123
+            name = "My test goal",
+            description = "The bestest test goal",
+            imageUrl = "https://example.com/image.png",
+            target = GoalTarget.AMOUNT,
+            trackingType = GoalTrackingType.CREDIT,
+            frequency = GoalFrequency.WEEKLY,
+            startDate = null,
+            endDate = "2019-07-15",
+            periodAmount = BigDecimal(700),
+            startAmount = BigDecimal(0),
+            targetAmount = null,
+            accountId = 123
         ) { result ->
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
@@ -544,8 +545,8 @@ class GoalsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -615,7 +616,7 @@ class GoalsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -752,8 +753,8 @@ class GoalsTest : BaseAndroidTest() {
         database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 460, goalId = 223, trackingStatus = GoalTrackingStatus.ON_TRACK).toGoalPeriod())
 
         val testObserver = goals.fetchGoalPeriodsWithRelation(
-                goalId = 123,
-                trackingStatus = GoalTrackingStatus.ON_TRACK
+            goalId = 123,
+            trackingStatus = GoalTrackingStatus.ON_TRACK
         ).test()
 
         testObserver.awaitValue()
@@ -778,8 +779,8 @@ class GoalsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -853,8 +854,8 @@ class GoalsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -916,12 +917,12 @@ class GoalsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.goal_periods_linked_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.goal_periods_linked_valid))
                 } else if (request?.trimmedPath == GoalsAPI.URL_GOALS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.goals_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.goals_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -965,8 +966,8 @@ class GoalsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == GoalsAPI.URL_GOALS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }

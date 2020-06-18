@@ -18,8 +18,8 @@ package us.frollo.frollosdk.core
 
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert
-import org.junit.Test
 import org.junit.Before
+import org.junit.Test
 
 class DeviceInfoTest {
 

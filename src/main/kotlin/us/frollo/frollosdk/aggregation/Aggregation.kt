@@ -37,8 +37,6 @@ import us.frollo.frollosdk.core.ARGUMENT.ARG_TRANSACTION_IDS
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.core.TagApplyAllPair
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.network.NetworkService
-import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
@@ -79,7 +77,6 @@ import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccoun
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.providers.ProviderResponse
-import us.frollo.frollosdk.model.coredata.aggregation.tags.SuggestedTagsSortType
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
@@ -101,7 +98,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderRelation
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
-import us.frollo.frollosdk.model.coredata.shared.OrderType
+import us.frollo.frollosdk.model.coredata.aggregation.tags.SuggestedTagsSortType
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
@@ -113,6 +110,9 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionRe
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionsSummary
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.model.coredata.shared.OrderType
+import us.frollo.frollosdk.network.NetworkService
+import us.frollo.frollosdk.network.api.AggregationAPI
 import kotlin.collections.ArrayList
 
 /**
@@ -141,8 +141,10 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     init {
-        localBroadcastManager.registerReceiver(refreshTransactionsReceiver,
-                IntentFilter(ACTION_REFRESH_TRANSACTIONS))
+        localBroadcastManager.registerReceiver(
+            refreshTransactionsReceiver,
+            IntentFilter(ACTION_REFRESH_TRANSACTIONS)
+        )
     }
 
     // Provider
@@ -155,9 +157,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<Provider> which can be observed using an Observer for future changes as well.
      */
     fun fetchProvider(providerId: Long): LiveData<Resource<Provider>> =
-            Transformations.map(db.providers().load(providerId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.providers().load(providerId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch providers from the cache
@@ -167,9 +169,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<Provider>> which can be observed using an Observer for future changes as well.
      */
     fun fetchProviders(status: ProviderStatus? = null): LiveData<Resource<List<Provider>>> =
-            Transformations.map(db.providers().loadByQuery(sqlForProviders(status = status))) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.providers().loadByQuery(sqlForProviders(status = status))) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch providers by SQL query from the cache
@@ -181,9 +183,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<Provider>> which can be observed using an Observer for future changes as well.
      */
     fun fetchProviders(query: SimpleSQLiteQuery): LiveData<Resource<List<Provider>>> =
-            Transformations.map(db.providers().loadByQuery(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.providers().loadByQuery(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch provider by ID from the cache along with other associated data.
@@ -193,9 +195,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<ProviderRelation> which can be observed using an Observer for future changes as well.
      */
     fun fetchProviderWithRelation(providerId: Long): LiveData<Resource<ProviderRelation>> =
-            Transformations.map(db.providers().loadWithRelation(providerId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.providers().loadWithRelation(providerId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch providers from the cache along with other associated data.
@@ -205,9 +207,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<ProviderRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchProvidersWithRelation(status: ProviderStatus? = null): LiveData<Resource<List<ProviderRelation>>> =
-            Transformations.map(db.providers().loadByQueryWithRelation(sqlForProviders(status = status))) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.providers().loadByQueryWithRelation(sqlForProviders(status = status))) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch providers by SQL query from the cache along with other associated data.
@@ -219,9 +221,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<ProviderRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchProvidersWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<ProviderRelation>>> =
-            Transformations.map(db.providers().loadByQueryWithRelation(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.providers().loadByQueryWithRelation(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Refresh a specific provider by ID from the host
@@ -306,7 +308,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     private fun mapProviderResponse(models: List<ProviderResponse>): List<Provider> =
-            models.map { it.toProvider() }.toList()
+        models.map { it.toProvider() }.toList()
 
     // Provider Account
 
@@ -318,9 +320,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<ProviderAccount> which can be observed using an Observer for future changes as well.
      */
     fun fetchProviderAccount(providerAccountId: Long): LiveData<Resource<ProviderAccount>> =
-            Transformations.map(db.providerAccounts().load(providerAccountId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.providerAccounts().load(providerAccountId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch provider accounts from the cache
@@ -332,9 +334,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<ProviderAccount>> which can be observed using an Observer for future changes as well.
      */
     fun fetchProviderAccounts(providerId: Long? = null, refreshStatus: AccountRefreshStatus? = null, externalId: String? = null): LiveData<Resource<List<ProviderAccount>>> =
-            Transformations.map(db.providerAccounts().loadByQuery(sqlForProviderAccounts(providerId, refreshStatus, externalId))) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.providerAccounts().loadByQuery(sqlForProviderAccounts(providerId, refreshStatus, externalId))) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch provider accounts by SQL query from the cache
@@ -346,9 +348,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<ProviderAccount>> which can be observed using an Observer for future changes as well.
      */
     fun fetchProviderAccounts(query: SimpleSQLiteQuery): LiveData<Resource<List<ProviderAccount>>> =
-            Transformations.map(db.providerAccounts().loadByQuery(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.providerAccounts().loadByQuery(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch provider account by ID from the cache along with other associated data.
@@ -358,9 +360,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<ProviderAccountRelation> which can be observed using an Observer for future changes as well.
      */
     fun fetchProviderAccountWithRelation(providerAccountId: Long): LiveData<Resource<ProviderAccountRelation>> =
-            Transformations.map(db.providerAccounts().loadWithRelation(providerAccountId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.providerAccounts().loadWithRelation(providerAccountId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch provider accounts from the cache along with other associated data.
@@ -372,9 +374,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<ProviderAccountRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchProviderAccountsWithRelation(providerId: Long? = null, refreshStatus: AccountRefreshStatus? = null, externalId: String? = null): LiveData<Resource<List<ProviderAccountRelation>>> =
-            Transformations.map(db.providerAccounts().loadByQueryWithRelation(sqlForProviderAccounts(providerId, refreshStatus, externalId))) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.providerAccounts().loadByQueryWithRelation(sqlForProviderAccounts(providerId, refreshStatus, externalId))) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch provider accounts by SQL query from the cache along with other associated data.
@@ -386,9 +388,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<ProviderAccountRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchProviderAccountsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<ProviderAccountRelation>>> =
-            Transformations.map(db.providerAccounts().loadByQueryWithRelation(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.providerAccounts().loadByQueryWithRelation(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Refresh a specific provider account by ID from the host
@@ -569,7 +571,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     private fun mapProviderAccountResponse(models: List<ProviderAccountResponse>): List<ProviderAccount> =
-            models.map { it.toProviderAccount() }.toList()
+        models.map { it.toProviderAccount() }.toList()
 
     // Account
 
@@ -581,9 +583,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<Account> which can be observed using an Observer for future changes as well.
      */
     fun fetchAccount(accountId: Long): LiveData<Resource<Account>> =
-            Transformations.map(db.accounts().load(accountId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.accounts().load(accountId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch accounts from the cache
@@ -613,7 +615,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         refreshStatus: AccountRefreshStatus? = null,
         externalId: String? = null
     ): LiveData<Resource<List<Account>>> =
-            Transformations.map(db.accounts().loadByQuery(sqlForAccounts(
+        Transformations.map(
+            db.accounts().loadByQuery(
+                sqlForAccounts(
                     providerAccountId = providerAccountId,
                     accountStatus = accountStatus,
                     accountSubType = accountSubType,
@@ -624,9 +628,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     included = included,
                     refreshStatus = refreshStatus,
                     externalId = externalId
-            ))) { models ->
-                Resource.success(models)
-            }
+                )
+            )
+        ) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch accounts by SQL query from the cache
@@ -638,9 +644,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<Account>> which can be observed using an Observer for future changes as well.
      */
     fun fetchAccounts(query: SimpleSQLiteQuery): LiveData<Resource<List<Account>>> =
-            Transformations.map(db.accounts().loadByQuery(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.accounts().loadByQuery(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch account by ID from the cache along with other associated data.
@@ -650,9 +656,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<AccountRelation> which can be observed using an Observer for future changes as well.
      */
     fun fetchAccountWithRelation(accountId: Long): LiveData<Resource<AccountRelation>> =
-            Transformations.map(db.accounts().loadWithRelation(accountId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.accounts().loadWithRelation(accountId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch accounts from the cache along with other associated data.
@@ -682,7 +688,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         refreshStatus: AccountRefreshStatus? = null,
         externalId: String? = null
     ): LiveData<Resource<List<AccountRelation>>> =
-            Transformations.map(db.accounts().loadByQueryWithRelation(sqlForAccounts(
+        Transformations.map(
+            db.accounts().loadByQueryWithRelation(
+                sqlForAccounts(
                     providerAccountId = providerAccountId,
                     accountStatus = accountStatus,
                     accountSubType = accountSubType,
@@ -693,9 +701,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     included = included,
                     refreshStatus = refreshStatus,
                     externalId = externalId
-            ))) { models ->
-                Resource.success(models)
-            }
+                )
+            )
+        ) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch accounts by SQL query from the cache along with other associated data.
@@ -707,9 +717,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<AccountRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchAccountsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<AccountRelation>>> =
-            Transformations.map(db.accounts().loadByQueryWithRelation(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.accounts().loadByQueryWithRelation(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Refresh a specific account by ID from the host
@@ -777,19 +787,21 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     ) {
         // Updating account cache immediately to update the UI
         updateAccountCache(
-                accountId = accountId,
-                hidden = hidden,
-                included = included,
-                favourite = favourite,
-                accountSubType = accountSubType,
-                nickName = nickName)
+            accountId = accountId,
+            hidden = hidden,
+            included = included,
+            favourite = favourite,
+            accountSubType = accountSubType,
+            nickName = nickName
+        )
 
         val request = AccountUpdateRequest(
-                hidden = hidden,
-                included = included,
-                favourite = favourite,
-                accountSubType = accountSubType,
-                nickName = nickName)
+            hidden = hidden,
+            included = included,
+            favourite = favourite,
+            accountSubType = accountSubType,
+            nickName = nickName
+        )
 
         if (!request.valid) {
             Log.e("$TAG#updateAccount", "'hidden' and 'included' must compliment each other. Both cannot be true.")
@@ -848,18 +860,21 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         nickName: String? = null
     ) {
         doAsync {
-            db.accounts().updateByQuery(sqlForUpdateAccount(
+            db.accounts().updateByQuery(
+                sqlForUpdateAccount(
                     accountId = accountId,
                     hidden = hidden,
                     included = included,
                     favourite = favourite,
                     accountSubType = accountSubType,
-                    nickName = nickName))
+                    nickName = nickName
+                )
+            )
         }
     }
 
     private fun mapAccountResponse(models: List<AccountResponse>): List<Account> =
-            models.map { it.toAccount() }.toList()
+        models.map { it.toAccount() }.toList()
 
     // Transaction
 
@@ -871,9 +886,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<Transaction> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransaction(transactionId: Long): LiveData<Resource<Transaction>> =
-            Transformations.map(db.transactions().load(transactionId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.transactions().load(transactionId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch transactions from the cache
@@ -906,7 +921,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         fromDate: String? = null,
         toDate: String? = null
     ): LiveData<Resource<List<Transaction>>> =
-            Transformations.map(db.transactions().loadByQuery(sqlForTransactions(
+        Transformations.map(
+            db.transactions().loadByQuery(
+                sqlForTransactions(
                     searchTerm,
                     merchantIds,
                     accountIds,
@@ -921,9 +938,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     transactionIncluded,
                     fromDate,
                     toDate
-            ))) { models ->
-                Resource.success(models)
-            }
+                )
+            )
+        ) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Fetch transactions from the cache
@@ -956,7 +975,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         fromDate: String? = null,
         toDate: String? = null
     ): LiveData<Resource<List<TransactionRelation>>> =
-            Transformations.map(db.transactions().loadByQueryWithRelation(sqlForTransactions(
+        Transformations.map(
+            db.transactions().loadByQueryWithRelation(
+                sqlForTransactions(
                     searchTerm,
                     merchantIds,
                     accountIds,
@@ -971,9 +992,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                     transactionIncluded,
                     fromDate,
                     toDate
-            ))) { models ->
-                Resource.success(models)
-            }
+                )
+            )
+        ) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch transactions by SQL query from the cache
@@ -985,9 +1008,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<Transaction>> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactions(query: SimpleSQLiteQuery): LiveData<Resource<List<Transaction>>> =
-            Transformations.map(db.transactions().loadByQuery(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.transactions().loadByQuery(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch transaction by ID from the cache along with other associated data.
@@ -997,9 +1020,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<TransactionRelation> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactionWithRelation(transactionId: Long): LiveData<Resource<TransactionRelation>> =
-            Transformations.map(db.transactions().loadWithRelation(transactionId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.transactions().loadWithRelation(transactionId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch transactions from the cache along with other associated data.
@@ -1027,9 +1050,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<TransactionRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactionsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<TransactionRelation>>> =
-            Transformations.map(db.transactions().loadByQueryWithRelation(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.transactions().loadByQueryWithRelation(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Refresh a specific transaction by ID from the host
@@ -1076,23 +1099,25 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         size: Long? = null,
         completion: OnFrolloSDKCompletionListener<Resource<TransactionPagingResponse?>>? = null
     ) {
-        aggregationAPI.fetchTransactions(after = after,
-                searchTerm = searchTerm,
-                merchantIds = merchantIds,
-                accountIds = accountIds,
-                transactionCategoryIds = transactionCategoryIds,
-                transactionIds = transactionIds,
-                budgetCategory = budgetCategory,
-                minAmount = minAmount,
-                maxAmount = maxAmount,
-                baseType = baseType,
-                status = status,
-                tags = tags,
-                transactionIncluded = transactionIncluded,
-                fromDate = fromDate,
-                toDate = toDate,
-                accountIncluded = accountIncluded,
-                size = size).enqueue { resource ->
+        aggregationAPI.fetchTransactions(
+            after = after,
+            searchTerm = searchTerm,
+            merchantIds = merchantIds,
+            accountIds = accountIds,
+            transactionCategoryIds = transactionCategoryIds,
+            transactionIds = transactionIds,
+            budgetCategory = budgetCategory,
+            minAmount = minAmount,
+            maxAmount = maxAmount,
+            baseType = baseType,
+            status = status,
+            tags = tags,
+            transactionIncluded = transactionIncluded,
+            fromDate = fromDate,
+            toDate = toDate,
+            accountIncluded = accountIncluded,
+            size = size
+        ).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {
                     val response = resource.data
@@ -1127,26 +1152,26 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                         }
 
                         val localIds = db.transactions().getIdsQuery(
-                                sqlForTransactionStaleIds(
-                                        beforeDate,
-                                        afterDate,
-                                        beforeId,
-                                        afterId,
-                                        searchTerm,
-                                        merchantIds,
-                                        accountIds,
-                                        transactionCategoryIds,
-                                        transactionIds,
-                                        budgetCategory,
-                                        minAmount,
-                                        maxAmount,
-                                        baseType,
-                                        status,
-                                        tags,
-                                        transactionIncluded,
-                                        fromDate,
-                                        toDate
-                                )
+                            sqlForTransactionStaleIds(
+                                beforeDate,
+                                afterDate,
+                                beforeId,
+                                afterId,
+                                searchTerm,
+                                merchantIds,
+                                accountIds,
+                                transactionCategoryIds,
+                                transactionIds,
+                                budgetCategory,
+                                minAmount,
+                                maxAmount,
+                                baseType,
+                                status,
+                                tags,
+                                transactionIncluded,
+                                fromDate,
+                                toDate
+                            )
                         )
 
                         val staleIds = localIds.toHashSet().minus(apiIds.toHashSet())
@@ -1159,12 +1184,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                             for (i in 0 until (iterations - 1)) {
                                 if (i == 0) {
 
-                                    removeCachedTransactions(staleIdsList.subList(0, ((i*SQLITE_MAX_VARIABLE_NUMBER) - 1)).toLongArray())
+                                    removeCachedTransactions(staleIdsList.subList(0, ((i * SQLITE_MAX_VARIABLE_NUMBER) - 1)).toLongArray())
                                 }
                                 if (i == iterations - 1) {
-                                    removeCachedTransactions(staleIdsList.subList(i*SQLITE_MAX_VARIABLE_NUMBER, staleIdsList.size - 1).toLongArray())
+                                    removeCachedTransactions(staleIdsList.subList(i * SQLITE_MAX_VARIABLE_NUMBER, staleIdsList.size - 1).toLongArray())
                                 } else {
-                                    removeCachedTransactions(staleIdsList.subList(i*SQLITE_MAX_VARIABLE_NUMBER, ((i*SQLITE_MAX_VARIABLE_NUMBER) + SQLITE_MAX_VARIABLE_NUMBER - 1)).toLongArray())
+                                    removeCachedTransactions(staleIdsList.subList(i * SQLITE_MAX_VARIABLE_NUMBER, ((i * SQLITE_MAX_VARIABLE_NUMBER) + SQLITE_MAX_VARIABLE_NUMBER - 1)).toLongArray())
                                 }
                             }
                         } else {
@@ -1172,11 +1197,17 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                         }
 
                         fetchMissingMerchants(merchantIdsX.toSet())
-                        completion?.invoke(Resource.success(TransactionPagingResponse(transactionResponseWrapper.paging,
-                                beforeDateForDevice,
-                                beforeIdForDevice,
-                                afterDateForDevice,
-                                afterIdForDevice)))
+                        completion?.invoke(
+                            Resource.success(
+                                TransactionPagingResponse(
+                                    transactionResponseWrapper.paging,
+                                    beforeDateForDevice,
+                                    beforeIdForDevice,
+                                    afterDateForDevice,
+                                    afterIdForDevice
+                                )
+                            )
+                        )
                     } ?: run { completion?.invoke(Resource.success(null)) } // Explicitly invoke completion callback if response is null.
                 }
                 Resource.Status.ERROR -> {
@@ -1208,9 +1239,10 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
             uiThread {
                 transaction?.let { model ->
                     val request = TransactionUpdateRequest(
-                            budgetCategory = model.budgetCategory,
-                            included = !excluded,
-                            includeApplyAll = applyToAll)
+                        budgetCategory = model.budgetCategory,
+                        included = !excluded,
+                        includeApplyAll = applyToAll
+                    )
 
                     aggregationAPI.updateTransaction(transactionId, request).enqueue { resource ->
                         when (resource.status) {
@@ -1251,9 +1283,10 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
             uiThread {
                 transaction?.let { model ->
                     val request = TransactionUpdateRequest(
-                            budgetCategory = model.budgetCategory,
-                            categoryId = transactionCategoryId,
-                            recategoriseAll = applyToAll)
+                        budgetCategory = model.budgetCategory,
+                        categoryId = transactionCategoryId,
+                        recategoriseAll = applyToAll
+                    )
 
                     aggregationAPI.updateTransaction(transactionId, request).enqueue { resource ->
                         when (resource.status) {
@@ -1294,14 +1327,15 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
         val request = TransactionUpdateRequest(
-                budgetCategory = budgetCategory,
-                categoryId = transaction.categoryId,
-                included = transaction.included,
-                memo = transaction.memo,
-                userDescription = transaction.description?.user,
-                recategoriseAll = recategoriseAll,
-                budgetCategoryApplyAll = budgetCategoryApplyAll,
-                includeApplyAll = includeApplyAll)
+            budgetCategory = budgetCategory,
+            categoryId = transaction.categoryId,
+            included = transaction.included,
+            memo = transaction.memo,
+            userDescription = transaction.description?.user,
+            recategoriseAll = recategoriseAll,
+            budgetCategoryApplyAll = budgetCategoryApplyAll,
+            includeApplyAll = includeApplyAll
+        )
 
         aggregationAPI.updateTransaction(transactionId, request).enqueue { resource ->
             when (resource.status) {
@@ -1371,8 +1405,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         val skip = page * TRANSACTION_BATCH_SIZE
 
         aggregationAPI.transactionSearch(
-                searchTerm = searchTerm, fromDate = fromDate, toDate = toDate, accountIds = accountIds,
-                accountIncluded = accountIncluded, count = TRANSACTION_BATCH_SIZE, skip = skip).enqueue { resource ->
+            searchTerm = searchTerm, fromDate = fromDate, toDate = toDate, accountIds = accountIds,
+            accountIncluded = accountIncluded, count = TRANSACTION_BATCH_SIZE, skip = skip
+        ).enqueue { resource ->
 
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -1420,9 +1455,10 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         completion: OnFrolloSDKCompletionListener<Resource<TransactionsSummary>>
     ) {
         aggregationAPI.fetchTransactionsSummaryByQuery(
-                fromDate = fromDate, toDate = toDate,
-                accountIds = accountIds, transactionIncluded = onlyIncludedTransactions,
-                accountIncluded = onlyIncludedAccounts).enqueue { resource ->
+            fromDate = fromDate, toDate = toDate,
+            accountIds = accountIds, transactionIncluded = onlyIncludedTransactions,
+            accountIncluded = onlyIncludedAccounts
+        ).enqueue { resource ->
 
             if (resource.status == Resource.Status.ERROR)
                 Log.e("$TAG#fetchTransactionsSummary", resource.error?.localizedDescription)
@@ -1465,9 +1501,14 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     ) {
 
         val apiIds = excludingIds.sorted()
-        val staleIds = ArrayList(db.transactions().getIdsQuery(
-                sqlForTransactionStaleIds(fromDate = fromDate, toDate = toDate,
-                        accountIds = accountIds?.toList(), transactionIncluded = transactionIncluded)).sorted())
+        val staleIds = ArrayList(
+            db.transactions().getIdsQuery(
+                sqlForTransactionStaleIds(
+                    fromDate = fromDate, toDate = toDate,
+                    accountIds = accountIds?.toList(), transactionIncluded = transactionIncluded
+                )
+            ).sorted()
+        )
 
         staleIds.removeAll(apiIds)
 
@@ -1507,7 +1548,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     private fun mapTransactionResponse(models: List<TransactionResponse>): List<Transaction> =
-            models.map { it.toTransaction() }.toList()
+        models.map { it.toTransaction() }.toList()
 
     // Transaction Tags
 
@@ -1549,10 +1590,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
         val tagNames = tagApplyAllPairs.map { it.first }.toTypedArray()
 
-        val requestArray = tagApplyAllPairs.map { TransactionTagUpdateRequest(
+        val requestArray = tagApplyAllPairs.map {
+            TransactionTagUpdateRequest(
                 name = it.first,
                 applyToAll = it.second
-        ) }.toTypedArray()
+            )
+        }.toTypedArray()
 
         aggregationAPI.createTags(transactionId, requestArray).enqueue { resource ->
             when (resource.status) {
@@ -1584,10 +1627,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
         val tagNames = tagApplyAllPairs.map { it.first }.toTypedArray()
 
-        val requestArray = tagApplyAllPairs.map { TransactionTagUpdateRequest(
+        val requestArray = tagApplyAllPairs.map {
+            TransactionTagUpdateRequest(
                 name = it.first,
                 applyToAll = it.second
-        ) }.toTypedArray()
+            )
+        }.toTypedArray()
 
         aggregationAPI.deleteTags(transactionId, requestArray).enqueue { resource ->
             when (resource.status) {
@@ -1725,9 +1770,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<TransactionCategory> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactionCategory(transactionCategoryId: Long): LiveData<Resource<TransactionCategory>> =
-            Transformations.map(db.transactionCategories().load(transactionCategoryId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.transactionCategories().load(transactionCategoryId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch transaction categories from the cache
@@ -1741,9 +1786,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
         defaultBudgetCategory: BudgetCategory? = null,
         type: TransactionCategoryType? = null
     ): LiveData<Resource<List<TransactionCategory>>> =
-            Transformations.map(db.transactionCategories().loadByQuery(sqlForTransactionCategories(defaultBudgetCategory, type))) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.transactionCategories().loadByQuery(sqlForTransactionCategories(defaultBudgetCategory, type))) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch transaction categories by SQL query from the cache
@@ -1755,9 +1800,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<TransactionCategory>> which can be observed using an Observer for future changes as well.
      */
     fun fetchTransactionCategories(query: SimpleSQLiteQuery): LiveData<Resource<List<TransactionCategory>>> =
-            Transformations.map(db.transactionCategories().loadByQuery(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.transactionCategories().loadByQuery(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Refresh all transaction categories from the host
@@ -1797,7 +1842,7 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
     }
 
     private fun mapTransactionCategoryResponse(models: List<TransactionCategoryResponse>): List<TransactionCategory> =
-            models.map { it.toTransactionCategory() }.toList()
+        models.map { it.toTransactionCategory() }.toList()
 
     // Merchant
 
@@ -1809,9 +1854,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<Merchant> which can be observed using an Observer for future changes as well.
      */
     fun fetchMerchant(merchantId: Long): LiveData<Resource<Merchant>> =
-            Transformations.map(db.merchants().load(merchantId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.merchants().load(merchantId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch merchants from the cache
@@ -1821,9 +1866,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<Merchant>> which can be observed using an Observer for future changes as well.
      */
     fun fetchMerchants(type: MerchantType? = null): LiveData<Resource<List<Merchant>>> =
-            Transformations.map(db.merchants().loadByQuery(sqlForMerchants(type))) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.merchants().loadByQuery(sqlForMerchants(type))) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch merchants by SQL query from the cache
@@ -1835,9 +1880,9 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
      * @return LiveData object of Resource<List<Merchant>> which can be observed using an Observer for future changes as well.
      */
     fun fetchMerchants(query: SimpleSQLiteQuery): LiveData<Resource<List<Merchant>>> =
-            Transformations.map(db.merchants().loadByQuery(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.merchants().loadByQuery(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Refresh a specific merchant by ID from the host
@@ -1902,10 +1947,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
 
                         response.paging.cursors?.after?.let { newAfter ->
                             refreshNextMerchantsByIds(
-                                    merchantIds = merchantIds,
-                                    after = newAfter.toLong(),
-                                    batchSize = batchSize,
-                                    completion = completion)
+                                merchantIds = merchantIds,
+                                after = newAfter.toLong(),
+                                batchSize = batchSize,
+                                completion = completion
+                            )
                         } ?: run {
                             // Invoke completion callback when after is returned null
                             // which indicats that we have completed paginating
@@ -1953,9 +1999,12 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                             handleMerchantsResponseByIds(response = response.data)
 
                             uiThread {
-                                completion?.invoke(PaginatedResult.Success(
+                                completion?.invoke(
+                                    PaginatedResult.Success(
                                         before = response.paging.cursors?.before?.toLong(),
-                                        after = response.paging.cursors?.after?.toLong()))
+                                        after = response.paging.cursors?.after?.toLong()
+                                    )
+                                )
                             }
                         }
                     } ?: run {
@@ -1991,10 +2040,11 @@ class Aggregation(network: NetworkService, private val db: SDKDatabase, localBro
                 Resource.Status.SUCCESS -> {
                     val response = resource.data
                     handleMerchantsResponse(
-                            response = response?.data,
-                            before = response?.paging?.cursors?.before?.toLong(),
-                            after = response?.paging?.cursors?.after?.toLong(),
-                            completion = completion)
+                        response = response?.data,
+                        before = response?.paging?.cursors?.before?.toLong(),
+                        after = response?.paging?.cursors?.after?.toLong(),
+                        completion = completion
+                    )
                 }
             }
         }

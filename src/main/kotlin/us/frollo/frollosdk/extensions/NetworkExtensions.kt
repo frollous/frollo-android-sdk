@@ -27,9 +27,9 @@ import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.error.NetworkError
 import us.frollo.frollosdk.error.OAuth2Error
 import us.frollo.frollosdk.error.OAuth2ErrorType
-import us.frollo.frollosdk.network.ApiResponse
 import us.frollo.frollosdk.mapping.toDataError
 import us.frollo.frollosdk.mapping.toOAuth2ErrorResponse
+import us.frollo.frollosdk.network.ApiResponse
 import us.frollo.frollosdk.network.ErrorResponseType
 
 internal fun <T> Call<T>.enqueue(errorResponseType: ErrorResponseType = ErrorResponseType.NORMAL, completion: (Resource<T>) -> Unit) {

@@ -21,7 +21,6 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import org.threeten.bp.LocalDate
 import org.threeten.bp.temporal.ChronoUnit
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
-import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
@@ -42,6 +41,7 @@ import us.frollo.frollosdk.model.coredata.bills.BillType
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
+import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -57,21 +57,22 @@ import us.frollo.frollosdk.notifications.NotificationPayloadNames
 import kotlin.math.absoluteValue
 
 internal fun User.updateRequest(): UserUpdateRequest =
-        UserUpdateRequest(
-                firstName = firstName,
-                email = email,
-                primaryCurrency = primaryCurrency,
-                attribution = attribution,
-                lastName = lastName,
-                mobileNumber = mobileNumber,
-                gender = gender,
-                currentAddress = currentAddress,
-                householdSize = householdSize,
-                householdType = householdType,
-                occupation = occupation,
-                industry = industry,
-                dateOfBirth = dateOfBirth,
-                driverLicense = driverLicense)
+    UserUpdateRequest(
+        firstName = firstName,
+        email = email,
+        primaryCurrency = primaryCurrency,
+        attribution = attribution,
+        lastName = lastName,
+        mobileNumber = mobileNumber,
+        gender = gender,
+        currentAddress = currentAddress,
+        householdSize = householdSize,
+        householdType = householdType,
+        occupation = occupation,
+        industry = industry,
+        dateOfBirth = dateOfBirth,
+        driverLicense = driverLicense
+    )
 
 internal fun sqlForMessages(messageTypes: List<String>? = null, read: Boolean? = null, contentType: ContentType? = null): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("message")
@@ -204,7 +205,9 @@ internal fun sqlForTransactionStaleIds(
     }
 
     val dateQuery = dateQueryBuilder.toString()
-    return SimpleSQLiteQuery(whereClauseForTransactions(dateQuery,
+    return SimpleSQLiteQuery(
+        whereClauseForTransactions(
+            dateQuery,
             searchTerm,
             merchantIds,
             accountIds,
@@ -218,7 +221,9 @@ internal fun sqlForTransactionStaleIds(
             tags,
             transactionIncluded,
             fromDate,
-            toDate))
+            toDate
+        )
+    )
 }
 
 internal fun sqlForTransactions(
@@ -241,7 +246,8 @@ internal fun sqlForTransactions(
     val dateQuery = "SELECT * FROM transaction_model  "
     // just for compiler, should never come here
     return SimpleSQLiteQuery(
-            whereClauseForTransactions(dateQuery,
+        whereClauseForTransactions(
+            dateQuery,
             searchTerm,
             merchantIds,
             accountIds,
@@ -255,7 +261,9 @@ internal fun sqlForTransactions(
             tags,
             transactionIncluded,
             fromDate,
-            toDate))
+            toDate
+        )
+    )
 }
 
 private fun whereClauseForTransactions(
@@ -659,33 +667,36 @@ internal fun sqlForGoalPeriods(
 }
 
 internal fun Bundle.toNotificationPayload(): NotificationPayload =
-        createNotificationPayload(
-                getString(NotificationPayloadNames.EVENT.toString()),
-                getString(NotificationPayloadNames.LINK.toString()),
-                getString(NotificationPayloadNames.TRANSACTION_IDS.toString()),
-                getString(NotificationPayloadNames.USER_EVENT_ID.toString()),
-                getString(NotificationPayloadNames.USER_MESSAGE_ID.toString()))
+    createNotificationPayload(
+        getString(NotificationPayloadNames.EVENT.toString()),
+        getString(NotificationPayloadNames.LINK.toString()),
+        getString(NotificationPayloadNames.TRANSACTION_IDS.toString()),
+        getString(NotificationPayloadNames.USER_EVENT_ID.toString()),
+        getString(NotificationPayloadNames.USER_MESSAGE_ID.toString())
+    )
 
 internal fun Map<String, String>.toNotificationPayload(): NotificationPayload =
-        createNotificationPayload(
-                get(NotificationPayloadNames.EVENT.toString()),
-                get(NotificationPayloadNames.LINK.toString()),
-                get(NotificationPayloadNames.TRANSACTION_IDS.toString()),
-                get(NotificationPayloadNames.USER_EVENT_ID.toString()),
-                get(NotificationPayloadNames.USER_MESSAGE_ID.toString()))
+    createNotificationPayload(
+        get(NotificationPayloadNames.EVENT.toString()),
+        get(NotificationPayloadNames.LINK.toString()),
+        get(NotificationPayloadNames.TRANSACTION_IDS.toString()),
+        get(NotificationPayloadNames.USER_EVENT_ID.toString()),
+        get(NotificationPayloadNames.USER_MESSAGE_ID.toString())
+    )
 
 internal fun createNotificationPayload(event: String? = null, link: String? = null, transactionIDs: String? = null, userEventID: String? = null, userMessageID: String? = null) =
-        NotificationPayload(
-                event = event,
-                link = link,
-                transactionIDs = transactionIDs
-                        ?.replace("[", "")
-                        ?.replace("]", "")
-                        ?.split(",")
-                        ?.map { it.toLong() }
-                        ?.toList(),
-                userEventID = userEventID?.trim()?.toLong(),
-                userMessageID = userMessageID?.trim()?.toLong())
+    NotificationPayload(
+        event = event,
+        link = link,
+        transactionIDs = transactionIDs
+            ?.replace("[", "")
+            ?.replace("]", "")
+            ?.split(",")
+            ?.map { it.toLong() }
+            ?.toList(),
+        userEventID = userEventID?.trim()?.toLong(),
+        userMessageID = userMessageID?.trim()?.toLong()
+    )
 
 internal fun String.toBudgetCategory(): BudgetCategory? {
     return when (this) {
@@ -756,7 +767,8 @@ internal fun sqlForBudgetPeriods(
     budgetId?.let { sqlQueryBuilder.appendSelection(selection = "budget_id = $it") }
     trackingStatus?.let { sqlQueryBuilder.appendSelection(selection = "tracking_status = '${ it.name }'") }
     ifNotNull(fromDate, toDate) {
-        from, to -> sqlQueryBuilder.appendSelection(selection = "(start_date BETWEEN Date('$from') AND Date('$to'))")
+        from, to ->
+        sqlQueryBuilder.appendSelection(selection = "(start_date BETWEEN Date('$from') AND Date('$to'))")
     }
 
     return sqlQueryBuilder.create()

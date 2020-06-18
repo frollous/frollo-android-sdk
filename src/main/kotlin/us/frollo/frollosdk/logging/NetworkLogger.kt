@@ -16,10 +16,10 @@
 
 package us.frollo.frollosdk.logging
 
-import us.frollo.frollosdk.network.NetworkService
-import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.model.api.device.LogRequest
+import us.frollo.frollosdk.network.NetworkService
+import us.frollo.frollosdk.network.api.DeviceAPI
 
 internal class NetworkLogger(
     private val network: NetworkService?,
@@ -36,11 +36,14 @@ internal class NetworkLogger(
             return
         }
 
-        deviceAPI?.createLog(LogRequest(
+        deviceAPI?.createLog(
+            LogRequest(
                 message = message,
                 score = logLevel.score,
                 deviceId = deviceId,
                 deviceType = deviceType,
-                deviceName = deviceName))?.enqueue { }
+                deviceName = deviceName
+            )
+        )?.enqueue { }
     }
 }

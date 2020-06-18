@@ -29,9 +29,9 @@ open class FrolloSDKError(errorMessage: String? = null) : Error(errorMessage) {
 
     /** Localized description */
     open val localizedDescription: String? =
-            errorMessage ?: context?.resources?.getString(R.string.FrolloSDK_Error_Generic_UnknownError)
+        errorMessage ?: context?.resources?.getString(R.string.FrolloSDK_Error_Generic_UnknownError)
 
     /** Debug description */
     open val debugDescription: String? =
-            errorMessage ?: context?.resources?.getString(R.string.FrolloSDK_Error_Generic_UnknownError)
+        errorMessage ?: context?.resources?.getString(R.string.FrolloSDK_Error_Generic_UnknownError)
 }

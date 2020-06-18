@@ -35,8 +35,8 @@ internal data class OAuthTokenRequest(
 ) {
     val valid: Boolean
         get() = when (grantType) {
-                    OAuthGrantType.AUTHORIZATION_CODE -> code != null && redirectUrl != null
-                    OAuthGrantType.PASSWORD -> (password != null && username != null) || legacyToken != null
-                    OAuthGrantType.REFRESH_TOKEN -> refreshToken != null
-                }
+            OAuthGrantType.AUTHORIZATION_CODE -> code != null && redirectUrl != null
+            OAuthGrantType.PASSWORD -> (password != null && username != null) || legacyToken != null
+            OAuthGrantType.REFRESH_TOKEN -> refreshToken != null
+        }
 }

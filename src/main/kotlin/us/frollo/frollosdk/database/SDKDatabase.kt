@@ -49,31 +49,34 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.Tran
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.bills.Bill
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
+import us.frollo.frollosdk.model.coredata.budgets.Budget
+import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
 import us.frollo.frollosdk.model.coredata.goals.Goal
 import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
 import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalance
 import us.frollo.frollosdk.model.coredata.user.User
-import us.frollo.frollosdk.model.coredata.budgets.Budget
-import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
 
-@Database(entities = [
-    User::class,
-    MessageResponse::class,
-    Provider::class,
-    ProviderAccount::class,
-    Account::class,
-    Transaction::class,
-    TransactionCategory::class,
-    Merchant::class,
-    ReportAccountBalance::class,
-    Bill::class,
-    BillPayment::class,
-    TransactionTag::class,
-    Goal::class,
-    GoalPeriod::class,
-    Budget::class,
-    BudgetPeriod::class
-], version = 9, exportSchema = true)
+@Database(
+    entities = [
+        User::class,
+        MessageResponse::class,
+        Provider::class,
+        ProviderAccount::class,
+        Account::class,
+        Transaction::class,
+        TransactionCategory::class,
+        Merchant::class,
+        ReportAccountBalance::class,
+        Bill::class,
+        BillPayment::class,
+        TransactionTag::class,
+        Goal::class,
+        GoalPeriod::class,
+        Budget::class,
+        BudgetPeriod::class
+    ],
+    version = 9, exportSchema = true
+)
 
 @TypeConverters(Converters::class)
 abstract class SDKDatabase : RoomDatabase() {
@@ -108,11 +111,11 @@ abstract class SDKDatabase : RoomDatabase() {
         }
 
         private fun create(app: Application): SDKDatabase =
-                Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
-                        .allowMainThreadQueries() // Needed for some tests
-                        // .fallbackToDestructiveMigration()
-                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9)
-                        .build()
+            Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
+                .allowMainThreadQueries() // Needed for some tests
+                // .fallbackToDestructiveMigration()
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9)
+                .build()
 
         // Copy-paste of auto-generated SQLs from room schema json file
         // located in sandbox code after building under frollo-android-sdk/schemas/$version.json

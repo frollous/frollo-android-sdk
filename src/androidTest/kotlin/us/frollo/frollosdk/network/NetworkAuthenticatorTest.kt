@@ -19,10 +19,9 @@ package us.frollo.frollosdk.network
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
-
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
@@ -30,8 +29,8 @@ import us.frollo.frollosdk.BaseAndroidTest
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.error.APIError
 import us.frollo.frollosdk.error.APIErrorType
-import us.frollo.frollosdk.network.api.UserAPI
 import us.frollo.frollosdk.extensions.enqueue
+import us.frollo.frollosdk.network.api.UserAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
@@ -57,9 +56,9 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
-                        return MockResponse()
-                                .setResponseCode(200)
-                                .setBody(readStringFromJson(app, R.raw.user_details_complete))
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.user_details_complete))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -69,8 +68,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.token_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -111,13 +110,13 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     if (failedOnce) {
                         return MockResponse()
-                                .setResponseCode(200)
-                                .setBody(readStringFromJson(app, R.raw.user_details_complete))
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.user_details_complete))
                     } else {
                         failedOnce = true
                         return MockResponse()
-                                .setResponseCode(401)
-                                .setBody(readStringFromJson(app, R.raw.error_invalid_access_token))
+                            .setResponseCode(401)
+                            .setBody(readStringFromJson(app, R.raw.error_invalid_access_token))
                     }
                 }
                 return MockResponse().setResponseCode(404)
@@ -128,8 +127,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.token_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -167,8 +166,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
-                            .setResponseCode(401)
-                            .setBody(readStringFromJson(app, R.raw.error_invalid_access_token))
+                        .setResponseCode(401)
+                        .setBody(readStringFromJson(app, R.raw.error_invalid_access_token))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -178,8 +177,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.token_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -223,12 +222,12 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
                     if (userRequestCount < 3) {
                         userRequestCount++
                         return MockResponse()
-                                .setResponseCode(401)
-                                .setBody(readStringFromJson(app, R.raw.error_invalid_access_token))
+                            .setResponseCode(401)
+                            .setBody(readStringFromJson(app, R.raw.error_invalid_access_token))
                     } else {
                         return MockResponse()
-                                .setResponseCode(200)
-                                .setBody(readStringFromJson(app, R.raw.user_details_complete))
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.user_details_complete))
                     }
                 }
                 return MockResponse().setResponseCode(404)
@@ -239,8 +238,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.token_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -277,8 +276,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 return MockResponse()
-                        .setResponseCode(401)
-                        .setBody(readStringFromJson(app, R.raw.error_invalid_refresh_token))
+                    .setResponseCode(401)
+                    .setBody(readStringFromJson(app, R.raw.error_invalid_refresh_token))
             }
         })
 
@@ -318,12 +317,12 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
                     if (userRequestCount < 3) {
                         userRequestCount++
                         return MockResponse()
-                                .setResponseCode(401)
-                                .setBody(readStringFromJson(app, R.raw.error_invalid_access_token))
+                            .setResponseCode(401)
+                            .setBody(readStringFromJson(app, R.raw.error_invalid_access_token))
                     } else {
                         return MockResponse()
-                                .setResponseCode(200)
-                                .setBody(readStringFromJson(app, R.raw.user_details_complete))
+                            .setResponseCode(200)
+                            .setBody(readStringFromJson(app, R.raw.user_details_complete))
                     }
                 }
                 return MockResponse().setResponseCode(404)
@@ -334,8 +333,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.token_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -391,8 +390,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
-                            .setResponseCode(401)
-                            .setBody(readStringFromJson(app, R.raw.error_invalid_access_token))
+                        .setResponseCode(401)
+                        .setBody(readStringFromJson(app, R.raw.error_invalid_access_token))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -402,8 +401,8 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(401)
-                            .setBody(readStringFromJson(app, R.raw.error_oauth2_invalid_client))
+                        .setResponseCode(401)
+                        .setBody(readStringFromJson(app, R.raw.error_oauth2_invalid_client))
                 }
                 return MockResponse().setResponseCode(404)
             }

@@ -39,8 +39,8 @@ import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagUpdateReques
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponseWrapper
-import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
+import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 
 internal interface AggregationAPI {
     companion object {

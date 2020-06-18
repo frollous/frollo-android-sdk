@@ -24,23 +24,20 @@ import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import okhttp3.mockwebserver.Dispatcher
-import org.junit.Assert.assertTrue
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import us.frollo.frollosdk.base.LiveDataCallAdapterFactory
-import us.frollo.frollosdk.test.R
-import us.frollo.frollosdk.testutils.TestAPI
-import us.frollo.frollosdk.testutils.readStringFromJson
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import okhttp3.mockwebserver.SocketPolicy
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import us.frollo.frollosdk.FrolloSDK
+import us.frollo.frollosdk.base.LiveDataCallAdapterFactory
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.error.APIError
 import us.frollo.frollosdk.error.APIErrorType
@@ -54,6 +51,9 @@ import us.frollo.frollosdk.error.OAuth2Error
 import us.frollo.frollosdk.error.OAuth2ErrorType
 import us.frollo.frollosdk.network.ApiResponse
 import us.frollo.frollosdk.network.ErrorResponseType
+import us.frollo.frollosdk.test.R
+import us.frollo.frollosdk.testutils.TestAPI
+import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
 import java.io.IOException
 import java.net.SocketTimeoutException
@@ -71,18 +71,18 @@ class NetworkExtensionTest {
 
     private fun createRetrofit(baseUrl: String): Retrofit {
         val gson = GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .enableComplexMapKeySerialization()
-                .create()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .enableComplexMapKeySerialization()
+            .create()
 
         val httpClient = OkHttpClient.Builder()
-                .build()
+            .build()
 
         val builder = Retrofit.Builder()
-                .client(httpClient)
-                .baseUrl(baseUrl)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .addCallAdapterFactory(LiveDataCallAdapterFactory)
+            .client(httpClient)
+            .baseUrl(baseUrl)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .addCallAdapterFactory(LiveDataCallAdapterFactory)
 
         return builder.build()
     }
@@ -111,8 +111,8 @@ class NetworkExtensionTest {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TestAPI.URL_TEST) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody("{}")
+                        .setResponseCode(200)
+                        .setBody("{}")
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -143,8 +143,8 @@ class NetworkExtensionTest {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TestAPI.URL_TEST) {
                     return MockResponse()
-                            .setResponseCode(401)
-                            .setBody("{}")
+                        .setResponseCode(401)
+                        .setBody("{}")
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -211,8 +211,9 @@ class NetworkExtensionTest {
         initSetup()
 
         val errorBody = ResponseBody.create(
-                MediaType.parse("application/json"),
-                readStringFromJson(app, R.raw.error_invalid_access_token))
+            MediaType.parse("application/json"),
+            readStringFromJson(app, R.raw.error_invalid_access_token)
+        )
 
         handleFailure<Void>(ErrorResponseType.NORMAL, ApiResponse(Response.error(401, errorBody))) { result ->
             assertEquals(Resource.Status.ERROR, result.status)
@@ -306,8 +307,9 @@ class NetworkExtensionTest {
         initSetup()
 
         val errorBody = ResponseBody.create(
-                MediaType.parse("application/json"),
-                readStringFromJson(app, R.raw.error_oauth2_invalid_client))
+            MediaType.parse("application/json"),
+            readStringFromJson(app, R.raw.error_oauth2_invalid_client)
+        )
 
         handleFailure<Void>(ErrorResponseType.OAUTH2, ApiResponse(Response.error(401, errorBody))) { result ->
             assertEquals(Resource.Status.ERROR, result.status)

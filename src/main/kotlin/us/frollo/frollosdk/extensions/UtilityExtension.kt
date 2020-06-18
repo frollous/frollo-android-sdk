@@ -61,9 +61,9 @@ internal inline fun <reified T> Gson.fromJson(json: String): T? {
  */
 internal fun Enum<*>.serializedName(): String? {
     return javaClass.getField(name).annotations
-            .filter { it.annotationClass == SerializedName::class }
-            .map { it as SerializedName }
-            .firstOrNull()?.value
+        .filter { it.annotationClass == SerializedName::class }
+        .map { it as SerializedName }
+        .firstOrNull()?.value
 }
 
 /* Network Extensions */
@@ -110,8 +110,8 @@ internal fun Set<Long>.compareToFindMissingItems(s2: Set<Long>): Set<Long> {
 
 fun String.toLocalDate(pattern: String): LocalDate {
     val formatter = DateTimeFormatterBuilder()
-            .appendPattern(pattern)
-            .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
-            .toFormatter()
+        .appendPattern(pattern)
+        .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+        .toFormatter()
     return LocalDate.parse(this, formatter)
 }

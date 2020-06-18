@@ -19,9 +19,9 @@ package us.frollo.frollosdk.logging
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
@@ -138,7 +138,7 @@ class LogTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == DeviceAPI.URL_LOG) {
                     return MockResponse()
-                            .setResponseCode(201)
+                        .setResponseCode(201)
                 }
                 return MockResponse().setResponseCode(404)
             }

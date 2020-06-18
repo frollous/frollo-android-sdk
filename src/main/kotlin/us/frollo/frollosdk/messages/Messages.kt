@@ -26,8 +26,6 @@ import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.network.NetworkService
-import us.frollo.frollosdk.network.api.MessagesAPI
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.sqlForMessages
 import us.frollo.frollosdk.extensions.sqlForMessagesCount
@@ -36,8 +34,10 @@ import us.frollo.frollosdk.mapping.toMessage
 import us.frollo.frollosdk.model.api.messages.MessageResponse
 import us.frollo.frollosdk.model.api.messages.MessageUpdateRequest
 import us.frollo.frollosdk.model.coredata.messages.ContentType
-import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
 import us.frollo.frollosdk.model.coredata.messages.Message
+import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
+import us.frollo.frollosdk.network.NetworkService
+import us.frollo.frollosdk.network.api.MessagesAPI
 
 /**
  * Manages caching and refreshing of messages
@@ -58,9 +58,9 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<Message> which can be observed using an Observer for future changes as well.
      */
     fun fetchMessage(messageId: Long): LiveData<Resource<Message>> =
-            Transformations.map(db.messages().load(messageId)) { response ->
-                Resource.success(response?.toMessage())
-            }
+        Transformations.map(db.messages().load(messageId)) { response ->
+            Resource.success(response?.toMessage())
+        }
 
     /**
      * Fetch messages from the cache
@@ -74,9 +74,9 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<Message>> which can be observed using an Observer for future changes as well.
      */
     fun fetchMessages(messageTypes: List<String>? = null, read: Boolean? = null, contentType: ContentType? = null): LiveData<Resource<List<Message>>> =
-            Transformations.map(db.messages().loadByQuery(sqlForMessages(messageTypes, read, contentType))) { response ->
-                Resource.success(mapMessageResponse(response))
-            }
+        Transformations.map(db.messages().loadByQuery(sqlForMessages(messageTypes, read, contentType))) { response ->
+            Resource.success(mapMessageResponse(response))
+        }
 
     /**
      * Advanced method to fetch messages by SQL query from the cache
@@ -88,9 +88,9 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<Message>> which can be observed using an Observer for future changes as well.
      */
     fun fetchMessages(query: SimpleSQLiteQuery): LiveData<Resource<List<Message>>> =
-            Transformations.map(db.messages().loadByQuery(query)) { response ->
-                Resource.success(mapMessageResponse(response))
-            }
+        Transformations.map(db.messages().loadByQuery(query)) { response ->
+            Resource.success(mapMessageResponse(response))
+        }
 
     /**
      * Fetch messages count from the cache
@@ -229,5 +229,5 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
     }
 
     private fun mapMessageResponse(models: List<MessageResponse>): List<Message> =
-            models.mapNotNull { it.toMessage() }.toList()
+        models.mapNotNull { it.toMessage() }.toList()
 }

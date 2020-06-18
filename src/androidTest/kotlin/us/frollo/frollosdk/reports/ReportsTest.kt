@@ -140,8 +140,8 @@ class ReportsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -196,8 +196,8 @@ class ReportsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -250,8 +250,8 @@ class ReportsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -307,8 +307,8 @@ class ReportsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -361,12 +361,12 @@ class ReportsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_day_container_bank_2018_10_29_2019_01_29))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_day_container_bank_2018_10_29_2019_01_29))
                 } else if (request?.trimmedPath == AggregationAPI.URL_ACCOUNTS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.accounts_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.accounts_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -429,12 +429,12 @@ class ReportsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath1) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_month_2018_10_29_2019_01_29))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_month_2018_10_29_2019_01_29))
                 } else if (request?.trimmedPath == requestPath2) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_month_2018_11_01_2019_02_01))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_month_2018_11_01_2019_02_01))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -537,16 +537,16 @@ class ReportsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath1) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_day_2018_10_29_2019_01_29))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_day_2018_10_29_2019_01_29))
                 } else if (request?.trimmedPath == requestPath2) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_week_2018_10_29_2019_01_29))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_week_2018_10_29_2019_01_29))
                 } else if (request?.trimmedPath == requestPath3) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_month_2018_10_29_2019_01_29))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.account_balance_reports_by_month_2018_10_29_2019_01_29))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -642,8 +642,8 @@ class ReportsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -710,8 +710,8 @@ class ReportsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -779,8 +779,8 @@ class ReportsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -847,8 +847,8 @@ class ReportsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -915,8 +915,8 @@ class ReportsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -985,19 +985,20 @@ class ReportsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
         reports.fetchBudgetCategoryReports(
-                period = period,
-                fromDate = fromDate,
-                toDate = toDate,
-                budgetCategory = budgetCategory,
-                grouping = grouping) { resource ->
+            period = period,
+            fromDate = fromDate,
+            toDate = toDate,
+            budgetCategory = budgetCategory,
+            grouping = grouping
+        ) { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
 
@@ -1058,17 +1059,18 @@ class ReportsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
         reports.fetchTagReports(
-                period = period,
-                fromDate = fromDate,
-                toDate = toDate) { resource ->
+            period = period,
+            fromDate = fromDate,
+            toDate = toDate
+        ) { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
 
@@ -1130,18 +1132,19 @@ class ReportsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == requestPath) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
         reports.fetchTagReports(
-                period = period,
-                fromDate = fromDate,
-                toDate = toDate,
-                transactionTag = tag) { resource ->
+            period = period,
+            fromDate = fromDate,
+            toDate = toDate,
+            transactionTag = tag
+        ) { resource ->
             assertEquals(Resource.Status.SUCCESS, resource.status)
             assertNull(resource.error)
 

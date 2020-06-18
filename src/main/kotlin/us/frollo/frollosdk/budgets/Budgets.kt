@@ -23,26 +23,24 @@ import com.google.gson.JsonObject
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.base.Resource
-import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
+import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
+import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.extensions.enqueue
-import us.frollo.frollosdk.extensions.fetchBudgets
-import us.frollo.frollosdk.extensions.sqlForBudgets
-import us.frollo.frollosdk.extensions.sqlForBudgetIds
-import us.frollo.frollosdk.network.NetworkService
-import us.frollo.frollosdk.logging.Log
-import us.frollo.frollosdk.mapping.toBudget
-import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.extensions.fetchBudgetPeriods
+import us.frollo.frollosdk.extensions.fetchBudgets
+import us.frollo.frollosdk.extensions.sqlForBudgetIds
 import us.frollo.frollosdk.extensions.sqlForBudgetPeriodIds
 import us.frollo.frollosdk.extensions.sqlForBudgetPeriods
+import us.frollo.frollosdk.extensions.sqlForBudgets
+import us.frollo.frollosdk.logging.Log
+import us.frollo.frollosdk.mapping.toBudget
 import us.frollo.frollosdk.mapping.toBudgetPeriod
 import us.frollo.frollosdk.model.api.budgets.BudgetCreateRequest
 import us.frollo.frollosdk.model.api.budgets.BudgetPeriodResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetUpdateRequest
-import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
@@ -50,7 +48,9 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriodRelation
 import us.frollo.frollosdk.model.coredata.budgets.BudgetRelation
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
+import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.BudgetsAPI
 import java.math.BigDecimal
 
@@ -71,9 +71,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<Budget> which can be observed using an Observer for future changes as well.
      */
     fun fetchBudget(budgetId: Long): LiveData<Resource<Budget>> =
-            Transformations.map(db.budgets().load(budgetId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.budgets().load(budgetId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch budget by ID from the cache along with other associated data.
@@ -83,9 +83,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<BudgetRelation> which can be observed using an Observer for future changes as well.
      */
     fun fetchBudgetWithRelation(budgetId: Long): LiveData<Resource<BudgetRelation>> =
-            Transformations.map(db.budgets().loadWithRelation(budgetId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.budgets().loadWithRelation(budgetId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch budgets from the cache by Merchant
@@ -107,7 +107,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         trackingStatus: BudgetTrackingStatus? = null
 
     ): LiveData<Resource<List<Budget>>> =
-            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.MERCHANT, merchantId?.toString())
+        fetchBudgets(current, frequency, status, trackingStatus, BudgetType.MERCHANT, merchantId?.toString())
 
     /**
      * Fetch budgets from the cache by Budget Category
@@ -128,7 +128,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         status: BudgetStatus? = null,
         trackingStatus: BudgetTrackingStatus? = null
     ): LiveData<Resource<List<Budget>>> =
-            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.BUDGET_CATEGORY, budgetCategory?.toString())
+        fetchBudgets(current, frequency, status, trackingStatus, BudgetType.BUDGET_CATEGORY, budgetCategory?.toString())
 
     /**
      * Fetch budgets from the cache by Category
@@ -149,7 +149,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         status: BudgetStatus? = null,
         trackingStatus: BudgetTrackingStatus? = null
     ): LiveData<Resource<List<Budget>>> =
-            fetchBudgets(current, frequency, status, trackingStatus, BudgetType.TRANSACTION_CATEGORY, categoryId?.toString())
+        fetchBudgets(current, frequency, status, trackingStatus, BudgetType.TRANSACTION_CATEGORY, categoryId?.toString())
 
     /**
      * Fetch budgets from the cache
@@ -172,13 +172,13 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         type: BudgetType? = null,
         typeValue: String? = null
     ): LiveData<Resource<List<Budget>>> =
-            Transformations.map(
-                    db.budgets().loadByQuery(
-                            sqlForBudgets(current, frequency, status, trackingStatus, type, typeValue)
-                    )
-            ) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(
+            db.budgets().loadByQuery(
+                sqlForBudgets(current, frequency, status, trackingStatus, type, typeValue)
+            )
+        ) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch budgets by SQL query from the cache
@@ -190,9 +190,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<Budget>> which can be observed using an Observer for future changes as well.
      */
     fun fetchBudgets(query: SimpleSQLiteQuery): LiveData<Resource<List<Budget>>> =
-            Transformations.map(db.budgets().loadByQuery(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.budgets().loadByQuery(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch budgets with relation from the cache by merchant
@@ -213,7 +213,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         status: BudgetStatus? = null,
         trackingStatus: BudgetTrackingStatus? = null
     ): LiveData<Resource<List<BudgetRelation>>> =
-            fetchBudgetsWithRelation(current, frequency, status, trackingStatus, BudgetType.MERCHANT, merchantId.toString())
+        fetchBudgetsWithRelation(current, frequency, status, trackingStatus, BudgetType.MERCHANT, merchantId.toString())
 
     /**
      * Fetch budgets with relation from the cache by Budget Category
@@ -234,7 +234,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         trackingStatus: BudgetTrackingStatus? = null,
         budgetCategory: BudgetCategory
     ): LiveData<Resource<List<BudgetRelation>>> =
-            fetchBudgetsWithRelation(current, frequency, status, trackingStatus, BudgetType.BUDGET_CATEGORY, budgetCategory.toString())
+        fetchBudgetsWithRelation(current, frequency, status, trackingStatus, BudgetType.BUDGET_CATEGORY, budgetCategory.toString())
 
     /**
      * Fetch budgets with relation from the cache by transaction category
@@ -255,7 +255,7 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         status: BudgetStatus? = null,
         trackingStatus: BudgetTrackingStatus? = null
     ): LiveData<Resource<List<BudgetRelation>>> =
-            fetchBudgetsWithRelation(current, frequency, status, trackingStatus, BudgetType.TRANSACTION_CATEGORY, categoryId.toString())
+        fetchBudgetsWithRelation(current, frequency, status, trackingStatus, BudgetType.TRANSACTION_CATEGORY, categoryId.toString())
 
     /**
      * Fetch budgets from the cache with associated data
@@ -277,17 +277,20 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         type: BudgetType? = null,
         typeValue: String? = null
     ): LiveData<Resource<List<BudgetRelation>>> =
-            Transformations.map(db.budgets().loadByQueryWithRelation(
-                    sqlForBudgets(
-                            current = current,
-                            budgetFrequency = frequency,
-                            budgetStatus = status,
-                            budgetTrackingStatus = trackingStatus,
-                            budgetType = type,
-                            budgetTypeValue = typeValue))
-            ) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(
+            db.budgets().loadByQueryWithRelation(
+                sqlForBudgets(
+                    current = current,
+                    budgetFrequency = frequency,
+                    budgetStatus = status,
+                    budgetTrackingStatus = trackingStatus,
+                    budgetType = type,
+                    budgetTypeValue = typeValue
+                )
+            )
+        ) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch budgets by SQL query from the cache with associated data
@@ -299,9 +302,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<BudgetRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchBudgetWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<BudgetRelation>>> =
-            Transformations.map(db.budgets().loadByQueryWithRelation(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.budgets().loadByQueryWithRelation(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Refresh all budgets from the host
@@ -434,13 +437,14 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
         val budgetCreateRequest = BudgetCreateRequest(
-                budgetFrequency = budgetFrequency,
-                periodAmount = periodAmount,
-                type = type,
-                typedValue = typedValue,
-                startDate = startDate,
-                imageUrl = imageUrl,
-                metadata = metadata)
+            budgetFrequency = budgetFrequency,
+            periodAmount = periodAmount,
+            type = type,
+            typedValue = typedValue,
+            startDate = startDate,
+            imageUrl = imageUrl,
+            metadata = metadata
+        )
         budgetsAPI.createBudget(budgetCreateRequest).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
@@ -462,9 +466,10 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      */
     fun updateBudget(budget: Budget, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val request = BudgetUpdateRequest(
-                periodAmount = budget.periodAmount,
-                imageUrl = budget.imageUrl,
-                metadata = budget.metadata ?: JsonObject())
+            periodAmount = budget.periodAmount,
+            imageUrl = budget.imageUrl,
+            metadata = budget.metadata ?: JsonObject()
+        )
 
         budgetsAPI.updateBudget(budget.budgetId, request).enqueue { resource ->
             when (resource.status) {
@@ -510,9 +515,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<BudgetPeriod> which can be observed using an Observer for future changes as well.
      */
     fun fetchBudgetPeriod(budgetPeriodId: Long): LiveData<Resource<BudgetPeriod>> =
-            Transformations.map(db.budgetPeriods().load(budgetPeriodId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.budgetPeriods().load(budgetPeriodId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch budget periods from the cache
@@ -530,9 +535,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         fromDate: String? = null,
         toDate: String? = null
     ): LiveData<Resource<List<BudgetPeriod>>> =
-            Transformations.map(db.budgetPeriods().loadByQuery(sqlForBudgetPeriods(budgetId, trackingStatus, fromDate, toDate))) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.budgetPeriods().loadByQuery(sqlForBudgetPeriods(budgetId, trackingStatus, fromDate, toDate))) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch budget periods by SQL query from the cache
@@ -544,9 +549,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<BudgetPeriod>> which can be observed using an Observer for future changes as well.
      */
     fun fetchBudgetPeriods(query: SimpleSQLiteQuery): LiveData<Resource<List<BudgetPeriod>>> =
-            Transformations.map(db.budgetPeriods().loadByQuery(query)) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.budgetPeriods().loadByQuery(query)) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch budget periods from cache by SQL query from the cache with associated data
@@ -557,9 +562,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<BudgetPeriodRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchBudgetPeriodsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<BudgetPeriodRelation>>> =
-            Transformations.map(db.budgetPeriods().loadByQueryWithRelation(query)) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.budgetPeriods().loadByQueryWithRelation(query)) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Fetch budget periods from cache with associated data
@@ -577,9 +582,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
         fromDate: String? = null,
         toDate: String? = null
     ): LiveData<Resource<List<BudgetPeriodRelation>>> =
-            Transformations.map(db.budgetPeriods().loadByQueryWithRelation(sqlForBudgetPeriods(budgetId, trackingStatus, fromDate, toDate))) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.budgetPeriods().loadByQueryWithRelation(sqlForBudgetPeriods(budgetId, trackingStatus, fromDate, toDate))) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Fetch budget periods from the cache with associated data
@@ -589,9 +594,9 @@ class Budgets(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<BudgetPeriodRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchBudgetPeriodsWithRelation(budgetPeriodId: Long): LiveData<Resource<BudgetPeriodRelation>> =
-            Transformations.map(db.budgetPeriods().loadWithRelation(budgetPeriodId)) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.budgetPeriods().loadWithRelation(budgetPeriodId)) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Refresh a budget period

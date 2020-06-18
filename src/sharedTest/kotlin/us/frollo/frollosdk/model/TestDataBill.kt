@@ -38,30 +38,33 @@ internal fun testBillResponseData(
 ): BillResponse {
 
     val category = BillResponse.Category(
-            id = transactionCategoryId ?: randomNumber().toLong(),
-            name = randomString(20))
+        id = transactionCategoryId ?: randomNumber().toLong(),
+        name = randomString(20)
+    )
 
     val merchant = BillResponse.Merchant(
-            id = merchantId ?: randomNumber().toLong(),
-            name = randomString(20))
+        id = merchantId ?: randomNumber().toLong(),
+        name = randomString(20)
+    )
 
     return BillResponse(
-            billId = billId ?: randomNumber().toLong(),
-            name = randomString(50),
-            description = randomString(50),
-            billType = BillType.values()[Random.nextInt(BillType.values().size)],
-            status = BillStatus.values()[Random.nextInt(BillStatus.values().size)],
-            lastAmount = BigDecimal("101.23"),
-            dueAmount = BigDecimal("79.65"),
-            averageAmount = BigDecimal("99.89"),
-            frequency = frequency ?: BillFrequency.values()[Random.nextInt(BillFrequency.values().size)],
-            paymentStatus = paymentStatus ?: BillPaymentStatus.values()[Random.nextInt(BillPaymentStatus.values().size)],
-            lastPaymentDate = "2018-12-01",
-            nextPaymentDate = "2019-01-01",
-            category = category,
-            merchant = merchant,
-            accountId = accountId ?: randomNumber().toLong(),
-            notes = randomString(200))
+        billId = billId ?: randomNumber().toLong(),
+        name = randomString(50),
+        description = randomString(50),
+        billType = BillType.values()[Random.nextInt(BillType.values().size)],
+        status = BillStatus.values()[Random.nextInt(BillStatus.values().size)],
+        lastAmount = BigDecimal("101.23"),
+        dueAmount = BigDecimal("79.65"),
+        averageAmount = BigDecimal("99.89"),
+        frequency = frequency ?: BillFrequency.values()[Random.nextInt(BillFrequency.values().size)],
+        paymentStatus = paymentStatus ?: BillPaymentStatus.values()[Random.nextInt(BillPaymentStatus.values().size)],
+        lastPaymentDate = "2018-12-01",
+        nextPaymentDate = "2019-01-01",
+        category = category,
+        merchant = merchant,
+        accountId = accountId ?: randomNumber().toLong(),
+        notes = randomString(200)
+    )
 }
 
 internal fun testBillPaymentResponseData(
@@ -72,13 +75,14 @@ internal fun testBillPaymentResponseData(
     paymentStatus: BillPaymentStatus? = null
 ): BillPaymentResponse {
     return BillPaymentResponse(
-            billPaymentId = billPaymentId ?: randomNumber().toLong(),
-            billId = billId ?: randomNumber().toLong(),
-            name = randomString(50),
-            amount = BigDecimal("70.05"),
-            frequency = frequency ?: BillFrequency.values()[Random.nextInt(BillFrequency.values().size)],
-            paymentStatus = paymentStatus ?: BillPaymentStatus.values()[Random.nextInt(BillPaymentStatus.values().size)],
-            date = date ?: "2018-12-01",
-            merchantId = randomNumber().toLong(),
-            unpayable = randomBoolean())
+        billPaymentId = billPaymentId ?: randomNumber().toLong(),
+        billId = billId ?: randomNumber().toLong(),
+        name = randomString(50),
+        amount = BigDecimal("70.05"),
+        frequency = frequency ?: BillFrequency.values()[Random.nextInt(BillFrequency.values().size)],
+        paymentStatus = paymentStatus ?: BillPaymentStatus.values()[Random.nextInt(BillPaymentStatus.values().size)],
+        date = date ?: "2018-12-01",
+        merchantId = randomNumber().toLong(),
+        unpayable = randomBoolean()
+    )
 }

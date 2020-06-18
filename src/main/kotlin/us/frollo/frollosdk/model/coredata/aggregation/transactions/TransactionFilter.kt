@@ -1,5 +1,21 @@
-import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
-import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
+/*
+ * Copyright 2019 Frollo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package us.frollo.frollosdk.model.coredata.aggregation.transactions
+
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 
 /** Represents a model that contains all the filters to apply on transaction list
@@ -24,25 +40,25 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
  * @param size: Count of objects to return in one call
  **/
 data class TransactionFilter(
-        val searchTerm: String? = null,
-        val merchantIds: LongArray? = null,
-        val accountIds: LongArray? = null,
-        val transactionCategoryIds: LongArray? = null,
-        val transactionIds: LongArray? = null,
-        val budgetCategory: BudgetCategory? = null,
-        val minAmount: Long? = null,
-        val maxAmount: Long? = null,
-        val baseType: TransactionBaseType? = null,
-        val status: TransactionStatus? = null,
-        val tags: List<String>? = null,
-        val accountIncluded: Boolean? = null,
-        val transactionIncluded: Boolean? = null,
-        val fromDate: String? = null,
-        val toDate: String? = null,
-        val before: String? = null,
-        val after: String? = null,
-        val size: Long? = null
-       ) {
+    val searchTerm: String? = null,
+    val merchantIds: LongArray? = null,
+    val accountIds: LongArray? = null,
+    val transactionCategoryIds: LongArray? = null,
+    val transactionIds: LongArray? = null,
+    val budgetCategory: BudgetCategory? = null,
+    val minAmount: Long? = null,
+    val maxAmount: Long? = null,
+    val baseType: TransactionBaseType? = null,
+    val status: TransactionStatus? = null,
+    val tags: List<String>? = null,
+    val accountIncluded: Boolean? = null,
+    val transactionIncluded: Boolean? = null,
+    val fromDate: String? = null,
+    val toDate: String? = null,
+    val before: String? = null,
+    val after: String? = null,
+    val size: Long? = null
+) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

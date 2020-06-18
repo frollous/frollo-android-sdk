@@ -19,10 +19,9 @@ package us.frollo.frollosdk.network
 import android.app.Application
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.After
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
-
-import org.junit.Assert.assertNotNull
 import us.frollo.frollosdk.authentication.AuthToken
 import us.frollo.frollosdk.core.AppInfo
 import us.frollo.frollosdk.keystore.Keystore

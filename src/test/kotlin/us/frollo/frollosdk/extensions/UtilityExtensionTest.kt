@@ -40,20 +40,20 @@ class UtilityExtensionTest {
     @Before
     fun setup() {
         val mHttpUrl = HttpUrl.Builder()
-                .scheme("https")
-                .host("test.frollosdk.com")
-                .build()
+            .scheme("https")
+            .host("test.frollosdk.com")
+            .build()
         val mRequest = Request.Builder()
-                .url(mHttpUrl)
-                .build()
+            .url(mHttpUrl)
+            .build()
 
         // Prepare the builder with common stuff.
         mOkHttpResponseBuilder = Response.Builder()
-                .request(mRequest)
-                .protocol(Protocol.HTTP_1_1)
-                .code(401)
-                .body(ResponseBody.create(MediaType.parse("text"), "Unauthorized"))
-                .message("Unauthorized Error")
+            .request(mRequest)
+            .protocol(Protocol.HTTP_1_1)
+            .code(401)
+            .body(ResponseBody.create(MediaType.parse("text"), "Unauthorized"))
+            .message("Unauthorized Error")
     }
 
     @Test

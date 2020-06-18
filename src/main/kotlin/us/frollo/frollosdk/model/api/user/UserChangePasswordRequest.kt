@@ -22,5 +22,5 @@ internal data class UserChangePasswordRequest(
     @SerializedName("current_password") val currentPassword: String?,
     @SerializedName("new_password") val newPassword: String
 ) {
-        fun valid() = newPassword.length >= 8
+    fun valid() = newPassword.length >= 8
 }

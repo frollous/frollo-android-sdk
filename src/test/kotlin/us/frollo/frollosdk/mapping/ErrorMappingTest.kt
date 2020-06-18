@@ -16,14 +16,14 @@
 
 package us.frollo.frollosdk.mapping
 
+import net.openid.appauth.AuthorizationException
 import org.junit.Assert
 import org.junit.Test
 import us.frollo.frollosdk.error.APIErrorType
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
-import us.frollo.frollosdk.model.api.shared.APIErrorCode
-import net.openid.appauth.AuthorizationException
 import us.frollo.frollosdk.error.OAuth2ErrorType
+import us.frollo.frollosdk.model.api.shared.APIErrorCode
 
 class ErrorMappingTest {
 

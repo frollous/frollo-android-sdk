@@ -28,12 +28,13 @@ import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.reports.TransactionReportPeriod
 
 internal fun AccountBalanceReportResponse.Report.BalanceReport.toReportAccountBalance(date: String, period: ReportPeriod) =
-        ReportAccountBalance(
-                date = date,
-                value = value,
-                period = period,
-                currency = currency,
-                accountId = id)
+    ReportAccountBalance(
+        date = date,
+        value = value,
+        period = period,
+        currency = currency,
+        accountId = id
+    )
 
 internal fun ReportsResponse.toReports(grouping: ReportGrouping, period: TransactionReportPeriod): List<Report> {
     val reports = mutableListOf<Report>()
@@ -49,21 +50,23 @@ internal fun ReportResponse.toReport(grouping: ReportGrouping, period: Transacti
         groups.add(groupResponse.toGroupReport(grouping, period, this.date))
     }
     return Report(
-            date = date,
-            isIncome = income,
-            value = value,
-            groups = groups,
-            grouping = grouping,
-            period = period)
+        date = date,
+        isIncome = income,
+        value = value,
+        groups = groups,
+        grouping = grouping,
+        period = period
+    )
 }
 
 internal fun GroupReportResponse.toGroupReport(grouping: ReportGrouping, period: TransactionReportPeriod, date: String): GroupReport =
-        GroupReport(
-                linkedId = id,
-                name = name,
-                isIncome = income,
-                value = value,
-                transactionIds = transactionIds,
-                grouping = grouping,
-                period = period,
-                date = date)
+    GroupReport(
+        linkedId = id,
+        name = name,
+        isIncome = income,
+        value = value,
+        transactionIds = transactionIds,
+        grouping = grouping,
+        period = period,
+        date = date
+    )

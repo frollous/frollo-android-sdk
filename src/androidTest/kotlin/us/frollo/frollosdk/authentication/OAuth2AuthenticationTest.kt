@@ -22,13 +22,12 @@ import net.openid.appauth.AuthorizationException
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
-import org.junit.Test
-
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
@@ -73,8 +72,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.token_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -110,8 +109,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(401)
-                            .setBody(readStringFromJson(app, R.raw.error_oauth2_invalid_client))
+                        .setResponseCode(401)
+                        .setBody(readStringFromJson(app, R.raw.error_oauth2_invalid_client))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -153,8 +152,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.token_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -201,8 +200,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.token_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -271,7 +270,7 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
                     tokenRevoked = true
                     signal.countDown()
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -303,8 +302,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
-                            .setResponseCode(401)
-                            .setBody(body)
+                        .setResponseCode(401)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -350,8 +349,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.token_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -383,8 +382,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.token_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -420,8 +419,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(401)
-                            .setBody(readStringFromJson(app, R.raw.error_oauth2_invalid_client))
+                        .setResponseCode(401)
+                        .setBody(readStringFromJson(app, R.raw.error_oauth2_invalid_client))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -459,8 +458,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.token_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -495,8 +494,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.token_valid))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.token_valid))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -534,8 +533,8 @@ class OAuth2AuthenticationTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == TOKEN_URL) {
                     return MockResponse()
-                            .setResponseCode(401)
-                            .setBody(readStringFromJson(app, R.raw.error_oauth2_invalid_grant))
+                        .setResponseCode(401)
+                        .setBody(readStringFromJson(app, R.raw.error_oauth2_invalid_grant))
                 }
                 return MockResponse().setResponseCode(404)
             }

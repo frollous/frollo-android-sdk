@@ -22,14 +22,14 @@ import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.ACTION.ACTION_REFRESH_TRANSACTIONS
 import us.frollo.frollosdk.core.ARGUMENT.ARG_TRANSACTION_IDS
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
-import us.frollo.frollosdk.network.NetworkService
-import us.frollo.frollosdk.network.api.EventsAPI
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.notify
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.model.api.events.EventCreateRequest
 import us.frollo.frollosdk.model.coredata.notifications.NotificationPayload
+import us.frollo.frollosdk.network.NetworkService
+import us.frollo.frollosdk.network.api.EventsAPI
 
 /**
  * Manages triggering and handling of events from the host
@@ -81,8 +81,10 @@ class Events(network: NetworkService) {
                 Log.i("$TAG#handleEvent", "Transactions updated event received")
 
                 notificationPayload?.transactionIDs?.let {
-                    notify(ACTION_REFRESH_TRANSACTIONS,
-                            bundleOf(Pair(ARG_TRANSACTION_IDS, it.toLongArray())))
+                    notify(
+                        ACTION_REFRESH_TRANSACTIONS,
+                        bundleOf(Pair(ARG_TRANSACTION_IDS, it.toLongArray()))
+                    )
                 }
 
                 completion?.invoke(true, null)

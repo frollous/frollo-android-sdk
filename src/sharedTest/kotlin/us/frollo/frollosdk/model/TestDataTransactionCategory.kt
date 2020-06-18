@@ -26,11 +26,12 @@ import kotlin.random.Random
 
 internal fun testTransactionCategoryResponseData(transactionCategoryId: Long? = null): TransactionCategoryResponse {
     return TransactionCategoryResponse(
-            transactionCategoryId = transactionCategoryId ?: randomNumber().toLong(),
-            categoryType = TransactionCategoryType.values()[Random.nextInt(TransactionCategoryType.values().size)],
-            defaultBudgetCategory = BudgetCategory.values()[Random.nextInt(BudgetCategory.values().size)],
-            name = randomUUID(),
-            userDefined = randomBoolean(),
-            placement = 1,
-            iconUrl = "https://example.com/category.png")
+        transactionCategoryId = transactionCategoryId ?: randomNumber().toLong(),
+        categoryType = TransactionCategoryType.values()[Random.nextInt(TransactionCategoryType.values().size)],
+        defaultBudgetCategory = BudgetCategory.values()[Random.nextInt(BudgetCategory.values().size)],
+        name = randomUUID(),
+        userDefined = randomBoolean(),
+        placement = 1,
+        iconUrl = "https://example.com/category.png"
+    )
 }

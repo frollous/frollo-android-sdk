@@ -81,21 +81,22 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_REGISTER) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
         userManagement.registerUser(
-                firstName = "Frollo",
-                lastName = "User",
-                mobileNumber = "0412345678",
-                postcode = "2060",
-                dateOfBirth = Date(),
-                email = "user@frollo.us",
-                password = "password") { result ->
+            firstName = "Frollo",
+            lastName = "User",
+            mobileNumber = "0412345678",
+            postcode = "2060",
+            dateOfBirth = Date(),
+            email = "user@frollo.us",
+            password = "password"
+        ) { result ->
 
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
@@ -128,21 +129,22 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_REGISTER) {
                     return MockResponse()
-                            .setResponseCode(409)
-                            .setBody(readStringFromJson(app, R.raw.error_duplicate))
+                        .setResponseCode(409)
+                        .setBody(readStringFromJson(app, R.raw.error_duplicate))
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
         userManagement.registerUser(
-                firstName = "Frollo",
-                lastName = "User",
-                mobileNumber = "0412345678",
-                postcode = "2060",
-                dateOfBirth = Date(),
-                email = "user@frollo.us",
-                password = "password") { result ->
+            firstName = "Frollo",
+            lastName = "User",
+            mobileNumber = "0412345678",
+            postcode = "2060",
+            dateOfBirth = Date(),
+            email = "user@frollo.us",
+            password = "password"
+        ) { result ->
 
             assertEquals(Result.Status.ERROR, result.status)
             assertNotNull(result.error)
@@ -182,8 +184,8 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -227,8 +229,8 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -268,8 +270,8 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.user_details_complete))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.user_details_complete))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -310,8 +312,8 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -354,7 +356,7 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_CHANGE_PASSWORD) {
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -390,7 +392,7 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_CHANGE_PASSWORD) {
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -423,7 +425,7 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_DELETE_USER) {
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -466,7 +468,7 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_DELETE_USER) {
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -503,7 +505,7 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_PASSWORD_RESET) {
                     return MockResponse()
-                            .setResponseCode(202)
+                        .setResponseCode(202)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -534,7 +536,7 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == DeviceAPI.URL_DEVICE) {
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -570,7 +572,7 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == DeviceAPI.URL_DEVICE) {
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -604,9 +606,11 @@ class UserManagementTest : BaseAndroidTest() {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        val request = userManagement.authenticateRequest(Request.Builder()
+        val request = userManagement.authenticateRequest(
+            Request.Builder()
                 .url("http://api.example.com/")
-                .build())
+                .build()
+        )
         assertNotNull(request)
         assertEquals("http://api.example.com/", request.url().toString())
         assertEquals("Bearer ExistingAccessToken", request.header("Authorization"))
@@ -629,7 +633,7 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_MIGRATE_USER) {
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -671,8 +675,8 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_MIGRATE_USER) {
                     return MockResponse()
-                            .setResponseCode(400)
-                            .setBody(readStringFromJson(app, R.raw.error_migration))
+                        .setResponseCode(400)
+                        .setBody(readStringFromJson(app, R.raw.error_migration))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -741,7 +745,7 @@ class UserManagementTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_MIGRATE_USER) {
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }

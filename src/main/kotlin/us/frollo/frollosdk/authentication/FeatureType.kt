@@ -28,5 +28,5 @@ enum class FeatureType {
 
     /** Enum to serialized string */
     override fun toString(): String =
-            serializedName() ?: super.toString()
+        serializedName() ?: super.toString()
 }

@@ -17,13 +17,11 @@
 package us.frollo.frollosdk.database
 
 import com.google.gson.JsonObject
-import org.junit.Test
-
-import org.junit.Assert.assertTrue
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
-import us.frollo.frollosdk.model.coredata.budgets.BudgetType
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountGroup
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
@@ -54,6 +52,7 @@ import us.frollo.frollosdk.model.coredata.bills.BillType
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
+import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -308,14 +307,15 @@ class ConvertersTest {
     @Test
     fun testStringFromProviderLoginForm() {
         val form = ProviderLoginForm(
-                formId = "13039",
-                forgetPasswordUrl = "https://ib.mebank.com.au/auth/ib/login.html",
-                formType = ProviderFormType.LOGIN,
-                rows = listOf(),
-                help = null,
-                mfaInfoText = null,
-                mfaInfoTitle = null,
-                mfaTimeout = null)
+            formId = "13039",
+            forgetPasswordUrl = "https://ib.mebank.com.au/auth/ib/login.html",
+            formType = ProviderFormType.LOGIN,
+            rows = listOf(),
+            help = null,
+            mfaInfoText = null,
+            mfaInfoTitle = null,
+            mfaTimeout = null
+        )
         val json = Converters.instance.stringFromProviderLoginForm(form)
         assertEquals("{\"id\":\"13039\",\"forgetPasswordURL\":\"https://ib.mebank.com.au/auth/ib/login.html\",\"formType\":\"login\",\"row\":[]}", json)
     }
@@ -612,16 +612,17 @@ class ConvertersTest {
     @Test
     fun testStringFromMerchantLocation() {
         val location = MerchantLocation(
-                formattedAddress = "41 McLaren St, North Sydney, NSW 2120 Australia",
-                line1 = "41 McLaren St",
-                line2 = null,
-                line3 = null,
-                suburb = "North Sydney",
-                state = "NSW",
-                postcode = "2120",
-                country = "Australia",
-                latitude = BigDecimal("-33.83517030000001"),
-                longitude = BigDecimal("151.2086038"))
+            formattedAddress = "41 McLaren St, North Sydney, NSW 2120 Australia",
+            line1 = "41 McLaren St",
+            line2 = null,
+            line3 = null,
+            suburb = "North Sydney",
+            state = "NSW",
+            postcode = "2120",
+            country = "Australia",
+            latitude = BigDecimal("-33.83517030000001"),
+            longitude = BigDecimal("151.2086038")
+        )
         val json = Converters.instance.stringFromMerchantLocation(location)
         assertEquals("{\"formatted_address\":\"41 McLaren St, North Sydney, NSW 2120 Australia\",\"line_1\":\"41 McLaren St\",\"suburb\":\"North Sydney\",\"state\":\"NSW\",\"postcode\":\"2120\",\"country\":\"Australia\",\"latitude\":-33.83517030000001,\"longitude\":151.2086038}", json)
     }

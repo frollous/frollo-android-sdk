@@ -22,32 +22,34 @@ import us.frollo.frollosdk.model.coredata.bills.Bill
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
 
 internal fun BillResponse.toBill(): Bill =
-        Bill(
-                billId = billId,
-                name = name,
-                description = description,
-                billType = billType,
-                status = status,
-                lastAmount = lastAmount,
-                dueAmount = dueAmount,
-                averageAmount = averageAmount,
-                frequency = frequency,
-                paymentStatus = paymentStatus,
-                lastPaymentDate = lastPaymentDate,
-                nextPaymentDate = nextPaymentDate,
-                categoryId = category?.id,
-                merchantId = merchant?.id,
-                accountId = accountId,
-                notes = notes)
+    Bill(
+        billId = billId,
+        name = name,
+        description = description,
+        billType = billType,
+        status = status,
+        lastAmount = lastAmount,
+        dueAmount = dueAmount,
+        averageAmount = averageAmount,
+        frequency = frequency,
+        paymentStatus = paymentStatus,
+        lastPaymentDate = lastPaymentDate,
+        nextPaymentDate = nextPaymentDate,
+        categoryId = category?.id,
+        merchantId = merchant?.id,
+        accountId = accountId,
+        notes = notes
+    )
 
 internal fun BillPaymentResponse.toBillPayment(): BillPayment =
-        BillPayment(
-                billPaymentId = billPaymentId,
-                billId = billId,
-                name = name,
-                merchantId = merchantId,
-                date = date,
-                paymentStatus = paymentStatus,
-                frequency = frequency,
-                amount = amount,
-                unpayable = unpayable)
+    BillPayment(
+        billPaymentId = billPaymentId,
+        billId = billId,
+        name = name,
+        merchantId = merchantId,
+        date = date,
+        paymentStatus = paymentStatus,
+        frequency = frequency,
+        amount = amount,
+        unpayable = unpayable
+    )

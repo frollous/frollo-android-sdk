@@ -39,71 +39,78 @@ class OAuth2Helper(val config: FrolloSDKConfiguration) {
         get() = Uri.parse(config.serverUrl).host ?: ""
 
     internal fun getRefreshTokensRequest(refreshToken: String?) =
-            OAuthTokenRequest(
-                grantType = OAuthGrantType.REFRESH_TOKEN,
-                clientId = config.clientId,
-                domain = domain,
-                refreshToken = refreshToken)
+        OAuthTokenRequest(
+            grantType = OAuthGrantType.REFRESH_TOKEN,
+            clientId = config.clientId,
+            domain = domain,
+            refreshToken = refreshToken
+        )
 
     internal fun getLoginRequest(username: String, password: String, scopes: List<String>) =
-            OAuthTokenRequest(
-                    grantType = OAuthGrantType.PASSWORD,
-                    clientId = config.clientId,
-                    domain = domain,
-                    username = username,
-                    password = password,
-                    audience = config.serverUrl,
-                    scope = scopes.joinToString(" "))
+        OAuthTokenRequest(
+            grantType = OAuthGrantType.PASSWORD,
+            clientId = config.clientId,
+            domain = domain,
+            username = username,
+            password = password,
+            audience = config.serverUrl,
+            scope = scopes.joinToString(" ")
+        )
 
     internal fun getRegisterRequest(username: String, password: String, scopes: List<String>) =
-            OAuthTokenRequest(
-                    grantType = OAuthGrantType.PASSWORD,
-                    clientId = config.clientId,
-                    domain = domain,
-                    username = username,
-                    password = password,
-                    audience = config.serverUrl,
-                    scope = scopes.joinToString(" "))
+        OAuthTokenRequest(
+            grantType = OAuthGrantType.PASSWORD,
+            clientId = config.clientId,
+            domain = domain,
+            username = username,
+            password = password,
+            audience = config.serverUrl,
+            scope = scopes.joinToString(" ")
+        )
 
     internal fun getExchangeAuthorizationCodeRequest(scopes: List<String>, code: String, codeVerifier: String? = null) =
-            OAuthTokenRequest(
-                    grantType = OAuthGrantType.AUTHORIZATION_CODE,
-                    clientId = config.clientId,
-                    domain = domain,
-                    code = code,
-                    codeVerifier = codeVerifier,
-                    redirectUrl = oAuth2.redirectUrl,
-                    audience = config.serverUrl,
-                    scope = scopes.joinToString(" "))
+        OAuthTokenRequest(
+            grantType = OAuthGrantType.AUTHORIZATION_CODE,
+            clientId = config.clientId,
+            domain = domain,
+            code = code,
+            codeVerifier = codeVerifier,
+            redirectUrl = oAuth2.redirectUrl,
+            audience = config.serverUrl,
+            scope = scopes.joinToString(" ")
+        )
 
     internal fun getExchangeTokenRequest(legacyToken: String, scopes: List<String>) =
-            OAuthTokenRequest(
-                    grantType = OAuthGrantType.PASSWORD,
-                    clientId = config.clientId,
-                    domain = domain,
-                    legacyToken = legacyToken,
-                    audience = config.serverUrl,
-                    scope = scopes.joinToString(" "))
+        OAuthTokenRequest(
+            grantType = OAuthGrantType.PASSWORD,
+            clientId = config.clientId,
+            domain = domain,
+            legacyToken = legacyToken,
+            audience = config.serverUrl,
+            scope = scopes.joinToString(" ")
+        )
 
     internal fun getAuthorizationRequest(scopes: List<String>, additionalParameters: Map<String, String>? = null): AuthorizationRequest {
         val serviceConfig = AuthorizationServiceConfiguration(
-                oAuth2.authorizationUri,
-                oAuth2.tokenUri)
+            oAuth2.authorizationUri,
+            oAuth2.tokenUri
+        )
 
         val authRequestBuilder = AuthorizationRequest.Builder(
-                serviceConfig,
-                config.clientId,
-                ResponseTypeValues.CODE,
-                oAuth2.redirectUri)
+            serviceConfig,
+            config.clientId,
+            ResponseTypeValues.CODE,
+            oAuth2.redirectUri
+        )
 
         val customParameters = mutableMapOf(Pair("audience", config.serverUrl), Pair("domain", domain))
         additionalParameters?.let { customParameters.putAll(it) }
 
         return authRequestBuilder
-                .setScopes(scopes)
-                // .setPrompt("login") // Specifies whether the Authorization Server prompts the End-User for re-authentication
-                .setAdditionalParameters(customParameters)
-                .build()
+            .setScopes(scopes)
+            // .setPrompt("login") // Specifies whether the Authorization Server prompts the End-User for re-authentication
+            .setAdditionalParameters(customParameters)
+            .build()
     }
 
     internal fun getCustomTabsIntent(service: AuthorizationService, request: AuthorizationRequest, toolBarColor: Int? = null): CustomTabsIntent {

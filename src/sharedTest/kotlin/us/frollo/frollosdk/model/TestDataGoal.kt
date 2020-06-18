@@ -38,30 +38,31 @@ internal fun testGoalResponseData(
     trackingStatus: GoalTrackingStatus? = null
 ): GoalResponse {
     return GoalResponse(
-            goalId = goalId ?: randomNumber().toLong(),
-            name = randomString(20),
-            description = randomString(100),
-            imageUrl = "https://example.com/image.png",
-            accountId = accountId ?: randomNumber().toLong(),
-            trackingStatus = trackingStatus ?: GoalTrackingStatus.values().randomElement(),
-            trackingType = GoalTrackingType.values().randomElement(),
-            status = status ?: GoalStatus.values().randomElement(),
-            frequency = frequency ?: GoalFrequency.values().randomElement(),
-            target = GoalTarget.values().randomElement(),
-            currency = "AUD",
-            currentAmount = BigDecimal("7500.0"),
-            periodAmount = BigDecimal("300.0"),
-            startAmount = BigDecimal("0.0"),
-            targetAmount = BigDecimal("20000.0"),
-            startDate = "2019-01-02",
-            endDate = "2019-11-02",
-            estimatedEndDate = "2019-12-02",
-            estimatedTargetAmount = BigDecimal("20000.0"),
-            periodsCount = 52,
-            currentPeriod = testGoalPeriodResponseData(),
-            metadata = JsonObject().apply {
-                addProperty("seen", true)
-            })
+        goalId = goalId ?: randomNumber().toLong(),
+        name = randomString(20),
+        description = randomString(100),
+        imageUrl = "https://example.com/image.png",
+        accountId = accountId ?: randomNumber().toLong(),
+        trackingStatus = trackingStatus ?: GoalTrackingStatus.values().randomElement(),
+        trackingType = GoalTrackingType.values().randomElement(),
+        status = status ?: GoalStatus.values().randomElement(),
+        frequency = frequency ?: GoalFrequency.values().randomElement(),
+        target = GoalTarget.values().randomElement(),
+        currency = "AUD",
+        currentAmount = BigDecimal("7500.0"),
+        periodAmount = BigDecimal("300.0"),
+        startAmount = BigDecimal("0.0"),
+        targetAmount = BigDecimal("20000.0"),
+        startDate = "2019-01-02",
+        endDate = "2019-11-02",
+        estimatedEndDate = "2019-12-02",
+        estimatedTargetAmount = BigDecimal("20000.0"),
+        periodsCount = 52,
+        currentPeriod = testGoalPeriodResponseData(),
+        metadata = JsonObject().apply {
+            addProperty("seen", true)
+        }
+    )
 }
 
 internal fun testGoalPeriodResponseData(
@@ -70,15 +71,16 @@ internal fun testGoalPeriodResponseData(
     trackingStatus: GoalTrackingStatus? = null
 ): GoalPeriodResponse {
     return GoalPeriodResponse(
-            goalPeriodId = goalPeriodId ?: randomNumber().toLong(),
-            goalId = goalId ?: randomNumber().toLong(),
-            startDate = "2019-02-01",
-            endDate = "2020-01-31",
-            trackingStatus = trackingStatus ?: GoalTrackingStatus.values().randomElement(),
-            currentAmount = BigDecimal("243.11"),
-            targetAmount = BigDecimal("300.0"),
-            requiredAmount = BigDecimal("355.0"),
-            index = 0)
+        goalPeriodId = goalPeriodId ?: randomNumber().toLong(),
+        goalId = goalId ?: randomNumber().toLong(),
+        startDate = "2019-02-01",
+        endDate = "2020-01-31",
+        trackingStatus = trackingStatus ?: GoalTrackingStatus.values().randomElement(),
+        currentAmount = BigDecimal("243.11"),
+        targetAmount = BigDecimal("300.0"),
+        requiredAmount = BigDecimal("355.0"),
+        index = 0
+    )
 }
 
 internal fun testGoalRequestTargetData(
@@ -88,19 +90,20 @@ internal fun testGoalRequestTargetData(
     endDate: String? = null
 ): GoalCreateRequest {
     return GoalCreateRequest(
-            accountId = randomNumber().toLong(),
-            description = randomString(200),
-            endDate = endDate,
-            frequency = GoalFrequency.MONTHLY,
-            imageUrl = "https://example.com/image.png",
-            name = randomString(20),
-            periodAmount = periodAmount,
-            startAmount = BigDecimal(0),
-            startDate = "2018-10-01",
-            target = target,
-            targetAmount = targetAmount,
-            trackingType = GoalTrackingType.values().randomElement(),
-            metadata = JsonObject().apply {
-                addProperty("seen", true)
-            })
+        accountId = randomNumber().toLong(),
+        description = randomString(200),
+        endDate = endDate,
+        frequency = GoalFrequency.MONTHLY,
+        imageUrl = "https://example.com/image.png",
+        name = randomString(20),
+        periodAmount = periodAmount,
+        startAmount = BigDecimal(0),
+        startDate = "2018-10-01",
+        target = target,
+        targetAmount = targetAmount,
+        trackingType = GoalTrackingType.values().randomElement(),
+        metadata = JsonObject().apply {
+            addProperty("seen", true)
+        }
+    )
 }

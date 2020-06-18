@@ -19,11 +19,10 @@ package us.frollo.frollosdk.surveys
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
-import org.junit.Test
-
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
@@ -65,8 +64,8 @@ class SurveysTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "user/surveys/$surveyKey") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -134,8 +133,8 @@ class SurveysTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "user/surveys/$surveyKey?latest=$latest") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -177,8 +176,8 @@ class SurveysTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == SurveysAPI.URL_SURVEYS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }

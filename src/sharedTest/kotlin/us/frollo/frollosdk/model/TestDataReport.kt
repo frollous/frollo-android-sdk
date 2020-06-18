@@ -28,15 +28,20 @@ import java.math.BigDecimal
 
 internal fun testAccountBalanceReportResponseData(): AccountBalanceReportResponse {
     val accounts = listOf(
-            AccountBalanceReportResponse.Report.BalanceReport(
-                    id = 1,
-                    currency = "AUD",
-                    value = randomNumber().toBigDecimal()))
+        AccountBalanceReportResponse.Report.BalanceReport(
+            id = 1,
+            currency = "AUD",
+            value = randomNumber().toBigDecimal()
+        )
+    )
 
-    val data = listOf(AccountBalanceReportResponse.Report(
+    val data = listOf(
+        AccountBalanceReportResponse.Report(
             date = "2019-03",
             value = randomNumber().toBigDecimal(),
-            accounts = accounts))
+            accounts = accounts
+        )
+    )
 
     return AccountBalanceReportResponse(data = data)
 }
@@ -48,19 +53,21 @@ internal fun testReportsResponseData(): ReportsResponse {
 internal fun testReportResponseData(): ReportResponse {
     val groups = listOf(testGroupReportResponseData())
     return ReportResponse(
-            date = "2019-03-01",
-            value = randomNumber().toBigDecimal(),
-            income = randomBoolean(),
-            groups = groups)
+        date = "2019-03-01",
+        value = randomNumber().toBigDecimal(),
+        income = randomBoolean(),
+        groups = groups
+    )
 }
 
 internal fun testGroupReportResponseData(): GroupReportResponse {
     return GroupReportResponse(
-            id = 1,
-            name = "living",
-            value = randomNumber().toBigDecimal(),
-            income = randomBoolean(),
-            transactionIds = listOf(1093435, 2959945))
+        id = 1,
+        name = "living",
+        value = randomNumber().toBigDecimal(),
+        income = randomBoolean(),
+        transactionIds = listOf(1093435, 2959945)
+    )
 }
 
 internal fun testReportAccountBalanceData(
@@ -71,11 +78,12 @@ internal fun testReportAccountBalanceData(
     value: BigDecimal? = null
 ): ReportAccountBalance {
     val report = ReportAccountBalance(
-            date = date,
-            accountId = accountId ?: randomNumber().toLong(),
-            currency = "AUD",
-            value = value ?: BigDecimal(34.67),
-            period = period)
+        date = date,
+        accountId = accountId ?: randomNumber().toLong(),
+        currency = "AUD",
+        value = value ?: BigDecimal(34.67),
+        period = period
+    )
 
     id?.let { report.reportId = it }
 

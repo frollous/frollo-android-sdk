@@ -29,38 +29,44 @@ class GoalCreateRequestTest {
     fun testValid() {
         // Test Target Amount
         var request = testGoalRequestTargetData(
-                target = GoalTarget.AMOUNT,
-                targetAmount = BigDecimal(20000),
-                periodAmount = null)
+            target = GoalTarget.AMOUNT,
+            targetAmount = BigDecimal(20000),
+            periodAmount = null
+        )
         assertFalse(request.valid())
         request = testGoalRequestTargetData(
-                target = GoalTarget.AMOUNT,
-                targetAmount = BigDecimal(20000),
-                periodAmount = BigDecimal(300))
+            target = GoalTarget.AMOUNT,
+            targetAmount = BigDecimal(20000),
+            periodAmount = BigDecimal(300)
+        )
         assertTrue(request.valid())
 
         // Test Target Date
         request = testGoalRequestTargetData(
-                target = GoalTarget.DATE,
-                targetAmount = BigDecimal(20000),
-                endDate = null)
+            target = GoalTarget.DATE,
+            targetAmount = BigDecimal(20000),
+            endDate = null
+        )
         assertFalse(request.valid())
         request = testGoalRequestTargetData(
-                target = GoalTarget.DATE,
-                targetAmount = BigDecimal(20000),
-                endDate = "2019-12-31")
+            target = GoalTarget.DATE,
+            targetAmount = BigDecimal(20000),
+            endDate = "2019-12-31"
+        )
         assertTrue(request.valid())
 
         // Test Target Open Ended
         request = testGoalRequestTargetData(
-                target = GoalTarget.OPEN_ENDED,
-                periodAmount = BigDecimal(300),
-                endDate = null)
+            target = GoalTarget.OPEN_ENDED,
+            periodAmount = BigDecimal(300),
+            endDate = null
+        )
         assertFalse(request.valid())
         request = testGoalRequestTargetData(
-                target = GoalTarget.OPEN_ENDED,
-                periodAmount = BigDecimal(300),
-                endDate = "2019-12-31")
+            target = GoalTarget.OPEN_ENDED,
+            periodAmount = BigDecimal(300),
+            endDate = "2019-12-31"
+        )
         assertTrue(request.valid())
     }
 }

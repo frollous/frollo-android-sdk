@@ -111,7 +111,8 @@ class SimpleSQLiteQueryBuilder(
     fun create(): SimpleSQLiteQuery {
         if (isEmpty(groupBy) && !isEmpty(having)) {
             throw IllegalArgumentException(
-                    "HAVING clauses are only permitted when using a GROUP BY clause")
+                "HAVING clauses are only permitted when using a GROUP BY clause"
+            )
         }
         val query = StringBuilder()
 

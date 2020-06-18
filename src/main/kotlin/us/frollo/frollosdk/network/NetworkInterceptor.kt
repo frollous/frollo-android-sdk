@@ -22,15 +22,15 @@ import okhttp3.Request
 import okhttp3.Response
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
-import us.frollo.frollosdk.network.NetworkHelper.Companion.HEADER_AUTHORIZATION
-import us.frollo.frollosdk.network.api.UserAPI.Companion.URL_REGISTER
-import us.frollo.frollosdk.network.api.UserAPI.Companion.URL_PASSWORD_RESET
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.toJson
 import us.frollo.frollosdk.logging.Log
+import us.frollo.frollosdk.network.NetworkHelper.Companion.HEADER_AUTHORIZATION
 import us.frollo.frollosdk.network.api.UserAPI.Companion.URL_MIGRATE_USER
+import us.frollo.frollosdk.network.api.UserAPI.Companion.URL_PASSWORD_RESET
+import us.frollo.frollosdk.network.api.UserAPI.Companion.URL_REGISTER
 import java.io.IOException
 
 internal class NetworkInterceptor(private val network: NetworkService, private val helper: NetworkHelper) : Interceptor {
@@ -91,12 +91,14 @@ internal class NetworkInterceptor(private val network: NetworkService, private v
     private fun addAuthorizationHeader(request: Request, builder: Request.Builder) {
         val url = request.url().toString()
         if (request.headers().get(HEADER_AUTHORIZATION) == null &&
-                url.contains(URL_MIGRATE_USER)) {
+            url.contains(URL_MIGRATE_USER)
+        ) {
 
             appendRefreshToken(builder)
         } else if (request.headers().get(HEADER_AUTHORIZATION) == null &&
-                !url.contains(URL_REGISTER) &&
-                !url.contains(URL_PASSWORD_RESET)) {
+            !url.contains(URL_REGISTER) &&
+            !url.contains(URL_PASSWORD_RESET)
+        ) {
 
             validateAndAppendAccessToken(builder)
         }

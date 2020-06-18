@@ -26,10 +26,14 @@ import java.math.BigDecimal
 // Declaring the ColumnInfo allows for the renaming of variables without
 // implementing a database migration, as the column name would not change.
 
-@Entity(tableName = "bill_payment",
-        indices = [Index("bill_payment_id"),
-            Index("bill_id"),
-            Index("merchant_id")])
+@Entity(
+    tableName = "bill_payment",
+    indices = [
+        Index("bill_payment_id"),
+        Index("bill_id"),
+        Index("merchant_id")
+    ]
+)
 
 /** Data representation of a Bill payment */
 data class BillPayment(

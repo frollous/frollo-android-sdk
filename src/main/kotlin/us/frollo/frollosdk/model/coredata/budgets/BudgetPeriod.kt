@@ -23,10 +23,13 @@ import androidx.room.PrimaryKey
 import us.frollo.frollosdk.model.IAdapterModel
 import java.math.BigDecimal
 
-@Entity(tableName = "budget_period",
-        indices = [
-            Index("budget_period_id"),
-            Index("budget_id")])
+@Entity(
+    tableName = "budget_period",
+    indices = [
+        Index("budget_period_id"),
+        Index("budget_id")
+    ]
+)
 
 /** Data representation of a Budget Period */
 data class BudgetPeriod(

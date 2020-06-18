@@ -75,5 +75,5 @@ enum class APIErrorType(
 
     /** Enum to localized message */
     fun toLocalizedString(context: Context?, arg1: String? = null): String? =
-            context?.resources?.getString(textResource, arg1)
+        context?.resources?.getString(textResource, arg1)
 }

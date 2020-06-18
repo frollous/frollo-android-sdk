@@ -20,12 +20,11 @@ import com.jraska.livedata.test
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
-import org.junit.Test
-
-import org.junit.Assert.assertTrue
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
@@ -33,7 +32,6 @@ import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
-import us.frollo.frollosdk.network.api.MessagesAPI
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.messages.MessageHTML
 import us.frollo.frollosdk.model.coredata.messages.MessageImage
@@ -41,6 +39,7 @@ import us.frollo.frollosdk.model.coredata.messages.MessageText
 import us.frollo.frollosdk.model.coredata.messages.MessageVideo
 import us.frollo.frollosdk.model.testMessageNotificationPayload
 import us.frollo.frollosdk.model.testMessageResponseData
+import us.frollo.frollosdk.network.api.MessagesAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
@@ -185,8 +184,8 @@ class MessagesTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == MessagesAPI.URL_MESSAGES) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -254,8 +253,8 @@ class MessagesTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == MessagesAPI.URL_MESSAGES) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -301,8 +300,8 @@ class MessagesTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "messages/12345") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -362,8 +361,8 @@ class MessagesTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == MessagesAPI.URL_UNREAD) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -434,8 +433,8 @@ class MessagesTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "messages/12345") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -493,8 +492,8 @@ class MessagesTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == "messages/12345") {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(body)
+                        .setResponseCode(200)
+                        .setBody(body)
                 }
                 return MockResponse().setResponseCode(404)
             }

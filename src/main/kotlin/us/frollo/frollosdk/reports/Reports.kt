@@ -110,9 +110,9 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
      * @return LiveData object of Resource<List<ReportAccountBalanceRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchAccountBalanceReports(query: SimpleSQLiteQuery): LiveData<Resource<List<ReportAccountBalanceRelation>>> =
-            Transformations.map(db.reportsAccountBalance().loadWithRelation(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.reportsAccountBalance().loadWithRelation(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Refresh account balance reports from the host
@@ -140,11 +140,12 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                 }
                 Resource.Status.SUCCESS -> {
                     handleAccountBalanceReportsResponse(
-                            response = resource.data?.data?.toMutableList(),
-                            period = period,
-                            accountId = accountId,
-                            accountType = accountType,
-                            completion = completion)
+                        response = resource.data?.data?.toMutableList(),
+                        period = period,
+                        accountId = accountId,
+                        accountType = accountType,
+                        completion = completion
+                    )
                 }
             }
         }
@@ -171,17 +172,19 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         completion: OnFrolloSDKCompletionListener<Resource<List<Report>>>
     ) {
         reportsAPI.fetchTransactionCategoryReports(
-                fromDate = fromDate,
-                toDate = toDate,
-                period = period,
-                grouping = grouping,
-                categoryId = categoryId).enqueue { resource ->
+            fromDate = fromDate,
+            toDate = toDate,
+            period = period,
+            grouping = grouping,
+            categoryId = categoryId
+        ).enqueue { resource ->
 
             handleTransactionReports(
-                    resource = resource,
-                    period = period,
-                    grouping = grouping ?: ReportGrouping.TRANSACTION_CATEGORY, // Set default grouping only while sending back result to the app
-                    completion = completion)
+                resource = resource,
+                period = period,
+                grouping = grouping ?: ReportGrouping.TRANSACTION_CATEGORY, // Set default grouping only while sending back result to the app
+                completion = completion
+            )
         }
     }
 
@@ -204,17 +207,19 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         completion: OnFrolloSDKCompletionListener<Resource<List<Report>>>
     ) {
         reportsAPI.fetchMerchantReports(
-                fromDate = fromDate,
-                toDate = toDate,
-                period = period,
-                grouping = grouping,
-                merchantId = merchantId).enqueue { resource ->
+            fromDate = fromDate,
+            toDate = toDate,
+            period = period,
+            grouping = grouping,
+            merchantId = merchantId
+        ).enqueue { resource ->
 
             handleTransactionReports(
-                    resource = resource,
-                    period = period,
-                    grouping = grouping ?: ReportGrouping.MERCHANT, // Set default grouping only while sending back result to the app
-                    completion = completion)
+                resource = resource,
+                period = period,
+                grouping = grouping ?: ReportGrouping.MERCHANT, // Set default grouping only while sending back result to the app
+                completion = completion
+            )
         }
     }
 
@@ -237,17 +242,19 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         completion: OnFrolloSDKCompletionListener<Resource<List<Report>>>
     ) {
         reportsAPI.fetchBudgetCategoryReports(
-                fromDate = fromDate,
-                toDate = toDate,
-                period = period,
-                grouping = grouping,
-                budgetCategory = budgetCategory).enqueue { resource ->
+            fromDate = fromDate,
+            toDate = toDate,
+            period = period,
+            grouping = grouping,
+            budgetCategory = budgetCategory
+        ).enqueue { resource ->
 
             handleTransactionReports(
-                    resource = resource,
-                    period = period,
-                    grouping = grouping ?: ReportGrouping.BUDGET_CATEGORY, // Set default grouping only while sending back result to the app
-                    completion = completion)
+                resource = resource,
+                period = period,
+                grouping = grouping ?: ReportGrouping.BUDGET_CATEGORY, // Set default grouping only while sending back result to the app
+                completion = completion
+            )
         }
     }
 
@@ -270,17 +277,19 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
         completion: OnFrolloSDKCompletionListener<Resource<List<Report>>>
     ) {
         reportsAPI.fetchTagReports(
-                fromDate = fromDate,
-                toDate = toDate,
-                period = period,
-                grouping = grouping,
-                transactionTag = transactionTag).enqueue { resource ->
+            fromDate = fromDate,
+            toDate = toDate,
+            period = period,
+            grouping = grouping,
+            transactionTag = transactionTag
+        ).enqueue { resource ->
 
             handleTransactionReports(
-                    resource = resource,
-                    period = period,
-                    grouping = grouping ?: ReportGrouping.TAG, // Set default grouping only while sending back result to the app
-                    completion = completion)
+                resource = resource,
+                period = period,
+                grouping = grouping ?: ReportGrouping.TAG, // Set default grouping only while sending back result to the app
+                completion = completion
+            )
         }
     }
 
@@ -372,9 +381,11 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
                 completion.invoke(resource.map { null })
             }
             Resource.Status.SUCCESS -> {
-                completion.invoke(resource.map { response ->
-                    response?.toReports(grouping, period)
-                })
+                completion.invoke(
+                    resource.map { response ->
+                        response?.toReports(grouping, period)
+                    }
+                )
             }
         }
     }

@@ -19,23 +19,23 @@ package us.frollo.frollosdk.testutils
 import android.content.Context
 import android.util.Log
 import androidx.annotation.RawRes
-import us.frollo.frollosdk.extensions.toString
-import java.io.InputStream
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeParseException
+import us.frollo.frollosdk.extensions.toString
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
 import java.sql.Timestamp
 import java.util.Date
 import java.util.Random
 import java.util.UUID
 
 internal fun randomNumber(range: IntRange? = null) =
-        if (range == null) Random().nextInt() else range.random()
+    if (range == null) Random().nextInt() else range.random()
 
 internal fun randomUUID() = UUID.randomUUID().toString()
 
@@ -44,15 +44,15 @@ internal fun today(format: String) = Date().toString(format)
 internal fun randomString(length: Int): String {
     val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
     return (1..length)
-            .map { kotlin.random.Random.nextInt(0, charPool.size) }
-            .map(charPool::get)
-            .joinToString("")
+        .map { kotlin.random.Random.nextInt(0, charPool.size) }
+        .map(charPool::get)
+        .joinToString("")
 }
 
 internal fun randomBoolean() = Random().nextBoolean()
 
 internal fun <T : Enum<*>> Array<T>.randomElement() =
-        this[kotlin.random.Random.nextInt(this.size)]
+    this[kotlin.random.Random.nextInt(this.size)]
 
 @Throws(Exception::class)
 fun convertStreamToString(inputStream: InputStream): String {
@@ -78,7 +78,7 @@ fun readStringFromJson(context: Context, @RawRes resId: Int): String {
 
 fun get429Response(): MockResponse {
     return MockResponse().setResponseCode(429)
-            .setBody("{\"error\":\"too_many_requests\", \"reason\":\"example reason\"}\r\n")
+        .setBody("{\"error\":\"too_many_requests\", \"reason\":\"example reason\"}\r\n")
 }
 
 fun wait(seconds: Int) {

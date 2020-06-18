@@ -31,7 +31,7 @@ data class DataError(
     /** Localized description */
     override val localizedDescription: String?
         get() = if (subType.type == type) subType.toLocalizedString(context)
-                else type.toLocalizedString(context)
+        else type.toLocalizedString(context)
 
     /** Debug description */
     override val debugDescription: String?

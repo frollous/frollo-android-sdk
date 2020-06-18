@@ -38,8 +38,8 @@ import us.frollo.frollosdk.error.OAuth2Error
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.handleOAuth2Failure
 import us.frollo.frollosdk.extensions.notify
-import us.frollo.frollosdk.model.oauth.OAuth2Scope
 import us.frollo.frollosdk.logging.Log
+import us.frollo.frollosdk.model.oauth.OAuth2Scope
 import us.frollo.frollosdk.model.oauth.OAuthTokenRequest
 import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
 import us.frollo.frollosdk.model.oauth.OAuthTokenRevokeRequest
@@ -391,8 +391,10 @@ class OAuth2Authentication(
         if (!loggedIn) {
             loggedIn = true
 
-            notify(ACTION.ACTION_AUTHENTICATION_CHANGED,
-                    bundleOf(Pair(ARGUMENT.ARG_AUTHENTICATION_STATUS, AuthenticationStatus.AUTHENTICATED)))
+            notify(
+                ACTION.ACTION_AUTHENTICATION_CHANGED,
+                bundleOf(Pair(ARGUMENT.ARG_AUTHENTICATION_STATUS, AuthenticationStatus.AUTHENTICATED))
+            )
         }
     }
 

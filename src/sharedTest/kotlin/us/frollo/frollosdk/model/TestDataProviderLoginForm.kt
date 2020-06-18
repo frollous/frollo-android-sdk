@@ -25,130 +25,140 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginFor
 
 internal fun loginFormUsernameRow(): ProviderFormRow {
     val field = ProviderFormField(
-            fieldId = "5092",
-            image = null,
-            isOptional = false,
-            maxLength = null,
-            name = "LOGIN",
-            options = null,
-            prefix = null,
-            suffix = null,
-            type = ProviderFieldType.TEXT,
-            validations = null,
-            value = "",
-            valueEditable = true)
+        fieldId = "5092",
+        image = null,
+        isOptional = false,
+        maxLength = null,
+        name = "LOGIN",
+        options = null,
+        prefix = null,
+        suffix = null,
+        type = ProviderFieldType.TEXT,
+        validations = null,
+        value = "",
+        valueEditable = true
+    )
 
     return ProviderFormRow(
-            fields = listOf(field),
-            fieldRowChoice = "0001",
-            form = "0001",
-            hint = null,
-            rowId = "7331",
-            label = "User ID")
+        fields = listOf(field),
+        fieldRowChoice = "0001",
+        form = "0001",
+        hint = null,
+        rowId = "7331",
+        label = "User ID"
+    )
 }
 
 internal fun loginFormPasswordRow(): ProviderFormRow {
     val field = ProviderFormField(
-            fieldId = "5091",
-            image = null,
-            isOptional = false,
-            maxLength = null,
-            name = "PASSWORD",
-            options = null,
-            prefix = null,
-            suffix = null,
-            type = ProviderFieldType.PASSWORD,
-            validations = null,
-            value = "",
-            valueEditable = true)
+        fieldId = "5091",
+        image = null,
+        isOptional = false,
+        maxLength = null,
+        name = "PASSWORD",
+        options = null,
+        prefix = null,
+        suffix = null,
+        type = ProviderFieldType.PASSWORD,
+        validations = null,
+        value = "",
+        valueEditable = true
+    )
 
     return ProviderFormRow(
-            fields = listOf(field),
-            fieldRowChoice = "0002",
-            form = "0001",
-            hint = null,
-            rowId = "7330",
-            label = "Password")
+        fields = listOf(field),
+        fieldRowChoice = "0002",
+        form = "0001",
+        hint = null,
+        rowId = "7330",
+        label = "Password"
+    )
 }
 
 internal fun loginFormMaxLengthRow(): ProviderFormRow {
     val field = ProviderFormField(
-            fieldId = "7224",
-            image = null,
-            isOptional = false,
-            maxLength = 12,
-            name = "MEMBER_NO",
-            options = null,
-            prefix = null,
-            suffix = null,
-            type = ProviderFieldType.TEXT,
-            validations = null,
-            value = "",
-            valueEditable = true)
+        fieldId = "7224",
+        image = null,
+        isOptional = false,
+        maxLength = 12,
+        name = "MEMBER_NO",
+        options = null,
+        prefix = null,
+        suffix = null,
+        type = ProviderFieldType.TEXT,
+        validations = null,
+        value = "",
+        valueEditable = true
+    )
 
     return ProviderFormRow(
-            fields = listOf(field),
-            fieldRowChoice = "0002",
-            form = "0001",
-            hint = null,
-            rowId = "7330",
-            label = "Member Number")
+        fields = listOf(field),
+        fieldRowChoice = "0002",
+        form = "0001",
+        hint = null,
+        rowId = "7330",
+        label = "Member Number"
+    )
 }
 
 internal fun loginFormMultipleChoiceRow(choice: String): ProviderFormRow {
     val field = ProviderFormField(
-            fieldId = "65773",
-            image = null,
-            isOptional = true,
-            maxLength = 12,
-            name = "OP_LOGIN1",
-            options = null,
-            prefix = null,
-            suffix = null,
-            type = ProviderFieldType.TEXT,
-            validations = null,
-            value = "",
-            valueEditable = true)
+        fieldId = "65773",
+        image = null,
+        isOptional = true,
+        maxLength = 12,
+        name = "OP_LOGIN1",
+        options = null,
+        prefix = null,
+        suffix = null,
+        type = ProviderFieldType.TEXT,
+        validations = null,
+        value = "",
+        valueEditable = true
+    )
 
     return ProviderFormRow(
-            fields = listOf(field),
-            fieldRowChoice = choice,
-            form = "0001",
-            hint = null,
-            rowId = "151124",
-            label = "An Option")
+        fields = listOf(field),
+        fieldRowChoice = choice,
+        form = "0001",
+        hint = null,
+        rowId = "151124",
+        label = "An Option"
+    )
 }
 
 internal fun loginFormMultipleChoiceRows(): List<ProviderFormRow> {
     return listOf(
-            loginFormMultipleChoiceRow(choice = "0002 Choice"),
-            loginFormMultipleChoiceRow(choice = "0002 Choice"),
-            loginFormMultipleChoiceRow(choice = "0002 Choice")
+        loginFormMultipleChoiceRow(choice = "0002 Choice"),
+        loginFormMultipleChoiceRow(choice = "0002 Choice"),
+        loginFormMultipleChoiceRow(choice = "0002 Choice")
     )
 }
 
 internal fun loginFormValidationField(): ProviderFormRow {
     val field = ProviderFormField(
-            fieldId = "65773",
-            image = null,
-            isOptional = true,
-            maxLength = null,
-            name = "PASSWORD",
-            options = null,
-            prefix = null,
-            suffix = null,
-            type = ProviderFieldType.TEXT,
-            validations = listOf(loginFormRegexValidation()),
-            value = "",
-            valueEditable = true)
+        fieldId = "65773",
+        image = null,
+        isOptional = true,
+        maxLength = null,
+        name = "PASSWORD",
+        options = null,
+        prefix = null,
+        suffix = null,
+        type = ProviderFieldType.TEXT,
+        validations = listOf(loginFormRegexValidation()),
+        value = "",
+        valueEditable = true
+    )
 
     return ProviderFormRow(
-            fields = listOf(field),
-            fieldRowChoice = "0001",
-            form = "0001",
-            hint = null,
-            rowId = "151124",
-            label = "Password")
+        fields = listOf(field),
+        fieldRowChoice = "0001",
+        form = "0001",
+        hint = null,
+        rowId = "151124",
+        label = "Password"
+    )
 }
 
 internal fun loginFormRegexValidation(): ProviderFieldValidation {
@@ -163,14 +173,15 @@ internal fun loginFormFilledData(formType: ProviderFormType? = null): ProviderLo
     passwordRow.fields[0].value = "password"
 
     return ProviderLoginForm(
-            formId = "3410",
-            forgetPasswordUrl = "https://secure.amp.com.au/wps/portal/sec/ForgotUsername/!ut/p/a1/04_Sj9CPykssy0xPLMnMz0vMAfGjzOIDDC1cPUzcDbwNLANcDBxdg009vfz9jQxcTfW99KPSc_KTgEoj9SPxKy3IDnIEAM_vx8Q!/",
-            formType = formType ?: ProviderFormType.LOGIN,
-            help = null,
-            mfaInfoText = null,
-            mfaTimeout = null,
-            mfaInfoTitle = null,
-            rows = listOf(usernameRow, passwordRow))
+        formId = "3410",
+        forgetPasswordUrl = "https://secure.amp.com.au/wps/portal/sec/ForgotUsername/!ut/p/a1/04_Sj9CPykssy0xPLMnMz0vMAfGjzOIDDC1cPUzcDbwNLANcDBxdg009vfz9jQxcTfW99KPSc_KTgEoj9SPxKy3IDnIEAM_vx8Q!/",
+        formType = formType ?: ProviderFormType.LOGIN,
+        help = null,
+        mfaInfoText = null,
+        mfaTimeout = null,
+        mfaInfoTitle = null,
+        rows = listOf(usernameRow, passwordRow)
+    )
 }
 
 internal fun loginFormFilledMissingRequiredField(): ProviderLoginForm {
@@ -180,14 +191,15 @@ internal fun loginFormFilledMissingRequiredField(): ProviderLoginForm {
     val passwordRow = loginFormPasswordRow()
 
     return ProviderLoginForm(
-            formId = "3410",
-            forgetPasswordUrl = "https://secure.amp.com.au/wps/portal/sec/ForgotUsername/!ut/p/a1/04_Sj9CPykssy0xPLMnMz0vMAfGjzOIDDC1cPUzcDbwNLANcDBxdg009vfz9jQxcTfW99KPSc_KTgEoj9SPxKy3IDnIEAM_vx8Q!/",
-            formType = ProviderFormType.LOGIN,
-            help = null,
-            mfaInfoText = null,
-            mfaTimeout = null,
-            mfaInfoTitle = null,
-            rows = listOf(usernameRow, passwordRow))
+        formId = "3410",
+        forgetPasswordUrl = "https://secure.amp.com.au/wps/portal/sec/ForgotUsername/!ut/p/a1/04_Sj9CPykssy0xPLMnMz0vMAfGjzOIDDC1cPUzcDbwNLANcDBxdg009vfz9jQxcTfW99KPSc_KTgEoj9SPxKy3IDnIEAM_vx8Q!/",
+        formType = ProviderFormType.LOGIN,
+        help = null,
+        mfaInfoText = null,
+        mfaTimeout = null,
+        mfaInfoTitle = null,
+        rows = listOf(usernameRow, passwordRow)
+    )
 }
 
 internal fun loginFormFilledInvalidMultipleChoiceField(): ProviderLoginForm {
@@ -197,14 +209,15 @@ internal fun loginFormFilledInvalidMultipleChoiceField(): ProviderLoginForm {
     val multipleChoiceRows = loginFormMultipleChoiceRows()
 
     return ProviderLoginForm(
-            formId = "3410",
-            forgetPasswordUrl = "https://secure.amp.com.au/wps/portal/sec/ForgotUsername/!ut/p/a1/04_Sj9CPykssy0xPLMnMz0vMAfGjzOIDDC1cPUzcDbwNLANcDBxdg009vfz9jQxcTfW99KPSc_KTgEoj9SPxKy3IDnIEAM_vx8Q!/",
-            formType = ProviderFormType.LOGIN,
-            help = null,
-            mfaInfoText = null,
-            mfaTimeout = null,
-            mfaInfoTitle = null,
-            rows = listOf(usernameRow).plus(multipleChoiceRows))
+        formId = "3410",
+        forgetPasswordUrl = "https://secure.amp.com.au/wps/portal/sec/ForgotUsername/!ut/p/a1/04_Sj9CPykssy0xPLMnMz0vMAfGjzOIDDC1cPUzcDbwNLANcDBxdg009vfz9jQxcTfW99KPSc_KTgEoj9SPxKy3IDnIEAM_vx8Q!/",
+        formType = ProviderFormType.LOGIN,
+        help = null,
+        mfaInfoText = null,
+        mfaTimeout = null,
+        mfaInfoTitle = null,
+        rows = listOf(usernameRow).plus(multipleChoiceRows)
+    )
 }
 
 internal fun loginFormMultipleChoiceFields(): ProviderLoginForm {
@@ -213,14 +226,15 @@ internal fun loginFormMultipleChoiceFields(): ProviderLoginForm {
     val multipleChoiceRows = loginFormMultipleChoiceRows()
 
     return ProviderLoginForm(
-            formId = "3410",
-            forgetPasswordUrl = "https://secure.amp.com.au/wps/portal/sec/ForgotUsername/!ut/p/a1/04_Sj9CPykssy0xPLMnMz0vMAfGjzOIDDC1cPUzcDbwNLANcDBxdg009vfz9jQxcTfW99KPSc_KTgEoj9SPxKy3IDnIEAM_vx8Q!/",
-            formType = ProviderFormType.LOGIN,
-            help = null,
-            mfaInfoText = null,
-            mfaTimeout = null,
-            mfaInfoTitle = null,
-            rows = listOf(usernameRow).plus(multipleChoiceRows))
+        formId = "3410",
+        forgetPasswordUrl = "https://secure.amp.com.au/wps/portal/sec/ForgotUsername/!ut/p/a1/04_Sj9CPykssy0xPLMnMz0vMAfGjzOIDDC1cPUzcDbwNLANcDBxdg009vfz9jQxcTfW99KPSc_KTgEoj9SPxKy3IDnIEAM_vx8Q!/",
+        formType = ProviderFormType.LOGIN,
+        help = null,
+        mfaInfoText = null,
+        mfaTimeout = null,
+        mfaInfoTitle = null,
+        rows = listOf(usernameRow).plus(multipleChoiceRows)
+    )
 }
 
 internal fun loginFormFilledMaxLengthExceededField(): ProviderLoginForm {
@@ -231,14 +245,15 @@ internal fun loginFormFilledMaxLengthExceededField(): ProviderLoginForm {
     maxLengthRow.fields[0].value = "This string is way too long"
 
     return ProviderLoginForm(
-            formId = "3410",
-            forgetPasswordUrl = "https://secure.amp.com.au/wps/portal/sec/ForgotUsername/!ut/p/a1/04_Sj9CPykssy0xPLMnMz0vMAfGjzOIDDC1cPUzcDbwNLANcDBxdg009vfz9jQxcTfW99KPSc_KTgEoj9SPxKy3IDnIEAM_vx8Q!/",
-            formType = ProviderFormType.LOGIN,
-            help = null,
-            mfaInfoText = null,
-            mfaTimeout = null,
-            mfaInfoTitle = null,
-            rows = listOf(usernameRow, maxLengthRow))
+        formId = "3410",
+        forgetPasswordUrl = "https://secure.amp.com.au/wps/portal/sec/ForgotUsername/!ut/p/a1/04_Sj9CPykssy0xPLMnMz0vMAfGjzOIDDC1cPUzcDbwNLANcDBxdg009vfz9jQxcTfW99KPSc_KTgEoj9SPxKy3IDnIEAM_vx8Q!/",
+        formType = ProviderFormType.LOGIN,
+        help = null,
+        mfaInfoText = null,
+        mfaTimeout = null,
+        mfaInfoTitle = null,
+        rows = listOf(usernameRow, maxLengthRow)
+    )
 }
 
 internal fun loginFormFilledRegexInvalidField(): ProviderLoginForm {
@@ -246,14 +261,15 @@ internal fun loginFormFilledRegexInvalidField(): ProviderLoginForm {
     regexField.fields[0].value = "Not an access code"
 
     return ProviderLoginForm(
-            formId = "3410",
-            forgetPasswordUrl = "https://secure.amp.com.au/wps/portal/sec/ForgotUsername/!ut/p/a1/04_Sj9CPykssy0xPLMnMz0vMAfGjzOIDDC1cPUzcDbwNLANcDBxdg009vfz9jQxcTfW99KPSc_KTgEoj9SPxKy3IDnIEAM_vx8Q!/",
-            formType = ProviderFormType.LOGIN,
-            help = null,
-            mfaInfoText = null,
-            mfaTimeout = null,
-            mfaInfoTitle = null,
-            rows = listOf(regexField))
+        formId = "3410",
+        forgetPasswordUrl = "https://secure.amp.com.au/wps/portal/sec/ForgotUsername/!ut/p/a1/04_Sj9CPykssy0xPLMnMz0vMAfGjzOIDDC1cPUzcDbwNLANcDBxdg009vfz9jQxcTfW99KPSc_KTgEoj9SPxKy3IDnIEAM_vx8Q!/",
+        formType = ProviderFormType.LOGIN,
+        help = null,
+        mfaInfoText = null,
+        mfaTimeout = null,
+        mfaInfoTitle = null,
+        rows = listOf(regexField)
+    )
 }
 
 /*

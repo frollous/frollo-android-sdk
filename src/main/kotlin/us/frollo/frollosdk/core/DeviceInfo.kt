@@ -30,7 +30,7 @@ class DeviceInfo(private val context: Context) {
 
     internal val deviceName: String
         get() = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) Settings.System.getString(context.contentResolver, Settings.Global.DEVICE_NAME) ?: Build.MODEL
-                else Build.MODEL
+        else Build.MODEL
 
     internal val deviceType: String
         get() = if (Build.MODEL.startsWith(Build.MANUFACTURER)) {

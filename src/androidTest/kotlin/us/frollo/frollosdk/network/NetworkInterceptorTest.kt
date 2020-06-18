@@ -21,19 +21,18 @@ import okhttp3.Request
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
-
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
-import us.frollo.frollosdk.network.api.UserAPI
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.model.api.user.UserMigrationRequest
 import us.frollo.frollosdk.model.testResetPasswordData
 import us.frollo.frollosdk.model.testValidRegisterData
+import us.frollo.frollosdk.network.api.UserAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.TestAPI
 import us.frollo.frollosdk.testutils.readStringFromJson
@@ -59,8 +58,8 @@ class NetworkInterceptorTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.user_details_complete))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.user_details_complete))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -92,8 +91,8 @@ class NetworkInterceptorTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_REGISTER) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.user_details_complete))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.user_details_complete))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -117,7 +116,7 @@ class NetworkInterceptorTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_PASSWORD_RESET) {
                     return MockResponse()
-                            .setResponseCode(200)
+                        .setResponseCode(200)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -141,8 +140,8 @@ class NetworkInterceptorTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_USER_DETAILS) {
                     return MockResponse()
-                            .setResponseCode(200)
-                            .setBody(readStringFromJson(app, R.raw.user_details_complete))
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.user_details_complete))
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -168,9 +167,9 @@ class NetworkInterceptorTest : BaseAndroidTest() {
         val interceptor = NetworkInterceptor(network, NetworkHelper(appInfo))
 
         val originalRequest = Request.Builder()
-                .url("https://id.example.com/oauth/token/")
-                .method("POST", FormBody.Builder().build())
-                .build()
+            .url("https://id.example.com/oauth/token/")
+            .method("POST", FormBody.Builder().build())
+            .build()
         val adaptedRequest = interceptor.adaptRequest(originalRequest)
 
         assertNull(adaptedRequest.header("Authorization"))
@@ -206,9 +205,11 @@ class NetworkInterceptorTest : BaseAndroidTest() {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        val request = network.authenticateRequest(Request.Builder()
+        val request = network.authenticateRequest(
+            Request.Builder()
                 .url("https://api.example.com")
-                .build())
+                .build()
+        )
         assertNotNull(request)
         assertEquals("Bearer ExistingAccessToken", request.header("Authorization"))
 
@@ -223,7 +224,7 @@ class NetworkInterceptorTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_MIGRATE_USER) {
                     return MockResponse()
-                            .setResponseCode(204)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }

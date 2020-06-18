@@ -38,10 +38,10 @@ data class ReportAccountBalanceRelation(
 
 ) : IAdapterModel {
 
-        /** Associated Account */
-        val account: AccountRelation?
-                get() {
-                        val models = accounts
-                        return if (models?.isNotEmpty() == true) models[0] else null
-                }
+    /** Associated Account */
+    val account: AccountRelation?
+        get() {
+            val models = accounts
+            return if (models?.isNotEmpty() == true) models[0] else null
+        }
 }

@@ -25,11 +25,11 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Assert
-import org.junit.Test
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
@@ -39,8 +39,8 @@ import us.frollo.frollosdk.core.ARGUMENT
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
-import us.frollo.frollosdk.network.api.EventsAPI
 import us.frollo.frollosdk.model.testTransactionUpdatedNotificationPayload
+import us.frollo.frollosdk.network.api.EventsAPI
 import us.frollo.frollosdk.testutils.trimmedPath
 import us.frollo.frollosdk.testutils.wait
 import java.util.concurrent.CountDownLatch
@@ -77,7 +77,7 @@ class EventsTest : BaseAndroidTest() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == EventsAPI.URL_EVENT) {
                     return MockResponse()
-                            .setResponseCode(201)
+                        .setResponseCode(201)
                 }
                 return MockResponse().setResponseCode(404)
             }

@@ -26,8 +26,10 @@ import us.frollo.frollosdk.model.IAdapterModel
 // Declaring the ColumnInfo allows for the renaming of variables without
 // implementing a database migration, as the column name would not change.
 
-@Entity(tableName = "provider",
-        indices = [Index("provider_id")])
+@Entity(
+    tableName = "provider",
+    indices = [Index("provider_id")]
+)
 
 /** Data representation Provider */
 data class Provider(

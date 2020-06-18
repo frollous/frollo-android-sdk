@@ -28,15 +28,16 @@ internal fun testSDKConfig(
     redirectUrl: String? = null,
     revokeTokenURL: String? = null
 ) =
-        FrolloSDKConfiguration(
-                authenticationType = AuthenticationType.OAuth2(
-                        redirectUrl = redirectUrl ?: "app://redirect",
-                        authorizationUrl = authorizationUrl ?: "https://id.example.com/oauth/authorize/",
-                        tokenUrl = tokenUrl ?: "https://id.example.com/oauth/token/",
-                        revokeTokenURL = revokeTokenURL ?: "https://id.example.com/oauth/revoke/"
-                ),
-                clientId = clientId ?: "abc123",
-                serverUrl = serverUrl ?: "https://api.example.com/")
+    FrolloSDKConfiguration(
+        authenticationType = AuthenticationType.OAuth2(
+            redirectUrl = redirectUrl ?: "app://redirect",
+            authorizationUrl = authorizationUrl ?: "https://id.example.com/oauth/authorize/",
+            tokenUrl = tokenUrl ?: "https://id.example.com/oauth/token/",
+            revokeTokenURL = revokeTokenURL ?: "https://id.example.com/oauth/revoke/"
+        ),
+        clientId = clientId ?: "abc123",
+        serverUrl = serverUrl ?: "https://api.example.com/"
+    )
 
 internal fun testSDKCustomConfig(
     accessTokenProvider: AccessTokenProvider,
@@ -44,7 +45,8 @@ internal fun testSDKCustomConfig(
     clientId: String? = null,
     serverUrl: String? = null
 ) =
-        FrolloSDKConfiguration(
-                authenticationType = AuthenticationType.Custom(accessTokenProvider, authenticationCallback),
-                clientId = clientId ?: "abc123",
-                serverUrl = serverUrl ?: "https://api.example.com/")
+    FrolloSDKConfiguration(
+        authenticationType = AuthenticationType.Custom(accessTokenProvider, authenticationCallback),
+        clientId = clientId ?: "abc123",
+        serverUrl = serverUrl ?: "https://api.example.com/"
+    )

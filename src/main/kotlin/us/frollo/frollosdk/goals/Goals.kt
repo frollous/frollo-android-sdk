@@ -35,7 +35,6 @@ import us.frollo.frollosdk.extensions.fetchGoals
 import us.frollo.frollosdk.extensions.sqlForGoalIds
 import us.frollo.frollosdk.extensions.sqlForGoalPeriods
 import us.frollo.frollosdk.extensions.sqlForGoals
-import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toGoal
 import us.frollo.frollosdk.mapping.toGoalPeriod
@@ -52,6 +51,7 @@ import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
+import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.GoalsAPI
 import java.math.BigDecimal
 
@@ -74,9 +74,9 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<Goal> which can be observed using an Observer for future changes as well.
      */
     fun fetchGoal(goalId: Long): LiveData<Resource<Goal>> =
-            Transformations.map(db.goals().load(goalId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.goals().load(goalId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch goal by ID from the cache along with other associated data.
@@ -86,9 +86,9 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<GoalRelation> which can be observed using an Observer for future changes as well.
      */
     fun fetchGoalWithRelation(goalId: Long): LiveData<Resource<GoalRelation>> =
-            Transformations.map(db.goals().loadWithRelation(goalId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.goals().loadWithRelation(goalId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch goals from the cache
@@ -110,17 +110,20 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
         trackingType: GoalTrackingType? = null,
         accountId: Long? = null
     ): LiveData<Resource<List<Goal>>> =
-            Transformations.map(db.goals().loadByQuery(
-                    sqlForGoals(
-                            frequency = frequency,
-                            status = status,
-                            target = target,
-                            trackingStatus = trackingStatus,
-                            trackingType = trackingType,
-                            accountId = accountId))
-            ) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(
+            db.goals().loadByQuery(
+                sqlForGoals(
+                    frequency = frequency,
+                    status = status,
+                    target = target,
+                    trackingStatus = trackingStatus,
+                    trackingType = trackingType,
+                    accountId = accountId
+                )
+            )
+        ) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch goals by SQL query from the cache
@@ -132,9 +135,9 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<Goal>> which can be observed using an Observer for future changes as well.
      */
     fun fetchGoals(query: SimpleSQLiteQuery): LiveData<Resource<List<Goal>>> =
-            Transformations.map(db.goals().loadByQuery(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.goals().loadByQuery(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch goals from the cache with associated data
@@ -156,17 +159,20 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
         trackingType: GoalTrackingType? = null,
         accountId: Long? = null
     ): LiveData<Resource<List<GoalRelation>>> =
-            Transformations.map(db.goals().loadByQueryWithRelation(
-                    sqlForGoals(
-                            frequency = frequency,
-                            status = status,
-                            target = target,
-                            trackingStatus = trackingStatus,
-                            trackingType = trackingType,
-                            accountId = accountId))
-            ) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(
+            db.goals().loadByQueryWithRelation(
+                sqlForGoals(
+                    frequency = frequency,
+                    status = status,
+                    target = target,
+                    trackingStatus = trackingStatus,
+                    trackingType = trackingType,
+                    accountId = accountId
+                )
+            )
+        ) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch goals by SQL query from the cache with associated data
@@ -178,9 +184,9 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<GoalRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchGoalsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<GoalRelation>>> =
-            Transformations.map(db.goals().loadByQueryWithRelation(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.goals().loadByQueryWithRelation(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Refresh a specific goal by ID from the host
@@ -222,10 +228,11 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
                 }
                 Resource.Status.SUCCESS -> {
                     handleGoalsResponse(
-                            response = resource.data,
-                            status = status,
-                            trackingStatus = trackingStatus,
-                            completion = completion)
+                        response = resource.data,
+                        status = status,
+                        trackingStatus = trackingStatus,
+                        completion = completion
+                    )
                 }
             }
         }
@@ -266,19 +273,20 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
         val request = GoalCreateRequest(
-                name = name,
-                description = description,
-                imageUrl = imageUrl,
-                target = target,
-                trackingType = trackingType,
-                frequency = frequency,
-                startDate = startDate,
-                endDate = endDate,
-                periodAmount = periodAmount,
-                startAmount = startAmount,
-                targetAmount = targetAmount,
-                accountId = accountId,
-                metadata = metadata ?: JsonObject())
+            name = name,
+            description = description,
+            imageUrl = imageUrl,
+            target = target,
+            trackingType = trackingType,
+            frequency = frequency,
+            startDate = startDate,
+            endDate = endDate,
+            periodAmount = periodAmount,
+            startAmount = startAmount,
+            targetAmount = targetAmount,
+            accountId = accountId,
+            metadata = metadata ?: JsonObject()
+        )
 
         if (!request.valid()) {
             val error = DataError(type = DataErrorType.API, subType = DataErrorSubType.INVALID_DATA)
@@ -307,10 +315,11 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
      */
     fun updateGoal(goal: Goal, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val request = GoalUpdateRequest(
-                name = goal.name,
-                description = goal.description,
-                imageUrl = goal.imageUrl,
-                metadata = goal.metadata ?: JsonObject())
+            name = goal.name,
+            description = goal.description,
+            imageUrl = goal.imageUrl,
+            metadata = goal.metadata ?: JsonObject()
+        )
 
         goalsAPI.updateGoal(goal.goalId, request).enqueue { resource ->
             when (resource.status) {
@@ -356,9 +365,9 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<GoalPeriod> which can be observed using an Observer for future changes as well.
      */
     fun fetchGoalPeriod(goalPeriodId: Long): LiveData<Resource<GoalPeriod>> =
-            Transformations.map(db.goalPeriods().load(goalPeriodId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.goalPeriods().load(goalPeriodId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch goal periods by goal ID from the cache
@@ -372,9 +381,9 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
         goalId: Long? = null,
         trackingStatus: GoalTrackingStatus? = null
     ): LiveData<Resource<List<GoalPeriod>>> =
-            Transformations.map(db.goalPeriods().loadByQuery(sqlForGoalPeriods(goalId, trackingStatus))) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.goalPeriods().loadByQuery(sqlForGoalPeriods(goalId, trackingStatus))) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch goal periods by SQL query from the cache
@@ -386,9 +395,9 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<GoalPeriod>> which can be observed using an Observer for future changes as well.
      */
     fun fetchGoalPeriods(query: SimpleSQLiteQuery): LiveData<Resource<List<GoalPeriod>>> =
-            Transformations.map(db.goalPeriods().loadByQuery(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.goalPeriods().loadByQuery(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch goal period by ID from the cache with associated data
@@ -398,9 +407,9 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<GoalPeriodRelation> which can be observed using an Observer for future changes as well.
      */
     fun fetchGoalPeriodWithRelation(goalPeriodId: Long): LiveData<Resource<GoalPeriodRelation>> =
-            Transformations.map(db.goalPeriods().loadWithRelation(goalPeriodId)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.goalPeriods().loadWithRelation(goalPeriodId)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Fetch goal periods by goal ID from the cache with associated data
@@ -414,9 +423,9 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
         goalId: Long? = null,
         trackingStatus: GoalTrackingStatus? = null
     ): LiveData<Resource<List<GoalPeriodRelation>>> =
-            Transformations.map(db.goalPeriods().loadByQueryWithRelation(sqlForGoalPeriods(goalId, trackingStatus))) { models ->
-                Resource.success(models)
-            }
+        Transformations.map(db.goalPeriods().loadByQueryWithRelation(sqlForGoalPeriods(goalId, trackingStatus))) { models ->
+            Resource.success(models)
+        }
 
     /**
      * Advanced method to fetch goal periods by SQL query from the cache with associated data
@@ -428,9 +437,9 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
      * @return LiveData object of Resource<List<GoalPeriodRelation>> which can be observed using an Observer for future changes as well.
      */
     fun fetchGoalPeriodsWithRelation(query: SimpleSQLiteQuery): LiveData<Resource<List<GoalPeriodRelation>>> =
-            Transformations.map(db.goalPeriods().loadByQueryWithRelation(query)) { model ->
-                Resource.success(model)
-            }
+        Transformations.map(db.goalPeriods().loadByQueryWithRelation(query)) { model ->
+            Resource.success(model)
+        }
 
     /**
      * Refresh goal period by ID from the host
@@ -550,10 +559,10 @@ class Goals(network: NetworkService, private val db: SDKDatabase) {
     }
 
     private fun mapGoalsResponse(models: List<GoalResponse>): List<Goal> =
-            models.map { it.toGoal() }.toList()
+        models.map { it.toGoal() }.toList()
 
     private fun mapGoalPeriodsResponse(models: List<GoalPeriodResponse>): List<GoalPeriod> =
-            models.map { it.toGoalPeriod() }.toList()
+        models.map { it.toGoalPeriod() }.toList()
 
     // WARNING: Do not call this method on the main thread
     private fun removeCachedGoals(goalIds: LongArray) {

@@ -25,8 +25,10 @@ import androidx.room.PrimaryKey
 // Declaring the ColumnInfo allows for the renaming of variables without
 // implementing a database migration, as the column name would not change.
 
-@Entity(tableName = "user",
-        indices = [Index("user_id")])
+@Entity(
+    tableName = "user",
+    indices = [Index("user_id")]
+)
 
 /**
  * Data representation of User

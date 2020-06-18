@@ -16,13 +16,11 @@
 
 package us.frollo.frollosdk.extensions
 
-import TransactionFilter
 import android.os.Bundle
 import androidx.sqlite.db.SimpleSQLiteQuery
 import org.threeten.bp.LocalDate
 import org.threeten.bp.temporal.ChronoUnit
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
-import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
@@ -34,8 +32,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategoryType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
-import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
-import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionFilter
 import us.frollo.frollosdk.model.coredata.bills.BillFrequency
 import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.model.coredata.bills.BillStatus
@@ -43,6 +40,7 @@ import us.frollo.frollosdk.model.coredata.bills.BillType
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
+import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -55,25 +53,25 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.model.coredata.user.User
 import us.frollo.frollosdk.notifications.NotificationPayloadNames
-import java.math.BigDecimal
 import kotlin.math.absoluteValue
 
 internal fun User.updateRequest(): UserUpdateRequest =
-        UserUpdateRequest(
-                firstName = firstName,
-                email = email,
-                primaryCurrency = primaryCurrency,
-                attribution = attribution,
-                lastName = lastName,
-                mobileNumber = mobileNumber,
-                gender = gender,
-                currentAddress = currentAddress,
-                householdSize = householdSize,
-                householdType = householdType,
-                occupation = occupation,
-                industry = industry,
-                dateOfBirth = dateOfBirth,
-                driverLicense = driverLicense)
+    UserUpdateRequest(
+        firstName = firstName,
+        email = email,
+        primaryCurrency = primaryCurrency,
+        attribution = attribution,
+        lastName = lastName,
+        mobileNumber = mobileNumber,
+        gender = gender,
+        currentAddress = currentAddress,
+        householdSize = householdSize,
+        householdType = householdType,
+        occupation = occupation,
+        industry = industry,
+        dateOfBirth = dateOfBirth,
+        driverLicense = driverLicense
+    )
 
 internal fun sqlForMessages(messageTypes: List<String>? = null, read: Boolean? = null, contentType: ContentType? = null): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("message")
@@ -148,24 +146,24 @@ internal fun sqlForTransactionStaleIds(
         when (daysInBetween.absoluteValue) {
             0L -> {
                 // this is same day so we need a and
-                dateQueryBuilder.append("(transaction_date = '${beforeDate}' AND transaction_id <= $beforeId) ")
-                dateQueryBuilder.append("and (transaction_date = '${afterDate}' AND transaction_id >= $afterId) ")
+                dateQueryBuilder.append("(transaction_date = '$beforeDate' AND transaction_id <= $beforeId) ")
+                dateQueryBuilder.append("and (transaction_date = '$afterDate' AND transaction_id >= $afterId) ")
             }
             1L -> {
                 // this is 2 different dates , so we need a or
-                dateQueryBuilder.append("(transaction_date = '${beforeDate}' AND transaction_id <= $beforeId) ")
-                dateQueryBuilder.append("or (transaction_date = '${afterDate}' AND transaction_id >= $afterId) ")
+                dateQueryBuilder.append("(transaction_date = '$beforeDate' AND transaction_id <= $beforeId) ")
+                dateQueryBuilder.append("or (transaction_date = '$afterDate' AND transaction_id >= $afterId) ")
             }
             2L -> {
-                dateQueryBuilder.append("(transaction_date = '${beforeDate}' AND transaction_id <= $beforeId) ")
-                dateQueryBuilder.append("and ((transaction_date = '${afterDate}' AND transaction_id >= $afterId) ")
+                dateQueryBuilder.append("(transaction_date = '$beforeDate' AND transaction_id <= $beforeId) ")
+                dateQueryBuilder.append("and ((transaction_date = '$afterDate' AND transaction_id >= $afterId) ")
                 dateQueryBuilder.append("or transaction_date = '${afterDate.toLocalDate(Transaction.DATE_FORMAT_PATTERN).plusDays(1)}') ")
             }
             else -> {
                 dateQueryBuilder.append("((transaction_date >= '${afterDate.toLocalDate(Transaction.DATE_FORMAT_PATTERN).plusDays(1)}')  ")
                 dateQueryBuilder.append("and (transaction_date <= '${beforeDate.toLocalDate(Transaction.DATE_FORMAT_PATTERN).minusDays(1)}')) ")
-                dateQueryBuilder.append("or ((transaction_date = '${beforeDate}' AND transaction_id <= $beforeId) ")
-                dateQueryBuilder.append("or (transaction_date = '${afterDate}' AND transaction_id >= $afterId)) ")
+                dateQueryBuilder.append("or ((transaction_date = '$beforeDate' AND transaction_id <= $beforeId) ")
+                dateQueryBuilder.append("or (transaction_date = '$afterDate' AND transaction_id >= $afterId)) ")
             }
         }
     }
@@ -175,7 +173,7 @@ internal fun sqlForTransactionStaleIds(
         // no more transactions in future, so u take first transaction in before and get every after that
         dateQueryBuilder.append(where)
         dateQueryBuilder.append(" (transaction_date <= '${beforeDate.toLocalDate(Transaction.DATE_FORMAT_PATTERN).minusDays(1)}') ")
-        dateQueryBuilder.append("or (transaction_date = '${beforeDate}' AND transaction_id <= $beforeId) ")
+        dateQueryBuilder.append("or (transaction_date = '$beforeDate' AND transaction_id <= $beforeId) ")
     }
 
     if (beforeDate == null && afterDate != null) {
@@ -184,7 +182,7 @@ internal fun sqlForTransactionStaleIds(
         dateQueryBuilder.append(where)
         dateQueryBuilder.append("(transaction_date <= '${LocalDate.now().toString(Transaction.DATE_FORMAT_PATTERN)}') ")
         dateQueryBuilder.append("or transaction_date >= '${afterDate.toLocalDate(Transaction.DATE_FORMAT_PATTERN).plusDays(1)}'  ") // 2018-08-02
-        dateQueryBuilder.append("OR (transaction_date = '${afterDate}' AND transaction_id >= $afterId) ") // 2018-08-01 5
+        dateQueryBuilder.append("OR (transaction_date = '$afterDate' AND transaction_id >= $afterId) ") // 2018-08-01 5
     }
 
     // i opened my account today, there are barely any transactions
@@ -193,18 +191,20 @@ internal fun sqlForTransactionStaleIds(
     }
 
     val dateQuery = dateQueryBuilder.toString()
-    return SimpleSQLiteQuery(whereClauseForTransactions(
-            dateQuery,transactionFilter
-            ))
+    return SimpleSQLiteQuery(
+        whereClauseForTransactions(
+            dateQuery, transactionFilter
+        )
+    )
 }
 
-internal fun sqlForTransactions(transactionFilter: TransactionFilter, isCredit:Boolean? = null): SimpleSQLiteQuery {
+internal fun sqlForTransactions(transactionFilter: TransactionFilter, isCredit: Boolean? = null): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("transaction_model")
     whereClauseForTransactions(sqlQueryBuilder, transactionFilter, isCredit)
     return sqlQueryBuilder.create()
 }
 
-private fun whereClauseForTransactions(sqLiteQueryBuilder: SimpleSQLiteQueryBuilder, transactionFilter: TransactionFilter, isCredit: Boolean? = null){
+private fun whereClauseForTransactions(sqLiteQueryBuilder: SimpleSQLiteQueryBuilder, transactionFilter: TransactionFilter, isCredit: Boolean? = null) {
     transactionFilter.accountIds?.let { sqLiteQueryBuilder.appendSelection(selection = "account_id IN (${transactionFilter.accountIds.joinToString(",")})") }
     transactionFilter.merchantIds?.let { sqLiteQueryBuilder.appendSelection(selection = "merchant_id IN (${transactionFilter.merchantIds.joinToString(",")})") }
     transactionFilter.transactionCategoryIds?.let { sqLiteQueryBuilder.appendSelection(selection = "category_id IN (${transactionFilter.transactionCategoryIds.joinToString(",")})") }
@@ -228,13 +228,12 @@ private fun whereClauseForTransactions(sqLiteQueryBuilder: SimpleSQLiteQueryBuil
     transactionFilter.minAmount?.let { sqLiteQueryBuilder.appendSelection(selection = "ABS(CAST(amount_amount AS DECIMAL)) >= $it") }
     transactionFilter.maxAmount?.let { sqLiteQueryBuilder.appendSelection(selection = "ABS(CAST(amount_amount AS DECIMAL)) <= $it") }
     transactionFilter.baseType?.let { sqLiteQueryBuilder.appendSelection(selection = "base_type = '${ it.name }'") }
-    transactionFilter.status?.let{sqLiteQueryBuilder.appendSelection(selection = "status = '${ it.name}'") }
+    transactionFilter.status?.let { sqLiteQueryBuilder.appendSelection(selection = "status = '${ it.name}'") }
     transactionFilter.accountIncluded?.let { sqLiteQueryBuilder.appendSelection(selection = "account_included = ${ it.toInt() }") }
     transactionFilter.transactionIncluded?.let { sqLiteQueryBuilder.appendSelection(selection = "transaction_included = ${ it.toInt() }") }
     transactionFilter.searchTerm?.let {
         sqLiteQueryBuilder.appendSelection(selection = " ( description_original LIKE '%$it%' or description_user LIKE '%$it%' or description_simple LIKE '%$it%' ) ")
     }
-
 }
 
 private fun whereClauseForTransactions(
@@ -625,33 +624,36 @@ internal fun sqlForGoalPeriods(
 }
 
 internal fun Bundle.toNotificationPayload(): NotificationPayload =
-        createNotificationPayload(
-                getString(NotificationPayloadNames.EVENT.toString()),
-                getString(NotificationPayloadNames.LINK.toString()),
-                getString(NotificationPayloadNames.TRANSACTION_IDS.toString()),
-                getString(NotificationPayloadNames.USER_EVENT_ID.toString()),
-                getString(NotificationPayloadNames.USER_MESSAGE_ID.toString()))
+    createNotificationPayload(
+        getString(NotificationPayloadNames.EVENT.toString()),
+        getString(NotificationPayloadNames.LINK.toString()),
+        getString(NotificationPayloadNames.TRANSACTION_IDS.toString()),
+        getString(NotificationPayloadNames.USER_EVENT_ID.toString()),
+        getString(NotificationPayloadNames.USER_MESSAGE_ID.toString())
+    )
 
 internal fun Map<String, String>.toNotificationPayload(): NotificationPayload =
-        createNotificationPayload(
-                get(NotificationPayloadNames.EVENT.toString()),
-                get(NotificationPayloadNames.LINK.toString()),
-                get(NotificationPayloadNames.TRANSACTION_IDS.toString()),
-                get(NotificationPayloadNames.USER_EVENT_ID.toString()),
-                get(NotificationPayloadNames.USER_MESSAGE_ID.toString()))
+    createNotificationPayload(
+        get(NotificationPayloadNames.EVENT.toString()),
+        get(NotificationPayloadNames.LINK.toString()),
+        get(NotificationPayloadNames.TRANSACTION_IDS.toString()),
+        get(NotificationPayloadNames.USER_EVENT_ID.toString()),
+        get(NotificationPayloadNames.USER_MESSAGE_ID.toString())
+    )
 
 internal fun createNotificationPayload(event: String? = null, link: String? = null, transactionIDs: String? = null, userEventID: String? = null, userMessageID: String? = null) =
-        NotificationPayload(
-                event = event,
-                link = link,
-                transactionIDs = transactionIDs
-                        ?.replace("[", "")
-                        ?.replace("]", "")
-                        ?.split(",")
-                        ?.map { it.toLong() }
-                        ?.toList(),
-                userEventID = userEventID?.trim()?.toLong(),
-                userMessageID = userMessageID?.trim()?.toLong())
+    NotificationPayload(
+        event = event,
+        link = link,
+        transactionIDs = transactionIDs
+            ?.replace("[", "")
+            ?.replace("]", "")
+            ?.split(",")
+            ?.map { it.toLong() }
+            ?.toList(),
+        userEventID = userEventID?.trim()?.toLong(),
+        userMessageID = userMessageID?.trim()?.toLong()
+    )
 
 internal fun String.toBudgetCategory(): BudgetCategory? {
     return when (this) {
@@ -722,7 +724,8 @@ internal fun sqlForBudgetPeriods(
     budgetId?.let { sqlQueryBuilder.appendSelection(selection = "budget_id = $it") }
     trackingStatus?.let { sqlQueryBuilder.appendSelection(selection = "tracking_status = '${ it.name }'") }
     ifNotNull(fromDate, toDate) {
-        from, to -> sqlQueryBuilder.appendSelection(selection = "(start_date BETWEEN Date('$from') AND Date('$to'))")
+        from, to ->
+        sqlQueryBuilder.appendSelection(selection = "(start_date BETWEEN Date('$from') AND Date('$to'))")
     }
 
     return sqlQueryBuilder.create()

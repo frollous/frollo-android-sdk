@@ -29,13 +29,14 @@ internal fun testOAuthTokenRequestData(
 ): OAuthTokenRequest {
 
     return OAuthTokenRequest(
-            grantType = grantType,
-            clientId = randomString(32),
-            domain = "api.example.com",
-            username = "user@example.com",
-            password = password,
-            legacyToken = legacyToken,
-            refreshToken = refreshToken,
-            code = authorizationCode,
-            audience = "https://api.example.com/api/v2")
+        grantType = grantType,
+        clientId = randomString(32),
+        domain = "api.example.com",
+        username = "user@example.com",
+        password = password,
+        legacyToken = legacyToken,
+        refreshToken = refreshToken,
+        code = authorizationCode,
+        audience = "https://api.example.com/api/v2"
+    )
 }

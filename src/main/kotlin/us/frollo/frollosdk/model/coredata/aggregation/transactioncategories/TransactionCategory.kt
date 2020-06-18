@@ -26,8 +26,10 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 // Declaring the ColumnInfo allows for the renaming of variables without
 // implementing a database migration, as the column name would not change.
 
-@Entity(tableName = "transaction_category",
-        indices = [Index("transaction_category_id")])
+@Entity(
+    tableName = "transaction_category",
+    indices = [Index("transaction_category_id")]
+)
 
 /** Data representation of a Transaction Category */
 data class TransactionCategory(

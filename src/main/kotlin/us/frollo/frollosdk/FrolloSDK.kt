@@ -28,8 +28,8 @@ import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.authentication.AuthenticationStatus
 import us.frollo.frollosdk.authentication.AuthenticationType.Custom
 import us.frollo.frollosdk.authentication.AuthenticationType.OAuth2
-import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.authentication.OAuth2Authentication
+import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.authentication.TokenInjector
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.bills.Bills
@@ -38,10 +38,9 @@ import us.frollo.frollosdk.core.ACTION.ACTION_AUTHENTICATION_CHANGED
 import us.frollo.frollosdk.core.ARGUMENT.ARG_AUTHENTICATION_STATUS
 import us.frollo.frollosdk.core.AppInfo
 import us.frollo.frollosdk.core.DeviceInfo
-import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.core.FrolloSDKConfiguration
+import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.events.Events
 import us.frollo.frollosdk.extensions.notify
@@ -51,6 +50,7 @@ import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
+import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.notifications.Notifications
 import us.frollo.frollosdk.preferences.Preferences
@@ -282,7 +282,7 @@ object FrolloSDK {
      * Get Token Injector. See [TokenInjector] for details
      */
     fun getTokenInjector(): TokenInjector =
-            tokenInjector ?: throw IllegalAccessException(SDK_NOT_SETUP)
+        tokenInjector ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     /**
      * Reset the SDK. Clears all caches, databases, tokens, keystore and preferences.
@@ -312,8 +312,10 @@ object FrolloSDK {
         database.clearAllTables()
         completion?.invoke(Result.success())
 
-        notify(ACTION_AUTHENTICATION_CHANGED,
-                bundleOf(Pair(ARG_AUTHENTICATION_STATUS, AuthenticationStatus.LOGGED_OUT)))
+        notify(
+            ACTION_AUTHENTICATION_CHANGED,
+            bundleOf(Pair(ARG_AUTHENTICATION_STATUS, AuthenticationStatus.LOGGED_OUT))
+        )
     }
 
     private fun initializeThreeTenABP() {
@@ -416,9 +418,10 @@ object FrolloSDK {
         }
         refreshTimer = Timer()
         refreshTimer?.schedule(
-                timerTask,
-                CACHE_EXPIRY, // Initial delay set to CACHE_EXPIRY minutes, as refreshData() would have already run refreshPrimary() once.
-                CACHE_EXPIRY) // Repeat every CACHE_EXPIRY minutes
+            timerTask,
+            CACHE_EXPIRY, // Initial delay set to CACHE_EXPIRY minutes, as refreshData() would have already run refreshPrimary() once.
+            CACHE_EXPIRY
+        ) // Repeat every CACHE_EXPIRY minutes
     }
 
     private fun pauseScheduledRefreshing() {

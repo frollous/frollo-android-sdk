@@ -42,8 +42,8 @@ data class FrolloSDKConfiguration(
     internal fun validForROPC(): Boolean {
         if (authenticationType is OAuth2) {
             return clientId.isNotBlank() &&
-                    authenticationType.tokenUrl.isNotBlank() &&
-                    serverUrl.isNotBlank()
+                authenticationType.tokenUrl.isNotBlank() &&
+                serverUrl.isNotBlank()
         }
         return false
     }
@@ -51,10 +51,10 @@ data class FrolloSDKConfiguration(
     internal fun validForAuthorizationCodeFlow(): Boolean {
         if (authenticationType is OAuth2) {
             return clientId.isNotBlank() &&
-                    authenticationType.tokenUrl.isNotBlank() &&
-                    authenticationType.redirectUrl.isNotBlank() &&
-                    authenticationType.authorizationUrl.isNotBlank() &&
-                    serverUrl.isNotBlank()
+                authenticationType.tokenUrl.isNotBlank() &&
+                authenticationType.redirectUrl.isNotBlank() &&
+                authenticationType.authorizationUrl.isNotBlank() &&
+                serverUrl.isNotBlank()
         }
         return false
     }

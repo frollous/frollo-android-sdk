@@ -16,9 +16,9 @@
 
 package us.frollo.frollosdk.mapping
 
-import org.junit.Assert.assertTrue
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import us.frollo.frollosdk.model.api.messages.MessageContent
 import us.frollo.frollosdk.model.coredata.messages.ContentType

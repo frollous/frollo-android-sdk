@@ -58,9 +58,9 @@ internal inline fun <reified T> Gson.fromJson(json: String): T? {
  */
 internal fun Enum<*>.serializedName(): String? {
     return javaClass.getField(name).annotations
-            .filter { it.annotationClass == SerializedName::class }
-            .map { it as SerializedName }
-            .firstOrNull()?.value
+        .filter { it.annotationClass == SerializedName::class }
+        .map { it as SerializedName }
+        .firstOrNull()?.value
 }
 
 /* Network Extensions */

@@ -17,10 +17,9 @@
 package us.frollo.frollosdk.network
 
 import okhttp3.Request
-import org.junit.Test
-
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
@@ -35,9 +34,11 @@ class NetworkServiceTest : BaseAndroidTest() {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        val request = network.authenticateRequest(Request.Builder()
+        val request = network.authenticateRequest(
+            Request.Builder()
                 .url("http://api.example.com/")
-                .build())
+                .build()
+        )
         assertNotNull(request)
         assertEquals("http://api.example.com/", request.url().toString())
 

@@ -27,17 +27,19 @@ import us.frollo.frollosdk.testutils.randomString
 internal fun testProviderAccountResponseData(providerAccountId: Long? = null, providerId: Long? = null, accountRefreshStatus: AccountRefreshStatus? = null): ProviderAccountResponse {
 
     val refreshStatus = RefreshStatus(
-            status = accountRefreshStatus ?: AccountRefreshStatus.NEEDS_ACTION,
-            subStatus = AccountRefreshSubStatus.INPUT_REQUIRED,
-            additionalStatus = AccountRefreshAdditionalStatus.MFA_NEEDED,
-            lastRefreshed = "2019-01-01",
-            nextRefresh = "2019-01-01")
+        status = accountRefreshStatus ?: AccountRefreshStatus.NEEDS_ACTION,
+        subStatus = AccountRefreshSubStatus.INPUT_REQUIRED,
+        additionalStatus = AccountRefreshAdditionalStatus.MFA_NEEDED,
+        lastRefreshed = "2019-01-01",
+        nextRefresh = "2019-01-01"
+    )
 
     return ProviderAccountResponse(
-            providerAccountId = providerAccountId ?: randomNumber().toLong(),
-            providerId = providerId ?: randomNumber().toLong(),
-            editable = true,
-            refreshStatus = refreshStatus,
-            loginForm = null,
-            externalId = randomString(8))
+        providerAccountId = providerAccountId ?: randomNumber().toLong(),
+        providerId = providerId ?: randomNumber().toLong(),
+        editable = true,
+        refreshStatus = refreshStatus,
+        loginForm = null,
+        externalId = randomString(8)
+    )
 }

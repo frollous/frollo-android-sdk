@@ -20,12 +20,12 @@ import us.frollo.frollosdk.model.api.shared.Paging
 
 /** Model with information of transaction Pagination cursors and total count, ids and dates **/
 data class TransactionPaginationInfo(
-        val paging: Paging,
-        val beforeId: Long?,
-        val afterId: Long?,
-        val beforeDate: String?,
-        val afterDate: String?,
-        val before: String? = null,
-        val after: String? = null,
-        val total: Long? = null
+    val paging: Paging,
+    val beforeId: Long?,
+    val afterId: Long?,
+    val beforeDate: String?,
+    val afterDate: String?,
+    val before: String? = null,
+    val after: String? = null,
+    val total: Long? = null
 )

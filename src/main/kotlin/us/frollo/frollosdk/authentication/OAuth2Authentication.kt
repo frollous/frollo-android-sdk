@@ -19,7 +19,6 @@ package us.frollo.frollosdk.authentication
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.Intent
-import androidx.core.os.bundleOf
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
@@ -392,8 +391,9 @@ class OAuth2Authentication(
             loggedIn = true
 
             notify(
-                ACTION.ACTION_AUTHENTICATION_CHANGED,
-                bundleOf(Pair(ARGUMENT.ARG_AUTHENTICATION_STATUS, AuthenticationStatus.AUTHENTICATED))
+                action = ACTION.ACTION_AUTHENTICATION_CHANGED,
+                extrasKey = ARGUMENT.ARG_AUTHENTICATION_STATUS,
+                extrasData = AuthenticationStatus.AUTHENTICATED
             )
         }
     }

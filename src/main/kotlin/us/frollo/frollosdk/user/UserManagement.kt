@@ -362,7 +362,7 @@ class UserManagement(
 
                 uiThread {
                     completion?.invoke(Result.success())
-                    notify(ACTION.ACTION_USER_UPDATED)
+                    notify(action = ACTION.ACTION_USER_UPDATED)
                 }
             }
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.

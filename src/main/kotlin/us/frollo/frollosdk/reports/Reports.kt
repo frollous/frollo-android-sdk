@@ -37,7 +37,7 @@ import us.frollo.frollosdk.extensions.fetchBudgetCategoryReports
 import us.frollo.frollosdk.extensions.fetchMerchantReports
 import us.frollo.frollosdk.extensions.fetchTagReports
 import us.frollo.frollosdk.extensions.fetchTransactionCategoryReports
-import us.frollo.frollosdk.extensions.isValidFormat
+import us.frollo.frollosdk.extensions.isValidDateFormat
 import us.frollo.frollosdk.extensions.sqlForExistingAccountBalanceReports
 import us.frollo.frollosdk.extensions.sqlForFetchingAccountBalanceReports
 import us.frollo.frollosdk.extensions.sqlForStaleIdsAccountBalanceReports
@@ -392,7 +392,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
 
     @Throws(FrolloSDKError::class)
     private fun String.toReportDateFormat(period: ReportPeriod): String {
-        if (!this.isValidFormat(DATE_PATTERN_FOR_REQUEST)) {
+        if (!this.isValidDateFormat(DATE_PATTERN_FOR_REQUEST)) {
             throw FrolloSDKError("Invalid format for from/to date")
         }
 

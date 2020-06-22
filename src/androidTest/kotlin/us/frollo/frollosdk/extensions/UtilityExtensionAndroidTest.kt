@@ -21,49 +21,108 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import androidx.core.os.bundleOf
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.authentication.AuthenticationStatus
-import us.frollo.frollosdk.core.ARGUMENT.ARG_AUTHENTICATION_STATUS
 import us.frollo.frollosdk.core.ARGUMENT.ARG_DATA
 
 class UtilityExtensionAndroidTest {
 
     private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
 
+    private var dataType = TestDataType.STRING
     private var notifyFlag = false
-    private var status = AuthenticationStatus.AUTHENTICATED
+    private var serializableData = AuthenticationStatus.AUTHENTICATED
+    private var longArrayData: LongArray? = longArrayOf()
+    private var stringData: String? = ""
+    private lateinit var lbm: LocalBroadcastManager
 
     @Before
     fun setup() {
         FrolloSDK.app = app
+        notifyFlag = false
+        lbm = LocalBroadcastManager.getInstance(app)
+        lbm.registerReceiver(receiver, IntentFilter("ACTION_NOTIFY"))
+    }
+
+    @After
+    fun tearDown() {
+        notifyFlag = false
+        lbm.unregisterReceiver(receiver)
     }
 
     @Test
-    fun testNotify() {
-        val lbm = LocalBroadcastManager.getInstance(app)
-        lbm.registerReceiver(receiver, IntentFilter("ACTION_NOTIFY"))
+    fun testNotifySerializable() {
+        dataType = TestDataType.SERIALIZABLE
 
-        notify("ACTION_NOTIFY", bundleOf(Pair(ARG_AUTHENTICATION_STATUS, AuthenticationStatus.LOGGED_OUT)))
+        notify(
+            action = "ACTION_NOTIFY",
+            extrasKey = ARG_DATA,
+            extrasData = AuthenticationStatus.LOGGED_OUT
+        )
 
         Thread.sleep(2000)
 
         assertTrue(notifyFlag)
-        assertEquals(AuthenticationStatus.LOGGED_OUT, status)
+        assertEquals(AuthenticationStatus.LOGGED_OUT, serializableData)
+    }
 
-        lbm.unregisterReceiver(receiver)
+    @Test
+    fun testNotifyString() {
+        dataType = TestDataType.STRING
+
+        notify(
+            action = "ACTION_NOTIFY",
+            extrasKey = ARG_DATA,
+            extrasData = "Test String"
+        )
+
+        Thread.sleep(2000)
+
+        assertTrue(notifyFlag)
+        assertEquals("Test String", stringData)
+    }
+
+    @Test
+    fun testNotifyLongArray() {
+        dataType = TestDataType.LONG_ARRAY
+
+        notify(
+            action = "ACTION_NOTIFY",
+            extrasKey = ARG_DATA,
+            extrasData = longArrayOf(100, 200)
+        )
+
+        Thread.sleep(2000)
+
+        assertTrue(notifyFlag)
+        assertEquals(100L, longArrayData?.get(0))
+        assertEquals(200L, longArrayData?.get(1))
     }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             notifyFlag = true
-            status = intent.getBundleExtra(ARG_DATA).getSerializable(ARG_AUTHENTICATION_STATUS) as AuthenticationStatus
+            when (dataType) {
+                TestDataType.SERIALIZABLE -> {
+                    serializableData = intent.getSerializableExtra(ARG_DATA) as AuthenticationStatus
+                }
+                TestDataType.STRING -> {
+                    stringData = intent.getStringExtra(ARG_DATA)
+                }
+                TestDataType.LONG_ARRAY -> {
+                    longArrayData = intent.getLongArrayExtra(ARG_DATA)
+                }
+            }
         }
+    }
+    private enum class TestDataType {
+        SERIALIZABLE, STRING, LONG_ARRAY
     }
 }

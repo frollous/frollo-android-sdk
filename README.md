@@ -2,21 +2,21 @@
 
 ### Requirements
 
-- Android Studio 3.5+
-- Kotlin version 1.3.41+
-- Gradle tools plugin version 3.5.1+ - In your project level **build.gradle**
+- Android Studio 3.6.2+
+- Kotlin version 1.3.72+
+- Gradle tools plugin version 3.6.3+ - In your project level **build.gradle**
     ```
     dependencies {
-        classpath "com.android.tools.build:gradle:3.5.1"
+        classpath "com.android.tools.build:gradle:3.6.3"
         //..
     }
     ```
-- Gradle version must be 5.4.1+
+- Gradle version must be 5.6.4+
 
     Modify Gradle version in your **gradle_wrapper.properties** as below
 
     ```
-    distributionUrl=https\://services.gradle.org/distributions/gradle-5.4.1-all.zip
+    distributionUrl=https\://services.gradle.org/distributions/gradle-5.6.4-all.zip
     ```
     
 - **minSdkVersion** in your gradle file must be **23** or above. Frollo SDK does not support Android versions below Marshmallow (6.0).

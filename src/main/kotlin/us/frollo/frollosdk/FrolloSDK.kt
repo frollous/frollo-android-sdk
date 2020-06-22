@@ -18,7 +18,6 @@ package us.frollo.frollosdk
 
 import android.app.Application
 import android.os.Handler
-import androidx.core.os.bundleOf
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.threeten.bp.Duration
@@ -313,8 +312,9 @@ object FrolloSDK {
         completion?.invoke(Result.success())
 
         notify(
-            ACTION_AUTHENTICATION_CHANGED,
-            bundleOf(Pair(ARG_AUTHENTICATION_STATUS, AuthenticationStatus.LOGGED_OUT))
+            action = ACTION_AUTHENTICATION_CHANGED,
+            extrasKey = ARG_AUTHENTICATION_STATUS,
+            extrasData = AuthenticationStatus.LOGGED_OUT
         )
     }
 

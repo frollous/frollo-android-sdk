@@ -26,8 +26,8 @@ data class TransactionDescription(
     @ColumnInfo(name = "original") @SerializedName("original") val original: String,
 
     /** User determined description of the transaction (optional) */
-    @ColumnInfo(name = "user") @SerializedName("user") var user: String?,
+    @ColumnInfo(name = "user") @SerializedName("user") var user: String? = null,
 
     /** Simplified description of the transaction (optional) */
-    @ColumnInfo(name = "simple") @SerializedName("simple") val simple: String?
+    @ColumnInfo(name = "simple") @SerializedName("simple") val simple: String? = null
 )

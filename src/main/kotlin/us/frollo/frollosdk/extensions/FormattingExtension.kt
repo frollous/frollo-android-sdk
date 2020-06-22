@@ -27,13 +27,28 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-internal fun LocalDate.toString(formatPattern: String): String =
+/**
+ * LocalDate object to string
+ *
+ * @param formatPattern Date format pattern of the string
+ */
+fun LocalDate.toString(formatPattern: String): String =
     DateTimeFormatter.ofPattern(formatPattern).format(this)
 
-internal fun Date.toString(formatPattern: String): String =
+/**
+ * Date object to string
+ *
+ * @param formatPattern Date format pattern of the string
+ */
+fun Date.toString(formatPattern: String): String =
     SimpleDateFormat(formatPattern, Locale.getDefault()).format(this)
 
-internal fun String.isValidFormat(formatPattern: String): Boolean {
+/**
+ * Checks if the given date string is of valid format
+ *
+ * @param formatPattern Date format pattern of the string to validate against
+ */
+fun String.isValidDateFormat(formatPattern: String): Boolean {
     val formatter = DateTimeFormatter.ofPattern(formatPattern)
     try {
         formatter.parse(this) // if not valid, it will throw DateTimeParseException
@@ -45,7 +60,13 @@ internal fun String.isValidFormat(formatPattern: String): Boolean {
     return true
 }
 
-internal fun String.changeDateFormat(from: String, to: String): String {
+/**
+ * Change date format
+ *
+ * @param from Date format pattern of the from date string
+ * @param to Date format pattern of the to date string
+ */
+fun String.changeDateFormat(from: String, to: String): String {
     var dateStr = ""
 
     try {
@@ -88,6 +109,11 @@ internal fun getWeekInMonth(dayOfMonth: Int): Int {
     }
 }
 
+/**
+ * Convert string to LocalDate
+ *
+ * @param pattern Date format pattern of the string
+ */
 fun String.toLocalDate(pattern: String): LocalDate {
     val formatter = DateTimeFormatterBuilder()
         .appendPattern(pattern)

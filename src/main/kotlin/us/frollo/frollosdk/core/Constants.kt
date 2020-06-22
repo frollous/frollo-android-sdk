@@ -54,3 +54,7 @@ object ACTION {
      */
     const val ACTION_AUTHENTICATION_CHANGED = "us.frollo.frollosdk.ACTION_AUTHENTICATION_CHANGED"
 }
+
+internal object LIMIT {
+    internal const val SQLITE_MAX_VARIABLE_NUMBER = 998
+}

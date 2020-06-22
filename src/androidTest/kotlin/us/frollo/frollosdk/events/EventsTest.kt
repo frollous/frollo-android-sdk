@@ -171,7 +171,7 @@ class EventsTest : BaseAndroidTest() {
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             notifyFlag = true
-            transactionIds = intent.getBundleExtra(ARGUMENT.ARG_DATA).getLongArray(ARGUMENT.ARG_TRANSACTION_IDS)
+            transactionIds = intent.getLongArrayExtra(ARGUMENT.ARG_TRANSACTION_IDS)
         }
     }
 }

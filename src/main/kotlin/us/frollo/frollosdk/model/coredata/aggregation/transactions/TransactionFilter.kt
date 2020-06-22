@@ -16,81 +16,48 @@
 
 package us.frollo.frollosdk.model.coredata.aggregation.transactions
 
+import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantDetails
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 
-/** Represents a model that contains all the filters to apply on transaction list
+/**
+ * Represents a model that contains all the filters to apply on transaction list
  *
- * @param transactionIDs: Array of `Transaction.transactionID` to filter transactions; Optional
- * @param accountIDs: Array of `Transaction.accountID` to filter transactions; Optional
- * @param budgetCategories: Array of `BudgetCategory` to filter transactions
- * @param transactionCategoryIDs: Array of `Transaction.transactionCategoryID` to filter transactions
- * @param merchantIDs: Array of `Transaction.mechantID` to filter transactions
- * @param searchTerm: Search term to filter transactions
- * @param minimumAmount: Amount to filter tramsactions from (inclusive)
- * @param maximumAmount: Amount to filter transactions to (inclusive)
- * @param baseType: `Transaction.BaseType` to filter transactions
- * @param tags: Array of tags to filter transactions
- * @param status: `Transaction.Status` to filter transactions
- * @param fromDate: Date to filter transactions from (inclusive)
- * @param toDate: Date to filter transactions to (inclusive)
- * @param transactionIncluded:`Transaction.included` status of 'Transaction' to filter by
- * @param accountIncluded: 'included' status of 'Account' to filter by
- * @param after: after field to get next list in pagination. Format is "<epoch_date>_<transaction_id>"
- * @param before: before field to get previous list in pagination. Format is "<epoch_date>_<transaction_id>"
- * @param size: Count of objects to return in one call
+ * @param transactionIds List of [Transaction.transactionId] to filter transactions
+ * @param accountIds List of [Transaction.accountId] to filter transactions
+ * @param budgetCategory [BudgetCategory] to filter transactions on
+ * @param transactionCategoryIds List of [Transaction.categoryId] to filter transactions
+ * @param merchantIds List of [MerchantDetails.id] to filter transactions
+ * @param searchTerm Search term to filter transactions
+ * @param minimumAmount Amount to filter transactions from (inclusive)
+ * @param maximumAmount Amount to filter transactions to (inclusive)
+ * @param baseType [TransactionBaseType] to filter transactions
+ * @param tags List of tags to filter transactions
+ * @param status [TransactionStatus] to filter transactions
+ * @param fromDate Date to filter transactions from (inclusive). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
+ * @param toDate Date to filter transactions to (inclusive). Please use [Transaction.DATE_FORMAT_PATTERN] for the format pattern.
+ * @param transactionIncluded [Transaction.included] status of 'Transaction' to filter by
+ * @param accountIncluded 'included' status of 'Account' to filter by
+ * @param after after field to get next list in pagination. Format is "<epoch_date>_<transaction_id>"
+ * @param before before field to get previous list in pagination. Format is "<epoch_date>_<transaction_id>"
+ * @param size Count of objects to returned from the API (page size)
  **/
 data class TransactionFilter(
-    val searchTerm: String? = null,
-    val merchantIds: LongArray? = null,
-    val accountIds: LongArray? = null,
-    val transactionCategoryIds: LongArray? = null,
-    val transactionIds: LongArray? = null,
-    val budgetCategory: BudgetCategory? = null,
-    val minAmount: Long? = null,
-    val maxAmount: Long? = null,
-    val baseType: TransactionBaseType? = null,
-    val status: TransactionStatus? = null,
-    val tags: List<String>? = null,
-    val accountIncluded: Boolean? = null,
-    val transactionIncluded: Boolean? = null,
-    val fromDate: String? = null,
-    val toDate: String? = null,
-    val before: String? = null,
-    val after: String? = null,
-    val size: Long? = null
-) {
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as TransactionFilter
-
-        if (merchantIds != null) {
-            if (other.merchantIds == null) return false
-            if (!merchantIds.contentEquals(other.merchantIds)) return false
-        } else if (other.merchantIds != null) return false
-        if (accountIds != null) {
-            if (other.accountIds == null) return false
-            if (!accountIds.contentEquals(other.accountIds)) return false
-        } else if (other.accountIds != null) return false
-        if (transactionCategoryIds != null) {
-            if (other.transactionCategoryIds == null) return false
-            if (!transactionCategoryIds.contentEquals(other.transactionCategoryIds)) return false
-        } else if (other.transactionCategoryIds != null) return false
-        if (transactionIds != null) {
-            if (other.transactionIds == null) return false
-            if (!transactionIds.contentEquals(other.transactionIds)) return false
-        } else if (other.transactionIds != null) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = merchantIds?.contentHashCode() ?: 0
-        result = 31 * result + (accountIds?.contentHashCode() ?: 0)
-        result = 31 * result + (transactionCategoryIds?.contentHashCode() ?: 0)
-        result = 31 * result + (transactionIds?.contentHashCode() ?: 0)
-        return result
-    }
-}
+    var transactionIds: List<Long>? = null,
+    var accountIds: List<Long>? = null,
+    var budgetCategory: BudgetCategory? = null,
+    var transactionCategoryIds: List<Long>? = null,
+    var merchantIds: List<Long>? = null,
+    var searchTerm: String? = null,
+    var minimumAmount: String? = null,
+    var maximumAmount: String? = null,
+    var baseType: TransactionBaseType? = null,
+    var tags: List<String>? = null,
+    var status: TransactionStatus? = null,
+    var fromDate: String? = null, // yyyy-MM-dd
+    var toDate: String? = null, // yyyy-MM-dd
+    var transactionIncluded: Boolean? = null,
+    var accountIncluded: Boolean? = null,
+    var after: String? = null,
+    var before: String? = null,
+    var size: Long? = null
+)

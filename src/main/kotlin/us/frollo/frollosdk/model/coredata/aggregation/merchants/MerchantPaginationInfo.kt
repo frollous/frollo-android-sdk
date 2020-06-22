@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.aggregation.transactions
+package us.frollo.frollosdk.model.coredata.aggregation.merchants
 
-import us.frollo.frollosdk.model.api.shared.Paging
-
-/** Model with information of transaction Pagination cursors and total count, ids and dates **/
-data class TransactionPaginationInfo(
-    val paging: Paging,
-    val beforeId: Long?,
-    val afterId: Long?,
-    val beforeDate: String?,
-    val afterDate: String?,
-    val before: String? = null,
-    val after: String? = null,
+/**
+ * Result with information of Pagination
+ *
+ * @param before Before cursor (merchant ID) for pagination (Optional)
+ * @param after After cursor (merchant ID) for pagination (Optional)
+ * @param total Total count (Optional)
+ */
+data class MerchantPaginationInfo(
+    val before: Long? = null,
+    val after: Long? = null,
     val total: Long? = null
 )

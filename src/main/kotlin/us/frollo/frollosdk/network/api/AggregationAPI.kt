@@ -29,7 +29,6 @@ import retrofit2.http.QueryMap
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
-import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantsResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountCreateRequest
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountUpdateRequest
@@ -38,9 +37,9 @@ import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
-import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponseWrapper
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
+import us.frollo.frollosdk.model.api.shared.PaginatedResponse
 
 internal interface AggregationAPI {
     companion object {
@@ -59,7 +58,6 @@ internal interface AggregationAPI {
         // Transaction URLs
         const val URL_TRANSACTIONS = "aggregation/transactions"
         const val URL_TRANSACTION = "aggregation/transactions/{transaction_id}"
-        const val URL_TRANSACTIONS_SEARCH = "aggregation/transactions/search"
         const val URL_TRANSACTIONS_SUMMARY = "aggregation/transactions/summary"
 
         // Tags URLs
@@ -117,7 +115,7 @@ internal interface AggregationAPI {
     // Transaction API
 
     @GET(URL_TRANSACTIONS)
-    fun fetchTransactions(@QueryMap queryParams: Map<String, String>): Call<TransactionResponseWrapper>
+    fun fetchTransactions(@QueryMap queryParams: Map<String, String>): Call<PaginatedResponse<TransactionResponse>>
 
     @GET(URL_TRANSACTION)
     fun fetchTransaction(@Path("transaction_id") transactionId: Long): Call<TransactionResponse>
@@ -138,7 +136,7 @@ internal interface AggregationAPI {
 
     // Query parameters: {before, after, size}
     @GET(URL_MERCHANTS)
-    fun fetchMerchants(@QueryMap queryParams: Map<String, String>): Call<MerchantsResponse>
+    fun fetchMerchants(@QueryMap queryParams: Map<String, String>): Call<PaginatedResponse<MerchantResponse>>
 
     @GET(URL_MERCHANT)
     fun fetchMerchant(@Path("merchant_id") merchantId: Long): Call<MerchantResponse>

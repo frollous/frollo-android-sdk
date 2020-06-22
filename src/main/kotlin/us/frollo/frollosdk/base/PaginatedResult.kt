@@ -21,18 +21,16 @@ import us.frollo.frollosdk.error.FrolloSDKError
 /**
  * A value that represents either a success (with before and after cursors for pagination) or a failure, including an associated error on failure.
  */
-sealed class PaginatedResult {
+sealed class PaginatedResult<out T> {
 
     /**
-     * Indicates data fetched successfully
+     * Indicates data fetched successfully with pagination info
      *
-     * @param before: Before cursor (usually ID) for pagination (Optional)
-     * @param after: After cursor (usually ID) for pagination (Optional)
+     * @param paginationInfo: Pagination info usually with cursors and total count
      */
-    class Success(
-        val before: Long? = null,
-        val after: Long? = null
-    ) : PaginatedResult()
+    class Success<T>(
+        val paginationInfo: T? = null
+    ) : PaginatedResult<T>()
 
     /**
      * Indicates error while fetching data
@@ -41,5 +39,5 @@ sealed class PaginatedResult {
      */
     class Error(
         val error: FrolloSDKError? = null
-    ) : PaginatedResult()
+    ) : PaginatedResult<Nothing>()
 }

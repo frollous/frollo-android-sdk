@@ -21,7 +21,7 @@ object ARGUMENT {
     /**
      * Generic Key for any data sent with an intent.
      */
-    const val ARG_DATA = "arg_data"
+    internal const val ARG_DATA = "arg_data"
 
     /**
      * Key for authentication status sent with [ACTION.ACTION_AUTHENTICATION_CHANGED] broadcast.
@@ -53,4 +53,8 @@ object ACTION {
      * Listen to this to detect if the SDK user has authenticated or been logged out.
      */
     const val ACTION_AUTHENTICATION_CHANGED = "us.frollo.frollosdk.ACTION_AUTHENTICATION_CHANGED"
+}
+
+internal object LIMIT {
+    internal const val SQLITE_MAX_VARIABLE_NUMBER = 998
 }

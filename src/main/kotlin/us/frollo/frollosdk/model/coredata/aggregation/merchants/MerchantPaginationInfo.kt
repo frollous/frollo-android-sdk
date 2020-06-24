@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.aggregation.transactions
+package us.frollo.frollosdk.model.coredata.aggregation.merchants
 
-import org.threeten.bp.LocalDate
-import us.frollo.frollosdk.model.api.shared.Paging
-
-data class TransactionPagingResponse(
-    val paging: Paging,
-    val beforeDate: LocalDate? = null,
-    val beforeId: Long? = null,
-    val afterDate: LocalDate? = null,
-    val afterId: Long? = null
+/**
+ * Result with information of Pagination
+ *
+ * @param before Before cursor (merchant ID) for pagination (Optional)
+ * @param after After cursor (merchant ID) for pagination (Optional)
+ * @param total Total count (Optional)
+ */
+data class MerchantPaginationInfo(
+    val before: Long? = null,
+    val after: Long? = null,
+    val total: Long? = null
 )

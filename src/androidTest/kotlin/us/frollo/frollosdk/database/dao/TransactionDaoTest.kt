@@ -30,13 +30,14 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.extensions.sqlForTransactionStaleIds
+import us.frollo.frollosdk.extensions.sqlForTransactions
 import us.frollo.frollosdk.mapping.toAccount
 import us.frollo.frollosdk.mapping.toMerchant
 import us.frollo.frollosdk.mapping.toProvider
 import us.frollo.frollosdk.mapping.toProviderAccount
 import us.frollo.frollosdk.mapping.toTransaction
 import us.frollo.frollosdk.mapping.toTransactionCategory
+import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionFilter
 import us.frollo.frollosdk.model.testAccountResponseData
 import us.frollo.frollosdk.model.testMerchantResponseData
 import us.frollo.frollosdk.model.testProviderAccountResponseData
@@ -164,7 +165,8 @@ class TransactionDaoTest {
 
         db.transactions().insertAll(*list.map { it.toTransaction() }.toList().toTypedArray())
 
-        val query = sqlForTransactionStaleIds(fromDate = "2019-01-03", toDate = "2019-02-03", accountIds = listOf(1), transactionIncluded = false)
+        val filter = TransactionFilter(fromDate = "2019-01-03", toDate = "2019-02-03", accountIds = listOf(1), transactionIncluded = false)
+        val query = sqlForTransactions(filter)
 
         val ids = db.transactions().getIdsQuery(query)
 

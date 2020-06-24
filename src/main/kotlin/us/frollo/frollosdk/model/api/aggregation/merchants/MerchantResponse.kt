@@ -17,13 +17,7 @@
 package us.frollo.frollosdk.model.api.aggregation.merchants
 
 import com.google.gson.annotations.SerializedName
-import us.frollo.frollosdk.model.api.shared.Paging
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
-
-internal data class MerchantsResponse(
-    @SerializedName("data") val data: List<MerchantResponse>,
-    @SerializedName("paging") val paging: Paging
-)
 
 internal data class MerchantResponse(
     @SerializedName("id") val merchantId: Long,

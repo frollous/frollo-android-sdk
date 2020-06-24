@@ -45,19 +45,19 @@ class FormattingExtensionTest {
     @Test
     fun testDateStringIsValidFormat() {
         var dateStr = "2019-02-01"
-        assertTrue(dateStr.isValidFormat("yyyy-MM-dd"))
+        assertTrue(dateStr.isValidDateFormat("yyyy-MM-dd"))
 
         dateStr = "2019-02"
-        assertTrue(dateStr.isValidFormat("yyyy-MM"))
+        assertTrue(dateStr.isValidDateFormat("yyyy-MM"))
 
         dateStr = "01-02-2019"
-        assertFalse(dateStr.isValidFormat("yyyy-MM-dd"))
+        assertFalse(dateStr.isValidDateFormat("yyyy-MM-dd"))
 
         dateStr = "2019-02"
-        assertFalse(dateStr.isValidFormat("yyyy-MM-dd"))
+        assertFalse(dateStr.isValidDateFormat("yyyy-MM-dd"))
 
         dateStr = "02-2019"
-        assertFalse(dateStr.isValidFormat("yyyy-MM-dd"))
+        assertFalse(dateStr.isValidDateFormat("yyyy-MM-dd"))
     }
 
     @Test

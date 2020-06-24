@@ -116,7 +116,9 @@ The following features are part of budgets and pay day:
 * Set multiple budgets
 * Set budgets by category, merchant or bucket
 
-*Coming Soon to SDK*
+See [Budgets](us.frollo.frollosdk.auth/-budgets/index.html) for more details.
+
+*Pay Day is Coming Soon to SDK*
 
 ### Reports
 

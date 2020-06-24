@@ -17,17 +17,13 @@
 package us.frollo.frollosdk.extensions
 
 import android.content.Intent
-import android.os.Bundle
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import okhttp3.Response
-import org.threeten.bp.LocalDate
-import org.threeten.bp.format.DateTimeFormatterBuilder
-import org.threeten.bp.temporal.ChronoField
 import us.frollo.frollosdk.FrolloSDK
-import us.frollo.frollosdk.core.ARGUMENT.ARG_DATA
+import java.io.Serializable
 import java.nio.charset.Charset
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
@@ -79,10 +75,30 @@ internal val Response.clonedBodyString: String?
         return buffer?.clone()?.readString(Charset.forName("UTF-8"))
     }
 
-internal fun notify(action: String, bundleExtras: Bundle? = null) {
+internal fun notify(action: String) {
     val broadcastManager = LocalBroadcastManager.getInstance(FrolloSDK.app)
     val intent = Intent(action)
-    bundleExtras?.let { intent.putExtra(ARG_DATA, bundleExtras) }
+    broadcastManager.sendBroadcast(intent)
+}
+
+internal fun notify(action: String, extrasKey: String, extrasData: String) {
+    val broadcastManager = LocalBroadcastManager.getInstance(FrolloSDK.app)
+    val intent = Intent(action)
+    intent.putExtra(extrasKey, extrasData)
+    broadcastManager.sendBroadcast(intent)
+}
+
+internal fun notify(action: String, extrasKey: String, extrasData: LongArray) {
+    val broadcastManager = LocalBroadcastManager.getInstance(FrolloSDK.app)
+    val intent = Intent(action)
+    intent.putExtra(extrasKey, extrasData)
+    broadcastManager.sendBroadcast(intent)
+}
+
+internal fun notify(action: String, extrasKey: String, extrasData: Serializable) {
+    val broadcastManager = LocalBroadcastManager.getInstance(FrolloSDK.app)
+    val intent = Intent(action)
+    intent.putExtra(extrasKey, extrasData)
     broadcastManager.sendBroadcast(intent)
 }
 
@@ -106,12 +122,4 @@ internal fun Set<Long>.compareToFindMissingItems(s2: Set<Long>): Set<Long> {
     }
 
     return missingElements
-}
-
-fun String.toLocalDate(pattern: String): LocalDate {
-    val formatter = DateTimeFormatterBuilder()
-        .appendPattern(pattern)
-        .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
-        .toFormatter()
-    return LocalDate.parse(this, formatter)
 }

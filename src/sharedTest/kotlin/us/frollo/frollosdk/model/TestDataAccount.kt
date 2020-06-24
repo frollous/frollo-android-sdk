@@ -38,7 +38,7 @@ import us.frollo.frollosdk.testutils.randomUUID
 import java.math.BigDecimal
 import kotlin.random.Random
 
-internal fun testAccountResponseData(accountId: Long? = null, providerAccountId: Long? = null, accountType: AccountType? = null, accountRefreshStatus: AccountRefreshStatus? = null): AccountResponse {
+internal fun testAccountResponseData(accountId: Long? = null, providerAccountId: Long? = null, accountType: AccountType? = null, accountRefreshStatus: AccountRefreshStatus? = null, included: Boolean? = null): AccountResponse {
 
     val balanceDetails = BalanceDetails(
         currentDescription = randomUUID(),
@@ -71,7 +71,7 @@ internal fun testAccountResponseData(accountId: Long? = null, providerAccountId:
         accountStatus = AccountStatus.ACTIVE,
         favourite = true,
         hidden = false,
-        included = true,
+        included = included ?: true,
         providerName = "Detailed Test Provider",
         amountDue = Balance(amount = randomNumber().toBigDecimal(), currency = "AUD"),
         apr = BigDecimal("18.53"),

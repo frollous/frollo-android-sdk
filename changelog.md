@@ -1,5 +1,21 @@
 ## Changelog
 
+### 3.6.0
+
+#### Changes
+
+- Optimize Transactions advanced filtering and searching
+
+### 3.5.0
+
+#### Features
+
+- Transactions advanced filtering and searching
+
+#### Changes
+
+- Transaction pagination improvements
+
 ### 3.4.0
 
 #### Features

@@ -20,6 +20,10 @@ Frollo SDK base classes
 
 Manages bills and bill payments
 
+# Package us.frollo.frollosdk.budgets
+
+Manages budgets
+
 # Package us.frollo.frollosdk.core
 
 Frollo SDK core classes
@@ -31,6 +35,10 @@ Types of Frollo SDK errors
 # Package us.frollo.frollosdk.events
 
 Handles events and allows triggering of events on the host.
+
+# Package us.frollo.frollosdk.extensions
+
+Convenient extension methods for use of the app
 
 # Package us.frollo.frollosdk.goals
 
@@ -83,6 +91,10 @@ Frollo SDK transaction models
 # Package us.frollo.frollosdk.model.coredata.bills
 
 Frollo SDK bill and bill payment models
+
+# Package us.frollo.frollosdk.model.coredata.budgets
+
+Frollo SDK budget models
 
 # Package us.frollo.frollosdk.model.coredata.goals
 

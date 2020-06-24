@@ -65,6 +65,13 @@ class SimpleSQLiteQueryBuilderTest {
             .having("placement = 1")
             .create()
         Assert.assertEquals("SELECT  *  FROM message GROUP BY placement HAVING placement = 1", query.sql)
+
+        query = SimpleSQLiteQueryBuilder("transaction", "t")
+            .appendJoin("LEFT JOIN account a ON t.account_id = a.account_id")
+            .appendSelection("read = 0")
+            .appendSelection("content_type = 'VIDEO'")
+            .create()
+        Assert.assertEquals("SELECT  *  FROM transaction AS t LEFT JOIN account a ON t.account_id = a.account_id  WHERE read = 0 AND content_type = 'VIDEO' ", query.sql)
     }
 
     @Test

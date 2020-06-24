@@ -621,8 +621,8 @@ class BillsTest : BaseAndroidTest() {
 
         aggregation.refreshMerchantsWithPagination { result ->
             assertTrue(result is PaginatedResult.Success)
-            assertNull((result as PaginatedResult.Success).after)
-            assertNull(result.before)
+            assertNull((result as PaginatedResult.Success).paginationInfo?.after)
+            assertNull(result.paginationInfo?.before)
 
             signal.countDown()
         }

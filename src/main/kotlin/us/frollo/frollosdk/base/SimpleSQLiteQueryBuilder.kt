@@ -24,12 +24,14 @@ import java.util.regex.Pattern
  */
 class SimpleSQLiteQueryBuilder(
     /** The table name to query. */
-    private val tableName: String
+    private val tableName: String,
+    private val aliasName: String? = null
 ) {
 
     private val limitPattern = Pattern.compile("\\s*\\d+\\s*(,\\s*\\d+\\s*)?")
 
     private var distinct = false
+    private val joins = mutableListOf<String>()
     private val selections = mutableListOf<String>()
     private var columns: Array<String>? = null
     private var groupBy: String? = null
@@ -93,6 +95,15 @@ class SimpleSQLiteQueryBuilder(
     }
 
     /**
+     * Appends to the join criteria.
+     *
+     * @param joinQuery The join criteria. Eg: "LEFT JOIN account a ON t.account_id = a.account_id"
+     */
+    fun appendJoin(joinQuery: String) = apply {
+        this.joins.add(joinQuery)
+    }
+
+    /**
      * Appends to the selection criteria for the WHERE clause.
      *
      * Note: These selection criteria strings will be joined together with "AND"
@@ -129,6 +140,8 @@ class SimpleSQLiteQueryBuilder(
         }
         query.append(" FROM ")
         query.append(tableName)
+        aliasName?.let { query.append(" AS ").append(it) }
+        appendJoins(query, joins)
         appendSelections(query, " WHERE ", selections)
         appendClause(query, " GROUP BY ", groupBy)
         appendClause(query, " HAVING ", having)
@@ -136,6 +149,14 @@ class SimpleSQLiteQueryBuilder(
         appendClause(query, " LIMIT ", limit)
 
         return SimpleSQLiteQuery(query.toString())
+    }
+
+    private fun appendJoins(s: StringBuilder, joins: List<String>) {
+        if (joins.isNotEmpty()) {
+            joins.forEach { join ->
+                s.append(" ").append(join).append(" ")
+            }
+        }
     }
 
     private fun appendSelections(s: StringBuilder, name: String, selections: List<String>) {

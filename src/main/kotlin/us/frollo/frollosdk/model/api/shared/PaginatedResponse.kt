@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Frollo
+ * Copyright 2020 Frollo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,20 @@ package us.frollo.frollosdk.model.api.shared
 
 import com.google.gson.annotations.SerializedName
 
-class Paging(
-    @SerializedName("cursors") val cursors: PagingCursors?,
-    @SerializedName("previous") val previous: String?,
-    @SerializedName("next") val next: String?,
-    @SerializedName("total") val total: Long?
-)
+internal data class PaginatedResponse<T>(
+    @SerializedName("data") val data: List<T>,
+    @SerializedName("paging") val paging: Paging
+) {
 
-class PagingCursors(
-    @SerializedName("before") var before: String?,
-    @SerializedName("after") var after: String?
-)
+    internal class Paging(
+        @SerializedName("cursors") val cursors: PagingCursors?,
+        @SerializedName("previous") val previous: String?,
+        @SerializedName("next") val next: String?,
+        @SerializedName("total") val total: Long?
+    )
+
+    internal class PagingCursors(
+        @SerializedName("before") var before: String?,
+        @SerializedName("after") var after: String?
+    )
+}

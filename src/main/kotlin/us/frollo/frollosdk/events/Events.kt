@@ -16,7 +16,6 @@
 
 package us.frollo.frollosdk.events
 
-import androidx.core.os.bundleOf
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.ACTION.ACTION_REFRESH_TRANSACTIONS
@@ -82,8 +81,9 @@ class Events(network: NetworkService) {
 
                 notificationPayload?.transactionIDs?.let {
                     notify(
-                        ACTION_REFRESH_TRANSACTIONS,
-                        bundleOf(Pair(ARG_TRANSACTION_IDS, it.toLongArray()))
+                        action = ACTION_REFRESH_TRANSACTIONS,
+                        extrasKey = ARG_TRANSACTION_IDS,
+                        extrasData = it.toLongArray()
                     )
                 }
 

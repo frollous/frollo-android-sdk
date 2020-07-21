@@ -75,7 +75,7 @@ import us.frollo.frollosdk.model.coredata.user.User
         Budget::class,
         BudgetPeriod::class
     ],
-    version = 9, exportSchema = true
+    version = 10, exportSchema = true
 )
 
 @TypeConverters(Converters::class)
@@ -114,7 +114,7 @@ abstract class SDKDatabase : RoomDatabase() {
             Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
                 .allowMainThreadQueries() // Needed for some tests
                 // .fallbackToDestructiveMigration()
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9,MIGRATION_9_10)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
                 .build()
 
         // Copy-paste of auto-generated SQLs from room schema json file

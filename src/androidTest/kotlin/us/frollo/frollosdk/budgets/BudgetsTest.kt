@@ -206,15 +206,15 @@ class BudgetsTest : BaseAndroidTest() {
     fun testFetchBudgets() {
         initSetup()
 
-        val data1 = testBudgetResponseData(100, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data2 = testBudgetResponseData(101, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data3 = testBudgetResponseData(102, frequency = BudgetFrequency.ANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data4 = testBudgetResponseData(103, frequency = BudgetFrequency.ANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data5 = testBudgetResponseData(105, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data6 = testBudgetResponseData(106, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.CANCELLED, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data7 = testBudgetResponseData(107, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.AHEAD)
-        val data8 = testBudgetResponseData(108, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data9 = testBudgetResponseData(109, frequency = BudgetFrequency.BIANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
+        val data1 = testBudgetResponseData(100, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data2 = testBudgetResponseData(101, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data3 = testBudgetResponseData(102, frequency = BudgetFrequency.ANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data4 = testBudgetResponseData(103, frequency = BudgetFrequency.ANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data5 = testBudgetResponseData(105, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data6 = testBudgetResponseData(106, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.CANCELLED, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data7 = testBudgetResponseData(107, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ABOVE)
+        val data8 = testBudgetResponseData(108, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data9 = testBudgetResponseData(109, frequency = BudgetFrequency.BIANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
 
         val list = mutableListOf(data1, data2, data3, data4, data5, data6, data7, data8, data9)
         database.budgets().insertAll(*list.map { it.toBudget() }.toList().toTypedArray())
@@ -222,7 +222,7 @@ class BudgetsTest : BaseAndroidTest() {
         val testObserver = budgets.fetchBudgets(
             frequency = BudgetFrequency.MONTHLY,
             status = BudgetStatus.ACTIVE,
-            trackingStatus = BudgetTrackingStatus.ON_TRACK
+            trackingStatus = BudgetTrackingStatus.EQUAL
         ).test()
 
         testObserver.awaitValue()
@@ -236,26 +236,26 @@ class BudgetsTest : BaseAndroidTest() {
     fun testFetchBudgetsWithRelation() {
         initSetup()
 
-        val data1 = testBudgetResponseData(100, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data2 = testBudgetResponseData(101, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data3 = testBudgetResponseData(102, frequency = BudgetFrequency.ANNUALLY, status = BudgetStatus.UNSTARTED, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data4 = testBudgetResponseData(103, frequency = BudgetFrequency.ANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data5 = testBudgetResponseData(105, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data6 = testBudgetResponseData(106, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.CANCELLED, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data7 = testBudgetResponseData(107, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.AHEAD)
-        val data8 = testBudgetResponseData(108, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data9 = testBudgetResponseData(109, frequency = BudgetFrequency.BIANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
+        val data1 = testBudgetResponseData(100, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data2 = testBudgetResponseData(101, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data3 = testBudgetResponseData(102, frequency = BudgetFrequency.ANNUALLY, status = BudgetStatus.UNSTARTED, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data4 = testBudgetResponseData(103, frequency = BudgetFrequency.ANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data5 = testBudgetResponseData(105, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data6 = testBudgetResponseData(106, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.CANCELLED, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data7 = testBudgetResponseData(107, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ABOVE)
+        val data8 = testBudgetResponseData(108, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data9 = testBudgetResponseData(109, frequency = BudgetFrequency.BIANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
 
         val list = mutableListOf(data1, data2, data3, data4, data5, data6, data7, data8, data9)
         database.budgets().insertAll(*list.map { it.toBudget() }.toList().toTypedArray())
 
-        val data11 = testBudgetPeriodResponseData(budgetPeriodId = 100, budgetId = 100, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data12 = testBudgetPeriodResponseData(budgetPeriodId = 101, budgetId = 101, trackingStatus = BudgetTrackingStatus.AHEAD)
-        val data13 = testBudgetPeriodResponseData(budgetPeriodId = 102, budgetId = 103, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data14 = testBudgetPeriodResponseData(budgetPeriodId = 103, budgetId = 200, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data15 = testBudgetPeriodResponseData(budgetPeriodId = 104, budgetId = 201, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data16 = testBudgetPeriodResponseData(budgetPeriodId = 105, budgetId = 100, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data17 = testBudgetPeriodResponseData(budgetPeriodId = 106, budgetId = 100, trackingStatus = BudgetTrackingStatus.ON_TRACK)
+        val data11 = testBudgetPeriodResponseData(budgetPeriodId = 100, budgetId = 100, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data12 = testBudgetPeriodResponseData(budgetPeriodId = 101, budgetId = 101, trackingStatus = BudgetTrackingStatus.ABOVE)
+        val data13 = testBudgetPeriodResponseData(budgetPeriodId = 102, budgetId = 103, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data14 = testBudgetPeriodResponseData(budgetPeriodId = 103, budgetId = 200, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data15 = testBudgetPeriodResponseData(budgetPeriodId = 104, budgetId = 201, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data16 = testBudgetPeriodResponseData(budgetPeriodId = 105, budgetId = 100, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data17 = testBudgetPeriodResponseData(budgetPeriodId = 106, budgetId = 100, trackingStatus = BudgetTrackingStatus.EQUAL)
         val periods = mutableListOf(data11, data12, data13, data14, data15, data16, data17)
 
         database.budgetPeriods().insertAll(*periods.map { it.toBudgetPeriod() }.toList().toTypedArray())
@@ -390,15 +390,15 @@ class BudgetsTest : BaseAndroidTest() {
     fun testFetchBudgetById() {
         initSetup()
 
-        val data1 = testBudgetResponseData(100, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data2 = testBudgetResponseData(101, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data3 = testBudgetResponseData(102, frequency = BudgetFrequency.ANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data4 = testBudgetResponseData(103, frequency = BudgetFrequency.ANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data5 = testBudgetResponseData(105, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data6 = testBudgetResponseData(106, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.CANCELLED, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data7 = testBudgetResponseData(107, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.AHEAD)
-        val data8 = testBudgetResponseData(108, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data9 = testBudgetResponseData(109, frequency = BudgetFrequency.BIANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ON_TRACK)
+        val data1 = testBudgetResponseData(100, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data2 = testBudgetResponseData(101, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data3 = testBudgetResponseData(102, frequency = BudgetFrequency.ANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data4 = testBudgetResponseData(103, frequency = BudgetFrequency.ANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data5 = testBudgetResponseData(105, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data6 = testBudgetResponseData(106, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.CANCELLED, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data7 = testBudgetResponseData(107, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.ABOVE)
+        val data8 = testBudgetResponseData(108, frequency = BudgetFrequency.MONTHLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data9 = testBudgetResponseData(109, frequency = BudgetFrequency.BIANNUALLY, status = BudgetStatus.ACTIVE, trackingStatus = BudgetTrackingStatus.EQUAL)
 
         val list = mutableListOf(data1, data2, data3, data4, data5, data6, data7, data8, data9)
         database.budgets().insertAll(*list.map { it.toBudget() }.toList().toTypedArray())
@@ -645,7 +645,7 @@ class BudgetsTest : BaseAndroidTest() {
             }
         })
 
-        val budget = testBudgetResponseData(budgetId, status = BudgetStatus.UNSTARTED, trackingStatus = BudgetTrackingStatus.ON_TRACK).toBudget()
+        val budget = testBudgetResponseData(budgetId, status = BudgetStatus.UNSTARTED, trackingStatus = BudgetTrackingStatus.EQUAL).toBudget()
 
         database.budgets().insert(budget)
 
@@ -659,7 +659,7 @@ class BudgetsTest : BaseAndroidTest() {
             val models = testObserver.value().data
             assertNotNull(models)
             assertEquals(budgetId, models?.budgetId)
-            assertEquals(BudgetTrackingStatus.BEHIND, models?.trackingStatus)
+            assertEquals(BudgetTrackingStatus.BELOW, models?.trackingStatus)
             signal.countDown()
         }
 
@@ -787,16 +787,16 @@ class BudgetsTest : BaseAndroidTest() {
     fun testFetchBudgetPeriods() {
         initSetup()
 
-        val data1 = testBudgetPeriodResponseData(budgetPeriodId = 100, budgetId = 200, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data2 = testBudgetPeriodResponseData(budgetPeriodId = 101, budgetId = 200, trackingStatus = BudgetTrackingStatus.AHEAD)
-        val data3 = testBudgetPeriodResponseData(budgetPeriodId = 102, budgetId = 201, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data4 = testBudgetPeriodResponseData(budgetPeriodId = 103, budgetId = 200, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data5 = testBudgetPeriodResponseData(budgetPeriodId = 104, budgetId = 201, trackingStatus = BudgetTrackingStatus.ON_TRACK)
+        val data1 = testBudgetPeriodResponseData(budgetPeriodId = 100, budgetId = 200, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data2 = testBudgetPeriodResponseData(budgetPeriodId = 101, budgetId = 200, trackingStatus = BudgetTrackingStatus.ABOVE)
+        val data3 = testBudgetPeriodResponseData(budgetPeriodId = 102, budgetId = 201, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data4 = testBudgetPeriodResponseData(budgetPeriodId = 103, budgetId = 200, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data5 = testBudgetPeriodResponseData(budgetPeriodId = 104, budgetId = 201, trackingStatus = BudgetTrackingStatus.EQUAL)
         val list = mutableListOf(data1, data2, data3, data4, data5)
 
         database.budgetPeriods().insertAll(*list.map { it.toBudgetPeriod() }.toList().toTypedArray())
 
-        val testObserver = budgets.fetchBudgetPeriods(budgetId = 200, trackingStatus = BudgetTrackingStatus.ON_TRACK).test()
+        val testObserver = budgets.fetchBudgetPeriods(budgetId = 200, trackingStatus = BudgetTrackingStatus.EQUAL).test()
 
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
@@ -860,7 +860,7 @@ class BudgetsTest : BaseAndroidTest() {
             assertEquals(BigDecimal("173.5"), period?.requiredAmount)
             assertEquals("2019-11-21", period?.startDate)
             assertEquals(BigDecimal("15.62"), period?.targetAmount)
-            assertEquals(BudgetTrackingStatus.BEHIND, period?.trackingStatus)
+            assertEquals(BudgetTrackingStatus.BELOW, period?.trackingStatus)
             signal.countDown()
         }
 
@@ -1010,12 +1010,12 @@ class BudgetsTest : BaseAndroidTest() {
         val periodId: Long = 85
         val requestPath = "budgets/$budgetId/periods?from_date=2019-11-20&to_date=2019-11-23"
 
-        val data11 = testBudgetPeriodResponseData(budgetPeriodId = 85, budgetId = 100, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data12 = testBudgetPeriodResponseData(budgetPeriodId = 101, budgetId = 6, trackingStatus = BudgetTrackingStatus.AHEAD)
+        val data11 = testBudgetPeriodResponseData(budgetPeriodId = 85, budgetId = 100, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data12 = testBudgetPeriodResponseData(budgetPeriodId = 101, budgetId = 6, trackingStatus = BudgetTrackingStatus.ABOVE)
         // below line tests removing of cached budget periods
-        val data13 = testBudgetPeriodResponseData(budgetPeriodId = 102, budgetId = 6, trackingStatus = BudgetTrackingStatus.ON_TRACK, fromDate = "2019-11-21", toDate = "2019-11-21")
-        val data14 = testBudgetPeriodResponseData(budgetPeriodId = 103, budgetId = 200, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data15 = testBudgetPeriodResponseData(budgetPeriodId = 104, budgetId = 201, trackingStatus = BudgetTrackingStatus.ON_TRACK)
+        val data13 = testBudgetPeriodResponseData(budgetPeriodId = 102, budgetId = 6, trackingStatus = BudgetTrackingStatus.EQUAL, fromDate = "2019-11-21", toDate = "2019-11-21")
+        val data14 = testBudgetPeriodResponseData(budgetPeriodId = 103, budgetId = 200, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data15 = testBudgetPeriodResponseData(budgetPeriodId = 104, budgetId = 201, trackingStatus = BudgetTrackingStatus.EQUAL)
         val periods = mutableListOf(data11, data12, data13, data14, data15)
 
         database.budgetPeriods().insertAll(*periods.map { it.toBudgetPeriod() }.toList().toTypedArray())
@@ -1072,12 +1072,12 @@ class BudgetsTest : BaseAndroidTest() {
         val periodId: Long = 85
         val requestPath = "budgets/$budgetId/periods"
 
-        val data11 = testBudgetPeriodResponseData(budgetPeriodId = 85, budgetId = 100, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data12 = testBudgetPeriodResponseData(budgetPeriodId = 101, budgetId = 6, trackingStatus = BudgetTrackingStatus.AHEAD)
+        val data11 = testBudgetPeriodResponseData(budgetPeriodId = 85, budgetId = 100, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data12 = testBudgetPeriodResponseData(budgetPeriodId = 101, budgetId = 6, trackingStatus = BudgetTrackingStatus.ABOVE)
         // below line tests removing of cached budget periods
-        val data13 = testBudgetPeriodResponseData(budgetPeriodId = 102, budgetId = 6, trackingStatus = BudgetTrackingStatus.ON_TRACK, fromDate = "2019-11-21", toDate = "2019-11-21")
-        val data14 = testBudgetPeriodResponseData(budgetPeriodId = 103, budgetId = 200, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data15 = testBudgetPeriodResponseData(budgetPeriodId = 104, budgetId = 201, trackingStatus = BudgetTrackingStatus.ON_TRACK)
+        val data13 = testBudgetPeriodResponseData(budgetPeriodId = 102, budgetId = 6, trackingStatus = BudgetTrackingStatus.EQUAL, fromDate = "2019-11-21", toDate = "2019-11-21")
+        val data14 = testBudgetPeriodResponseData(budgetPeriodId = 103, budgetId = 200, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data15 = testBudgetPeriodResponseData(budgetPeriodId = 104, budgetId = 201, trackingStatus = BudgetTrackingStatus.EQUAL)
         val periods = mutableListOf(data11, data12, data13, data14, data15)
 
         database.budgetPeriods().insertAll(*periods.map { it.toBudgetPeriod() }.toList().toTypedArray())
@@ -1133,11 +1133,11 @@ class BudgetsTest : BaseAndroidTest() {
 
         val requestPath = "budgets"
 
-        val data11 = testBudgetResponseData(budgetId = 85, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data12 = testBudgetResponseData(budgetId = 6, trackingStatus = BudgetTrackingStatus.AHEAD)
+        val data11 = testBudgetResponseData(budgetId = 85, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data12 = testBudgetResponseData(budgetId = 6, trackingStatus = BudgetTrackingStatus.ABOVE)
         // below line tests removing of cached budget periods
-        val data14 = testBudgetResponseData(budgetId = 200, trackingStatus = BudgetTrackingStatus.ON_TRACK)
-        val data15 = testBudgetResponseData(budgetId = 201, trackingStatus = BudgetTrackingStatus.ON_TRACK)
+        val data14 = testBudgetResponseData(budgetId = 200, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data15 = testBudgetResponseData(budgetId = 201, trackingStatus = BudgetTrackingStatus.EQUAL)
         val periods = mutableListOf(data11, data12, data14, data15)
 
         database.budgets().insertAll(*periods.map { it.toBudget() }.toList().toTypedArray())
@@ -1181,11 +1181,11 @@ class BudgetsTest : BaseAndroidTest() {
 
         val requestPath = "budgets?category_type=budget_category"
 
-        val data11 = testBudgetResponseData(budgetId = 85, trackingStatus = BudgetTrackingStatus.ON_TRACK, type = BudgetType.BUDGET_CATEGORY)
-        val data12 = testBudgetResponseData(budgetId = 6, trackingStatus = BudgetTrackingStatus.AHEAD, type = BudgetType.BUDGET_CATEGORY)
+        val data11 = testBudgetResponseData(budgetId = 85, trackingStatus = BudgetTrackingStatus.EQUAL, type = BudgetType.BUDGET_CATEGORY)
+        val data12 = testBudgetResponseData(budgetId = 6, trackingStatus = BudgetTrackingStatus.ABOVE, type = BudgetType.BUDGET_CATEGORY)
         // below line tests removing of cached budget periods
-        val data14 = testBudgetResponseData(budgetId = 200, trackingStatus = BudgetTrackingStatus.ON_TRACK, type = BudgetType.BUDGET_CATEGORY)
-        val data15 = testBudgetResponseData(budgetId = 201, trackingStatus = BudgetTrackingStatus.ON_TRACK, type = BudgetType.MERCHANT)
+        val data14 = testBudgetResponseData(budgetId = 200, trackingStatus = BudgetTrackingStatus.EQUAL, type = BudgetType.BUDGET_CATEGORY)
+        val data15 = testBudgetResponseData(budgetId = 201, trackingStatus = BudgetTrackingStatus.EQUAL, type = BudgetType.MERCHANT)
         val periods = mutableListOf(data11, data12, data14, data15)
 
         database.budgets().insertAll(*periods.map { it.toBudget() }.toList().toTypedArray())

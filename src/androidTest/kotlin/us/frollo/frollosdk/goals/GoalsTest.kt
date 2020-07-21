@@ -88,15 +88,15 @@ class GoalsTest : BaseAndroidTest() {
     fun testFetchGoals() {
         initSetup()
 
-        val data1 = testGoalResponseData(goalId = 100, frequency = GoalFrequency.MONTHLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.ON_TRACK, accountId = 200)
-        val data2 = testGoalResponseData(goalId = 101, frequency = GoalFrequency.MONTHLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.ON_TRACK, accountId = 200)
-        val data3 = testGoalResponseData(goalId = 102, frequency = GoalFrequency.ANNUALLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.ON_TRACK, accountId = 200)
-        val data4 = testGoalResponseData(goalId = 103, frequency = GoalFrequency.ANNUALLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.ON_TRACK, accountId = 200)
-        val data5 = testGoalResponseData(goalId = 105, frequency = GoalFrequency.MONTHLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.ON_TRACK, accountId = 200)
-        val data6 = testGoalResponseData(goalId = 106, frequency = GoalFrequency.MONTHLY, status = GoalStatus.CANCELLED, trackingStatus = GoalTrackingStatus.ON_TRACK, accountId = 200)
-        val data7 = testGoalResponseData(goalId = 107, frequency = GoalFrequency.MONTHLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.AHEAD, accountId = 200)
-        val data8 = testGoalResponseData(goalId = 108, frequency = GoalFrequency.MONTHLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.ON_TRACK, accountId = 201)
-        val data9 = testGoalResponseData(goalId = 109, frequency = GoalFrequency.BIANNUALLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.ON_TRACK, accountId = 201)
+        val data1 = testGoalResponseData(goalId = 100, frequency = GoalFrequency.MONTHLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.EQUAL, accountId = 200)
+        val data2 = testGoalResponseData(goalId = 101, frequency = GoalFrequency.MONTHLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.EQUAL, accountId = 200)
+        val data3 = testGoalResponseData(goalId = 102, frequency = GoalFrequency.ANNUALLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.EQUAL, accountId = 200)
+        val data4 = testGoalResponseData(goalId = 103, frequency = GoalFrequency.ANNUALLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.EQUAL, accountId = 200)
+        val data5 = testGoalResponseData(goalId = 105, frequency = GoalFrequency.MONTHLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.EQUAL, accountId = 200)
+        val data6 = testGoalResponseData(goalId = 106, frequency = GoalFrequency.MONTHLY, status = GoalStatus.CANCELLED, trackingStatus = GoalTrackingStatus.EQUAL, accountId = 200)
+        val data7 = testGoalResponseData(goalId = 107, frequency = GoalFrequency.MONTHLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.ABOVE, accountId = 200)
+        val data8 = testGoalResponseData(goalId = 108, frequency = GoalFrequency.MONTHLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.EQUAL, accountId = 201)
+        val data9 = testGoalResponseData(goalId = 109, frequency = GoalFrequency.BIANNUALLY, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.EQUAL, accountId = 201)
 
         val list = mutableListOf(data1, data2, data3, data4, data5, data6, data7, data8, data9)
 
@@ -106,7 +106,7 @@ class GoalsTest : BaseAndroidTest() {
             accountId = 200,
             frequency = GoalFrequency.MONTHLY,
             status = GoalStatus.ACTIVE,
-            trackingStatus = GoalTrackingStatus.ON_TRACK
+            trackingStatus = GoalTrackingStatus.EQUAL
         ).test()
 
         testObserver.awaitValue()
@@ -232,7 +232,7 @@ class GoalsTest : BaseAndroidTest() {
         val signal = CountDownLatch(1)
 
         val status = GoalStatus.CANCELLED
-        val trackingStatus = GoalTrackingStatus.ON_TRACK
+        val trackingStatus = GoalTrackingStatus.EQUAL
 
         val requestPath = "goals?status=$status&tracking_status=$trackingStatus"
 
@@ -248,7 +248,7 @@ class GoalsTest : BaseAndroidTest() {
             }
         })
 
-        val goal = testGoalResponseData(goalId = 3211, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.AHEAD).toGoal()
+        val goal = testGoalResponseData(goalId = 3211, status = GoalStatus.ACTIVE, trackingStatus = GoalTrackingStatus.ABOVE).toGoal()
         database.goals().insert(goal)
 
         // Check goal 3211 is added
@@ -706,16 +706,16 @@ class GoalsTest : BaseAndroidTest() {
     fun testFetchGoalPeriods() {
         initSetup()
 
-        val data1 = testGoalPeriodResponseData(goalPeriodId = 100, goalId = 200, trackingStatus = GoalTrackingStatus.ON_TRACK)
-        val data2 = testGoalPeriodResponseData(goalPeriodId = 101, goalId = 200, trackingStatus = GoalTrackingStatus.AHEAD)
-        val data3 = testGoalPeriodResponseData(goalPeriodId = 102, goalId = 201, trackingStatus = GoalTrackingStatus.ON_TRACK)
-        val data4 = testGoalPeriodResponseData(goalPeriodId = 103, goalId = 200, trackingStatus = GoalTrackingStatus.ON_TRACK)
-        val data5 = testGoalPeriodResponseData(goalPeriodId = 104, goalId = 201, trackingStatus = GoalTrackingStatus.ON_TRACK)
+        val data1 = testGoalPeriodResponseData(goalPeriodId = 100, goalId = 200, trackingStatus = GoalTrackingStatus.EQUAL)
+        val data2 = testGoalPeriodResponseData(goalPeriodId = 101, goalId = 200, trackingStatus = GoalTrackingStatus.ABOVE)
+        val data3 = testGoalPeriodResponseData(goalPeriodId = 102, goalId = 201, trackingStatus = GoalTrackingStatus.EQUAL)
+        val data4 = testGoalPeriodResponseData(goalPeriodId = 103, goalId = 200, trackingStatus = GoalTrackingStatus.EQUAL)
+        val data5 = testGoalPeriodResponseData(goalPeriodId = 104, goalId = 201, trackingStatus = GoalTrackingStatus.EQUAL)
         val list = mutableListOf(data1, data2, data3, data4, data5)
 
         database.goalPeriods().insertAll(*list.map { it.toGoalPeriod() }.toList().toTypedArray())
 
-        val testObserver = goals.fetchGoalPeriods(goalId = 200, trackingStatus = GoalTrackingStatus.ON_TRACK).test()
+        val testObserver = goals.fetchGoalPeriods(goalId = 200, trackingStatus = GoalTrackingStatus.EQUAL).test()
 
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
@@ -746,15 +746,15 @@ class GoalsTest : BaseAndroidTest() {
         initSetup()
 
         database.goals().insert(testGoalResponseData(goalId = 123).toGoal())
-        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 456, goalId = 123, trackingStatus = GoalTrackingStatus.ON_TRACK).toGoalPeriod())
-        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 457, goalId = 123, trackingStatus = GoalTrackingStatus.AHEAD).toGoalPeriod())
-        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 458, goalId = 123, trackingStatus = GoalTrackingStatus.BEHIND).toGoalPeriod())
-        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 459, goalId = 123, trackingStatus = GoalTrackingStatus.ON_TRACK).toGoalPeriod())
-        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 460, goalId = 223, trackingStatus = GoalTrackingStatus.ON_TRACK).toGoalPeriod())
+        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 456, goalId = 123, trackingStatus = GoalTrackingStatus.EQUAL).toGoalPeriod())
+        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 457, goalId = 123, trackingStatus = GoalTrackingStatus.ABOVE).toGoalPeriod())
+        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 458, goalId = 123, trackingStatus = GoalTrackingStatus.BELOW).toGoalPeriod())
+        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 459, goalId = 123, trackingStatus = GoalTrackingStatus.EQUAL).toGoalPeriod())
+        database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 460, goalId = 223, trackingStatus = GoalTrackingStatus.EQUAL).toGoalPeriod())
 
         val testObserver = goals.fetchGoalPeriodsWithRelation(
             goalId = 123,
-            trackingStatus = GoalTrackingStatus.ON_TRACK
+            trackingStatus = GoalTrackingStatus.EQUAL
         ).test()
 
         testObserver.awaitValue()
@@ -804,7 +804,7 @@ class GoalsTest : BaseAndroidTest() {
             assertEquals(BigDecimal("173.5"), period?.requiredAmount)
             assertEquals("2019-07-18", period?.startDate)
             assertEquals(BigDecimal("150"), period?.targetAmount)
-            assertEquals(GoalTrackingStatus.BEHIND, period?.trackingStatus)
+            assertEquals(GoalTrackingStatus.BELOW, period?.trackingStatus)
 
             signal.countDown()
         }

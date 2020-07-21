@@ -22,14 +22,14 @@ import us.frollo.frollosdk.extensions.serializedName
 /** How the user is tracking against an in progress goal */
 enum class GoalTrackingStatus {
 
-    /** Ahead - user is ahead on contributions */
-    @SerializedName("ahead") AHEAD,
+    /** ABOVE - user has made more contributions on goal than the target */
+    @SerializedName("above") ABOVE,
 
-    /** On Track - user in on track on contributions */
-    @SerializedName("on_track") ON_TRACK,
+    /** On Track - user has made equal contributions on goal as the target  */
+    @SerializedName("equal") EQUAL,
 
-    /** Behind - user is behind on contributions */
-    @SerializedName("behind") BEHIND;
+    /** BELOW - user has made less contributions on goal than the target */
+    @SerializedName("below") BELOW;
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

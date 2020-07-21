@@ -114,7 +114,7 @@ abstract class SDKDatabase : RoomDatabase() {
             Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
                 .allowMainThreadQueries() // Needed for some tests
                 // .fallbackToDestructiveMigration()
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9,MIGRATION_9_10)
                 .build()
 
         // Copy-paste of auto-generated SQLs from room schema json file
@@ -353,6 +353,23 @@ abstract class SDKDatabase : RoomDatabase() {
 
                 database.execSQL("ALTER TABLE `provider` ADD COLUMN `aggregator_type` TEXT NOT NULL DEFAULT 'YODLEE'")
                 database.execSQL("ALTER TABLE `provider` ADD COLUMN `permissions` TEXT")
+            }
+        }
+
+        private val MIGRATION_9_10: Migration = object : Migration(9, 10) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // New changes in this migration:
+                // 1) Delete & recreate table budget, budget period, goal, goal period i.e all tables with tracking statuses
+
+                database.execSQL("DROP TABLE budget")
+                database.execSQL("DROP TABLE budget_period")
+                database.execSQL("DROP TABLE goal")
+                database.execSQL("DROP TABLE goal_period")
+
+                database.execSQL("CREATE TABLE `budget` (`budget_id` INTEGER NOT NULL, `is_current` INTEGER NOT NULL, `image_url` TEXT, `tracking_status` TEXT NOT NULL, `status` TEXT NOT NULL, `frequency` TEXT NOT NULL, `user_id` INTEGER NOT NULL, `currency` TEXT NOT NULL, `current_amount` TEXT NOT NULL, `period_amount` TEXT NOT NULL, `start_date` TEXT, `type` TEXT NOT NULL, `type_value` TEXT NOT NULL, `periods_count` INTEGER NOT NULL, `metadata` TEXT, `c_period_budget_period_id` INTEGER, `c_period_budget_id` INTEGER, `c_period_start_date` TEXT, `c_period_end_date` TEXT, `c_period_current_amount` TEXT, `c_period_target_amount` TEXT, `c_period_required_amount` TEXT, `c_period_tracking_status` TEXT, `c_period_index` INTEGER, PRIMARY KEY(`budget_id`))")
+                database.execSQL("CREATE TABLE `budget_period` (`budget_period_id` INTEGER NOT NULL, `budget_id` INTEGER NOT NULL, `start_date` TEXT NOT NULL, `end_date` TEXT NOT NULL, `current_amount` TEXT NOT NULL, `target_amount` TEXT NOT NULL, `required_amount` TEXT NOT NULL, `tracking_status` TEXT NOT NULL, `index` INTEGER NOT NULL, PRIMARY KEY(`budget_period_id`))")
+                database.execSQL("CREATE TABLE `goal` (`goal_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `image_url` TEXT, `account_id` INTEGER, `tracking_status` TEXT NOT NULL, `tracking_type` TEXT NOT NULL, `status` TEXT NOT NULL, `frequency` TEXT NOT NULL, `target` TEXT NOT NULL, `currency` TEXT NOT NULL, `current_amount` TEXT NOT NULL, `period_amount` TEXT NOT NULL, `start_amount` TEXT NOT NULL, `target_amount` TEXT NOT NULL, `start_date` TEXT NOT NULL, `end_date` TEXT NOT NULL, `estimated_end_date` TEXT, `estimated_target_amount` TEXT, `periods_count` INTEGER NOT NULL, `metadata` TEXT, `c_period_goal_period_id` INTEGER, `c_period_goal_id` INTEGER, `c_period_start_date` TEXT, `c_period_end_date` TEXT, `c_period_tracking_status` TEXT, `c_period_current_amount` TEXT, `c_period_target_amount` TEXT, `c_period_required_amount` TEXT, `c_period_period_index` INTEGER, PRIMARY KEY(`goal_id`))")
+                database.execSQL("CREATE TABLE `goal_period` (`goal_period_id` INTEGER NOT NULL, `goal_id` INTEGER NOT NULL, `start_date` TEXT NOT NULL, `end_date` TEXT NOT NULL, `tracking_status` TEXT, `current_amount` TEXT NOT NULL, `target_amount` TEXT NOT NULL, `required_amount` TEXT NOT NULL, `period_index` INTEGER NOT NULL, PRIMARY KEY(`goal_period_id`))")
             }
         }
     }

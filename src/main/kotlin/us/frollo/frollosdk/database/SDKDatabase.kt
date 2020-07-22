@@ -23,6 +23,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.database.dao.AccountDao
 import us.frollo.frollosdk.database.dao.BillDao
 import us.frollo.frollosdk.database.dao.BillPaymentDao
@@ -359,33 +360,60 @@ abstract class SDKDatabase : RoomDatabase() {
         private val MIGRATION_9_10: Migration = object : Migration(9, 10) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // New changes in this migration:
-                // 1) No changes to the DB Schema. Delete & Recreate tables - budget, budget_period, goal, goal_period as tracking_status values are changed
+                // 1) Update tables with new tracking_status values - budget, budget_period, goal, goal_period
 
-                database.execSQL("DROP INDEX IF EXISTS `index_goal_goal_id`")
-                database.execSQL("DROP INDEX IF EXISTS `index_goal_account_id`")
-                database.execSQL("DROP INDEX IF EXISTS `index_goal_period_goal_period_id`")
-                database.execSQL("DROP INDEX IF EXISTS `index_goal_period_goal_id`")
-                database.execSQL("DROP INDEX IF EXISTS `index_budget_budget_id`")
-                database.execSQL("DROP INDEX IF EXISTS `index_budget_period_budget_period_id`")
-                database.execSQL("DROP INDEX IF EXISTS `index_budget_period_budget_id`")
+                database.execSQL("UPDATE budget  SET transaction_status = (case " +
+                        " when tracking_status = 'behind' then 'below'" +
+                        " when tracking_status = 'on_track' then 'equal'" +
+                        " when tracking_status = 'ahead' then 'above'" +
+                        " else 'equal'" +
+                        " end) ," +
+                        " c_period_tracking_status = (case  " +
+                        " when c_period_tracking_status = 'behind' then 'below'" +
+                        " when c_period_tracking_status = 'on_track' then 'equal'" +
+                        " when c_period_tracking_status = 'ahead' then 'above'" +
+                        " else 'equal'" +
+                        " end)")
 
-                database.execSQL("DROP TABLE budget")
-                database.execSQL("DROP TABLE budget_period")
-                database.execSQL("DROP TABLE goal")
-                database.execSQL("DROP TABLE goal_period")
+                database.execSQL("UPDATE goal  SET transaction_status = (case " +
+                        " when tracking_status = 'behind' then 'below'" +
+                        " when tracking_status = 'on_track' then 'equal'" +
+                        " when tracking_status = 'ahead' then 'above'" +
+                        " else 'equal'" +
+                        " end) ," +
+                        " c_period_tracking_status = (case  " +
+                        " when c_period_tracking_status = 'behind' then 'below'" +
+                        " when c_period_tracking_status = 'on_track' then 'equal'" +
+                        " when c_period_tracking_status = 'ahead' then 'above'" +
+                        " else 'equal'" +
+                        " end)")
 
-                database.execSQL("CREATE TABLE IF NOT EXISTS `budget` (`budget_id` INTEGER NOT NULL, `is_current` INTEGER NOT NULL, `image_url` TEXT, `tracking_status` TEXT NOT NULL, `status` TEXT NOT NULL, `frequency` TEXT NOT NULL, `user_id` INTEGER NOT NULL, `currency` TEXT NOT NULL, `current_amount` TEXT NOT NULL, `period_amount` TEXT NOT NULL, `start_date` TEXT, `type` TEXT NOT NULL, `type_value` TEXT NOT NULL, `periods_count` INTEGER NOT NULL, `metadata` TEXT, `c_period_budget_period_id` INTEGER, `c_period_budget_id` INTEGER, `c_period_start_date` TEXT, `c_period_end_date` TEXT, `c_period_current_amount` TEXT, `c_period_target_amount` TEXT, `c_period_required_amount` TEXT, `c_period_tracking_status` TEXT, `c_period_index` INTEGER, PRIMARY KEY(`budget_id`))")
-                database.execSQL("CREATE TABLE IF NOT EXISTS `budget_period` (`budget_period_id` INTEGER NOT NULL, `budget_id` INTEGER NOT NULL, `start_date` TEXT NOT NULL, `end_date` TEXT NOT NULL, `current_amount` TEXT NOT NULL, `target_amount` TEXT NOT NULL, `required_amount` TEXT NOT NULL, `tracking_status` TEXT NOT NULL, `index` INTEGER NOT NULL, PRIMARY KEY(`budget_period_id`))")
-                database.execSQL("CREATE TABLE IF NOT EXISTS `goal` (`goal_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `image_url` TEXT, `account_id` INTEGER, `tracking_status` TEXT NOT NULL, `tracking_type` TEXT NOT NULL, `status` TEXT NOT NULL, `frequency` TEXT NOT NULL, `target` TEXT NOT NULL, `currency` TEXT NOT NULL, `current_amount` TEXT NOT NULL, `period_amount` TEXT NOT NULL, `start_amount` TEXT NOT NULL, `target_amount` TEXT NOT NULL, `start_date` TEXT NOT NULL, `end_date` TEXT NOT NULL, `estimated_end_date` TEXT, `estimated_target_amount` TEXT, `periods_count` INTEGER NOT NULL, `metadata` TEXT, `c_period_goal_period_id` INTEGER, `c_period_goal_id` INTEGER, `c_period_start_date` TEXT, `c_period_end_date` TEXT, `c_period_tracking_status` TEXT, `c_period_current_amount` TEXT, `c_period_target_amount` TEXT, `c_period_required_amount` TEXT, `c_period_period_index` INTEGER, PRIMARY KEY(`goal_id`))")
-                database.execSQL("CREATE TABLE IF NOT EXISTS `goal_period` (`goal_period_id` INTEGER NOT NULL, `goal_id` INTEGER NOT NULL, `start_date` TEXT NOT NULL, `end_date` TEXT NOT NULL, `tracking_status` TEXT, `current_amount` TEXT NOT NULL, `target_amount` TEXT NOT NULL, `required_amount` TEXT NOT NULL, `period_index` INTEGER NOT NULL, PRIMARY KEY(`goal_period_id`))")
+                database.execSQL("UPDATE goal  SET transaction_status = (case " +
+                        " when tracking_status = 'behind' then 'below'" +
+                        " when tracking_status = 'on_track' then 'equal'" +
+                        " when tracking_status = 'ahead' then 'above'" +
+                        " else 'equal'" +
+                        " end) ," +
+                        " c_period_tracking_status = (case  " +
+                        " when c_period_tracking_status = 'behind' then 'below'" +
+                        " when c_period_tracking_status = 'on_track' then 'equal'" +
+                        " when c_period_tracking_status = 'ahead' then 'above'" +
+                        " else 'equal'" +
+                        " end)")
 
-                database.execSQL("CREATE INDEX IF NOT EXISTS `index_goal_goal_id` ON `goal` (`goal_id`)")
-                database.execSQL("CREATE INDEX IF NOT EXISTS `index_goal_account_id` ON `goal` (`account_id`)")
-                database.execSQL("CREATE INDEX IF NOT EXISTS `index_goal_period_goal_period_id` ON `goal_period` (`goal_period_id`)")
-                database.execSQL("CREATE INDEX IF NOT EXISTS `index_goal_period_goal_id` ON `goal_period` (`goal_id`)")
-                database.execSQL("CREATE INDEX IF NOT EXISTS `index_budget_budget_id` ON `budget` (`budget_id`)")
-                database.execSQL("CREATE INDEX IF NOT EXISTS `index_budget_period_budget_period_id` ON `budget_period` (`budget_period_id`)")
-                database.execSQL("CREATE INDEX IF NOT EXISTS `index_budget_period_budget_id` ON `budget_period` (`budget_id`)")
+                database.execSQL("UPDATE budget_period  SET transaction_status = (case " +
+                        " when tracking_status = 'behind' then 'below'" +
+                        " when tracking_status = 'on_track' then 'equal'" +
+                        " when tracking_status = 'ahead' then 'above'" +
+                        " else 'equal'" +
+                        " end)")
+
+                database.execSQL("UPDATE goal_period  SET transaction_status = (case " +
+                        " when tracking_status = 'behind' then 'below'" +
+                        " when tracking_status = 'on_track' then 'equal'" +
+                        " when tracking_status = 'ahead' then 'above'" +
+                        " else 'equal'" +
+                        " end)")
             }
         }
     }

@@ -23,7 +23,6 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.database.dao.AccountDao
 import us.frollo.frollosdk.database.dao.BillDao
 import us.frollo.frollosdk.database.dao.BillPaymentDao
@@ -362,7 +361,8 @@ abstract class SDKDatabase : RoomDatabase() {
                 // New changes in this migration:
                 // 1) Update tables with new tracking_status values - budget, budget_period, goal, goal_period
 
-                database.execSQL("UPDATE budget  SET transaction_status = (case " +
+                database.execSQL(
+                    "UPDATE budget  SET transaction_status = (case " +
                         " when tracking_status = 'behind' then 'below'" +
                         " when tracking_status = 'on_track' then 'equal'" +
                         " when tracking_status = 'ahead' then 'above'" +
@@ -373,9 +373,11 @@ abstract class SDKDatabase : RoomDatabase() {
                         " when c_period_tracking_status = 'on_track' then 'equal'" +
                         " when c_period_tracking_status = 'ahead' then 'above'" +
                         " else 'equal'" +
-                        " end)")
+                        " end)"
+                )
 
-                database.execSQL("UPDATE goal  SET transaction_status = (case " +
+                database.execSQL(
+                    "UPDATE goal  SET transaction_status = (case " +
                         " when tracking_status = 'behind' then 'below'" +
                         " when tracking_status = 'on_track' then 'equal'" +
                         " when tracking_status = 'ahead' then 'above'" +
@@ -386,9 +388,11 @@ abstract class SDKDatabase : RoomDatabase() {
                         " when c_period_tracking_status = 'on_track' then 'equal'" +
                         " when c_period_tracking_status = 'ahead' then 'above'" +
                         " else 'equal'" +
-                        " end)")
+                        " end)"
+                )
 
-                database.execSQL("UPDATE goal  SET transaction_status = (case " +
+                database.execSQL(
+                    "UPDATE goal  SET transaction_status = (case " +
                         " when tracking_status = 'behind' then 'below'" +
                         " when tracking_status = 'on_track' then 'equal'" +
                         " when tracking_status = 'ahead' then 'above'" +
@@ -399,21 +403,26 @@ abstract class SDKDatabase : RoomDatabase() {
                         " when c_period_tracking_status = 'on_track' then 'equal'" +
                         " when c_period_tracking_status = 'ahead' then 'above'" +
                         " else 'equal'" +
-                        " end)")
+                        " end)"
+                )
 
-                database.execSQL("UPDATE budget_period  SET transaction_status = (case " +
+                database.execSQL(
+                    "UPDATE budget_period  SET transaction_status = (case " +
                         " when tracking_status = 'behind' then 'below'" +
                         " when tracking_status = 'on_track' then 'equal'" +
                         " when tracking_status = 'ahead' then 'above'" +
                         " else 'equal'" +
-                        " end)")
+                        " end)"
+                )
 
-                database.execSQL("UPDATE goal_period  SET transaction_status = (case " +
+                database.execSQL(
+                    "UPDATE goal_period  SET transaction_status = (case " +
                         " when tracking_status = 'behind' then 'below'" +
                         " when tracking_status = 'on_track' then 'equal'" +
                         " when tracking_status = 'ahead' then 'above'" +
                         " else 'equal'" +
-                        " end)")
+                        " end)"
+                )
             }
         }
     }

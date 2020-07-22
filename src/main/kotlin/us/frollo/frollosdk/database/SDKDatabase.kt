@@ -362,66 +362,51 @@ abstract class SDKDatabase : RoomDatabase() {
                 // 1) Update tables with new tracking_status values - budget, budget_period, goal, goal_period
 
                 database.execSQL(
-                    "UPDATE budget  SET transaction_status = (case " +
-                        " when tracking_status = 'behind' then 'below'" +
-                        " when tracking_status = 'on_track' then 'equal'" +
-                        " when tracking_status = 'ahead' then 'above'" +
-                        " else 'equal'" +
-                        " end) ," +
-                        " c_period_tracking_status = (case  " +
-                        " when c_period_tracking_status = 'behind' then 'below'" +
-                        " when c_period_tracking_status = 'on_track' then 'equal'" +
-                        " when c_period_tracking_status = 'ahead' then 'above'" +
-                        " else 'equal'" +
-                        " end)"
+                    "UPDATE budget  SET tracking_status = (CASE " +
+                        " WHEN tracking_status = 'BEHIND' THEN 'BELOW'" +
+                        " WHEN tracking_status = 'ON_TRACK' THEN 'EQUAL'" +
+                        " WHEN tracking_status = 'AHEAD' THEN 'ABOVE'" +
+                        " ELSE 'EQUAL'" +
+                        " END) ," +
+                        " c_period_tracking_status = (CASE  " +
+                        " WHEN c_period_tracking_status = 'BEHIND' THEN 'BELOW'" +
+                        " WHEN c_period_tracking_status = 'ON_TRACK' THEN 'EQUAL'" +
+                        " WHEN c_period_tracking_status = 'AHEAD' THEN 'ABOVE'" +
+                        " ELSE 'EQUAL'" +
+                        " END)"
                 )
 
                 database.execSQL(
-                    "UPDATE goal  SET transaction_status = (case " +
-                        " when tracking_status = 'behind' then 'below'" +
-                        " when tracking_status = 'on_track' then 'equal'" +
-                        " when tracking_status = 'ahead' then 'above'" +
-                        " else 'equal'" +
-                        " end) ," +
-                        " c_period_tracking_status = (case  " +
-                        " when c_period_tracking_status = 'behind' then 'below'" +
-                        " when c_period_tracking_status = 'on_track' then 'equal'" +
-                        " when c_period_tracking_status = 'ahead' then 'above'" +
-                        " else 'equal'" +
-                        " end)"
+                    "UPDATE goal  SET tracking_status = (CASE " +
+                        " WHEN tracking_status = 'BEHIND' THEN 'BELOW'" +
+                        " WHEN tracking_status = 'ON_TRACK' THEN 'EQUAL'" +
+                        " WHEN tracking_status = 'AHEAD' THEN 'ABOVE'" +
+                        " ELSE 'EQUAL'" +
+                        " END) ," +
+                        " c_period_tracking_status = (CASE  " +
+                        " WHEN c_period_tracking_status = 'BEHIND' THEN 'BELOW'" +
+                        " WHEN c_period_tracking_status = 'ON_TRACK' THEN 'EQUAL'" +
+                        " WHEN c_period_tracking_status = 'AHEAD' THEN 'ABOVE'" +
+                        " ELSE 'EQUAL'" +
+                        " END)"
                 )
 
                 database.execSQL(
-                    "UPDATE goal  SET transaction_status = (case " +
-                        " when tracking_status = 'behind' then 'below'" +
-                        " when tracking_status = 'on_track' then 'equal'" +
-                        " when tracking_status = 'ahead' then 'above'" +
-                        " else 'equal'" +
-                        " end) ," +
-                        " c_period_tracking_status = (case  " +
-                        " when c_period_tracking_status = 'behind' then 'below'" +
-                        " when c_period_tracking_status = 'on_track' then 'equal'" +
-                        " when c_period_tracking_status = 'ahead' then 'above'" +
-                        " else 'equal'" +
-                        " end)"
+                    "UPDATE budget_period  SET tracking_status = (CASE " +
+                        " WHEN tracking_status = 'BEHIND' THEN 'BELOW'" +
+                        " WHEN tracking_status = 'ON_TRACK' THEN 'EQUAL'" +
+                        " WHEN tracking_status = 'AHEAD' THEN 'ABOVE'" +
+                        " ELSE 'EQUAL'" +
+                        " END)"
                 )
 
                 database.execSQL(
-                    "UPDATE budget_period  SET transaction_status = (case " +
-                        " when tracking_status = 'behind' then 'below'" +
-                        " when tracking_status = 'on_track' then 'equal'" +
-                        " when tracking_status = 'ahead' then 'above'" +
-                        " else 'equal'" +
-                        " end)"
-                )
-
-                database.execSQL(
-                    "UPDATE goal_period  SET transaction_status = (case " +
-                        " when tracking_status = 'behind' then 'below'" +
-                        " when tracking_status = 'on_track' then 'equal'" +
-                        " when tracking_status = 'ahead' then 'above'" +
-                        " else 'equal'" +
-                        " end)"
+                    "UPDATE goal_period  SET tracking_status = (CASE " +
+                        " WHEN tracking_status = 'BEHIND' THEN 'BELOW'" +
+                        " WHEN tracking_status = 'ON_TRACK' THEN 'EQUAL'" +
+                        " WHEN tracking_status = 'AHEAD' THEN 'ABOVE'" +
+                        " ELSE 'EQUAL'" +
+                        " END)"
                 )
             }
         }

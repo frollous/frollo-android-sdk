@@ -370,7 +370,7 @@ class ModelExtensionTest {
     @Test
     fun testSQLForGoals() {
         var query = sqlForGoals(frequency = GoalFrequency.MONTHLY, trackingStatus = GoalTrackingStatus.EQUAL, status = GoalStatus.ACTIVE, accountId = 12345, trackingType = GoalTrackingType.CREDIT, target = GoalTarget.OPEN_ENDED)
-        assertEquals("SELECT  *  FROM goal WHERE frequency = 'MONTHLY' AND status = 'ACTIVE' AND target = 'OPEN_ENDED' AND tracking_status = 'ON_TRACK' AND tracking_type = 'CREDIT' AND account_id = 12345 ", query.sql)
+        assertEquals("SELECT  *  FROM goal WHERE frequency = 'MONTHLY' AND status = 'ACTIVE' AND target = 'OPEN_ENDED' AND tracking_status = 'EQUAL' AND tracking_type = 'CREDIT' AND account_id = 12345 ", query.sql)
 
         query = sqlForGoals()
         assertEquals("SELECT  *  FROM goal", query.sql)
@@ -379,7 +379,7 @@ class ModelExtensionTest {
     @Test
     fun testSQLForGoalIds() {
         var query = sqlForGoalIds(trackingStatus = GoalTrackingStatus.EQUAL, status = GoalStatus.ACTIVE)
-        assertEquals("SELECT goal_id  FROM goal WHERE status = 'ACTIVE' AND tracking_status = 'ON_TRACK' ", query.sql)
+        assertEquals("SELECT goal_id  FROM goal WHERE status = 'ACTIVE' AND tracking_status = 'EQUAL' ", query.sql)
 
         query = sqlForGoalIds()
         assertEquals("SELECT goal_id  FROM goal", query.sql)
@@ -388,7 +388,7 @@ class ModelExtensionTest {
     @Test
     fun testSQLForGoalPeriods() {
         var query = sqlForGoalPeriods(goalId = 12345, trackingStatus = GoalTrackingStatus.EQUAL)
-        assertEquals("SELECT  *  FROM goal_period WHERE goal_id = 12345 AND tracking_status = 'ON_TRACK' ", query.sql)
+        assertEquals("SELECT  *  FROM goal_period WHERE goal_id = 12345 AND tracking_status = 'EQUAL' ", query.sql)
 
         query = sqlForGoalPeriods()
         assertEquals("SELECT  *  FROM goal_period", query.sql)
@@ -397,7 +397,7 @@ class ModelExtensionTest {
     @Test
     fun testSQLForBudgets() {
         var query = sqlForBudgets(true, BudgetFrequency.MONTHLY, BudgetStatus.UNSTARTED, BudgetTrackingStatus.BELOW, BudgetType.MERCHANT, "1")
-        assertEquals("SELECT  *  FROM budget WHERE frequency = 'MONTHLY' AND status = 'UNSTARTED' AND tracking_status = 'BEHIND' AND type = 'MERCHANT' AND type_value = '1' AND is_current = 1 ", query.sql)
+        assertEquals("SELECT  *  FROM budget WHERE frequency = 'MONTHLY' AND status = 'UNSTARTED' AND tracking_status = 'BELOW' AND type = 'MERCHANT' AND type_value = '1' AND is_current = 1 ", query.sql)
 
         query = sqlForBudgets()
         assertEquals("SELECT  *  FROM budget", query.sql)
@@ -424,7 +424,7 @@ class ModelExtensionTest {
     @Test
     fun testSQLForBudgetPeriod() {
         var query = sqlForBudgetPeriods(123, BudgetTrackingStatus.EQUAL)
-        assertEquals("SELECT  *  FROM budget_period WHERE budget_id = 123 AND tracking_status = 'ON_TRACK' ", query.sql)
+        assertEquals("SELECT  *  FROM budget_period WHERE budget_id = 123 AND tracking_status = 'EQUAL' ", query.sql)
 
         query = sqlForBudgetPeriods(123)
         assertEquals("SELECT  *  FROM budget_period WHERE budget_id = 123 ", query.sql)

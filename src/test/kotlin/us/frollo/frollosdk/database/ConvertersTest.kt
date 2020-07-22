@@ -809,7 +809,7 @@ class ConvertersTest {
 
     @Test
     fun testStringToGoalTrackingStatus() {
-        val status = Converters.instance.stringToGoalTrackingStatus("AHEAD")
+        val status = Converters.instance.stringToGoalTrackingStatus("ABOVE")
         assertEquals(GoalTrackingStatus.ABOVE, status)
 
         assertEquals(GoalTrackingStatus.EQUAL, Converters.instance.stringToGoalTrackingStatus(null))
@@ -818,9 +818,9 @@ class ConvertersTest {
     @Test
     fun testStringFromGoalTrackingStatus() {
         val str = Converters.instance.stringFromGoalTrackingStatus(GoalTrackingStatus.ABOVE)
-        assertEquals("AHEAD", str)
+        assertEquals("ABOVE", str)
 
-        assertEquals("ON_TRACK", Converters.instance.stringFromGoalTrackingStatus(null))
+        assertEquals("EQUAL", Converters.instance.stringFromGoalTrackingStatus(null))
     }
 
     @Test
@@ -873,7 +873,7 @@ class ConvertersTest {
 
     @Test
     fun testStringToBudgetTrackingStatus() {
-        val status = Converters.instance.stringToBudgetTrackingStatus("ON_TRACK")
+        val status = Converters.instance.stringToBudgetTrackingStatus("EQUAL")
         assertEquals(BudgetTrackingStatus.EQUAL, status)
 
         assertEquals(BudgetTrackingStatus.EQUAL, Converters.instance.stringToBudgetTrackingStatus(null))
@@ -882,8 +882,8 @@ class ConvertersTest {
     @Test
     fun testStringFromBudgetTrackingStatus() {
         val str = Converters.instance.stringFromBudgetTrackingStatus(BudgetTrackingStatus.EQUAL)
-        assertEquals("ON_TRACK", str)
-        assertEquals("ON_TRACK", Converters.instance.stringFromBudgetTrackingStatus(null))
+        assertEquals("EQUAL", str)
+        assertEquals("EQUAL", Converters.instance.stringFromBudgetTrackingStatus(null))
     }
 
     @Test

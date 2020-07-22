@@ -22,14 +22,14 @@ import us.frollo.frollosdk.extensions.serializedName
 /** How the user is tracking against an in progress budget */
 enum class BudgetTrackingStatus {
 
-    /** Ahead - user is ahead on budget */
-    @SerializedName("ahead") AHEAD,
+    /** ABOVE - user has spent more than his budget */
+    @SerializedName("above") ABOVE,
 
-    /** On Track - user in on track of the budget */
-    @SerializedName("on_track") ON_TRACK,
+    /** EQUAL - user has spent his budget exactly */
+    @SerializedName("equal") EQUAL,
 
-    /** Behind - user is behind the budget */
-    @SerializedName("behind") BEHIND;
+    /** BELOW - user has spent less than the budget */
+    @SerializedName("below") BELOW;
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

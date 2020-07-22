@@ -809,18 +809,18 @@ class ConvertersTest {
 
     @Test
     fun testStringToGoalTrackingStatus() {
-        val status = Converters.instance.stringToGoalTrackingStatus("AHEAD")
-        assertEquals(GoalTrackingStatus.AHEAD, status)
+        val status = Converters.instance.stringToGoalTrackingStatus("ABOVE")
+        assertEquals(GoalTrackingStatus.ABOVE, status)
 
-        assertEquals(GoalTrackingStatus.ON_TRACK, Converters.instance.stringToGoalTrackingStatus(null))
+        assertEquals(GoalTrackingStatus.EQUAL, Converters.instance.stringToGoalTrackingStatus(null))
     }
 
     @Test
     fun testStringFromGoalTrackingStatus() {
-        val str = Converters.instance.stringFromGoalTrackingStatus(GoalTrackingStatus.AHEAD)
-        assertEquals("AHEAD", str)
+        val str = Converters.instance.stringFromGoalTrackingStatus(GoalTrackingStatus.ABOVE)
+        assertEquals("ABOVE", str)
 
-        assertEquals("ON_TRACK", Converters.instance.stringFromGoalTrackingStatus(null))
+        assertEquals("EQUAL", Converters.instance.stringFromGoalTrackingStatus(null))
     }
 
     @Test
@@ -873,17 +873,17 @@ class ConvertersTest {
 
     @Test
     fun testStringToBudgetTrackingStatus() {
-        val status = Converters.instance.stringToBudgetTrackingStatus("ON_TRACK")
-        assertEquals(BudgetTrackingStatus.ON_TRACK, status)
+        val status = Converters.instance.stringToBudgetTrackingStatus("EQUAL")
+        assertEquals(BudgetTrackingStatus.EQUAL, status)
 
-        assertEquals(BudgetTrackingStatus.ON_TRACK, Converters.instance.stringToBudgetTrackingStatus(null))
+        assertEquals(BudgetTrackingStatus.EQUAL, Converters.instance.stringToBudgetTrackingStatus(null))
     }
 
     @Test
     fun testStringFromBudgetTrackingStatus() {
-        val str = Converters.instance.stringFromBudgetTrackingStatus(BudgetTrackingStatus.ON_TRACK)
-        assertEquals("ON_TRACK", str)
-        assertEquals("ON_TRACK", Converters.instance.stringFromBudgetTrackingStatus(null))
+        val str = Converters.instance.stringFromBudgetTrackingStatus(BudgetTrackingStatus.EQUAL)
+        assertEquals("EQUAL", str)
+        assertEquals("EQUAL", Converters.instance.stringFromBudgetTrackingStatus(null))
     }
 
     @Test

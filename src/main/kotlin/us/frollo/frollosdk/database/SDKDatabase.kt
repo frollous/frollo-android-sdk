@@ -75,7 +75,7 @@ import us.frollo.frollosdk.model.coredata.user.User
         Budget::class,
         BudgetPeriod::class
     ],
-    version = 9, exportSchema = true
+    version = 10, exportSchema = true
 )
 
 @TypeConverters(Converters::class)
@@ -114,7 +114,7 @@ abstract class SDKDatabase : RoomDatabase() {
             Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
                 .allowMainThreadQueries() // Needed for some tests
                 // .fallbackToDestructiveMigration()
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
                 .build()
 
         // Copy-paste of auto-generated SQLs from room schema json file
@@ -353,6 +353,61 @@ abstract class SDKDatabase : RoomDatabase() {
 
                 database.execSQL("ALTER TABLE `provider` ADD COLUMN `aggregator_type` TEXT NOT NULL DEFAULT 'YODLEE'")
                 database.execSQL("ALTER TABLE `provider` ADD COLUMN `permissions` TEXT")
+            }
+        }
+
+        private val MIGRATION_9_10: Migration = object : Migration(9, 10) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // New changes in this migration:
+                // 1) Update tables with new tracking_status values - budget, budget_period, goal, goal_period
+
+                database.execSQL(
+                    "UPDATE budget  SET tracking_status = (CASE " +
+                        " WHEN tracking_status = 'BEHIND' THEN 'BELOW'" +
+                        " WHEN tracking_status = 'ON_TRACK' THEN 'EQUAL'" +
+                        " WHEN tracking_status = 'AHEAD' THEN 'ABOVE'" +
+                        " ELSE 'EQUAL'" +
+                        " END) ," +
+                        " c_period_tracking_status = (CASE  " +
+                        " WHEN c_period_tracking_status = 'BEHIND' THEN 'BELOW'" +
+                        " WHEN c_period_tracking_status = 'ON_TRACK' THEN 'EQUAL'" +
+                        " WHEN c_period_tracking_status = 'AHEAD' THEN 'ABOVE'" +
+                        " ELSE 'EQUAL'" +
+                        " END)"
+                )
+
+                database.execSQL(
+                    "UPDATE goal  SET tracking_status = (CASE " +
+                        " WHEN tracking_status = 'BEHIND' THEN 'BELOW'" +
+                        " WHEN tracking_status = 'ON_TRACK' THEN 'EQUAL'" +
+                        " WHEN tracking_status = 'AHEAD' THEN 'ABOVE'" +
+                        " ELSE 'EQUAL'" +
+                        " END) ," +
+                        " c_period_tracking_status = (CASE  " +
+                        " WHEN c_period_tracking_status = 'BEHIND' THEN 'BELOW'" +
+                        " WHEN c_period_tracking_status = 'ON_TRACK' THEN 'EQUAL'" +
+                        " WHEN c_period_tracking_status = 'AHEAD' THEN 'ABOVE'" +
+                        " ELSE 'EQUAL'" +
+                        " END)"
+                )
+
+                database.execSQL(
+                    "UPDATE budget_period  SET tracking_status = (CASE " +
+                        " WHEN tracking_status = 'BEHIND' THEN 'BELOW'" +
+                        " WHEN tracking_status = 'ON_TRACK' THEN 'EQUAL'" +
+                        " WHEN tracking_status = 'AHEAD' THEN 'ABOVE'" +
+                        " ELSE 'EQUAL'" +
+                        " END)"
+                )
+
+                database.execSQL(
+                    "UPDATE goal_period  SET tracking_status = (CASE " +
+                        " WHEN tracking_status = 'BEHIND' THEN 'BELOW'" +
+                        " WHEN tracking_status = 'ON_TRACK' THEN 'EQUAL'" +
+                        " WHEN tracking_status = 'AHEAD' THEN 'ABOVE'" +
+                        " ELSE 'EQUAL'" +
+                        " END)"
+                )
             }
         }
     }

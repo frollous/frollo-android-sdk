@@ -346,10 +346,10 @@ internal class Converters {
     fun stringFromGoalTrackingType(value: GoalTrackingType?): String? = value?.name ?: GoalTrackingType.DEBIT_CREDIT.name
 
     @TypeConverter
-    fun stringToGoalTrackingStatus(value: String?): GoalTrackingStatus? = if (value == null) GoalTrackingStatus.ON_TRACK else GoalTrackingStatus.valueOf(value)
+    fun stringToGoalTrackingStatus(value: String?): GoalTrackingStatus? = if (value == null) GoalTrackingStatus.EQUAL else GoalTrackingStatus.valueOf(value)
 
     @TypeConverter
-    fun stringFromGoalTrackingStatus(value: GoalTrackingStatus?): String? = value?.name ?: GoalTrackingStatus.ON_TRACK.name
+    fun stringFromGoalTrackingStatus(value: GoalTrackingStatus?): String? = value?.name ?: GoalTrackingStatus.EQUAL.name
 
     @TypeConverter
     fun stringToGoalTarget(value: String?): GoalTarget? = if (value == null) GoalTarget.OPEN_ENDED else GoalTarget.valueOf(value)
@@ -372,10 +372,10 @@ internal class Converters {
     // Budget
 
     @TypeConverter
-    fun stringFromBudgetTrackingStatus(value: BudgetTrackingStatus?): String? = value?.name ?: BudgetTrackingStatus.ON_TRACK.name
+    fun stringFromBudgetTrackingStatus(value: BudgetTrackingStatus?): String? = value?.name ?: BudgetTrackingStatus.EQUAL.name
 
     @TypeConverter
-    fun stringToBudgetTrackingStatus(value: String?): BudgetTrackingStatus? = if (value == null) BudgetTrackingStatus.ON_TRACK else BudgetTrackingStatus.valueOf(value)
+    fun stringToBudgetTrackingStatus(value: String?): BudgetTrackingStatus? = if (value == null) BudgetTrackingStatus.EQUAL else BudgetTrackingStatus.valueOf(value)
 
     @TypeConverter
     fun stringFromBudgetStatus(value: BudgetStatus?): String? = value?.name ?: BudgetStatus.UNSTARTED.name

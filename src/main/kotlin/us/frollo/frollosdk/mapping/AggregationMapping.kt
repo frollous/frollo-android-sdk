@@ -28,6 +28,7 @@ import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummar
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
+import us.frollo.frollosdk.model.coredata.aggregation.providers.AggregatorType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderPermission
@@ -57,7 +58,7 @@ internal fun ProviderResponse.toProvider(): Provider =
         loginHelpMessage = loginHelpMessage,
         loginForm = loginForm,
         encryption = encryption,
-        aggregatorType = aggregatorType,
+        aggregatorType = aggregatorType ?: AggregatorType.YODLEE, // Set YODLEE if null as demo data has this field as null,
         permissions = permissions?.map { ProviderPermission.valueOf(it.toUpperCase()) }?.toList()
     )
 

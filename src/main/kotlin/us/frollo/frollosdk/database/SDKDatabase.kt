@@ -360,7 +360,8 @@ abstract class SDKDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // New changes in this migration:
                 // 1) Update tables with new tracking_status values - budget, budget_period, goal, goal_period
-                // 2) Alter account table - add column features
+                // 2) Alter account table - add column features, product_available, cdr_p_product_id, cdr_p_product_name, cdr_p_product_details_page_url, cdr_p_key_information
+                // 3) Alter provider table - add column product_available
 
                 database.execSQL(
                     "UPDATE budget  SET tracking_status = (CASE " +
@@ -411,6 +412,12 @@ abstract class SDKDatabase : RoomDatabase() {
                 )
 
                 database.execSQL("ALTER TABLE `account` ADD COLUMN `features` TEXT")
+                database.execSQL("ALTER TABLE `account` ADD COLUMN `cdr_p_product_id` INTEGER")
+                database.execSQL("ALTER TABLE `account` ADD COLUMN `cdr_p_product_name` TEXT")
+                database.execSQL("ALTER TABLE `account` ADD COLUMN `cdr_p_product_details_page_url` TEXT")
+                database.execSQL("ALTER TABLE `account` ADD COLUMN `cdr_p_key_information` TEXT")
+                database.execSQL("ALTER TABLE `account` ADD COLUMN `products_available` INTEGER NOT NULL DEFAULT 0")
+                database.execSQL("ALTER TABLE `provider` ADD COLUMN `products_available` INTEGER NOT NULL DEFAULT 0")
             }
         }
     }

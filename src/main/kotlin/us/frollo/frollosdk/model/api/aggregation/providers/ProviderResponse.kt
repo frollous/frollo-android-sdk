@@ -37,6 +37,7 @@ internal data class ProviderResponse(
     @SerializedName("large_logo_revision") val largeLogoRevision: Int?,
     @SerializedName("aggregator_type") val aggregatorType: AggregatorType,
     @SerializedName("permissions") val permissions: List<String>?,
+    @SerializedName("products_available") val productsAvailable: Boolean?,
 
     @SerializedName("base_url") val baseUrl: String?,
     @SerializedName("forget_password_url") val forgetPasswordUrl: String?,

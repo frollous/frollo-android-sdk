@@ -96,7 +96,20 @@
 	}, {
 		"id": "statements",
 		"name": "Statements"
-	}]
+	}],
+	"products_available": true,
+	"product": {
+		"id": 1,
+		"name": "Everyday Saver",
+		"product_details_page_url": "www.example.com/product_details",
+		"key_information": [{
+			"name": "Benefits",
+			"value": "Free ATMs"
+		},{
+			"name": "Addons",
+			"value": "0% Interest"
+		}]
+	}
 }, {
 	"id": 543,
 	"aggregator": "demo",

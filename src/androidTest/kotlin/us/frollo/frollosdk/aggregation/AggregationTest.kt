@@ -1070,6 +1070,7 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals(8, models?.size)
 
             val first = models?.get(0)
+
             assertTrue(first?.features?.size == 3)
             assertEquals("payments", first?.features?.get(0)?.featureId)
             assertEquals("Payments", first?.features?.get(0)?.name)
@@ -1084,6 +1085,14 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals("statements", first?.features?.get(2)?.featureId)
             assertNull(first?.features?.get(2)?.imageUrl)
             assertNull(first?.features?.get(2)?.details)
+
+            assertTrue(first?.productsAvailable == true)
+            assertEquals(1L, first?.cdrProduct?.productId)
+            assertEquals("Everyday Saver", first?.cdrProduct?.productName)
+            assertEquals("www.example.com/product_details", first?.cdrProduct?.productDetailsPageUrl)
+            assertEquals(2, first?.cdrProduct?.cdrProductInformations?.size)
+            assertEquals("Benefits", first?.cdrProduct?.cdrProductInformations?.first()?.name)
+            assertEquals("Free ATMs", first?.cdrProduct?.cdrProductInformations?.first()?.value)
 
             signal.countDown()
         }

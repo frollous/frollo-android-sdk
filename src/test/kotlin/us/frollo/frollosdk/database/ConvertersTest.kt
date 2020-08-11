@@ -28,6 +28,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.BalanceTier
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.CDRProductInformation
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantLocation
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
@@ -611,6 +612,30 @@ class ConvertersTest {
         val details = testAccountFeatureDetailsData()
         val json = Converters.instance.stringFromListOfAccountFeatureDetail(details)
         assertEquals("[{\"id\":\"bpay\",\"name\":\"BPAY\",\"image_url\":\"https://image-detail.png\"},{\"id\":\"npp\",\"name\":\"PayID\"}]", json)
+    }
+
+    @Test
+    fun testStringToListOfCDRProductInformation() {
+        val json = "[{\"name\":\"Benefits\",\"value\":\"Free ATMs\"},{\"name\":\"Addons\",\"value\":\"0% Interest\"}]"
+        val info = Converters.instance.stringToListOfCDRProductInformation(json)
+        assertNotNull(info)
+        assertTrue(info?.size == 2)
+        assertEquals("Benefits", info?.get(0)?.name)
+        assertEquals("Free ATMs", info?.get(0)?.value)
+        assertEquals("Addons", info?.get(1)?.name)
+        assertEquals("0% Interest", info?.get(1)?.value)
+
+        assertNull(Converters.instance.stringToListOfCDRProductInformation(null))
+    }
+
+    @Test
+    fun testStringFromListOfCDRProductInformation() {
+        val info = listOf(
+            CDRProductInformation("Benefits", "Free ATMs"),
+            CDRProductInformation("Addons", "0% Interest")
+        )
+        val json = Converters.instance.stringFromListOfCDRProductInformation(info)
+        assertEquals("[{\"name\":\"Benefits\",\"value\":\"Free ATMs\"},{\"name\":\"Addons\",\"value\":\"0% Interest\"}]", json)
     }
 
     @Test

@@ -43,7 +43,6 @@ import us.frollo.frollosdk.network.api.MessagesAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
-import us.frollo.frollosdk.testutils.wait
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -487,6 +486,8 @@ class MessagesTest : BaseAndroidTest() {
     fun testHandlePushMessage() {
         initSetup()
 
+        val signal = CountDownLatch(1)
+
         val body = readStringFromJson(app, R.raw.message_id_12345)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
@@ -499,18 +500,21 @@ class MessagesTest : BaseAndroidTest() {
             }
         })
 
-        messages.handleMessageNotification(testMessageNotificationPayload())
+        messages.handleMessageNotification(testMessageNotificationPayload()) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
-        wait(3)
+            val testObserver = messages.fetchMessage(12345L).test()
+            testObserver.awaitValue()
+            val model = testObserver.value().data
+            assertNotNull(model)
+            assertEquals(12345L, model?.messageId)
+        }
 
         val request = mockServer.takeRequest()
         assertEquals("messages/12345", request.trimmedPath)
 
-        val testObserver = messages.fetchMessage(12345L).test()
-        testObserver.awaitValue()
-        val model = testObserver.value().data
-        assertNotNull(model)
-        assertEquals(12345L, model?.messageId)
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }

@@ -73,7 +73,30 @@
           "max": 700
         }
       ]
-    }
+    },
+	"features": [{
+		"id": "payments",
+		"name": "Payments",
+		"image_url": "https://image.png",
+		"details": [{
+			"id": "bpay",
+			"name": "BPAY",
+			"image_url": "https://image-detail.png"
+		}, {
+			"id": "npp",
+			"name": "PayID"
+		}]
+	}, {
+		"id": "transfers",
+		"name": "Transfers",
+		"details": [{
+			"id": "internal_transfer",
+			"name": "Transfer"
+		}]
+	}, {
+		"id": "statements",
+		"name": "Statements"
+	}]
 }, {
 	"id": 543,
 	"aggregator": "demo",

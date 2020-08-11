@@ -156,6 +156,9 @@ data class Account(
     @ColumnInfo(name = "goal_ids") val goalIds: List<Long>?,
 
     /** External ID of the aggregator */
-    @ColumnInfo(name = "external_id") val externalId: String
+    @ColumnInfo(name = "external_id") val externalId: String,
+
+    /** Account features */
+    @ColumnInfo(name = "features") val features: List<AccountFeature>?
 
 ) : IAdapterModel

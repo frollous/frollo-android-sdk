@@ -70,6 +70,9 @@ data class Provider(
     /** The permission groups that are supported by this Provider */
     @ColumnInfo(name = "permissions") val permissions: List<ProviderPermission>?,
 
+    /** ProductsAvailable. True if CDR Products are available for this Provider */
+    @ColumnInfo(name = "products_available") val productsAvailable: Boolean,
+
     /** Base URL of the provider's website */
     @ColumnInfo(name = "base_url") val baseUrl: String?,
 

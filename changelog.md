@@ -5,7 +5,7 @@
 #### Changes
 
 - Optimize Transactions advanced filtering and searching
-- Add Account Features to Account API Response
+- Add Account Features & CDR Product Information to Account API Response
 
 ### 3.5.0
 

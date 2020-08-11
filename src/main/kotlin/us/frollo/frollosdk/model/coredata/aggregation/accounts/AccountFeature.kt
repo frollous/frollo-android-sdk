@@ -16,7 +16,6 @@
 
 package us.frollo.frollosdk.model.coredata.aggregation.accounts
 
-import androidx.room.ColumnInfo
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -25,14 +24,14 @@ import com.google.gson.annotations.SerializedName
 data class AccountFeature(
 
     /** Unique ID of the feature */
-    @ColumnInfo(name = "feature_id") @SerializedName("id") val featureId: String,
+    @SerializedName("id") val featureId: String,
 
     /** Name of the feature */
-    @ColumnInfo(name = "name") @SerializedName("name") val name: String,
+    @SerializedName("name") val name: String,
 
     /** Image URL for the feature (optional) */
-    @ColumnInfo(name = "image_url") @SerializedName("image_url") val imageUrl: String?,
+    @SerializedName("image_url") val imageUrl: String?,
 
     /** List of feature details (optional) */
-    @ColumnInfo(name = "details") @SerializedName("details") val details: List<AccountFeatureDetail>?
+    @SerializedName("details") val details: List<AccountFeatureDetail>?
 )

@@ -28,6 +28,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.BalanceTier
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.CDRProductInformation
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantLocation
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
@@ -274,6 +275,12 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromListOfAccountFeatureDetail(value: List<AccountFeatureDetail>?): String? = if (value == null) null else gson.toJson(value)
+
+    @TypeConverter
+    fun stringToListOfCDRProductInformation(value: String?): List<CDRProductInformation>? = if (value == null) null else gson.fromJson<List<CDRProductInformation>>(value)
+
+    @TypeConverter
+    fun stringFromListOfCDRProductInformation(value: List<CDRProductInformation>?): String? = if (value == null) null else gson.toJson(value)
 
     // Transaction
 

@@ -98,7 +98,9 @@ internal fun testAccountResponseData(accountId: Long? = null, providerAccountId:
         endDate = randomUUID(),
         goalIds = null,
         externalId = randomString(8),
-        features = testAccountFeaturesData()
+        features = testAccountFeaturesData(),
+        productsAvailable = false,
+        cdrProduct = null
     )
 }
 

@@ -59,7 +59,8 @@ internal fun ProviderResponse.toProvider(): Provider =
         loginForm = loginForm,
         encryption = encryption,
         aggregatorType = aggregatorType ?: AggregatorType.YODLEE, // Set YODLEE if null as demo data has this field as null,
-        permissions = permissions?.map { ProviderPermission.valueOf(it.toUpperCase()) }?.toList()
+        permissions = permissions?.map { ProviderPermission.valueOf(it.toUpperCase()) }?.toList(),
+        productsAvailable = productsAvailable ?: false
     )
 
 internal fun Provider.toProvidersResponse(): ProvidersResponse =
@@ -75,7 +76,8 @@ internal fun Provider.toProvidersResponse(): ProvidersResponse =
         largeLogoUrl = largeLogoUrl,
         largeLogoRevision = largeLogoRevision,
         aggregatorType = aggregatorType,
-        permissions = permissions
+        permissions = permissions,
+        productsAvailable = productsAvailable
     )
 
 internal fun ProviderAccountResponse.toProviderAccount(): ProviderAccount =
@@ -124,7 +126,9 @@ internal fun AccountResponse.toAccount(): Account =
         balanceDetails = balanceDetails,
         goalIds = goalIds,
         externalId = externalId ?: "",
-        features = features
+        features = features,
+        productsAvailable = productsAvailable ?: false,
+        cdrProduct = cdrProduct
     )
 
 internal fun TransactionResponse.toTransaction(): Transaction =

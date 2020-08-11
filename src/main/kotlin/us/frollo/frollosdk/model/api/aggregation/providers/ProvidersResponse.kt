@@ -41,5 +41,6 @@ internal data class ProvidersResponse(
     @ColumnInfo(name = "large_logo_url") val largeLogoUrl: String?,
     @ColumnInfo(name = "large_logo_revision") val largeLogoRevision: Int?,
     @ColumnInfo(name = "aggregator_type") val aggregatorType: AggregatorType,
-    @ColumnInfo(name = "permissions") val permissions: List<ProviderPermission>?
+    @ColumnInfo(name = "permissions") val permissions: List<ProviderPermission>?,
+    @ColumnInfo(name = "products_available") val productsAvailable: Boolean?
 )

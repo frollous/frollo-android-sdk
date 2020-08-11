@@ -22,6 +22,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeature
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Balance
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.BalanceDetails
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.CDRProduct
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.HolderProfile
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.RefreshStatus
 import java.math.BigDecimal
@@ -60,5 +61,7 @@ internal data class AccountResponse(
     @SerializedName("balance_details") val balanceDetails: BalanceDetails?,
     @SerializedName("goal_ids") val goalIds: List<Long>?,
     @SerializedName("external_id") val externalId: String?,
-    @SerializedName("features") val features: List<AccountFeature>?
+    @SerializedName("features") val features: List<AccountFeature>?,
+    @SerializedName("products_available") val productsAvailable: Boolean?,
+    @SerializedName("product") val cdrProduct: CDRProduct?
 )

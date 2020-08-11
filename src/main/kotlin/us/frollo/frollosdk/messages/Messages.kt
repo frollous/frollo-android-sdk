@@ -193,11 +193,11 @@ class Messages(network: NetworkService, private val db: SDKDatabase) {
         }
     }
 
-    internal fun handleMessageNotification(notification: NotificationPayload) {
+    internal fun handleMessageNotification(notification: NotificationPayload, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (notification.userMessageID == null)
             return
 
-        refreshMessage(notification.userMessageID)
+        updateMessage(notification.userMessageID, read = true, interacted = true, completion = completion)
     }
 
     private fun handleMessagesResponse(response: List<MessageResponse>?, unread: Boolean = false, completion: OnFrolloSDKCompletionListener<Result>? = null) {

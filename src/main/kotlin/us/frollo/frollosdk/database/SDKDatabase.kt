@@ -360,6 +360,7 @@ abstract class SDKDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // New changes in this migration:
                 // 1) Update tables with new tracking_status values - budget, budget_period, goal, goal_period
+                // 2) Alter account table - add column features
 
                 database.execSQL(
                     "UPDATE budget  SET tracking_status = (CASE " +
@@ -408,6 +409,8 @@ abstract class SDKDatabase : RoomDatabase() {
                         " ELSE 'EQUAL'" +
                         " END)"
                 )
+
+                database.execSQL("ALTER TABLE `account` ADD COLUMN `features` TEXT")
             }
         }
     }

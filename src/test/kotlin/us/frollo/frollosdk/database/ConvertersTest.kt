@@ -70,6 +70,8 @@ import us.frollo.frollosdk.model.coredata.user.HouseholdType
 import us.frollo.frollosdk.model.coredata.user.Industry
 import us.frollo.frollosdk.model.coredata.user.Occupation
 import us.frollo.frollosdk.model.coredata.user.UserStatus
+import us.frollo.frollosdk.model.testAccountFeatureDetailsData
+import us.frollo.frollosdk.model.testAccountFeaturesData
 import java.math.BigDecimal
 
 class ConvertersTest {
@@ -556,6 +558,59 @@ class ConvertersTest {
         val tiers = mutableListOf(BalanceTier(description = "Below average", max = 549, min = 0), BalanceTier(description = "Above average", max = 700, min = 550))
         val json = Converters.instance.stringFromListOfBalanceTier(tiers)
         assertEquals("[{\"description\":\"Below average\",\"min\":0,\"max\":549},{\"description\":\"Above average\",\"min\":550,\"max\":700}]", json)
+    }
+
+    @Test
+    fun testStringToListOfAccountFeature() {
+        val json = "[{\"id\":\"payments\",\"name\":\"Payments\",\"image_url\":\"https://image.png\",\"details\":[{\"id\":\"bpay\",\"name\":\"BPAY\",\"image_url\":\"https://image-detail.png\"},{\"id\":\"npp\",\"name\":\"PayID\"}]},{\"id\":\"transfers\",\"name\":\"Transfers\",\"details\":[{\"id\":\"internal_transfer\",\"name\":\"Transfer\"}]},{\"id\":\"statements\",\"name\":\"Statements\"}]"
+        val features = Converters.instance.stringToListOfAccountFeature(json)
+        assertNotNull(features)
+        assertTrue(features?.size == 3)
+        assertEquals("payments", features?.get(0)?.featureId)
+        assertEquals("Payments", features?.get(0)?.name)
+        assertEquals("https://image.png", features?.get(0)?.imageUrl)
+        assertEquals(2, features?.get(0)?.details?.size)
+        assertEquals("bpay", features?.get(0)?.details?.get(0)?.detailId)
+        assertEquals("BPAY", features?.get(0)?.details?.get(0)?.name)
+        assertEquals("https://image-detail.png", features?.get(0)?.details?.get(0)?.imageUrl)
+        assertEquals("transfers", features?.get(1)?.featureId)
+        assertNull(features?.get(1)?.imageUrl)
+        assertEquals(1, features?.get(1)?.details?.size)
+        assertEquals("statements", features?.get(2)?.featureId)
+        assertNull(features?.get(2)?.imageUrl)
+        assertNull(features?.get(2)?.details)
+
+        assertNull(Converters.instance.stringToListOfAccountFeature(null))
+    }
+
+    @Test
+    fun testStringFromListOfAccountFeature() {
+        val features = testAccountFeaturesData()
+        val json = Converters.instance.stringFromListOfAccountFeature(features)
+        assertEquals("[{\"id\":\"payments\",\"name\":\"Payments\",\"image_url\":\"https://image.png\",\"details\":[{\"id\":\"bpay\",\"name\":\"BPAY\",\"image_url\":\"https://image-detail.png\"},{\"id\":\"npp\",\"name\":\"PayID\"}]},{\"id\":\"transfers\",\"name\":\"Transfers\",\"details\":[{\"id\":\"internal_transfer\",\"name\":\"Transfer\"}]},{\"id\":\"statements\",\"name\":\"Statements\"}]", json)
+    }
+
+    @Test
+    fun testStringToListOfAccountFeatureDetail() {
+        val json = "[{\"id\":\"bpay\",\"name\":\"BPAY\",\"image_url\":\"https://image-detail.png\"},{\"id\":\"npp\",\"name\":\"PayID\"}]"
+        val details = Converters.instance.stringToListOfAccountFeatureDetail(json)
+        assertNotNull(details)
+        assertTrue(details?.size == 2)
+        assertEquals("bpay", details?.get(0)?.detailId)
+        assertEquals("BPAY", details?.get(0)?.name)
+        assertEquals("https://image-detail.png", details?.get(0)?.imageUrl)
+        assertEquals("npp", details?.get(1)?.detailId)
+        assertEquals("PayID", details?.get(1)?.name)
+        assertNull(details?.get(1)?.imageUrl)
+
+        assertNull(Converters.instance.stringToListOfAccountFeatureDetail(null))
+    }
+
+    @Test
+    fun testStringFromListOfAccountFeatureDetail() {
+        val details = testAccountFeatureDetailsData()
+        val json = Converters.instance.stringFromListOfAccountFeatureDetail(details)
+        assertEquals("[{\"id\":\"bpay\",\"name\":\"BPAY\",\"image_url\":\"https://image-detail.png\"},{\"id\":\"npp\",\"name\":\"PayID\"}]", json)
     }
 
     @Test

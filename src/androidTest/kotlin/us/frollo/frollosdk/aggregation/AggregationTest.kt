@@ -1069,6 +1069,22 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(models)
             assertEquals(8, models?.size)
 
+            val first = models?.get(0)
+            assertTrue(first?.features?.size == 3)
+            assertEquals("payments", first?.features?.get(0)?.featureId)
+            assertEquals("Payments", first?.features?.get(0)?.name)
+            assertEquals("https://image.png", first?.features?.get(0)?.imageUrl)
+            assertEquals(2, first?.features?.get(0)?.details?.size)
+            assertEquals("bpay", first?.features?.get(0)?.details?.get(0)?.detailId)
+            assertEquals("BPAY", first?.features?.get(0)?.details?.get(0)?.name)
+            assertEquals("https://image-detail.png", first?.features?.get(0)?.details?.get(0)?.imageUrl)
+            assertEquals("transfers", first?.features?.get(1)?.featureId)
+            assertNull(first?.features?.get(1)?.imageUrl)
+            assertEquals(1, first?.features?.get(1)?.details?.size)
+            assertEquals("statements", first?.features?.get(2)?.featureId)
+            assertNull(first?.features?.get(2)?.imageUrl)
+            assertNull(first?.features?.get(2)?.details)
+
             signal.countDown()
         }
 

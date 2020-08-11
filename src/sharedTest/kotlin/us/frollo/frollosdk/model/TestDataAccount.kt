@@ -20,6 +20,8 @@ import us.frollo.frollosdk.model.api.aggregation.accounts.AccountResponse
 import us.frollo.frollosdk.model.api.aggregation.accounts.AccountUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountAttributes
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeature
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeatureDetail
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountGroup
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
@@ -95,7 +97,52 @@ internal fun testAccountResponseData(accountId: Long? = null, providerAccountId:
         interestTotal = Balance(amount = randomNumber().toBigDecimal(), currency = "AUD"),
         endDate = randomUUID(),
         goalIds = null,
-        externalId = randomString(8)
+        externalId = randomString(8),
+        features = testAccountFeaturesData()
+    )
+}
+
+internal fun testAccountFeaturesData(): List<AccountFeature> {
+    return listOf(
+        AccountFeature(
+            featureId = "payments",
+            name = "Payments",
+            imageUrl = "https://image.png",
+            details = testAccountFeatureDetailsData()
+        ),
+        AccountFeature(
+            featureId = "transfers",
+            name = "Transfers",
+            imageUrl = null,
+            details = listOf(
+                AccountFeatureDetail(
+                    detailId = "internal_transfer",
+                    name = "Transfer",
+                    imageUrl = null
+                )
+            )
+        ),
+        AccountFeature(
+            featureId = "statements",
+            name = "Statements",
+            imageUrl = null,
+            details = null
+        )
+    )
+}
+
+internal fun testAccountFeatureDetailsData(): List<AccountFeatureDetail> {
+    return listOf(
+        AccountFeatureDetail(
+            detailId = "bpay",
+            name = "BPAY",
+            imageUrl = "https://image-detail.png"
+        ),
+        AccountFeatureDetail(
+            detailId = "npp",
+            name = "PayID",
+            imageUrl = null
+        )
     )
 }
 

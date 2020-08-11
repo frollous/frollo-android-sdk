@@ -18,6 +18,7 @@ package us.frollo.frollosdk.model.api.aggregation.accounts
 
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountAttributes
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeature
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Balance
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.BalanceDetails
@@ -58,5 +59,6 @@ internal data class AccountResponse(
     @SerializedName("end_date") val endDate: String?, // yyyy-MM-dd
     @SerializedName("balance_details") val balanceDetails: BalanceDetails?,
     @SerializedName("goal_ids") val goalIds: List<Long>?,
-    @SerializedName("external_id") val externalId: String?
+    @SerializedName("external_id") val externalId: String?,
+    @SerializedName("features") val features: List<AccountFeature>?
 )

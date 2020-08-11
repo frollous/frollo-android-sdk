@@ -123,7 +123,8 @@ internal fun AccountResponse.toAccount(): Account =
         endDate = endDate,
         balanceDetails = balanceDetails,
         goalIds = goalIds,
-        externalId = externalId ?: ""
+        externalId = externalId ?: "",
+        features = features
     )
 
 internal fun TransactionResponse.toTransaction(): Transaction =

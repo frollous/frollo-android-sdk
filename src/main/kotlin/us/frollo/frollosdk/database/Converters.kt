@@ -21,6 +21,8 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeature
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeatureDetail
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountGroup
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
@@ -260,6 +262,18 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromListOfBalanceTier(value: List<BalanceTier>?): String? = if (value == null) null else gson.toJson(value)
+
+    @TypeConverter
+    fun stringToListOfAccountFeature(value: String?): List<AccountFeature>? = if (value == null) null else gson.fromJson<List<AccountFeature>>(value)
+
+    @TypeConverter
+    fun stringFromListOfAccountFeature(value: List<AccountFeature>?): String? = if (value == null) null else gson.toJson(value)
+
+    @TypeConverter
+    fun stringToListOfAccountFeatureDetail(value: String?): List<AccountFeatureDetail>? = if (value == null) null else gson.fromJson<List<AccountFeatureDetail>>(value)
+
+    @TypeConverter
+    fun stringFromListOfAccountFeatureDetail(value: List<AccountFeatureDetail>?): String? = if (value == null) null else gson.toJson(value)
 
     // Transaction
 

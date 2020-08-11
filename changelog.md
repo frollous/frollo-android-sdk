@@ -5,6 +5,7 @@
 #### Changes
 
 - Optimize Transactions advanced filtering and searching
+- Add Account Features to Account API Response
 
 ### 3.5.0
 

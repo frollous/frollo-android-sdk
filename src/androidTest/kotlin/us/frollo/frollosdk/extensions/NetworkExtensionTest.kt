@@ -88,7 +88,7 @@ class NetworkExtensionTest {
     }
 
     private fun initSetup() {
-        FrolloSDK.app = app
+        FrolloSDK.context = app
 
         mockServer = MockWebServer()
         mockServer.start()

@@ -16,14 +16,14 @@
 
 package us.frollo.frollosdk.core
 
-import android.app.Application
+import android.content.Context
 import android.content.pm.PackageInfo
 import java.lang.Exception
 
 /**
  * @suppress
  */
-class AppInfo(private val application: Application) {
+class AppInfo(private val context: Context) {
 
     internal val versionNumber: String
         get() {
@@ -45,7 +45,7 @@ class AppInfo(private val application: Application) {
 
     private val packageInfo: PackageInfo
         get() {
-            val manager = application.packageManager
-            return manager.getPackageInfo(application.packageName, 0)
+            val manager = context.packageManager
+            return manager.getPackageInfo(context.packageName, 0)
         }
 }

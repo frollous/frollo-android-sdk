@@ -29,7 +29,7 @@ class DataErrorTest {
 
     @Before
     fun setUp() {
-        FrolloSDK.app = app
+        FrolloSDK.context = app
     }
 
     @Test

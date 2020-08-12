@@ -16,7 +16,7 @@
 
 package us.frollo.frollosdk
 
-import android.app.Application
+import android.content.Context
 import android.os.Handler
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -163,7 +163,7 @@ object FrolloSDK {
         private set
     private var deviceLastUpdated: LocalDateTime? = null
 
-    internal lateinit var app: Application
+    internal lateinit var context: Context
 
     /**
      * Setup the SDK
@@ -177,16 +177,15 @@ object FrolloSDK {
      * @throws FrolloSDKError if SDK is already setup or Server URL is empty.
      */
     @Throws(FrolloSDKError::class)
-    fun setup(application: Application, configuration: FrolloSDKConfiguration, completion: OnFrolloSDKCompletionListener<Result>) {
-        this.app = application
+    fun setup(configuration: FrolloSDKConfiguration, completion: OnFrolloSDKCompletionListener<Result>) {
 
         if (_setup) throw FrolloSDKError("SDK already setup")
         if (configuration.serverUrl.isBlank()) throw FrolloSDKError("Server URL cannot be empty")
 
-        val localBroadcastManager = LocalBroadcastManager.getInstance(app)
+        val localBroadcastManager = LocalBroadcastManager.getInstance(context)
 
         try {
-            val deviceInfo = DeviceInfo(application.applicationContext)
+            val deviceInfo = DeviceInfo(context)
 
             // 1. Initialize ThreeTenABP
             initializeThreeTenABP()
@@ -196,18 +195,18 @@ object FrolloSDK {
             keyStore.setup()
 
             // 3. Setup Preferences
-            preferences = Preferences(application.applicationContext)
+            preferences = Preferences(context)
             tokenInjector = TokenInjector(keyStore, preferences)
 
             // 4. Setup Database
-            database = SDKDatabase.getInstance(application)
+            database = SDKDatabase.getInstance(context)
 
             // 5. Setup Version Manager
             version = Version(preferences)
 
             // 6. Setup Network Stack
             val oAuth = OAuth2Helper(config = configuration)
-            network = NetworkService(oAuth2Helper = oAuth, keystore = keyStore, pref = preferences, appInfo = AppInfo(application))
+            network = NetworkService(oAuth2Helper = oAuth, keystore = keyStore, pref = preferences, appInfo = AppInfo(context))
 
             // 7. Setup Logger
             // Initialize Log.network, Log.deviceId, Log.deviceName and Log.deviceType
@@ -319,7 +318,7 @@ object FrolloSDK {
     }
 
     private fun initializeThreeTenABP() {
-        AndroidThreeTen.init(app)
+        AndroidThreeTen.init(context)
     }
 
     /**

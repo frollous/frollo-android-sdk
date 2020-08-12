@@ -45,7 +45,7 @@ class ProviderLoginFormTest {
 
     @Before
     fun setUp() {
-        FrolloSDK.app = app
+        FrolloSDK.context = app
     }
 
     @Test

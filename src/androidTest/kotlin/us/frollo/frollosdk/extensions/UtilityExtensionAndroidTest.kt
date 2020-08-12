@@ -45,7 +45,7 @@ class UtilityExtensionAndroidTest {
 
     @Before
     fun setup() {
-        FrolloSDK.app = app
+        FrolloSDK.context = app
         notifyFlag = false
         lbm = LocalBroadcastManager.getInstance(app)
         lbm.registerReceiver(receiver, IntentFilter("ACTION_NOTIFY"))

@@ -16,7 +16,7 @@
 
 package us.frollo.frollosdk.database
 
-import android.app.Application
+import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -104,14 +104,14 @@ abstract class SDKDatabase : RoomDatabase() {
         @Volatile
         private var instance: SDKDatabase? = null // Singleton instantiation
 
-        internal fun getInstance(app: Application): SDKDatabase {
+        internal fun getInstance(context: Context): SDKDatabase {
             return instance ?: synchronized(this) {
-                instance ?: create(app).also { instance = it }
+                instance ?: create(context).also { instance = it }
             }
         }
 
-        private fun create(app: Application): SDKDatabase =
-            Room.databaseBuilder(app, SDKDatabase::class.java, DATABASE_NAME)
+        private fun create(context: Context): SDKDatabase =
+            Room.databaseBuilder(context, SDKDatabase::class.java, DATABASE_NAME)
                 .allowMainThreadQueries() // Needed for some tests
                 // .fallbackToDestructiveMigration()
                 .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)

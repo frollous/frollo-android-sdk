@@ -25,7 +25,7 @@ import us.frollo.frollosdk.R
  */
 open class FrolloSDKError(errorMessage: String? = null) : Error(errorMessage) {
 
-    internal val context: Context? = FrolloSDK.app.applicationContext
+    internal val context: Context? = FrolloSDK.context
 
     /** Localized description */
     open val localizedDescription: String? =

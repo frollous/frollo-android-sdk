@@ -32,7 +32,7 @@ class ErrorExtensionTest {
 
     @Before
     fun setup() {
-        FrolloSDK.app = app
+        FrolloSDK.context = app
     }
 
     @Test

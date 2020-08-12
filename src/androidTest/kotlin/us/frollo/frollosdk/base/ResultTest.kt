@@ -32,7 +32,7 @@ class ResultTest {
 
     @Before
     fun setup() {
-        FrolloSDK.app = app
+        FrolloSDK.context = app
     }
 
     @Test

@@ -76,27 +76,27 @@ internal val Response.clonedBodyString: String?
     }
 
 internal fun notify(action: String) {
-    val broadcastManager = LocalBroadcastManager.getInstance(FrolloSDK.app)
+    val broadcastManager = LocalBroadcastManager.getInstance(FrolloSDK.context)
     val intent = Intent(action)
     broadcastManager.sendBroadcast(intent)
 }
 
 internal fun notify(action: String, extrasKey: String, extrasData: String) {
-    val broadcastManager = LocalBroadcastManager.getInstance(FrolloSDK.app)
+    val broadcastManager = LocalBroadcastManager.getInstance(FrolloSDK.context)
     val intent = Intent(action)
     intent.putExtra(extrasKey, extrasData)
     broadcastManager.sendBroadcast(intent)
 }
 
 internal fun notify(action: String, extrasKey: String, extrasData: LongArray) {
-    val broadcastManager = LocalBroadcastManager.getInstance(FrolloSDK.app)
+    val broadcastManager = LocalBroadcastManager.getInstance(FrolloSDK.context)
     val intent = Intent(action)
     intent.putExtra(extrasKey, extrasData)
     broadcastManager.sendBroadcast(intent)
 }
 
 internal fun notify(action: String, extrasKey: String, extrasData: Serializable) {
-    val broadcastManager = LocalBroadcastManager.getInstance(FrolloSDK.app)
+    val broadcastManager = LocalBroadcastManager.getInstance(FrolloSDK.context)
     val intent = Intent(action)
     intent.putExtra(extrasKey, extrasData)
     broadcastManager.sendBroadcast(intent)

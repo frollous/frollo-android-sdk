@@ -92,7 +92,10 @@ abstract class BaseAndroidTest {
         val baseRevokeTokenUrl = mockRevokeTokenServer.url("/$REVOKE_TOKEN_URL")
 
         val config = testSDKConfig(serverUrl = baseUrl.toString(), tokenUrl = baseTokenUrl.toString(), revokeTokenURL = baseRevokeTokenUrl.toString())
-        if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
+        if (!FrolloSDK.isSetup) {
+            FrolloSDK.context = app
+            FrolloSDK.setup(config) {}
+        }
 
         appInfo = AppInfo(app)
         keystore = Keystore()

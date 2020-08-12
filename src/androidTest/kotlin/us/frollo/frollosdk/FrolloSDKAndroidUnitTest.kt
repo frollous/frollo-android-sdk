@@ -84,7 +84,8 @@ class FrolloSDKAndroidUnitTest {
         assertFalse(FrolloSDK.isSetup)
 
         try {
-            FrolloSDK.setup(app, testSDKConfig(serverUrl = "")) { }
+            FrolloSDK.context = app
+            FrolloSDK.setup(testSDKConfig(serverUrl = "")) { }
         } catch (e: FrolloSDKError) {
             assertEquals("Server URL cannot be empty", e.localizedMessage)
         }
@@ -94,7 +95,8 @@ class FrolloSDKAndroidUnitTest {
     fun testSDKSetupSuccess() {
         assertFalse(FrolloSDK.isSetup)
 
-        FrolloSDK.setup(app, testSDKConfig()) { result ->
+        FrolloSDK.context = app
+        FrolloSDK.setup(testSDKConfig()) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -225,7 +227,8 @@ class FrolloSDKAndroidUnitTest {
 
     @Test
     fun testPauseScheduledRefresh() {
-        FrolloSDK.setup(app, testSDKConfig()) { result ->
+        FrolloSDK.context = app
+        FrolloSDK.setup(testSDKConfig()) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -236,7 +239,8 @@ class FrolloSDKAndroidUnitTest {
 
     @Test
     fun testResumeScheduledRefresh() {
-        FrolloSDK.setup(app, testSDKConfig()) { result ->
+        FrolloSDK.context = app
+        FrolloSDK.setup(testSDKConfig()) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
@@ -268,7 +272,8 @@ class FrolloSDKAndroidUnitTest {
             }
         })
 
-        FrolloSDK.setup(app, testSDKConfig()) {
+        FrolloSDK.context = app
+        FrolloSDK.setup(testSDKConfig()) {
 
             FrolloSDK.authentication.loginUser(AuthType.EMAIL, "user@frollo.us", "password") { error ->
                 assertNull(error)
@@ -306,7 +311,8 @@ class FrolloSDKAndroidUnitTest {
         testObserver.awaitValue()
         assertNotNull(testObserver.value())
 
-        FrolloSDK.setup(app, testSDKConfig()) { result ->
+        FrolloSDK.context = app
+        FrolloSDK.setup(testSDKConfig()) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 

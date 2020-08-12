@@ -77,7 +77,10 @@ class ZAuthenticationTest {
             authenticationCallback = authentication,
             serverUrl = baseUrl.toString()
         )
-        if (!FrolloSDK.isSetup) FrolloSDK.setup(app, config) {}
+        if (!FrolloSDK.isSetup) {
+            FrolloSDK.context = app
+            FrolloSDK.setup(config) {}
+        }
 
         keystore = Keystore()
         keystore.setup()

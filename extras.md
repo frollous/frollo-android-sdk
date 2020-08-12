@@ -27,7 +27,7 @@ Import the FrolloSDK and ensure you run setup with your tenant URL provided by u
                                       clientId = "<APPLICATION_CLIENT_ID>",
                                       serverUrl = "https://<API_TENANT>.frollo.us/api/v2/")
 
-            FrolloSDK.setup(this, configuration = configuration) { result ->
+            FrolloSDK.setup(configuration = configuration) { result ->
                 when (result.status) {
                     Result.Status.SUCCESS -> completeSetup()
                     Result.Status.ERROR -> Log.e(TAG, result.error?.localizedDescription)

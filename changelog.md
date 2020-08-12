@@ -7,6 +7,7 @@
 - Optimize Transactions advanced filtering and searching
 - Add Account Features & CDR Product Information to Account API Response
 - Migrate from Application Context to ContentProvider Context
+- Upgrade Host API Version to 2.11
 
 ### 3.5.0
 

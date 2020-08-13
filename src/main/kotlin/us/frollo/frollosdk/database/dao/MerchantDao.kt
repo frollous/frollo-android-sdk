@@ -23,6 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
+import io.reactivex.Observable
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
 
 @Dao
@@ -63,4 +64,17 @@ internal interface MerchantDao {
 
     @Query("DELETE FROM merchant")
     fun clear()
+
+    /**
+     * RxJava Return Types
+     */
+
+    @Query("SELECT * FROM merchant")
+    fun loadRx(): Observable<List<Merchant>>
+
+    @Query("SELECT * FROM merchant WHERE merchant_id = :merchantId")
+    fun loadRx(merchantId: Long): Observable<Merchant?>
+
+    @RawQuery(observedEntities = [Merchant::class])
+    fun loadByQueryRx(queryStr: SupportSQLiteQuery): Observable<List<Merchant>>
 }

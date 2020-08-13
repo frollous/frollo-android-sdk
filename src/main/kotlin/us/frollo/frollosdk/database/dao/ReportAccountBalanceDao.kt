@@ -25,6 +25,7 @@ import androidx.room.RawQuery
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
+import io.reactivex.Observable
 import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalance
 import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalanceRelation
 
@@ -52,4 +53,12 @@ internal interface ReportAccountBalanceDao {
 
     @Query("DELETE FROM report_account_balance")
     fun clear()
+
+    /**
+     * RxJava Return Types
+     */
+
+    @Transaction
+    @RawQuery(observedEntities = [ReportAccountBalance::class])
+    fun loadWithRelationRx(queryStr: SupportSQLiteQuery): Observable<List<ReportAccountBalanceRelation>>
 }

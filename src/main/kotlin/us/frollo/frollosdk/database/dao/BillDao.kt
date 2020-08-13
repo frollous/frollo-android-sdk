@@ -22,8 +22,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
-import androidx.room.Transaction
 import androidx.sqlite.db.SupportSQLiteQuery
+import io.reactivex.Observable
 import us.frollo.frollosdk.model.coredata.bills.Bill
 import us.frollo.frollosdk.model.coredata.bills.BillRelation
 
@@ -70,4 +70,31 @@ internal interface BillDao {
     @androidx.room.Transaction
     @RawQuery(observedEntities = [BillRelation::class])
     fun loadByQueryWithRelation(queryStr: SupportSQLiteQuery): LiveData<List<BillRelation>>
+
+    /**
+     * RxJava Return Types
+     */
+
+    @Query("SELECT * FROM bill")
+    fun loadRx(): Observable<List<Bill>>
+
+    @Query("SELECT * FROM bill WHERE bill_id = :billId")
+    fun loadRx(billId: Long): Observable<Bill?>
+
+    @RawQuery(observedEntities = [Bill::class])
+    fun loadByQueryRx(queryStr: SupportSQLiteQuery): Observable<List<Bill>>
+
+    // Relation methods
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM bill")
+    fun loadWithRelationRx(): Observable<List<BillRelation>>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM bill WHERE bill_id = :billId")
+    fun loadWithRelationRx(billId: Long): Observable<BillRelation?>
+
+    @androidx.room.Transaction
+    @RawQuery(observedEntities = [BillRelation::class])
+    fun loadByQueryWithRelationRx(queryStr: SupportSQLiteQuery): Observable<List<BillRelation>>
 }

@@ -24,6 +24,7 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
+import io.reactivex.Observable
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionRelation
 
@@ -98,4 +99,44 @@ internal interface TransactionDao {
 
     @RawQuery(observedEntities = [Transaction::class])
     fun loadByQueryWithRelation(queryStr: SupportSQLiteQuery): LiveData<List<TransactionRelation>>
+
+    /**
+     * RxJava Return Types
+     */
+
+    @Query("SELECT * FROM transaction_model")
+    fun loadRx(): Observable<List<Transaction>>
+
+    @Query("SELECT * FROM transaction_model WHERE transaction_id = :transactionId")
+    fun loadRx(transactionId: Long): Observable<Transaction?>
+
+    @Query("SELECT * FROM transaction_model WHERE transaction_id in (:transactionIds)")
+    fun loadRx(transactionIds: LongArray): Observable<List<Transaction>>
+
+    @Query("SELECT * FROM transaction_model WHERE account_id = :accountId")
+    fun loadByAccountIdRx(accountId: Long): Observable<List<Transaction>>
+
+    @RawQuery(observedEntities = [Transaction::class])
+    fun loadByQueryRx(queryStr: SupportSQLiteQuery): Observable<List<Transaction>>
+
+    // Relation methods
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM transaction_model")
+    fun loadWithRelationRx(): Observable<List<TransactionRelation>>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM transaction_model WHERE transaction_id = :transactionId")
+    fun loadWithRelationRx(transactionId: Long): Observable<TransactionRelation?>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM transaction_model WHERE transaction_id in (:transactionIds)")
+    fun loadWithRelationRx(transactionIds: LongArray): Observable<List<TransactionRelation>>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM transaction_model WHERE account_id = :accountId")
+    fun loadByAccountIdWithRelationRx(accountId: Long): Observable<List<TransactionRelation>>
+
+    @RawQuery(observedEntities = [Transaction::class])
+    fun loadByQueryWithRelationRx(queryStr: SupportSQLiteQuery): Observable<List<TransactionRelation>>
 }

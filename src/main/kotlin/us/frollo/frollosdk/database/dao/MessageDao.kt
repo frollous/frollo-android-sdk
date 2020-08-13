@@ -23,6 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
+import io.reactivex.Observable
 import us.frollo.frollosdk.model.api.messages.MessageResponse
 
 @Dao
@@ -65,4 +66,23 @@ internal interface MessageDao {
 
     @Query("DELETE FROM message")
     fun clear()
+
+    /**
+     * RxJava Return Types
+     */
+
+    @Query("SELECT * FROM message")
+    fun loadRx(): Observable<List<MessageResponse>>
+
+    @Query("SELECT * FROM message WHERE read = :readBool")
+    fun loadRx(readBool: Boolean): Observable<List<MessageResponse>>
+
+    @Query("SELECT * FROM message WHERE message_types LIKE '%|'||:messageType||'|%'")
+    fun loadRx(messageType: String): Observable<List<MessageResponse>>
+
+    @Query("SELECT * FROM message WHERE msg_id = :messageId")
+    fun loadRx(messageId: Long): Observable<MessageResponse?>
+
+    @RawQuery(observedEntities = [MessageResponse::class])
+    fun loadByQueryRx(queryStr: SupportSQLiteQuery): Observable<List<MessageResponse>>
 }

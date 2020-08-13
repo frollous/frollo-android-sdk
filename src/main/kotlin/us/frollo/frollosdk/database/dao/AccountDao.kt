@@ -23,6 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
+import io.reactivex.Observable
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountRelation
 
@@ -88,4 +89,38 @@ internal interface AccountDao {
     @androidx.room.Transaction
     @RawQuery(observedEntities = [Account::class])
     fun loadByQueryWithRelation(queryStr: SupportSQLiteQuery): LiveData<List<AccountRelation>>
+
+    /**
+     * RxJava Return Types
+     */
+
+    @Query("SELECT * FROM account")
+    fun loadRx(): Observable<List<Account>>
+
+    @Query("SELECT * FROM account WHERE account_id = :accountId")
+    fun loadRx(accountId: Long): Observable<Account?>
+
+    @Query("SELECT * FROM account WHERE provider_account_id = :providerAccountId")
+    fun loadByProviderAccountIdRx(providerAccountId: Long): Observable<List<Account>>
+
+    @RawQuery(observedEntities = [Account::class])
+    fun loadByQueryRx(queryStr: SupportSQLiteQuery): Observable<List<Account>>
+
+    // Relation methods
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM account")
+    fun loadWithRelationRx(): Observable<List<AccountRelation>>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM account WHERE account_id = :accountId")
+    fun loadWithRelationRx(accountId: Long): Observable<AccountRelation?>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM account WHERE provider_account_id = :providerAccountId")
+    fun loadByProviderAccountIdWithRelationRx(providerAccountId: Long): Observable<List<AccountRelation>>
+
+    @androidx.room.Transaction
+    @RawQuery(observedEntities = [Account::class])
+    fun loadByQueryWithRelationRx(queryStr: SupportSQLiteQuery): Observable<List<AccountRelation>>
 }

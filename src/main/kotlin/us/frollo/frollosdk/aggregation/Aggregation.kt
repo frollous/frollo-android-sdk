@@ -117,7 +117,7 @@ import us.frollo.frollosdk.network.api.AggregationAPI
 /**
  * Manages all aggregation data including accounts, transactions, categories and merchants.
  */
-class Aggregation(network: NetworkService, private val db: SDKDatabase, localBroadcastManager: LocalBroadcastManager) {
+class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBroadcastManager: LocalBroadcastManager) {
 
     companion object {
         private const val TAG = "Aggregation"

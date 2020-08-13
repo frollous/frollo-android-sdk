@@ -23,6 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
+import io.reactivex.Observable
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
 import us.frollo.frollosdk.model.coredata.bills.BillPaymentRelation
 
@@ -86,4 +87,45 @@ internal interface BillPaymentDao {
     @androidx.room.Transaction
     @RawQuery(observedEntities = [BillPaymentRelation::class])
     fun loadByQueryWithRelation(queryStr: SupportSQLiteQuery): LiveData<List<BillPaymentRelation>>
+
+    /**
+     * RxJava Return Types
+     */
+
+    @Query("SELECT * FROM bill_payment WHERE date BETWEEN Date(:fromDate) AND Date(:toDate)")
+    fun loadRx(fromDate: String, toDate: String): Observable<List<BillPayment>>
+
+    @Query("SELECT * FROM bill_payment WHERE bill_payment_id = :billPaymentId")
+    fun loadRx(billPaymentId: Long): Observable<BillPayment?>
+
+    @Query("SELECT * FROM bill_payment WHERE bill_id = :billId AND (date BETWEEN Date(:fromDate) AND Date(:toDate))")
+    fun loadByBillIdRx(billId: Long, fromDate: String, toDate: String): Observable<List<BillPayment>>
+
+    @Query("SELECT * FROM bill_payment WHERE bill_id = :billId")
+    fun loadByBillIdRx(billId: Long): Observable<List<BillPayment>>
+
+    @RawQuery(observedEntities = [BillPayment::class])
+    fun loadByQueryRx(queryStr: SupportSQLiteQuery): Observable<List<BillPayment>>
+
+    // Relation methods
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM bill_payment WHERE date BETWEEN Date(:fromDate) AND Date(:toDate)")
+    fun loadWithRelationRx(fromDate: String, toDate: String): Observable<List<BillPaymentRelation>>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM bill_payment WHERE bill_payment_id = :billPaymentId")
+    fun loadWithRelationRx(billPaymentId: Long): Observable<BillPaymentRelation?>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM bill_payment WHERE bill_id = :billId AND (date BETWEEN Date(:fromDate) AND Date(:toDate))")
+    fun loadByBillIdWithRelationRx(billId: Long, fromDate: String, toDate: String): Observable<List<BillPaymentRelation>>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM bill_payment WHERE bill_id = :billId")
+    fun loadByBillIdWithRelationRx(billId: Long): Observable<List<BillPaymentRelation>>
+
+    @androidx.room.Transaction
+    @RawQuery(observedEntities = [BillPaymentRelation::class])
+    fun loadByQueryWithRelationRx(queryStr: SupportSQLiteQuery): Observable<List<BillPaymentRelation>>
 }

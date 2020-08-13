@@ -23,6 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
+import io.reactivex.Observable
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 
 @Dao
@@ -54,4 +55,17 @@ internal interface TransactionCategoryDao {
 
     @Query("DELETE FROM transaction_category")
     fun clear()
+
+    /**
+     * RxJava Return Types
+     */
+
+    @Query("SELECT * FROM transaction_category")
+    fun loadRx(): Observable<List<TransactionCategory>>
+
+    @Query("SELECT * FROM transaction_category WHERE transaction_category_id = :transactionCategoryId")
+    fun loadRx(transactionCategoryId: Long): Observable<TransactionCategory?>
+
+    @RawQuery(observedEntities = [TransactionCategory::class])
+    fun loadByQueryRx(queryStr: SupportSQLiteQuery): Observable<List<TransactionCategory>>
 }

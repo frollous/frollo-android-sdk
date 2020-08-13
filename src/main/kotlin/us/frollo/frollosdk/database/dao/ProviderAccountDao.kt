@@ -23,6 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
+import io.reactivex.Observable
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccountRelation
 
@@ -79,4 +80,38 @@ internal interface ProviderAccountDao {
     @androidx.room.Transaction
     @RawQuery(observedEntities = [ProviderAccount::class])
     fun loadByQueryWithRelation(queryStr: SupportSQLiteQuery): LiveData<List<ProviderAccountRelation>>
+
+    /**
+     * RxJava Return Types
+     */
+
+    @Query("SELECT * FROM provider_account")
+    fun loadRx(): Observable<List<ProviderAccount>>
+
+    @Query("SELECT * FROM provider_account WHERE provider_account_id = :providerAccountId")
+    fun loadRx(providerAccountId: Long): Observable<ProviderAccount?>
+
+    @Query("SELECT * FROM provider_account WHERE provider_id = :providerId")
+    fun loadByProviderIdRx(providerId: Long): Observable<List<ProviderAccount>>
+
+    @RawQuery(observedEntities = [ProviderAccount::class])
+    fun loadByQueryRx(queryStr: SupportSQLiteQuery): Observable<List<ProviderAccount>>
+
+    // Relation methods
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM provider_account")
+    fun loadWithRelationRx(): Observable<List<ProviderAccountRelation>>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM provider_account WHERE provider_account_id = :providerAccountId")
+    fun loadWithRelationRx(providerAccountId: Long): Observable<ProviderAccountRelation?>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM provider_account WHERE provider_id = :providerId")
+    fun loadByProviderIdWithRelationRx(providerId: Long): Observable<List<ProviderAccountRelation>>
+
+    @androidx.room.Transaction
+    @RawQuery(observedEntities = [ProviderAccount::class])
+    fun loadByQueryWithRelationRx(queryStr: SupportSQLiteQuery): Observable<List<ProviderAccountRelation>>
 }

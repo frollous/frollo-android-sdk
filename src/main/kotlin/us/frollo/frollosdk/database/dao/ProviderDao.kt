@@ -24,6 +24,7 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
+import io.reactivex.Observable
 import us.frollo.frollosdk.model.api.aggregation.providers.ProvidersResponse
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderRelation
@@ -77,4 +78,31 @@ internal interface ProviderDao {
     @androidx.room.Transaction
     @RawQuery(observedEntities = [Provider::class])
     fun loadByQueryWithRelation(queryStr: SupportSQLiteQuery): LiveData<List<ProviderRelation>>
+
+    /**
+     * RxJava Return Types
+     */
+
+    @Query("SELECT * FROM provider")
+    fun loadRx(): Observable<List<Provider>>
+
+    @Query("SELECT * FROM provider WHERE provider_id = :providerId")
+    fun loadRx(providerId: Long): Observable<Provider?>
+
+    @RawQuery(observedEntities = [Provider::class])
+    fun loadByQueryRx(queryStr: SupportSQLiteQuery): Observable<List<Provider>>
+
+    // Relation methods
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM provider")
+    fun loadWithRelationRx(): Observable<List<ProviderRelation>>
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM provider WHERE provider_id = :providerId")
+    fun loadWithRelationRx(providerId: Long): Observable<ProviderRelation?>
+
+    @androidx.room.Transaction
+    @RawQuery(observedEntities = [Provider::class])
+    fun loadByQueryWithRelationRx(queryStr: SupportSQLiteQuery): Observable<List<ProviderRelation>>
 }

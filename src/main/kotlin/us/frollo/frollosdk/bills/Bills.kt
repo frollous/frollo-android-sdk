@@ -54,7 +54,7 @@ import us.frollo.frollosdk.network.api.BillsAPI
 import java.math.BigDecimal
 
 /** Manages bills and bill payments */
-class Bills(network: NetworkService, private val db: SDKDatabase, private val aggregation: Aggregation) {
+class Bills(network: NetworkService, internal val db: SDKDatabase, private val aggregation: Aggregation) {
 
     companion object {
         private const val TAG = "Bills"

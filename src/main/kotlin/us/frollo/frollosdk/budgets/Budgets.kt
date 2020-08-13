@@ -55,13 +55,15 @@ import us.frollo.frollosdk.network.api.BudgetsAPI
 import java.math.BigDecimal
 
 /** Manages user Budgets and tracking */
-class Budgets(network: NetworkService, private val db: SDKDatabase) {
+class Budgets(network: NetworkService, internal val db: SDKDatabase) {
 
     companion object {
         private const val TAG = "Budgets"
     }
 
     private val budgetsAPI: BudgetsAPI = network.create(BudgetsAPI::class.java)
+
+    // Budget
 
     /**
      * Fetch budget by ID from the cache

@@ -56,7 +56,7 @@ import us.frollo.frollosdk.network.api.GoalsAPI
 import java.math.BigDecimal
 
 /** Manages user goals and tracking */
-class Goals(network: NetworkService, private val db: SDKDatabase) {
+class Goals(network: NetworkService, internal val db: SDKDatabase) {
 
     companion object {
         private const val TAG = "Goals"

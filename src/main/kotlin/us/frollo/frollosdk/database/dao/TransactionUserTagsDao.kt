@@ -23,6 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
+import io.reactivex.Observable
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
 
 @Dao
@@ -39,4 +40,14 @@ internal interface TransactionUserTagsDao {
 
     @RawQuery(observedEntities = [TransactionTag::class])
     fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<TransactionTag>>
+
+    /**
+     * RxJava Return Types
+     */
+
+    @Query("SELECT * FROM transaction_user_tags")
+    fun loadRx(): Observable<List<TransactionTag>>
+
+    @RawQuery(observedEntities = [TransactionTag::class])
+    fun loadByQueryRx(queryStr: SupportSQLiteQuery): Observable<List<TransactionTag>>
 }

@@ -42,7 +42,7 @@ import us.frollo.frollosdk.network.api.MessagesAPI
 /**
  * Manages caching and refreshing of messages
  */
-class Messages(network: NetworkService, private val db: SDKDatabase) {
+class Messages(network: NetworkService, internal val db: SDKDatabase) {
 
     companion object {
         private const val TAG = "Messages"

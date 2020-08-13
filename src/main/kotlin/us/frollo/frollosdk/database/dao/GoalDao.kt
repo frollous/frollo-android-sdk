@@ -24,6 +24,7 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.Transaction
 import androidx.sqlite.db.SupportSQLiteQuery
+import io.reactivex.Observable
 import us.frollo.frollosdk.model.coredata.goals.Goal
 import us.frollo.frollosdk.model.coredata.goals.GoalRelation
 
@@ -73,4 +74,31 @@ internal interface GoalDao {
     @Transaction
     @RawQuery(observedEntities = [GoalRelation::class])
     fun loadByQueryWithRelation(queryStr: SupportSQLiteQuery): LiveData<List<GoalRelation>>
+
+    /**
+     * RxJava Return Types
+     */
+
+    @Query("SELECT * FROM goal")
+    fun loadRx(): Observable<List<Goal>>
+
+    @Query("SELECT * FROM goal WHERE goal_id = :goalId")
+    fun loadRx(goalId: Long): Observable<Goal?>
+
+    @RawQuery(observedEntities = [Goal::class])
+    fun loadByQueryRx(queryStr: SupportSQLiteQuery): Observable<List<Goal>>
+
+    // Relation methods
+
+    @Transaction
+    @Query("SELECT * FROM goal")
+    fun loadWithRelationRx(): Observable<List<GoalRelation>>
+
+    @Transaction
+    @Query("SELECT * FROM goal WHERE goal_id = :goalId")
+    fun loadWithRelationRx(goalId: Long): Observable<GoalRelation?>
+
+    @Transaction
+    @RawQuery(observedEntities = [GoalRelation::class])
+    fun loadByQueryWithRelationRx(queryStr: SupportSQLiteQuery): Observable<List<GoalRelation>>
 }

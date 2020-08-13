@@ -24,6 +24,7 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.Transaction
 import androidx.sqlite.db.SupportSQLiteQuery
+import io.reactivex.Observable
 import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
 import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriodRelation
 
@@ -69,4 +70,27 @@ internal interface BudgetPeriodDao {
     @Transaction
     @RawQuery(observedEntities = [BudgetPeriodRelation::class])
     fun loadByQueryWithRelation(queryStr: SupportSQLiteQuery): LiveData<List<BudgetPeriodRelation>>
+
+    /**
+     * RxJava Return Types
+     */
+
+    @Query("SELECT * FROM budget_period WHERE budget_period_id = :budgetPeriodId")
+    fun loadRx(budgetPeriodId: Long): Observable<BudgetPeriod?>
+
+    @Query("SELECT * FROM budget_period WHERE budget_id = :budgetId")
+    fun loadByBudgetIdRx(budgetId: Long): Observable<List<BudgetPeriod>>
+
+    @RawQuery(observedEntities = [BudgetPeriod::class])
+    fun loadByQueryRx(queryStr: SupportSQLiteQuery): Observable<List<BudgetPeriod>>
+
+    // Relation methods
+
+    @Transaction
+    @Query("SELECT * FROM budget_period WHERE budget_period_id = :budgetPeriodId")
+    fun loadWithRelationRx(budgetPeriodId: Long): Observable<BudgetPeriodRelation?>
+
+    @Transaction
+    @RawQuery(observedEntities = [BudgetPeriodRelation::class])
+    fun loadByQueryWithRelationRx(queryStr: SupportSQLiteQuery): Observable<List<BudgetPeriodRelation>>
 }

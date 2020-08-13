@@ -64,7 +64,7 @@ import us.frollo.frollosdk.network.api.ReportsAPI
 /**
  * Manages all aspects of reporting of aggregation data including spending and balances
  */
-class Reports(network: NetworkService, private val db: SDKDatabase, private val aggregation: Aggregation) {
+class Reports(network: NetworkService, internal val db: SDKDatabase, private val aggregation: Aggregation) {
 
     companion object {
         private const val TAG = "Reports"
@@ -391,7 +391,7 @@ class Reports(network: NetworkService, private val db: SDKDatabase, private val 
     }
 
     @Throws(FrolloSDKError::class)
-    private fun String.toReportDateFormat(period: ReportPeriod): String {
+    internal fun String.toReportDateFormat(period: ReportPeriod): String {
         if (!this.isValidDateFormat(DATE_PATTERN_FOR_REQUEST)) {
             throw FrolloSDKError("Invalid format for from/to date")
         }

@@ -14,31 +14,16 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.database.dao
+package us.frollo.frollosdk.user
 
-import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
 import io.reactivex.Observable
 import us.frollo.frollosdk.model.coredata.user.User
 
-@Dao
-internal interface UserDao {
-    @Query("SELECT * FROM user LIMIT 1")
-    fun load(): LiveData<User?>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(model: User): Long
-
-    @Query("DELETE FROM user")
-    fun clear()
-
-    /**
-     * RxJava Return Types
-     */
-
-    @Query("SELECT * FROM user LIMIT 1")
-    fun loadRx(): Observable<User?>
+/**
+ * Fetch the first available user model from the cache
+ *
+ * @return Rx Observable object of User which can be observed using an Observer for future changes as well.
+ */
+fun UserManagement.fetchUserRx(): Observable<User?> {
+    return db.users().loadRx()
 }

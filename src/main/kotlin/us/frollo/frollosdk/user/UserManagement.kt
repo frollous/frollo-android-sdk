@@ -61,7 +61,7 @@ class UserManagement(
     private val di: DeviceInfo,
     private val network: NetworkService,
     private val clientId: String,
-    private val db: SDKDatabase,
+    internal val db: SDKDatabase,
     private val pref: Preferences
 ) {
 

@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.coredata.aggregation.providers
+package us.frollo.frollosdk.model.coredata.aggregation.accounts
 
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
-/** Status of the support of the provider */
-enum class ProviderStatus {
+/**
+ * AccountFeatureSubType
+ * Subtype of [AccountFeatureType]
+ */
+enum class AccountFeatureSubType {
 
-    /** Beta. Support is still being developed so may have some issues */
-    @SerializedName("beta") BETA,
+    /** BPay Payment feature subtype */
+    @SerializedName("bpay") BPAY,
 
-    /** Disabled. Provider has been disabled by the aggregator */
-    @SerializedName("disabled") DISABLED,
+    /** NPP Payment feature subtype */
+    @SerializedName("npp") NPP,
 
-    /** Supported. Provider is fully supported */
-    @SerializedName("supported") SUPPORTED,
+    /** PayAnyone Payment feature subtype */
+    @SerializedName("pay_anyone") PAY_ANYONE,
 
-    /** Unsupported. Provider is no longer supported */
-    @SerializedName("unsupported") UNSUPPORTED,
+    /** Internal Transfer Payment feature subtype */
+    @SerializedName("internal") INTERNAL_TRANSFER,
 
-    /** Outage. Provider is down */
-    @SerializedName("outage") OUTAGE,
-
-    /** Coming Soon. Provider is currently unavailable but will be available soon */
-    @SerializedName("coming_soon") COMING_SOON, ;
+    /** Unknown feature subtype */
+    @SerializedName("unknown") UNKNOWN;
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

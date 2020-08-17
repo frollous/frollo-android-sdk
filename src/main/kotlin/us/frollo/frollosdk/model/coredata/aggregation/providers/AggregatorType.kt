@@ -26,7 +26,10 @@ enum class AggregatorType {
     @SerializedName("yodlee") YODLEE,
 
     /** OpenBanking - CDR */
-    @SerializedName("cdr") CDR;
+    @SerializedName("cdr") CDR,
+
+    /** Unknown aggregator */
+    @SerializedName("unknown") UNKNOWN;
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

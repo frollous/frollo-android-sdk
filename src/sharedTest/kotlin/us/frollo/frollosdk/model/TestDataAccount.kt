@@ -22,6 +22,8 @@ import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountAttributes
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeature
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeatureDetail
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeatureSubType
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeatureType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountGroup
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
@@ -107,25 +109,25 @@ internal fun testAccountResponseData(accountId: Long? = null, providerAccountId:
 internal fun testAccountFeaturesData(): List<AccountFeature> {
     return listOf(
         AccountFeature(
-            featureId = "payments",
+            featureId = AccountFeatureType.PAYMENTS,
             name = "Payments",
             imageUrl = "https://image.png",
             details = testAccountFeatureDetailsData()
         ),
         AccountFeature(
-            featureId = "transfers",
+            featureId = AccountFeatureType.TRANSFERS,
             name = "Transfers",
             imageUrl = null,
             details = listOf(
                 AccountFeatureDetail(
-                    detailId = "internal_transfer",
+                    detailId = AccountFeatureSubType.INTERNAL_TRANSFER,
                     name = "Transfer",
                     imageUrl = null
                 )
             )
         ),
         AccountFeature(
-            featureId = "statements",
+            featureId = AccountFeatureType.STATEMENTS,
             name = "Statements",
             imageUrl = null,
             details = null
@@ -136,12 +138,12 @@ internal fun testAccountFeaturesData(): List<AccountFeature> {
 internal fun testAccountFeatureDetailsData(): List<AccountFeatureDetail> {
     return listOf(
         AccountFeatureDetail(
-            detailId = "bpay",
+            detailId = AccountFeatureSubType.BPAY,
             name = "BPAY",
             imageUrl = "https://image-detail.png"
         ),
         AccountFeatureDetail(
-            detailId = "npp",
+            detailId = AccountFeatureSubType.NPP,
             name = "PayID",
             imageUrl = null
         )

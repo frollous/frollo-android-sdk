@@ -9,6 +9,7 @@
 - Migrate from Application Context to ContentProvider Context
 - Upgrade Host API Version to 2.11
 - Added Fetch methods that return Rx Observable
+- Provider availability status
 
 ### 3.5.0
 

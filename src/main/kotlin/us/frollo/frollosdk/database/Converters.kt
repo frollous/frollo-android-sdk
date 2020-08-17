@@ -23,6 +23,8 @@ import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeature
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeatureDetail
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeatureSubType
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeatureType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountGroup
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
@@ -84,16 +86,16 @@ internal class Converters {
 
     // Generic
     @TypeConverter
-    fun stringToListOfString(value: String?): List<String>? = if (value == null) null else value.split("|").filter { it.isNotBlank() }
+    fun stringToListOfString(value: String?): List<String>? = value?.split("|")?.filter { it.isNotBlank() }
 
     @TypeConverter
-    fun stringFromListOfString(value: List<String>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|", postfix = "|")
+    fun stringFromListOfString(value: List<String>?): String? = value?.joinToString(separator = "|", prefix = "|", postfix = "|")
 
     @TypeConverter
-    fun stringToListOfLong(value: String?): List<Long>? = if (value == null) null else value.split("|").filter { it.isNotBlank() }.map { it.toLong() }
+    fun stringToListOfLong(value: String?): List<Long>? = value?.split("|")?.filter { it.isNotBlank() }?.map { it.toLong() }
 
     @TypeConverter
-    fun stringFromListOfLong(value: List<Long>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|", postfix = "|")
+    fun stringFromListOfLong(value: List<Long>?): String? = value?.joinToString(separator = "|", prefix = "|", postfix = "|")
 
     @TypeConverter
     fun stringToBigDecimal(value: String?): BigDecimal? = if (value == null) null else BigDecimal(value)
@@ -191,22 +193,22 @@ internal class Converters {
     fun stringFromProviderEncryptionType(value: ProviderEncryptionType?): String? = value?.name
 
     @TypeConverter
-    fun stringToListOfProviderContainerName(value: String?): List<ProviderContainerName>? = if (value == null) null else value.split("|").filter { it.isNotBlank() }.map { ProviderContainerName.valueOf(it.toUpperCase()) }.toList()
+    fun stringToListOfProviderContainerName(value: String?): List<ProviderContainerName>? = value?.split("|")?.filter { it.isNotBlank() }?.map { ProviderContainerName.valueOf(it.toUpperCase()) }
 
     @TypeConverter
-    fun stringFromListOfProviderContainerName(value: List<ProviderContainerName>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|", postfix = "|")
+    fun stringFromListOfProviderContainerName(value: List<ProviderContainerName>?): String? = value?.joinToString(separator = "|", prefix = "|", postfix = "|")
 
     @TypeConverter
-    fun stringToAggregatorType(value: String?): AggregatorType? = if (value == null || value.isEmpty() || value.isBlank()) AggregatorType.YODLEE else AggregatorType.valueOf(value)
+    fun stringToAggregatorType(value: String?): AggregatorType? = if (value == null || value.isEmpty() || value.isBlank()) AggregatorType.UNKNOWN else AggregatorType.valueOf(value)
 
     @TypeConverter
-    fun stringFromAggregatorType(value: AggregatorType?): String? = value?.name ?: AggregatorType.YODLEE.name
+    fun stringFromAggregatorType(value: AggregatorType?): String? = value?.name ?: AggregatorType.UNKNOWN.name
 
     @TypeConverter
-    fun stringToListOfProviderPermission(value: String?): List<ProviderPermission>? = if (value == null) null else value.split("|").filter { it.isNotBlank() }.map { ProviderPermission.valueOf(it.toUpperCase()) }.toList()
+    fun stringToListOfProviderPermission(value: String?): List<ProviderPermission>? = value?.split("|")?.filter { it.isNotBlank() }?.map { ProviderPermission.valueOf(it.toUpperCase()) }
 
     @TypeConverter
-    fun stringFromListOfProviderPermission(value: List<ProviderPermission>?): String? = if (value == null) null else value.joinToString(separator = "|", prefix = "|", postfix = "|")
+    fun stringFromListOfProviderPermission(value: List<ProviderPermission>?): String? = value?.joinToString(separator = "|", prefix = "|", postfix = "|")
 
     // ProviderAccount
     @TypeConverter
@@ -275,6 +277,18 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromListOfAccountFeatureDetail(value: List<AccountFeatureDetail>?): String? = if (value == null) null else gson.toJson(value)
+
+    @TypeConverter
+    fun stringToAccountFeatureType(value: String?): AccountFeatureType? = if (value == null) AccountFeatureType.UNKNOWN else AccountFeatureType.valueOf(value)
+
+    @TypeConverter
+    fun stringFromAccountFeatureType(value: AccountFeatureType?): String? = value?.name ?: AccountFeatureType.UNKNOWN.name
+
+    @TypeConverter
+    fun stringToAccountFeatureSubType(value: String?): AccountFeatureSubType? = if (value == null) AccountFeatureSubType.UNKNOWN else AccountFeatureSubType.valueOf(value)
+
+    @TypeConverter
+    fun stringFromAccountFeatureSubType(value: AccountFeatureSubType?): String? = value?.name ?: AccountFeatureSubType.UNKNOWN.name
 
     @TypeConverter
     fun stringToListOfCDRProductInformation(value: String?): List<CDRProductInformation>? = if (value == null) null else gson.fromJson<List<CDRProductInformation>>(value)

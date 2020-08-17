@@ -58,7 +58,7 @@ internal fun ProviderResponse.toProvider(): Provider =
         loginHelpMessage = loginHelpMessage,
         loginForm = loginForm,
         encryption = encryption,
-        aggregatorType = aggregatorType ?: AggregatorType.YODLEE, // Set YODLEE if null as demo data has this field as null,
+        aggregatorType = aggregatorType ?: AggregatorType.UNKNOWN,
         permissions = permissions?.map { ProviderPermission.valueOf(it.toUpperCase()) }?.toList(),
         productsAvailable = productsAvailable ?: false
     )

@@ -23,6 +23,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeatureSubType
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeatureType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountGroup
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
@@ -364,7 +366,7 @@ class ConvertersTest {
         val status = Converters.instance.stringToAggregatorType("CDR")
         assertEquals(AggregatorType.CDR, status)
 
-        assertEquals(AggregatorType.YODLEE, Converters.instance.stringToAggregatorType(null))
+        assertEquals(AggregatorType.UNKNOWN, Converters.instance.stringToAggregatorType(null))
     }
 
     @Test
@@ -373,7 +375,7 @@ class ConvertersTest {
         assertEquals("CDR", str)
 
         assertEquals("YODLEE", Converters.instance.stringFromAggregatorType(AggregatorType.YODLEE))
-        assertEquals("YODLEE", Converters.instance.stringFromAggregatorType(null))
+        assertEquals("UNKNOWN", Converters.instance.stringFromAggregatorType(null))
     }
 
     @Test
@@ -563,21 +565,21 @@ class ConvertersTest {
 
     @Test
     fun testStringToListOfAccountFeature() {
-        val json = "[{\"id\":\"payments\",\"name\":\"Payments\",\"image_url\":\"https://image.png\",\"details\":[{\"id\":\"bpay\",\"name\":\"BPAY\",\"image_url\":\"https://image-detail.png\"},{\"id\":\"npp\",\"name\":\"PayID\"}]},{\"id\":\"transfers\",\"name\":\"Transfers\",\"details\":[{\"id\":\"internal_transfer\",\"name\":\"Transfer\"}]},{\"id\":\"statements\",\"name\":\"Statements\"}]"
+        val json = "[{\"id\":\"payments\",\"name\":\"Payments\",\"image_url\":\"https://image.png\",\"details\":[{\"id\":\"bpay\",\"name\":\"BPAY\",\"image_url\":\"https://image-detail.png\"},{\"id\":\"npp\",\"name\":\"PayID\"}]},{\"id\":\"transfers\",\"name\":\"Transfers\",\"details\":[{\"id\":\"internal\",\"name\":\"Transfer\"}]},{\"id\":\"statements\",\"name\":\"Statements\"}]"
         val features = Converters.instance.stringToListOfAccountFeature(json)
         assertNotNull(features)
         assertTrue(features?.size == 3)
-        assertEquals("payments", features?.get(0)?.featureId)
+        assertEquals(AccountFeatureType.PAYMENTS, features?.get(0)?.featureId)
         assertEquals("Payments", features?.get(0)?.name)
         assertEquals("https://image.png", features?.get(0)?.imageUrl)
         assertEquals(2, features?.get(0)?.details?.size)
-        assertEquals("bpay", features?.get(0)?.details?.get(0)?.detailId)
+        assertEquals(AccountFeatureSubType.BPAY, features?.get(0)?.details?.get(0)?.detailId)
         assertEquals("BPAY", features?.get(0)?.details?.get(0)?.name)
         assertEquals("https://image-detail.png", features?.get(0)?.details?.get(0)?.imageUrl)
-        assertEquals("transfers", features?.get(1)?.featureId)
+        assertEquals(AccountFeatureType.TRANSFERS, features?.get(1)?.featureId)
         assertNull(features?.get(1)?.imageUrl)
         assertEquals(1, features?.get(1)?.details?.size)
-        assertEquals("statements", features?.get(2)?.featureId)
+        assertEquals(AccountFeatureType.STATEMENTS, features?.get(2)?.featureId)
         assertNull(features?.get(2)?.imageUrl)
         assertNull(features?.get(2)?.details)
 
@@ -588,7 +590,7 @@ class ConvertersTest {
     fun testStringFromListOfAccountFeature() {
         val features = testAccountFeaturesData()
         val json = Converters.instance.stringFromListOfAccountFeature(features)
-        assertEquals("[{\"id\":\"payments\",\"name\":\"Payments\",\"image_url\":\"https://image.png\",\"details\":[{\"id\":\"bpay\",\"name\":\"BPAY\",\"image_url\":\"https://image-detail.png\"},{\"id\":\"npp\",\"name\":\"PayID\"}]},{\"id\":\"transfers\",\"name\":\"Transfers\",\"details\":[{\"id\":\"internal_transfer\",\"name\":\"Transfer\"}]},{\"id\":\"statements\",\"name\":\"Statements\"}]", json)
+        assertEquals("[{\"id\":\"payments\",\"name\":\"Payments\",\"image_url\":\"https://image.png\",\"details\":[{\"id\":\"bpay\",\"name\":\"BPAY\",\"image_url\":\"https://image-detail.png\"},{\"id\":\"npp\",\"name\":\"PayID\"}]},{\"id\":\"transfers\",\"name\":\"Transfers\",\"details\":[{\"id\":\"internal\",\"name\":\"Transfer\"}]},{\"id\":\"statements\",\"name\":\"Statements\"}]", json)
     }
 
     @Test
@@ -597,14 +599,46 @@ class ConvertersTest {
         val details = Converters.instance.stringToListOfAccountFeatureDetail(json)
         assertNotNull(details)
         assertTrue(details?.size == 2)
-        assertEquals("bpay", details?.get(0)?.detailId)
+        assertEquals(AccountFeatureSubType.BPAY, details?.get(0)?.detailId)
         assertEquals("BPAY", details?.get(0)?.name)
         assertEquals("https://image-detail.png", details?.get(0)?.imageUrl)
-        assertEquals("npp", details?.get(1)?.detailId)
+        assertEquals(AccountFeatureSubType.NPP, details?.get(1)?.detailId)
         assertEquals("PayID", details?.get(1)?.name)
         assertNull(details?.get(1)?.imageUrl)
 
         assertNull(Converters.instance.stringToListOfAccountFeatureDetail(null))
+    }
+
+    @Test
+    fun testStringToAccountFeatureType() {
+        val status = Converters.instance.stringToAccountFeatureType("PAYMENTS")
+        assertEquals(AccountFeatureType.PAYMENTS, status)
+
+        assertEquals(AccountFeatureType.UNKNOWN, Converters.instance.stringToAccountFeatureType(null))
+    }
+
+    @Test
+    fun testStringFromAccountFeatureType() {
+        val str = Converters.instance.stringFromAccountFeatureType(AccountFeatureType.PAYMENTS)
+        assertEquals("PAYMENTS", str)
+
+        assertEquals("UNKNOWN", Converters.instance.stringFromAccountFeatureType(null))
+    }
+
+    @Test
+    fun testStringToAccountFeatureSubType() {
+        val status = Converters.instance.stringToAccountFeatureSubType("BPAY")
+        assertEquals(AccountFeatureSubType.BPAY, status)
+
+        assertEquals(AccountFeatureSubType.UNKNOWN, Converters.instance.stringToAccountFeatureSubType(null))
+    }
+
+    @Test
+    fun testStringFromAccountFeatureSubType() {
+        val str = Converters.instance.stringFromAccountFeatureSubType(AccountFeatureSubType.BPAY)
+        assertEquals("BPAY", str)
+
+        assertEquals("UNKNOWN", Converters.instance.stringFromAccountFeatureSubType(null))
     }
 
     @Test

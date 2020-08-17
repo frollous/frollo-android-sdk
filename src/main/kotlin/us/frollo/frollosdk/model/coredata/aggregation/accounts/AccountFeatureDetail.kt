@@ -24,7 +24,7 @@ import com.google.gson.annotations.SerializedName
 data class AccountFeatureDetail(
 
     /** Unique ID of the feature detail */
-    @SerializedName("id") val detailId: String,
+    @SerializedName("id") val detailId: AccountFeatureSubType,
 
     /** Name of the feature detail */
     @SerializedName("name") val name: String,

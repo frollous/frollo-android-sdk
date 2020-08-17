@@ -14,31 +14,25 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.coredata.aggregation.providers
+package us.frollo.frollosdk.model.coredata.aggregation.accounts
 
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
-/** Status of the support of the provider */
-enum class ProviderStatus {
+/** Type of AccountFeature */
+enum class AccountFeatureType {
 
-    /** Beta. Support is still being developed so may have some issues */
-    @SerializedName("beta") BETA,
+    /** Payment feature */
+    @SerializedName("payments") PAYMENTS,
 
-    /** Disabled. Provider has been disabled by the aggregator */
-    @SerializedName("disabled") DISABLED,
+    /** Transfers feature */
+    @SerializedName("transfers") TRANSFERS,
 
-    /** Supported. Provider is fully supported */
-    @SerializedName("supported") SUPPORTED,
+    /** Statements feature */
+    @SerializedName("statements") STATEMENTS,
 
-    /** Unsupported. Provider is no longer supported */
-    @SerializedName("unsupported") UNSUPPORTED,
-
-    /** Outage. Provider is down */
-    @SerializedName("outage") OUTAGE,
-
-    /** Coming Soon. Provider is currently unavailable but will be available soon */
-    @SerializedName("coming_soon") COMING_SOON, ;
+    /** Unknown feature */
+    @SerializedName("unknown") UNKNOWN;
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

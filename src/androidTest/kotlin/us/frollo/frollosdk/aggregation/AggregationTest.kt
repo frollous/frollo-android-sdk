@@ -45,6 +45,8 @@ import us.frollo.frollosdk.mapping.toProvider
 import us.frollo.frollosdk.mapping.toProviderAccount
 import us.frollo.frollosdk.mapping.toTransaction
 import us.frollo.frollosdk.mapping.toTransactionCategory
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeatureSubType
+import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountFeatureType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
@@ -1072,17 +1074,17 @@ class AggregationTest : BaseAndroidTest() {
             val first = models?.get(0)
 
             assertTrue(first?.features?.size == 3)
-            assertEquals("payments", first?.features?.get(0)?.featureId)
+            assertEquals(AccountFeatureType.PAYMENTS, first?.features?.get(0)?.featureId)
             assertEquals("Payments", first?.features?.get(0)?.name)
             assertEquals("https://image.png", first?.features?.get(0)?.imageUrl)
             assertEquals(2, first?.features?.get(0)?.details?.size)
-            assertEquals("bpay", first?.features?.get(0)?.details?.get(0)?.detailId)
+            assertEquals(AccountFeatureSubType.BPAY, first?.features?.get(0)?.details?.get(0)?.detailId)
             assertEquals("BPAY", first?.features?.get(0)?.details?.get(0)?.name)
             assertEquals("https://image-detail.png", first?.features?.get(0)?.details?.get(0)?.imageUrl)
-            assertEquals("transfers", first?.features?.get(1)?.featureId)
+            assertEquals(AccountFeatureType.TRANSFERS, first?.features?.get(1)?.featureId)
             assertNull(first?.features?.get(1)?.imageUrl)
             assertEquals(1, first?.features?.get(1)?.details?.size)
-            assertEquals("statements", first?.features?.get(2)?.featureId)
+            assertEquals(AccountFeatureType.STATEMENTS, first?.features?.get(2)?.featureId)
             assertNull(first?.features?.get(2)?.imageUrl)
             assertNull(first?.features?.get(2)?.details)
 

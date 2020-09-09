@@ -1747,7 +1747,7 @@ class AggregationTest : BaseAndroidTest() {
             val testObserver1 = aggregation.fetchTransactions().test()
             testObserver1.awaitValue()
             val fetchedTransactions = testObserver1.value().data
-            assertEquals(201, fetchedTransactions?.size)
+            assertEquals(202, fetchedTransactions?.size)
 
             val testObserver2 = aggregation.fetchTransaction(160142L).test()
             testObserver2.awaitValue()
@@ -1772,7 +1772,7 @@ class AggregationTest : BaseAndroidTest() {
             val testObserver1 = aggregation.fetchTransactions().test()
             testObserver1.awaitValue()
             val fetchedTransactions = testObserver1.value().data
-            assertEquals(fetchedTransactions?.size, 398)
+            assertEquals(fetchedTransactions?.size, 399)
 
             val testObserver2 = aggregation.fetchTransaction(161135L).test()
             testObserver2.awaitValue()
@@ -1818,7 +1818,7 @@ class AggregationTest : BaseAndroidTest() {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            assertEquals(3, models?.size)
+            assertEquals(5, models?.size)
 
             signal.countDown()
         }
@@ -1945,7 +1945,7 @@ class AggregationTest : BaseAndroidTest() {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            assertEquals(3, models?.size)
+            assertEquals(4, models?.size)
 
             signal.countDown()
         }

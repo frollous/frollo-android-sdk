@@ -60,4 +60,28 @@ data class TransactionFilter(
     var after: String? = null,
     var before: String? = null,
     var size: Long? = null
-)
+) {
+
+    fun getQueryMap(): Map<String, String> {
+        val queryMap = mutableMapOf<String, String>()
+        transactionIds?.let { if (it.isNotEmpty()) queryMap.put("transaction_ids", it.joinToString(",")) }
+        accountIds?.let { if (it.isNotEmpty()) queryMap.put("account_ids", it.joinToString(",")) }
+        budgetCategory?.let { queryMap.put("budget_category", it.toString()) }
+        transactionCategoryIds?.let { if (it.isNotEmpty()) queryMap.put("transaction_category_ids", it.joinToString(",")) }
+        merchantIds?.let { if (it.isNotEmpty()) queryMap.put("merchant_ids", it.joinToString(",")) }
+        searchTerm?.let { if (it.isNotBlank()) queryMap.put("search_term", it) else null }
+        minimumAmount?.let { if (it.isNotBlank()) queryMap.put("min_amount", it) else null }
+        maximumAmount?.let { if (it.isNotBlank()) queryMap.put("max_amount", it) else null }
+        baseType?.let { queryMap.put("base_type", it.toString()) }
+        tags?.let { if (it.isNotEmpty()) queryMap.put("tags", it.joinToString(",")) }
+        status?.let { queryMap.put("status", it.toString()) }
+        transactionIncluded?.let { queryMap.put("transaction_included", it.toString()) }
+        accountIncluded?.let { queryMap.put("account_included", it.toString()) }
+        fromDate?.let { if (it.isNotBlank()) queryMap.put("from_date", it) else null }
+        toDate?.let { if (it.isNotBlank()) queryMap.put("to_date", it) else null }
+        after?.let { if (it.isNotBlank()) queryMap.put("after", it) else null }
+        before?.let { if (it.isNotBlank()) queryMap.put("before", it) else null }
+        size?.let { queryMap.put("size", it.toString()) }
+        return queryMap
+    }
+}

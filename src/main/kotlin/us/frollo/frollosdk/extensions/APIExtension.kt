@@ -29,7 +29,6 @@ import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.ReportsResponse
 import us.frollo.frollosdk.model.api.shared.PaginatedResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
-import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionFilter
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
@@ -49,26 +48,7 @@ import us.frollo.frollosdk.network.api.SurveysAPI
 // Aggregation
 
 internal fun AggregationAPI.fetchTransactions(transactionFilter: TransactionFilter? = null): Call<PaginatedResponse<TransactionResponse>> {
-    val queryMap = mutableMapOf<String, String>()
-    transactionFilter?.transactionIds?.let { queryMap.put("transaction_ids", it.joinToString(",")) }
-    transactionFilter?.accountIds?.let { queryMap.put("account_ids", it.joinToString(",")) }
-    transactionFilter?.budgetCategory?.let { queryMap.put("budget_category", it.toString()) }
-    transactionFilter?.transactionCategoryIds?.let { queryMap.put("transaction_category_ids", it.joinToString(",")) }
-    transactionFilter?.merchantIds?.let { queryMap.put("merchant_ids", it.joinToString(",")) }
-    transactionFilter?.searchTerm?.let { queryMap.put("search_term", it) }
-    transactionFilter?.minimumAmount?.let { queryMap.put("min_amount", it) }
-    transactionFilter?.maximumAmount?.let { queryMap.put("max_amount", it) }
-    transactionFilter?.baseType?.let { queryMap.put("base_type", it.toString()) }
-    transactionFilter?.tags?.let { queryMap.put("tags", it.joinToString(",")) }
-    transactionFilter?.status?.let { queryMap.put("status", it.toString()) }
-    transactionFilter?.transactionIncluded?.let { queryMap.put("transaction_included", it.toString()) }
-    transactionFilter?.accountIncluded?.let { queryMap.put("account_included", it.toString()) }
-    transactionFilter?.fromDate?.let { queryMap.put("from_date", it) }?.toLocalDate(Transaction.DATE_FORMAT_PATTERN)
-    transactionFilter?.toDate?.let { queryMap.put("to_date", it) }?.toLocalDate(Transaction.DATE_FORMAT_PATTERN)
-    transactionFilter?.after?.let { queryMap.put("after", it) }
-    transactionFilter?.before?.let { queryMap.put("before", it) }
-    transactionFilter?.size?.let { queryMap.put("size", it.toString()) }
-    return fetchTransactions(queryMap)
+    return fetchTransactions(transactionFilter?.getQueryMap() ?: mutableMapOf())
 }
 
 internal fun AggregationAPI.fetchTransactionsSummaryByQuery(

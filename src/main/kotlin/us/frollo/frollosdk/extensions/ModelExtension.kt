@@ -18,8 +18,6 @@ package us.frollo.frollosdk.extensions
 
 import android.os.Bundle
 import androidx.sqlite.db.SimpleSQLiteQuery
-import org.threeten.bp.LocalDate
-import org.threeten.bp.temporal.ChronoUnit
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
@@ -53,7 +51,6 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.model.coredata.user.User
 import us.frollo.frollosdk.notifications.NotificationPayloadNames
-import kotlin.math.absoluteValue
 
 internal fun User.updateRequest(): UserUpdateRequest =
     UserUpdateRequest(
@@ -128,8 +125,7 @@ internal fun sqlForTransactionIdsToGetStaleIds(
     afterDateString: String? = null,
     beforeId: Long? = null,
     afterId: Long? = null,
-    transactionFilter: TransactionFilter? = null,
-    today: String = LocalDate.now().toString(Transaction.DATE_FORMAT_PATTERN)
+    transactionFilter: TransactionFilter? = null
 ): SimpleSQLiteQuery {
 
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder(tableName = "transaction_model", aliasName = "t")
@@ -138,60 +134,33 @@ internal fun sqlForTransactionIdsToGetStaleIds(
     sqlQueryBuilder.appendJoin("LEFT JOIN account a ON t.account_id = a.account_id")
 
     val beforeDate = beforeDateString?.toLocalDate(Transaction.DATE_FORMAT_PATTERN)
+    val dayBeforeFirstDate = beforeDate?.minusDays(1)?.toString(Transaction.DATE_FORMAT_PATTERN)
     val afterDate = afterDateString?.toLocalDate(Transaction.DATE_FORMAT_PATTERN)
+    val dayAfterLastDate = afterDate?.plusDays(1)?.toString(Transaction.DATE_FORMAT_PATTERN)
 
-    when {
-        // TODO: Understand all the edge case scenarios and revisit these queries to check they can be optimized
-        beforeDate != null && afterDate != null -> {
-            val dayBeforeFirstDate = beforeDate.minusDays(1).toString(Transaction.DATE_FORMAT_PATTERN)
-            val dayAfterLastDate = afterDate.plusDays(1).toString(Transaction.DATE_FORMAT_PATTERN)
+    /**
+     * Following code creates a filter predicate that will be applied to cached transactions to update
+     * Predicate 1: Considers all transactions before first day of the transaction list (first day - 1)
+     * Predicate 2: Considers all transactions of first day and after first ID of transaction list
+     * Predicate 3: Considers all transactions after last day of the transaction list (last day + 1)
+     * Predicate 4: Considers all transactions of last day and before last ID of transaction list
+     * Predicate 5: Predicate 1 OR Predicate 2 (Upper limit Predicate)
+     * Predicate 6: Predicate 2 OR Predicate 4 (Lower limit Predicate)
+     * Predicate 7: Predicate 5 AND Predicate 6 (Satisfy both upper and lower limit) (Final filter predicate to apply in query)
+     */
 
-            val daysInBetween = ChronoUnit.DAYS.between(beforeDate, afterDate)
-            val selection = when (daysInBetween.absoluteValue) {
-                0L -> {
-                    // This is same day so we need an AND
-                    "((t.transaction_date = '$beforeDateString' AND t.transaction_id <= $beforeId) " +
-                        "AND (t.transaction_date = '$afterDateString' AND t.transaction_id >= $afterId))"
-                }
-                1L -> {
-                    // This is 2 different dates, so we need an OR
-                    "((t.transaction_date = '$beforeDateString' AND t.transaction_id <= $beforeId) " +
-                        "OR (t.transaction_date = '$afterDateString' AND t.transaction_id >= $afterId))"
-                }
-                2L -> {
-                    "((t.transaction_date = '$beforeDateString' AND t.transaction_id <= $beforeId) " +
-                        "AND ((t.transaction_date = '$beforeDateString' AND t.transaction_id >= $afterId) " +
-                        "OR t.transaction_date = '$dayAfterLastDate'))"
-                }
-                else -> {
-                    "((t.transaction_date >= '$dayAfterLastDate' AND t.transaction_date <= '$dayBeforeFirstDate') " +
-                        "OR ((t.transaction_date = '$beforeDateString' AND t.transaction_id <= $beforeId) " +
-                        "OR (t.transaction_date = '$afterDateString' AND t.transaction_id >= $afterId)))"
-                }
-            }
-            sqlQueryBuilder.appendSelection(selection)
-        }
+    // Filter by before cursor in paginated response
+    if (beforeDateString != null && beforeId != null && dayBeforeFirstDate != null) {
+        val selection = "(t.transaction_date <= '$dayBeforeFirstDate' " +
+            "OR (t.transaction_date = '$beforeDateString' AND t.transaction_id <= $beforeId))"
+        sqlQueryBuilder.appendSelection(selection)
+    }
 
-        beforeDate != null && afterDate == null -> {
-            val dayBeforeFirstDate = beforeDate.minusDays(1).toString(Transaction.DATE_FORMAT_PATTERN)
-            // Last page, so we take the first transaction in before and get everything after that
-            val selection = "(t.transaction_date <= '$dayBeforeFirstDate' " +
-                "OR (t.transaction_date = '$beforeDateString' AND t.transaction_id <= $beforeId))"
-            sqlQueryBuilder.appendSelection(selection)
-        }
-
-        beforeDate == null && afterDate != null -> {
-            val dayAfterLastDate = afterDate.plusDays(1).toString(Transaction.DATE_FORMAT_PATTERN)
-            // First page - Before date is today as we are fetching from top
-            val selection = "(t.transaction_date <= '$today' " +
-                "OR t.transaction_date >= '$dayAfterLastDate' " +
-                "OR (t.transaction_date = '$afterDateString' AND t.transaction_id >= $afterId))"
-            sqlQueryBuilder.appendSelection(selection)
-        }
-
-        else -> {
-            // No pagination or Single page
-        }
+    // Filter by after cursor in paginated response
+    if (afterDateString != null && afterId != null && dayAfterLastDate != null) {
+        val selection = "(t.transaction_date >= '$dayAfterLastDate' " +
+            "OR (t.transaction_date = '$afterDateString' AND t.transaction_id >= $afterId))"
+        sqlQueryBuilder.appendSelection(selection)
     }
 
     transactionFilter?.let { appendTransactionFilterToSqlQuery(sqlQueryBuilder, it) }
@@ -211,18 +180,18 @@ internal fun sqlForTransactions(transactionFilter: TransactionFilter? = null): S
 }
 
 private fun appendTransactionFilterToSqlQuery(sqlQueryBuilder: SimpleSQLiteQueryBuilder, filter: TransactionFilter) {
-    filter.transactionIds?.let { sqlQueryBuilder.appendSelection(selection = "t.transaction_id IN (${ it.joinToString(",") })") }
-    filter.accountIds?.let { sqlQueryBuilder.appendSelection(selection = "t.account_id IN (${ it.joinToString(",") })") }
-    filter.merchantIds?.let { sqlQueryBuilder.appendSelection(selection = "t.merchant_id IN (${ it.joinToString(",") })") }
-    filter.transactionCategoryIds?.let { sqlQueryBuilder.appendSelection(selection = "t.category_id IN (${ it.joinToString(",") })") }
+    filter.transactionIds?.let { if (it.isNotEmpty()) sqlQueryBuilder.appendSelection(selection = "t.transaction_id IN (${ it.joinToString(",") })") }
+    filter.accountIds?.let { if (it.isNotEmpty()) sqlQueryBuilder.appendSelection(selection = "t.account_id IN (${ it.joinToString(",") })") }
+    filter.merchantIds?.let { if (it.isNotEmpty()) sqlQueryBuilder.appendSelection(selection = "t.merchant_id IN (${ it.joinToString(",") })") }
+    filter.transactionCategoryIds?.let { if (it.isNotEmpty()) sqlQueryBuilder.appendSelection(selection = "t.category_id IN (${ it.joinToString(",") })") }
     filter.budgetCategory?.let { sqlQueryBuilder.appendSelection(selection = "t.budget_category = '${ it.name }'") }
     filter.baseType?.let { sqlQueryBuilder.appendSelection(selection = "t.base_type = '${ it.name }'") }
     filter.status?.let { sqlQueryBuilder.appendSelection(selection = "t.status = '${ it.name}'") }
-    filter.minimumAmount?.let { sqlQueryBuilder.appendSelection(selection = "ABS(CAST(t.amount_amount AS DECIMAL)) >= $it") }
-    filter.maximumAmount?.let { sqlQueryBuilder.appendSelection(selection = "ABS(CAST(t.amount_amount AS DECIMAL)) <= $it") }
+    filter.minimumAmount?.let { if (it.isNotBlank()) sqlQueryBuilder.appendSelection(selection = "ABS(CAST(t.amount_amount AS DECIMAL)) >= $it") }
+    filter.maximumAmount?.let { if (it.isNotBlank()) sqlQueryBuilder.appendSelection(selection = "ABS(CAST(t.amount_amount AS DECIMAL)) <= $it") }
     filter.transactionIncluded?.let { sqlQueryBuilder.appendSelection(selection = "t.included = ${ it.toInt() }") }
     filter.accountIncluded?.let { sqlQueryBuilder.appendSelection(selection = "a.included = ${ it.toInt() }") }
-    filter.searchTerm?.let { sqlQueryBuilder.appendSelection(selection = " ( t.description_original LIKE '%$it%' OR t.description_user LIKE '%$it%' OR t.description_simple LIKE '%$it%' ) ") }
+    filter.searchTerm?.let { if (it.isNotBlank()) sqlQueryBuilder.appendSelection(selection = " ( t.description_original LIKE '%$it%' OR t.description_user LIKE '%$it%' OR t.description_simple LIKE '%$it%' ) ") }
     val filterTags = filter.tags
     if (filterTags != null && filterTags.isNotEmpty()) {
         val sb = StringBuilder()
@@ -235,9 +204,15 @@ private fun appendTransactionFilterToSqlQuery(sqlQueryBuilder: SimpleSQLiteQuery
         sqlQueryBuilder.appendSelection(selection = sb.toString())
     }
     when {
-        filter.fromDate != null && filter.toDate == null -> sqlQueryBuilder.appendSelection(selection = "t.transaction_date >= '${ filter.fromDate }'")
-        filter.fromDate == null && filter.toDate != null -> sqlQueryBuilder.appendSelection(selection = "t.transaction_date <= '${ filter.toDate }'")
-        filter.fromDate != null && filter.toDate != null -> sqlQueryBuilder.appendSelection(selection = "(t.transaction_date BETWEEN Date('${ filter.fromDate }') AND Date('${ filter.toDate }'))")
+        filter.fromDate?.isNotBlank() == true && (filter.toDate == null || filter.toDate?.isBlank() == true) -> {
+            sqlQueryBuilder.appendSelection(selection = "t.transaction_date >= '${ filter.fromDate }'")
+        }
+        (filter.fromDate == null || filter.fromDate?.isBlank() == true) && filter.toDate?.isNotBlank() == true -> {
+            sqlQueryBuilder.appendSelection(selection = "t.transaction_date <= '${ filter.toDate }'")
+        }
+        filter.fromDate?.isNotBlank() == true && filter.toDate?.isNotBlank() == true -> {
+            sqlQueryBuilder.appendSelection(selection = "(t.transaction_date BETWEEN Date('${ filter.fromDate }') AND Date('${ filter.toDate }'))")
+        }
     }
 }
 

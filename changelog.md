@@ -10,6 +10,8 @@
 - Upgrade Host API Version to 2.11
 - Added Fetch methods that return Rx Observable
 - Provider availability status
+- Add dueAmount parameter to Create Bill method
+- Add billID filter to Transaction API
 
 ### 3.5.0
 

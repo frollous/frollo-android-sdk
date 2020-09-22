@@ -190,7 +190,7 @@ class BillsTest : BaseAndroidTest() {
 
         val date = LocalDate.now().plusDays(1).toString(Bill.DATE_FORMAT_PATTERN)
 
-        bills.createBill(transactionId = 987, frequency = BillFrequency.MONTHLY, nextPaymentDate = date) { result ->
+        bills.createBill(transactionId = 987, dueAmount = BigDecimal("11.99"), frequency = BillFrequency.MONTHLY, nextPaymentDate = date) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 

@@ -164,6 +164,7 @@ class Bills(network: NetworkService, internal val db: SDKDatabase, private val a
      * @param nextPaymentDate Date of the next payment is due
      * @param name Custom name for the bill (Optional: defaults to the transaction name)
      * @param notes Notes attached to the bill (Optional)
+     * @param dueAmount Amount the bill charges, recurring (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun createBill(
@@ -172,11 +173,12 @@ class Bills(network: NetworkService, internal val db: SDKDatabase, private val a
         nextPaymentDate: String,
         name: String? = null,
         notes: String? = null,
+        dueAmount: BigDecimal? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
         val request = BillCreateRequest(
             transactionId = transactionId,
-            dueAmount = null,
+            dueAmount = dueAmount,
             name = name,
             frequency = frequency,
             nextPaymentDate = nextPaymentDate,

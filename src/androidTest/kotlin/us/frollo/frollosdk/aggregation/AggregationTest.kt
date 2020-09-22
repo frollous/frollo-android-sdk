@@ -1406,6 +1406,11 @@ class AggregationTest : BaseAndroidTest() {
             testObserver.awaitValue()
             assertEquals(7, testObserver.value().data?.size)
 
+            transactionFilter = TransactionFilter(billId = 1024)
+            testObserver = aggregation.fetchTransactions(transactionFilter).test()
+            testObserver.awaitValue()
+            assertEquals(1, testObserver.value().data?.size)
+
             signal.countDown()
         }
 

@@ -27,6 +27,7 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
  * @param budgetCategory [BudgetCategory] to filter transactions on
  * @param transactionCategoryIds List of [Transaction.categoryId] to filter transactions
  * @param merchantIds List of [MerchantDetails.id] to filter transactions
+ * @param billId billID to filter the associated transactions (Optional)
  * @param searchTerm Search term to filter transactions
  * @param minimumAmount Amount to filter transactions from (inclusive)
  * @param maximumAmount Amount to filter transactions to (inclusive)
@@ -47,6 +48,7 @@ data class TransactionFilter(
     var budgetCategory: BudgetCategory? = null,
     var transactionCategoryIds: List<Long>? = null,
     var merchantIds: List<Long>? = null,
+    var billId: Long? = null,
     var searchTerm: String? = null,
     var minimumAmount: String? = null,
     var maximumAmount: String? = null,
@@ -69,6 +71,7 @@ data class TransactionFilter(
         budgetCategory?.let { queryMap.put("budget_category", it.toString()) }
         transactionCategoryIds?.let { if (it.isNotEmpty()) queryMap.put("transaction_category_ids", it.joinToString(",")) }
         merchantIds?.let { if (it.isNotEmpty()) queryMap.put("merchant_ids", it.joinToString(",")) }
+        billId?.let { queryMap.put("bill_id", it.toString()) }
         searchTerm?.let { if (it.isNotBlank()) queryMap.put("search_term", it) else null }
         minimumAmount?.let { if (it.isNotBlank()) queryMap.put("min_amount", it) else null }
         maximumAmount?.let { if (it.isNotBlank()) queryMap.put("max_amount", it) else null }

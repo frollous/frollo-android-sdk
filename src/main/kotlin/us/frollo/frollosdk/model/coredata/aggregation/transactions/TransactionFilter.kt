@@ -27,6 +27,7 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
  * @param budgetCategory [BudgetCategory] to filter transactions on
  * @param transactionCategoryIds List of [Transaction.categoryId] to filter transactions
  * @param merchantIds List of [MerchantDetails.id] to filter transactions
+ * @param billId billID to filter the associated transactions (Optional)
  * @param searchTerm Search term to filter transactions
  * @param minimumAmount Amount to filter transactions from (inclusive)
  * @param maximumAmount Amount to filter transactions to (inclusive)
@@ -40,7 +41,6 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
  * @param after after field to get next list in pagination. Format is "<epoch_date>_<transaction_id>"
  * @param before before field to get previous list in pagination. Format is "<epoch_date>_<transaction_id>"
  * @param size Count of objects to returned from the API (page size)
- * @param billId billID to filter the associated transactions (Optional)
  **/
 data class TransactionFilter(
     var transactionIds: List<Long>? = null,
@@ -48,6 +48,7 @@ data class TransactionFilter(
     var budgetCategory: BudgetCategory? = null,
     var transactionCategoryIds: List<Long>? = null,
     var merchantIds: List<Long>? = null,
+    var billId: Long? = null,
     var searchTerm: String? = null,
     var minimumAmount: String? = null,
     var maximumAmount: String? = null,
@@ -60,8 +61,7 @@ data class TransactionFilter(
     var accountIncluded: Boolean? = null,
     var after: String? = null,
     var before: String? = null,
-    var size: Long? = null,
-    var billId: Long? = null
+    var size: Long? = null
 ) {
 
     fun getQueryMap(): Map<String, String> {
@@ -71,6 +71,7 @@ data class TransactionFilter(
         budgetCategory?.let { queryMap.put("budget_category", it.toString()) }
         transactionCategoryIds?.let { if (it.isNotEmpty()) queryMap.put("transaction_category_ids", it.joinToString(",")) }
         merchantIds?.let { if (it.isNotEmpty()) queryMap.put("merchant_ids", it.joinToString(",")) }
+        billId?.let { queryMap.put("bill_id", it.toString()) }
         searchTerm?.let { if (it.isNotBlank()) queryMap.put("search_term", it) else null }
         minimumAmount?.let { if (it.isNotBlank()) queryMap.put("min_amount", it) else null }
         maximumAmount?.let { if (it.isNotBlank()) queryMap.put("max_amount", it) else null }
@@ -84,7 +85,6 @@ data class TransactionFilter(
         after?.let { if (it.isNotBlank()) queryMap.put("after", it) else null }
         before?.let { if (it.isNotBlank()) queryMap.put("before", it) else null }
         size?.let { queryMap.put("size", it.toString()) }
-        billId?.let { queryMap.put("bill_id", it.toString()) }
         return queryMap
     }
 }

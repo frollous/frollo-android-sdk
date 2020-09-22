@@ -42,6 +42,7 @@
         },
         "budget_category": "lifestyle",
         "category_id": 80,
+        "bill_id": 1024,
         "merchant": {
             "id": 715,
             "name": "Commonwealth Bank"

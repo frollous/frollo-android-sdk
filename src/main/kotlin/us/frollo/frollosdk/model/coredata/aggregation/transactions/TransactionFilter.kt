@@ -40,6 +40,7 @@ import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
  * @param after after field to get next list in pagination. Format is "<epoch_date>_<transaction_id>"
  * @param before before field to get previous list in pagination. Format is "<epoch_date>_<transaction_id>"
  * @param size Count of objects to returned from the API (page size)
+ * @param billId billID to filter the associated transactions (Optional)
  **/
 data class TransactionFilter(
     var transactionIds: List<Long>? = null,
@@ -59,7 +60,8 @@ data class TransactionFilter(
     var accountIncluded: Boolean? = null,
     var after: String? = null,
     var before: String? = null,
-    var size: Long? = null
+    var size: Long? = null,
+    var billId: Long? = null
 ) {
 
     fun getQueryMap(): Map<String, String> {
@@ -82,6 +84,7 @@ data class TransactionFilter(
         after?.let { if (it.isNotBlank()) queryMap.put("after", it) else null }
         before?.let { if (it.isNotBlank()) queryMap.put("before", it) else null }
         size?.let { queryMap.put("size", it.toString()) }
+        billId?.let { queryMap.put("bill_id", it.toString()) }
         return queryMap
     }
 }

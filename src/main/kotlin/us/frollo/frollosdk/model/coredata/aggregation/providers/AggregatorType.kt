@@ -28,6 +28,9 @@ enum class AggregatorType {
     /** OpenBanking - CDR */
     @SerializedName("cdr") CDR,
 
+    /** Demo */
+    @SerializedName("demo") DEMO,
+
     /** Unknown aggregator */
     @SerializedName("unknown") UNKNOWN;
 

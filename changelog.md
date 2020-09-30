@@ -12,6 +12,8 @@
 - Provider availability status
 - Add dueAmount parameter to Create Bill method
 - Add billID filter to Transaction API
+- Add Budget Current Period Ready notification event
+- Add DEMO AggregatorType
 
 ### 3.5.0
 

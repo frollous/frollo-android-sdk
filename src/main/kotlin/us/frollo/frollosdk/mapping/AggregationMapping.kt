@@ -58,7 +58,7 @@ internal fun ProviderResponse.toProvider(): Provider =
         loginHelpMessage = loginHelpMessage,
         loginForm = loginForm,
         encryption = encryption,
-        aggregatorType = aggregatorType ?: AggregatorType.UNKNOWN,
+        aggregatorType = aggregatorType ?: AggregatorType.UNKNOWN, // This is a required field but sometimes backend sends null hence this workaround instead of making the column nullable in DB.
         permissions = permissions?.map { ProviderPermission.valueOf(it.toUpperCase()) }?.toList(),
         productsAvailable = productsAvailable ?: false
     )

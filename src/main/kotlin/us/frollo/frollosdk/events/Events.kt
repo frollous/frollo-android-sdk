@@ -18,6 +18,7 @@ package us.frollo.frollosdk.events
 
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.core.ACTION.ACTION_BUDGET_CURRENT_PERIOD_READY
 import us.frollo.frollosdk.core.ACTION.ACTION_REFRESH_TRANSACTIONS
 import us.frollo.frollosdk.core.ARGUMENT.ARG_TRANSACTION_IDS
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
@@ -75,7 +76,6 @@ class Events(network: NetworkService) {
                 Log.i("$TAG#handleEvent", "Test event received")
                 completion?.invoke(true, null)
             }
-
             EventNames.TRANSACTIONS_UPDATED.toString() -> {
                 Log.i("$TAG#handleEvent", "Transactions updated event received")
 
@@ -89,7 +89,11 @@ class Events(network: NetworkService) {
 
                 completion?.invoke(true, null)
             }
-
+            EventNames.BUDGET_CURRENT_PERIOD_READY.toString() -> {
+                Log.i("$TAG#handleEvent", "Current budget period ready event received")
+                notify(action = ACTION_BUDGET_CURRENT_PERIOD_READY)
+                completion?.invoke(true, null)
+            }
             else -> {
                 // Event not recognised
                 completion?.invoke(false, null)

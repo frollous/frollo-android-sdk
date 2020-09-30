@@ -34,6 +34,7 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.core.ACTION.ACTION_BUDGET_CURRENT_PERIOD_READY
 import us.frollo.frollosdk.core.ACTION.ACTION_REFRESH_TRANSACTIONS
 import us.frollo.frollosdk.core.ARGUMENT
 import us.frollo.frollosdk.error.DataError
@@ -150,6 +151,27 @@ class EventsTest : BaseAndroidTest() {
 
         assertTrue(notifyFlag)
         assertTrue(transactionIds?.toList()?.containsAll(listOf(45123L, 986L, 7000072L)) == true)
+
+        lbm.unregisterReceiver(receiver)
+
+        tearDown()
+    }
+
+    @Test
+    fun testHandleBudgetCurrentPeriodReadyEvent() {
+        initSetup()
+
+        val lbm = LocalBroadcastManager.getInstance(app)
+        lbm.registerReceiver(receiver, IntentFilter(ACTION_BUDGET_CURRENT_PERIOD_READY))
+
+        events.handleEvent("B_CURRENT_PERIOD_READY") { handled, error ->
+            assertNull(error)
+            assertTrue(handled)
+        }
+
+        wait(3)
+
+        assertTrue(notifyFlag)
 
         lbm.unregisterReceiver(receiver)
 

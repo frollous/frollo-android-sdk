@@ -21,7 +21,8 @@ import us.frollo.frollosdk.extensions.serializedName
 
 internal enum class EventNames {
     @SerializedName("TEST_EVENT") TEST,
-    @SerializedName("T_UPDATED") TRANSACTIONS_UPDATED;
+    @SerializedName("T_UPDATED") TRANSACTIONS_UPDATED,
+    @SerializedName("B_CURRENT_PERIOD_READY") BUDGET_CURRENT_PERIOD_READY;
 
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =

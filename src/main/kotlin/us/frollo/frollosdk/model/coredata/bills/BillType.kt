@@ -25,13 +25,13 @@ enum class BillType {
     /** General bill */
     @SerializedName("bill") BILL,
 
-    /** Manually entered bill */
+    /** Recurring subscription */
     @SerializedName("subscription") SUBSCRIPTION,
 
     /** Repayment, e.g. of a debt */
     @SerializedName("repayment") REPAYMENT,
 
-    /** Recurring subscription */
+    /** Manually entered bill */
     @SerializedName("manual") MANUAL;
 
     /** Enum to serialized string */

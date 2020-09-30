@@ -53,6 +53,12 @@ object ACTION {
      * Listen to this to detect if the SDK user has authenticated or been logged out.
      */
     const val ACTION_AUTHENTICATION_CHANGED = "us.frollo.frollosdk.ACTION_AUTHENTICATION_CHANGED"
+
+    /**
+     * Local Broadcast triggered when the Current Budget Period is ready.
+     * Listen to this to detect when the Current Budget Period is ready.
+     */
+    const val ACTION_BUDGET_CURRENT_PERIOD_READY = "us.frollo.frollosdk.ACTION_BUDGET_CURRENT_PERIOD_READY"
 }
 
 internal object LIMIT {

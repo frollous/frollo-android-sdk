@@ -185,6 +185,7 @@ private fun appendTransactionFilterToSqlQuery(sqlQueryBuilder: SimpleSQLiteQuery
     filter.merchantIds?.let { if (it.isNotEmpty()) sqlQueryBuilder.appendSelection(selection = "t.merchant_id IN (${ it.joinToString(",") })") }
     filter.transactionCategoryIds?.let { if (it.isNotEmpty()) sqlQueryBuilder.appendSelection(selection = "t.category_id IN (${ it.joinToString(",") })") }
     filter.billId?.let { sqlQueryBuilder.appendSelection(selection = "t.bill_id = $it") }
+    filter.goalId?.let { sqlQueryBuilder.appendSelection(selection = "t.goal_id = $it") }
     filter.budgetCategory?.let { sqlQueryBuilder.appendSelection(selection = "t.budget_category = '${ it.name }'") }
     filter.baseType?.let { sqlQueryBuilder.appendSelection(selection = "t.base_type = '${ it.name }'") }
     filter.status?.let { sqlQueryBuilder.appendSelection(selection = "t.status = '${ it.name}'") }

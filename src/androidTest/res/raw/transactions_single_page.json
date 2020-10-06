@@ -43,6 +43,7 @@
         "budget_category": "lifestyle",
         "category_id": 80,
         "bill_id": 1024,
+        "goal_id": 2048,
         "merchant": {
             "id": 715,
             "name": "Commonwealth Bank"

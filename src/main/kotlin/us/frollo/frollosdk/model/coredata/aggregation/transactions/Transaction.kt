@@ -93,7 +93,10 @@ data class Transaction(
     @ColumnInfo(name = "user_tags") var userTags: List<String>?,
 
     /** External ID of the aggregator */
-    @ColumnInfo(name = "external_id") val externalId: String
+    @ColumnInfo(name = "external_id") val externalId: String,
+
+    /** Goal ID associated with the transaction */
+    @ColumnInfo(name = "goal_id") var goalId: Long?
 
 ) : IAdapterModel {
 

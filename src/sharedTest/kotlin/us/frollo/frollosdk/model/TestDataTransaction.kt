@@ -62,7 +62,8 @@ internal fun testTransactionResponseData(
         status = status ?: TransactionStatus.SCHEDULED,
         transactionDate = transactionDate ?: "2019-01-01",
         userTags = userTags,
-        externalId = randomString(8)
+        externalId = randomString(8),
+        goalId = randomNumber().toLong()
     )
 }
 

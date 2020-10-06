@@ -149,7 +149,8 @@ internal fun TransactionResponse.toTransaction(): Transaction =
         status = status,
         transactionDate = transactionDate,
         userTags = userTags,
-        externalId = externalId ?: ""
+        externalId = externalId ?: "",
+        goalId = goalId
     )
 
 internal fun TransactionsSummaryResponse.toTransactionsSummary(): TransactionsSummary =

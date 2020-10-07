@@ -25,6 +25,7 @@ import us.frollo.frollosdk.model.api.bills.BillPaymentResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetPeriodResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
 import us.frollo.frollosdk.model.api.goals.GoalResponse
+import us.frollo.frollosdk.model.api.images.ImageResponse
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.ReportsResponse
 import us.frollo.frollosdk.model.api.shared.PaginatedResponse
@@ -42,6 +43,7 @@ import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.network.api.BillsAPI
 import us.frollo.frollosdk.network.api.BudgetsAPI
 import us.frollo.frollosdk.network.api.GoalsAPI
+import us.frollo.frollosdk.network.api.ImagesAPI
 import us.frollo.frollosdk.network.api.ReportsAPI
 import us.frollo.frollosdk.network.api.SurveysAPI
 
@@ -234,4 +236,12 @@ internal fun BudgetsAPI.fetchBudgetPeriods(
     fromDate?.let { queryMap["from_date"] = it }
     toDate?.let { queryMap["to_date"] = it }
     return fetchBudgetPeriods(budgetId, queryMap)
+}
+
+// Images
+
+internal fun ImagesAPI.fetchImages(imageType: String? = null): Call<List<ImageResponse>> {
+    val queryMap = mutableMapOf<String, String>()
+    imageType?.let { queryMap["image_type"] = it }
+    return fetchImages(queryMap)
 }

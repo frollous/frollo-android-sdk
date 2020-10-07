@@ -545,3 +545,16 @@ internal fun sqlForBudgetPeriods(
 
     return sqlQueryBuilder.create()
 }
+
+internal fun sqlForImages(imageType: String? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("image")
+    imageType?.let { sqlQueryBuilder.appendSelection(selection = "image_types LIKE '%|$it|%'") }
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForImageIds(imageType: String? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("image")
+    sqlQueryBuilder.columns(arrayOf("image_id"))
+    imageType?.let { sqlQueryBuilder.appendSelection(selection = "image_types LIKE '%|$it|%'") }
+    return sqlQueryBuilder.create()
+}

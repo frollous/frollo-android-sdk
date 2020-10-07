@@ -2,6 +2,10 @@
 
 ### 3.6.0
 
+#### Features
+
+- Images
+
 #### Changes
 
 - Optimize Transactions advanced filtering and searching

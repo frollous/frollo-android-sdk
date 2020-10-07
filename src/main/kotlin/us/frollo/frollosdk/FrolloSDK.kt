@@ -45,6 +45,7 @@ import us.frollo.frollosdk.events.Events
 import us.frollo.frollosdk.extensions.notify
 import us.frollo.frollosdk.extensions.toString
 import us.frollo.frollosdk.goals.Goals
+import us.frollo.frollosdk.images.Images
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.messages.Messages
@@ -137,6 +138,12 @@ object FrolloSDK {
         get() = _budgets ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     /**
+     * Images - Tracking and managing images. See [Images] for details
+     */
+    val images: Images
+        get() = _images ?: throw IllegalAccessException(SDK_NOT_SETUP)
+
+    /**
      * User - User management. See [UserManagement] for details
      */
     val userManagement: UserManagement
@@ -152,6 +159,7 @@ object FrolloSDK {
     private var _bills: Bills? = null
     private var _goals: Goals? = null
     private var _budgets: Budgets? = null
+    private var _images: Images? = null
     private var _userManagement: UserManagement? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
@@ -263,6 +271,9 @@ object FrolloSDK {
 
             // 18. Setup Budgets
             _budgets = Budgets(network, database)
+
+            // 19. Setup Images
+            _images = Images(network, database)
 
             if (version.migrationNeeded()) {
                 version.migrateVersion()
@@ -405,6 +416,7 @@ object FrolloSDK {
         aggregation.refreshCachedMerchants()
         bills.refreshBills()
         userManagement.updateDevice()
+        images.refreshImages()
     }
 
     private fun resumeScheduledRefreshing() {

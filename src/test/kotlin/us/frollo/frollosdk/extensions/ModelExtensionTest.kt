@@ -412,4 +412,22 @@ class ModelExtensionTest {
         category = "invalid_category".toBudgetCategory()
         assertEquals(null, category)
     }
+
+    @Test
+    fun testSQLForImages() {
+        var query = sqlForImages("goal")
+        assertEquals("SELECT  *  FROM image WHERE image_types LIKE '%|goal|%' ", query.sql)
+
+        query = sqlForImages()
+        assertEquals("SELECT  *  FROM image", query.sql)
+    }
+
+    @Test
+    fun testSQLForImageIds() {
+        var query = sqlForImageIds("goal")
+        assertEquals("SELECT image_id  FROM image WHERE image_types LIKE '%|goal|%' ", query.sql)
+
+        query = sqlForImageIds()
+        assertEquals("SELECT image_id  FROM image", query.sql)
+    }
 }

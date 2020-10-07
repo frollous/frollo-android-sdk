@@ -30,6 +30,7 @@ import us.frollo.frollosdk.database.dao.BudgetDao
 import us.frollo.frollosdk.database.dao.BudgetPeriodDao
 import us.frollo.frollosdk.database.dao.GoalDao
 import us.frollo.frollosdk.database.dao.GoalPeriodDao
+import us.frollo.frollosdk.database.dao.ImageDao
 import us.frollo.frollosdk.database.dao.MerchantDao
 import us.frollo.frollosdk.database.dao.MessageDao
 import us.frollo.frollosdk.database.dao.ProviderAccountDao
@@ -53,6 +54,7 @@ import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
 import us.frollo.frollosdk.model.coredata.goals.Goal
 import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
+import us.frollo.frollosdk.model.coredata.images.Image
 import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalance
 import us.frollo.frollosdk.model.coredata.user.User
 
@@ -73,7 +75,8 @@ import us.frollo.frollosdk.model.coredata.user.User
         Goal::class,
         GoalPeriod::class,
         Budget::class,
-        BudgetPeriod::class
+        BudgetPeriod::class,
+        Image::class
     ],
     version = 10, exportSchema = true
 )
@@ -97,6 +100,7 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun goalPeriods(): GoalPeriodDao
     internal abstract fun budgets(): BudgetDao
     internal abstract fun budgetPeriods(): BudgetPeriodDao
+    internal abstract fun images(): ImageDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"
@@ -363,6 +367,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 // 2) Alter account table - add column features, product_available, cdr_p_product_id, cdr_p_product_name, cdr_p_product_details_page_url, cdr_p_key_information
                 // 3) Alter provider table - add column product_available
                 // 4) Alter transaction_model table - add column goal_id
+                // 5) New table image
 
                 database.execSQL(
                     "UPDATE budget  SET tracking_status = (CASE " +
@@ -421,6 +426,9 @@ abstract class SDKDatabase : RoomDatabase() {
                 database.execSQL("ALTER TABLE `provider` ADD COLUMN `products_available` INTEGER NOT NULL DEFAULT 0")
 
                 database.execSQL("ALTER TABLE `transaction_model` ADD COLUMN `goal_id` INTEGER")
+
+                database.execSQL("CREATE TABLE IF NOT EXISTS `image` (`image_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `image_types` TEXT NOT NULL, `small_image_url` TEXT NOT NULL, `large_image_url` TEXT NOT NULL, PRIMARY KEY(`image_id`))")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_image_image_id` ON `image` (`image_id`)")
             }
         }
     }

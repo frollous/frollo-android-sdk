@@ -34,6 +34,7 @@ import us.frollo.frollosdk.core.testSDKConfig
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.events.Events
 import us.frollo.frollosdk.goals.Goals
+import us.frollo.frollosdk.images.Images
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.network.NetworkService
@@ -74,6 +75,7 @@ abstract class BaseAndroidTest {
     lateinit var surveys: Surveys
     lateinit var goals: Goals
     lateinit var budgets: Budgets
+    lateinit var images: Images
     lateinit var appInfo: AppInfo
 
     val scopes = listOf("offline_access", "openid", "email")
@@ -123,6 +125,7 @@ abstract class BaseAndroidTest {
         surveys = Surveys(network)
         goals = Goals(network, database)
         budgets = Budgets(network, database)
+        images = Images(network, database)
 
         AndroidThreeTen.init(app)
     }

@@ -14,6 +14,7 @@
 - Add billID filter to Transaction API
 - Add Budget Current Period Ready notification event
 - Add DEMO AggregatorType
+- Add goalID filter to Transaction API and Transaction model
 
 ### 3.5.0
 

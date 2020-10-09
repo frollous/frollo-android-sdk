@@ -20,6 +20,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import us.frollo.frollosdk.model.IAdapterModel
 
 // Declaring the ColumnInfo allows for the renaming of variables without
 // implementing a database migration, as the column name would not change.
@@ -49,4 +50,5 @@ data class Image(
 
     /** URL to the large image */
     @ColumnInfo(name = "large_image_url") val largeImageUrl: String
-)
+
+) : IAdapterModel

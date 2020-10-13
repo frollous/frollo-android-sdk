@@ -28,6 +28,7 @@ import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
+import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
@@ -493,9 +494,10 @@ class BudgetsTest : BaseAndroidTest() {
         budgets.createBudgetCategoryBudget(
             BudgetFrequency.MONTHLY, BigDecimal(1000), BudgetCategory.LIVING, null,
             "https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg"
-        ) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        ) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+            assertEquals(6L, resource.data)
 
             val testObserver = budgets.fetchBudget(6).test()
 
@@ -536,9 +538,10 @@ class BudgetsTest : BaseAndroidTest() {
         budgets.createMerchantBudget(
             BudgetFrequency.MONTHLY, BigDecimal(1000), 7, null,
             "https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg"
-        ) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        ) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+            assertEquals(7L, resource.data)
 
             val testObserver = budgets.fetchBudget(7).test()
 
@@ -579,9 +582,10 @@ class BudgetsTest : BaseAndroidTest() {
         budgets.createCategoryBudget(
             BudgetFrequency.MONTHLY, BigDecimal(1000), 8L, null,
             "https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg"
-        ) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        ) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+            assertEquals(8L, resource.data)
 
             val testObserver = budgets.fetchBudget(8).test()
 
@@ -612,10 +616,10 @@ class BudgetsTest : BaseAndroidTest() {
         budgets.createBudgetCategoryBudget(
             BudgetFrequency.MONTHLY, BigDecimal(1000), BudgetCategory.LIFESTYLE, null,
             "https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg"
-        ) { result ->
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+        ) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
             signal.countDown()
         }
 

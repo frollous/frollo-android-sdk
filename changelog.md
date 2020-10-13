@@ -19,6 +19,8 @@
 - Add Budget Current Period Ready notification event
 - Add DEMO AggregatorType
 - Add goalID filter to Transaction API and Transaction model
+- Return Budget ID after budget creation
+- Return Goal ID after goal creation
 
 ### 3.5.0
 

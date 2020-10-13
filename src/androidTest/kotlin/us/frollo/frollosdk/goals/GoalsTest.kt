@@ -334,9 +334,10 @@ class GoalsTest : BaseAndroidTest() {
             startAmount = BigDecimal(0),
             targetAmount = BigDecimal(20000),
             accountId = 123
-        ) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        ) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+            assertEquals(3211L, resource.data)
 
             val testObserver = goals.fetchGoal(goalId = 3211).test()
 
@@ -387,9 +388,10 @@ class GoalsTest : BaseAndroidTest() {
             startAmount = BigDecimal(0),
             targetAmount = BigDecimal(20000),
             accountId = 123
-        ) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        ) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+            assertEquals(3212L, resource.data)
 
             val testObserver = goals.fetchGoal(goalId = 3212).test()
 
@@ -440,9 +442,10 @@ class GoalsTest : BaseAndroidTest() {
             startAmount = BigDecimal(0),
             targetAmount = BigDecimal(20000),
             accountId = 123
-        ) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        ) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+            assertEquals(3213L, resource.data)
 
             val testObserver = goals.fetchGoal(goalId = 3213).test()
 
@@ -483,11 +486,11 @@ class GoalsTest : BaseAndroidTest() {
             startAmount = BigDecimal(0),
             targetAmount = BigDecimal(20000),
             accountId = 123
-        ) { result ->
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+        ) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
 
             signal.countDown()
         }
@@ -516,11 +519,11 @@ class GoalsTest : BaseAndroidTest() {
             startAmount = BigDecimal(0),
             targetAmount = null,
             accountId = 123
-        ) { result ->
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
-            assertEquals(DataErrorType.API, (result.error as DataError).type)
-            assertEquals(DataErrorSubType.INVALID_DATA, (result.error as DataError).subType)
+        ) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.API, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.INVALID_DATA, (resource.error as DataError).subType)
 
             signal.countDown()
         }

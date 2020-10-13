@@ -362,7 +362,7 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
      * @param startDate Start date of the budget. Defaults to today (Optional)
      * @param imageUrl Image Url of the budget (Optional)
      * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
-     * @param completion Optional completion handler with optional error if the request fails
+     * @param completion Optional completion handler with optional error if the request fails else ID of the Budget created if success
      */
     fun createBudgetCategoryBudget(
         budgetFrequency: BudgetFrequency,
@@ -371,7 +371,7 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
         startDate: String? = null,
         imageUrl: String? = null,
         metadata: JsonObject? = null,
-        completion: OnFrolloSDKCompletionListener<Result>? = null
+        completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null
     ) = createBudget(budgetFrequency, periodAmount, BudgetType.BUDGET_CATEGORY, budgetCategory.toString(), startDate, imageUrl, metadata, completion)
 
     /**
@@ -383,7 +383,7 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
      * @param startDate Start date of the budget. Defaults to today (Optional)
      * @param imageUrl Image Url of the budget (Optional)
      * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
-     * @param completion Optional completion handler with optional error if the request fails
+     * @param completion Optional completion handler with optional error if the request fails else ID of the Budget created if success
      */
     fun createCategoryBudget(
         budgetFrequency: BudgetFrequency,
@@ -392,7 +392,7 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
         startDate: String? = null,
         imageUrl: String? = null,
         metadata: JsonObject? = null,
-        completion: OnFrolloSDKCompletionListener<Result>? = null
+        completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null
     ) = createBudget(budgetFrequency, periodAmount, BudgetType.TRANSACTION_CATEGORY, categoryId.toString(), startDate, imageUrl, metadata, completion)
 
     /**
@@ -404,7 +404,7 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
      * @param startDate Start date of the budget. Defaults to today (Optional)
      * @param imageUrl Image Url of the budget (Optional)
      * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
-     * @param completion Optional completion handler with optional error if the request fails
+     * @param completion Optional completion handler with optional error if the request fails else ID of the Budget created if success
      */
     fun createMerchantBudget(
         budgetFrequency: BudgetFrequency,
@@ -413,7 +413,7 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
         startDate: String? = null,
         imageUrl: String? = null,
         metadata: JsonObject? = null,
-        completion: OnFrolloSDKCompletionListener<Result>? = null
+        completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null
     ) = createBudget(budgetFrequency, periodAmount, BudgetType.MERCHANT, merchantId.toString(), startDate, imageUrl, metadata, completion)
 
     /**
@@ -426,7 +426,7 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
      * @param startDate Start date of the budget. Defaults to today (Optional)
      * @param imageUrl Image Url of the budget (Optional)
      * @param metadata Metadata - custom JSON to be stored with the budget (Optional)
-     * @param completion Optional completion handler with optional error if the request fails
+     * @param completion Optional completion handler with optional error if the request fails else ID of the Budget created if success
      */
     private fun createBudget(
         budgetFrequency: BudgetFrequency,
@@ -436,7 +436,7 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
         startDate: String?,
         imageUrl: String?,
         metadata: JsonObject?,
-        completion: OnFrolloSDKCompletionListener<Result>? = null
+        completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null
     ) {
         val budgetCreateRequest = BudgetCreateRequest(
             budgetFrequency = budgetFrequency,
@@ -451,10 +451,10 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#createBudget", resource.error?.localizedDescription)
-                    completion?.invoke(Result.error(resource.error))
+                    completion?.invoke(Resource.error(resource.error))
                 }
                 Resource.Status.SUCCESS -> {
-                    handleBudgetResponse(resource.data, completion)
+                    handleBudgetResponse(resource.data, completionWithData = completion)
                 }
             }
         }
@@ -643,15 +643,25 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
         }
     }
 
-    private fun handleBudgetResponse(response: BudgetResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    private fun handleBudgetResponse(
+        response: BudgetResponse?,
+        completion: OnFrolloSDKCompletionListener<Result>? = null,
+        completionWithData: OnFrolloSDKCompletionListener<Resource<Long>>? = null
+    ) {
         response?.let {
             doAsync {
                 val budget = response.toBudget()
                 db.budgets().insert(budget)
 
-                uiThread { completion?.invoke(Result.success()) }
+                uiThread {
+                    completion?.invoke(Result.success())
+                    completionWithData?.invoke(Resource.success(response.budgetId))
+                }
             }
-        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+        } ?: run {
+            completion?.invoke(Result.success())
+            completionWithData?.invoke(Resource.success(null))
+        } // Explicitly invoke completion callback if response is null.
     }
 
     private fun handleBudgetsResponse(

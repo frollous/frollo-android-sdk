@@ -254,7 +254,7 @@ class Goals(network: NetworkService, internal val db: SDKDatabase) {
      * @param targetAmount Target amount to reach for the goal. Required for amount and date based goals
      * @param accountId ID of the Account with which the Goal is associated with
      * @param metadata Optional metadata payload (of data type org.json.JSONObject) to append to the goal
-     * @param completion Optional completion handler with optional error if the request fails
+     * @param completion Optional completion handler with optional error if the request fails else ID of the Goal created if success
      */
     fun createGoal(
         name: String,
@@ -270,7 +270,7 @@ class Goals(network: NetworkService, internal val db: SDKDatabase) {
         targetAmount: BigDecimal?,
         accountId: Long,
         metadata: JsonObject? = null,
-        completion: OnFrolloSDKCompletionListener<Result>? = null
+        completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null
     ) {
         val request = GoalCreateRequest(
             name = name,
@@ -290,7 +290,7 @@ class Goals(network: NetworkService, internal val db: SDKDatabase) {
 
         if (!request.valid()) {
             val error = DataError(type = DataErrorType.API, subType = DataErrorSubType.INVALID_DATA)
-            completion?.invoke(Result.error(error))
+            completion?.invoke(Resource.error(error))
             return
         }
 
@@ -298,10 +298,10 @@ class Goals(network: NetworkService, internal val db: SDKDatabase) {
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#createGoal", resource.error?.localizedDescription)
-                    completion?.invoke(Result.error(resource.error))
+                    completion?.invoke(Resource.error(resource.error))
                 }
                 Resource.Status.SUCCESS -> {
-                    handleGoalResponse(response = resource.data, completion = completion)
+                    handleGoalResponse(response = resource.data, completionWithData = completion)
                 }
             }
         }
@@ -484,16 +484,26 @@ class Goals(network: NetworkService, internal val db: SDKDatabase) {
 
     // Response Handlers
 
-    private fun handleGoalResponse(response: GoalResponse?, completion: OnFrolloSDKCompletionListener<Result>?) {
+    private fun handleGoalResponse(
+        response: GoalResponse?,
+        completion: OnFrolloSDKCompletionListener<Result>? = null,
+        completionWithData: OnFrolloSDKCompletionListener<Resource<Long>>? = null
+    ) {
         response?.let {
             doAsync {
                 val model = response.toGoal()
 
                 db.goals().insert(model)
 
-                uiThread { completion?.invoke(Result.success()) }
+                uiThread {
+                    completion?.invoke(Result.success())
+                    completionWithData?.invoke(Resource.success(response.goalId))
+                }
             }
-        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+        } ?: run {
+            completion?.invoke(Result.success())
+            completionWithData?.invoke(Resource.success(null))
+        } // Explicitly invoke completion callback if response is null.
     }
 
     private fun handleGoalsResponse(

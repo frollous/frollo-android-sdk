@@ -53,12 +53,12 @@ import us.frollo.frollosdk.model.coredata.bills.BillPayment
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.notifications.Notifications
+import us.frollo.frollosdk.payments.Payments
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.reports.Reports
 import us.frollo.frollosdk.surveys.Surveys
 import us.frollo.frollosdk.user.UserManagement
 import us.frollo.frollosdk.version.Version
-import java.lang.Exception
 import java.util.Timer
 import java.util.TimerTask
 
@@ -149,6 +149,12 @@ object FrolloSDK {
     val userManagement: UserManagement
         get() = _userManagement ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
+    /**
+     * Payments - Managing payments. See [Payments] for details
+     */
+    val payments: Payments
+        get() = _payments ?: throw IllegalAccessException(SDK_NOT_SETUP)
+
     private var _setup = false
     private var _aggregation: Aggregation? = null
     private var _messages: Messages? = null
@@ -161,6 +167,7 @@ object FrolloSDK {
     private var _budgets: Budgets? = null
     private var _images: Images? = null
     private var _userManagement: UserManagement? = null
+    private var _payments: Payments? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
@@ -274,6 +281,9 @@ object FrolloSDK {
 
             // 19. Setup Images
             _images = Images(network, database)
+
+            // 20. Setup Payments
+            _payments = Payments(network)
 
             if (version.migrationNeeded()) {
                 version.migrateVersion()

@@ -25,11 +25,14 @@ import us.frollo.frollosdk.model.api.payments.PaymentBPayRequest
 import us.frollo.frollosdk.model.api.payments.PaymentBPayResponse
 import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
 import us.frollo.frollosdk.model.api.payments.PaymentTransferResponse
+import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneRequest
+import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneResponse
 
 internal interface PaymentsAPI {
     companion object {
         // Pay Anyone URLs
         const val URL_PAY_ANYONE = "payments/payanyone"
+        const val URL_VERIFY_PAY_ANYONE = "payments/verify/payanyone"
 
         // Transfer URLs
         const val URL_TRANSFER = "payments/transfer"
@@ -38,7 +41,7 @@ internal interface PaymentsAPI {
         const val URL_BPAY = "payments/bpay"
     }
 
-    // Payment API
+    // Make Payment APIs
 
     @POST(URL_PAY_ANYONE)
     fun payAnyone(@Body request: PayAnyoneRequest): Call<PayAnyoneResponse>
@@ -48,4 +51,9 @@ internal interface PaymentsAPI {
 
     @POST(URL_BPAY)
     fun bpayPayment(@Body request: PaymentBPayRequest): Call<PaymentBPayResponse>
+
+    // Verify Payment APIs
+
+    @POST(URL_VERIFY_PAY_ANYONE)
+    fun verifyPayAnyone(@Body request: VerifyPayAnyoneRequest): Call<VerifyPayAnyoneResponse>
 }

@@ -294,4 +294,126 @@ class PaymentsTest : BaseAndroidTest() {
 
         tearDown()
     }
+
+    // Verify Methods Tests
+
+    @Test
+    fun testVerifyPayAnyoneValid() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val body = readStringFromJson(app, R.raw.payment_verify_pay_anyone_valid)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == PaymentsAPI.URL_VERIFY_PAY_ANYONE) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        payments.verifyPayAnyone(
+            accountHolder = "Joe Blow",
+            accountNumber = "98765432",
+            bsb = "123456"
+        ) { resource ->
+
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val response = resource.data
+            assertNotNull(response)
+
+            assertEquals("98765432", response?.accountNumber)
+            assertEquals("Joe Blow", response?.accountHolder)
+            assertEquals("123456", response?.bsb)
+            assertEquals("Westpac Manly Corso", response?.bsbName)
+            assertEquals(true, response?.valid)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(PaymentsAPI.URL_VERIFY_PAY_ANYONE, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testVerifyPayAnyoneInvalid() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val body = readStringFromJson(app, R.raw.payment_verify_pay_anyone_invalid)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == PaymentsAPI.URL_VERIFY_PAY_ANYONE) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        payments.verifyPayAnyone(
+            accountHolder = "Joe Blow",
+            accountNumber = "98765432",
+            bsb = "123456"
+        ) { resource ->
+
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val response = resource.data
+            assertNotNull(response)
+
+            assertNull(response?.accountNumber)
+            assertNull(response?.accountHolder)
+            assertNull(response?.bsb)
+            assertNull(response?.bsbName)
+            assertEquals(false, response?.valid)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(PaymentsAPI.URL_VERIFY_PAY_ANYONE, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testVerifyPayAnyoneFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        payments.verifyPayAnyone(
+            accountHolder = "Joe Blow",
+            accountNumber = "98765432",
+            bsb = "123456"
+        ) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
 }

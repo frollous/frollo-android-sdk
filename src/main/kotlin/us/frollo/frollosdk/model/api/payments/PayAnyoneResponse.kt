@@ -29,7 +29,7 @@ data class PayAnyoneResponse(
     /** Amount of the the payment */
     @SerializedName("amount") val amount: BigDecimal,
 
-    /** Description of the the payment */
+    /** Description of the the payment (Optional) */
     @SerializedName("description") val description: String?,
 
     /** BSB of payee's account of the payment */
@@ -53,9 +53,9 @@ data class PayAnyoneResponse(
     /** Status of the payment */
     @SerializedName("status") val status: String,
 
-    /** Transaction ID of the payment */
+    /** Transaction ID of the payment (Optional) */
     @SerializedName("transaction_id") val transactionId: Long?,
 
-    /** Transaction reference of the payment */
+    /** Transaction reference of the payment (Optional) */
     @SerializedName("transaction_reference") val transactionReference: String?
 )

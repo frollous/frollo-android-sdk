@@ -21,6 +21,8 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 import us.frollo.frollosdk.model.api.payments.PayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.PayAnyoneResponse
+import us.frollo.frollosdk.model.api.payments.PaymentBPayRequest
+import us.frollo.frollosdk.model.api.payments.PaymentBPayResponse
 import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
 import us.frollo.frollosdk.model.api.payments.PaymentTransferResponse
 
@@ -31,6 +33,9 @@ internal interface PaymentsAPI {
 
         // Transfer URLs
         const val URL_TRANSFER = "payments/transfer"
+
+        // BPay URLs
+        const val URL_BPAY = "payments/bpay"
     }
 
     // Payment API
@@ -40,4 +45,7 @@ internal interface PaymentsAPI {
 
     @POST(URL_TRANSFER)
     fun transfer(@Body request: PaymentTransferRequest): Call<PaymentTransferResponse>
+
+    @POST(URL_BPAY)
+    fun bpayPayment(@Body request: PaymentBPayRequest): Call<PaymentBPayResponse>
 }

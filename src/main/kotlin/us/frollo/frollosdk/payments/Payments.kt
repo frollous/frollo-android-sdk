@@ -22,6 +22,8 @@ import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.model.api.payments.PayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.PayAnyoneResponse
+import us.frollo.frollosdk.model.api.payments.PaymentBPayRequest
+import us.frollo.frollosdk.model.api.payments.PaymentBPayResponse
 import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
 import us.frollo.frollosdk.model.api.payments.PaymentTransferResponse
 import us.frollo.frollosdk.network.NetworkService
@@ -113,7 +115,43 @@ class Payments(network: NetworkService) {
         )
         paymentsAPI.transfer(request).enqueue { resource ->
             if (resource.status == Resource.Status.ERROR) {
-                Log.e("$TAG#payAnyone", resource.error?.localizedDescription)
+                Log.e("$TAG#transferPayment", resource.error?.localizedDescription)
+            }
+            completion.invoke(resource)
+        }
+    }
+
+    /**
+     * BPay Payment
+     *
+     * @param amount Amount of the payment
+     * @param billerCode Biller code
+     * @param crn Customer reference Number (CRN)
+     * @param sourceAccountId Account ID of source account of the payment
+     * @param paymentDate Date of the payment (Optional). See [Payments.DATE_FORMAT_PATTERN]
+     * @param reference Reference of the payment (Optional)
+     * @param completion Optional completion handler with optional error if the request fails else PaymentTransferResponse if success
+     */
+    fun bpayPayment(
+        amount: BigDecimal,
+        billerCode: String,
+        crn: String,
+        sourceAccountId: Long,
+        paymentDate: String? = null,
+        reference: String? = null,
+        completion: OnFrolloSDKCompletionListener<Resource<PaymentBPayResponse>>
+    ) {
+        val request = PaymentBPayRequest(
+            amount = amount,
+            billerCode = billerCode,
+            crn = crn,
+            sourceAccountId = sourceAccountId,
+            paymentDate = paymentDate,
+            reference = reference
+        )
+        paymentsAPI.bpayPayment(request).enqueue { resource ->
+            if (resource.status == Resource.Status.ERROR) {
+                Log.e("$TAG#bpayPayment", resource.error?.localizedDescription)
             }
             completion.invoke(resource)
         }

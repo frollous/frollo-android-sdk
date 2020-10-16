@@ -5,6 +5,7 @@
 #### Features
 
 - Images
+- Payments
 
 #### Changes
 

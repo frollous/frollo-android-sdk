@@ -44,6 +44,36 @@ enum class APIErrorCode(val rawValue: String) {
     @SerializedName("F0012") MIGRATION_FAILED("F0012"),
     /** Aggregator Bad Request Received */
     @SerializedName("F0014") AGGREGATOR_BAD_REQUEST("F0014"),
+    /** Payment - Other error */
+    @SerializedName("F1000") PAYMENT_OTHER_ERROR("F1000"),
+    /** Payment - Payment processor error */
+    @SerializedName("F1001") PAYMENT_PROCESSOR_ERROR("F1001"),
+    /** Payment - Payment processor connectivity */
+    @SerializedName("F1002") PAYMENT_PROCESSOR_CONNECTIVITY_ERROR("F1002"),
+    /** Payment validation - Insufficient funds */
+    @SerializedName("F1010") PAYMENT_INSUFFICIENT_FUNDS("F1010"),
+    /** Payment validation - Invalid date */
+    @SerializedName("F1011") PAYMENT_INVALID_DATE("F1011"),
+    /** Payment validation - Invalid source account */
+    @SerializedName("F1012") PAYMENT_INVALID_SOURCE_ACCOUNT("F1012"),
+    /** Payment validation - Invalid destination account */
+    @SerializedName("F1013") PAYMENT_INVALID_DESTINATION_ACCOUNT("F1013"),
+    /** Payment validation - Account restricted */
+    @SerializedName("F1014") PAYMENT_ACCOUNT_RESTRICTED("F1014"),
+    /** Payment validation - BPAY Other */
+    @SerializedName("F1020") PAYMENT_INVALID_BPAY("F1020"),
+    /** Payment validation - BPAY Biller Code */
+    @SerializedName("F1021") PAYMENT_INVALID_BILLER_CODE("F1021"),
+    /** Payment validation - BPAY CRN */
+    @SerializedName("F1022") PAYMENT_INVALID_CRN("F1022"),
+    /** Payment validation - Pay Anyone Other */
+    @SerializedName("F1030") PAYMENT_INVALID_PAY_ANYONE("F1030"),
+    /** Payment validation - Pay Anyone BSB */
+    @SerializedName("F1031") PAYMENT_INVALID_BSB("F1031"),
+    /** Payment validation - Pay Anyone Account Name or Number */
+    @SerializedName("F1032") PAYMENT_INVALID_ACCOUNT("F1032"),
+    /** Transfer validation - Other */
+    @SerializedName("F1040") PAYMENT_INVALID_TRANSFER("F1040"),
 
     // 401 Not authenticated
     /** Invalid Access Token */

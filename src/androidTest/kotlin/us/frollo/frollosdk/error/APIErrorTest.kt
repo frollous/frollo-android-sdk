@@ -17,6 +17,7 @@
 package us.frollo.frollosdk.error
 
 import android.app.Application
+import androidx.annotation.RawRes
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -427,6 +428,94 @@ class APIErrorTest {
         assertEquals(302, error.statusCode)
         assertEquals(APIErrorType.UNKNOWN, error.type)
         assertNull(error.errorCode)
+        assertNotNull(error.message)
+    }
+
+    // Payment Errors
+
+    @Test
+    fun testAPIErrorPaymentAccountRestricted() {
+        validatePaymentErrors(R.raw.error_payment_account_restricted, APIErrorCode.PAYMENT_ACCOUNT_RESTRICTED)
+    }
+
+    @Test
+    fun testAPIErrorPaymentInsufficientFunds() {
+        validatePaymentErrors(R.raw.error_payment_insufficient_funds, APIErrorCode.PAYMENT_INSUFFICIENT_FUNDS)
+    }
+
+    @Test
+    fun testAPIErrorPaymentInvalidAccount() {
+        validatePaymentErrors(R.raw.error_payment_invalid_account, APIErrorCode.PAYMENT_INVALID_ACCOUNT)
+    }
+
+    @Test
+    fun testAPIErrorPaymentInvalidBillerCode() {
+        validatePaymentErrors(R.raw.error_payment_invalid_biller_code, APIErrorCode.PAYMENT_INVALID_BILLER_CODE)
+    }
+
+    @Test
+    fun testAPIErrorPaymentInvalidBpay() {
+        validatePaymentErrors(R.raw.error_payment_invalid_bpay, APIErrorCode.PAYMENT_INVALID_BPAY)
+    }
+
+    @Test
+    fun testAPIErrorPaymentInvalidBSB() {
+        validatePaymentErrors(R.raw.error_payment_invalid_bsb, APIErrorCode.PAYMENT_INVALID_BSB)
+    }
+
+    @Test
+    fun testAPIErrorPaymentInvalidCRN() {
+        validatePaymentErrors(R.raw.error_payment_invalid_crn, APIErrorCode.PAYMENT_INVALID_CRN)
+    }
+
+    @Test
+    fun testAPIErrorPaymentInvalidDate() {
+        validatePaymentErrors(R.raw.error_payment_invalid_date, APIErrorCode.PAYMENT_INVALID_DATE)
+    }
+
+    @Test
+    fun testAPIErrorPaymentInvalidDestinationAccount() {
+        validatePaymentErrors(R.raw.error_payment_invalid_destination_account, APIErrorCode.PAYMENT_INVALID_DESTINATION_ACCOUNT)
+    }
+
+    @Test
+    fun testAPIErrorPaymentInvalidPayAnyone() {
+        validatePaymentErrors(R.raw.error_payment_invalid_pay_anyone, APIErrorCode.PAYMENT_INVALID_PAY_ANYONE)
+    }
+
+    @Test
+    fun testAPIErrorPaymentInvalidSourceAccount() {
+        validatePaymentErrors(R.raw.error_payment_invalid_source_account, APIErrorCode.PAYMENT_INVALID_SOURCE_ACCOUNT)
+    }
+
+    @Test
+    fun testAPIErrorPaymentInvalidTransfer() {
+        validatePaymentErrors(R.raw.error_payment_invalid_transfer, APIErrorCode.PAYMENT_INVALID_TRANSFER)
+    }
+
+    @Test
+    fun testAPIErrorPaymentOther() {
+        validatePaymentErrors(R.raw.error_payment_other, APIErrorCode.PAYMENT_OTHER_ERROR)
+    }
+
+    @Test
+    fun testAPIErrorPaymentProcessorConnectivity() {
+        validatePaymentErrors(R.raw.error_payment_processor_connectivity, APIErrorCode.PAYMENT_PROCESSOR_CONNECTIVITY_ERROR)
+    }
+
+    @Test
+    fun testAPIErrorPaymentProcessor() {
+        validatePaymentErrors(R.raw.error_payment_processor, APIErrorCode.PAYMENT_PROCESSOR_ERROR)
+    }
+
+    private fun validatePaymentErrors(@RawRes rawJson: Int, errorCode: APIErrorCode) {
+        val errorResponse = readStringFromJson(app, rawJson)
+
+        val error = APIError(400, errorResponse)
+        assertEquals(app.resources.getString(APIErrorType.BAD_REQUEST.textResource), error.localizedDescription)
+        assertEquals(400, error.statusCode)
+        assertEquals(APIErrorType.BAD_REQUEST, error.type)
+        assertEquals(errorCode, error.errorCode)
         assertNotNull(error.message)
     }
 }

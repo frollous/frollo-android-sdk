@@ -21,15 +21,23 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 import us.frollo.frollosdk.model.api.payments.PayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.PayAnyoneResponse
+import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
+import us.frollo.frollosdk.model.api.payments.PaymentTransferResponse
 
 internal interface PaymentsAPI {
     companion object {
         // Pay Anyone URLs
         const val URL_PAY_ANYONE = "payments/payanyone"
+
+        // Transfer URLs
+        const val URL_TRANSFER = "payments/transfer"
     }
 
     // Payment API
 
     @POST(URL_PAY_ANYONE)
     fun payAnyone(@Body request: PayAnyoneRequest): Call<PayAnyoneResponse>
+
+    @POST(URL_TRANSFER)
+    fun transfer(@Body request: PaymentTransferRequest): Call<PaymentTransferResponse>
 }

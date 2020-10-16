@@ -20,11 +20,11 @@ import com.google.gson.annotations.SerializedName
 import java.math.BigDecimal
 
 /**
- * PayAnyoneResponse
+ * PaymentTransferResponse
  *
  * Represents the response after pay anyone is successful
  */
-data class PayAnyoneResponse(
+data class PaymentTransferResponse(
 
     /** Amount of the the payment */
     @SerializedName("amount") val amount: BigDecimal,
@@ -32,14 +32,11 @@ data class PayAnyoneResponse(
     /** Description of the the payment */
     @SerializedName("description") val description: String?,
 
-    /** BSB of payee's account of the payment */
-    @SerializedName("destination_bsb") val destinationBSB: String,
+    /** Account ID of destination account in the payment */
+    @SerializedName("destination_account_id") val destinationAccountId: Long,
 
-    /** Account name of payee's account in the payment */
-    @SerializedName("destination_account_holder") val destinationAccountHolder: String,
-
-    /** Account number of payee's account in the payment */
-    @SerializedName("destination_account_number") val destinationAccountNumber: String,
+    /** Account name of destination account in the payment */
+    @SerializedName("destination_account_name") val destinationAccountName: String,
 
     /** Date of the payment */
     @SerializedName("payment_date") val paymentDate: String,
@@ -54,7 +51,7 @@ data class PayAnyoneResponse(
     @SerializedName("status") val status: String,
 
     /** Transaction ID of the payment */
-    @SerializedName("transaction_id") val transactionId: Long?,
+    @SerializedName("transaction_id") val transactionID: Long?,
 
     /** Transaction reference of the payment */
     @SerializedName("transaction_reference") val transactionReference: String?

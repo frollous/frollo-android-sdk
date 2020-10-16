@@ -22,6 +22,8 @@ import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.model.api.payments.PayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.PayAnyoneResponse
+import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
+import us.frollo.frollosdk.model.api.payments.PaymentTransferResponse
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.PaymentsAPI
 import java.math.BigDecimal
@@ -77,6 +79,39 @@ class Payments(network: NetworkService) {
             sourceAccountId = sourceAccountId
         )
         paymentsAPI.payAnyone(request).enqueue { resource ->
+            if (resource.status == Resource.Status.ERROR) {
+                Log.e("$TAG#payAnyone", resource.error?.localizedDescription)
+            }
+            completion.invoke(resource)
+        }
+    }
+
+    /**
+     * Payment Transfer
+     *
+     * @param amount Amount of the payment
+     * @param description Description of the payment (Optional)
+     * @param destinationAccountId Account ID of destination account of the transfer
+     * @param sourceAccountId Account ID of source account of the transfer
+     * @param paymentDate Date of the payment (Optional). See [Payments.DATE_FORMAT_PATTERN]
+     * @param completion Optional completion handler with optional error if the request fails else PaymentTransferResponse if success
+     */
+    fun transferPayment(
+        amount: BigDecimal,
+        description: String? = null,
+        destinationAccountId: Long,
+        sourceAccountId: Long,
+        paymentDate: String? = null,
+        completion: OnFrolloSDKCompletionListener<Resource<PaymentTransferResponse>>
+    ) {
+        val request = PaymentTransferRequest(
+            amount = amount,
+            description = description,
+            destinationAccountId = destinationAccountId,
+            sourceAccountId = sourceAccountId,
+            paymentDate = paymentDate
+        )
+        paymentsAPI.transfer(request).enqueue { resource ->
             if (resource.status == Resource.Status.ERROR) {
                 Log.e("$TAG#payAnyone", resource.error?.localizedDescription)
             }

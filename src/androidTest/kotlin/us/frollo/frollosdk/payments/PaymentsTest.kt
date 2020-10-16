@@ -86,7 +86,7 @@ class PaymentsTest : BaseAndroidTest() {
             assertEquals(BigDecimal("542.37"), response?.amount)
             assertEquals("Joe Blow", response?.destinationAccountHolder)
             assertEquals("123456", response?.destinationBSB)
-            assertEquals(34L, response?.transactionID)
+            assertEquals(34L, response?.transactionId)
             assertEquals("XXX", response?.transactionReference)
             assertEquals("confirmed", response?.status)
             assertEquals("2020-12-25", response?.paymentDate)
@@ -116,6 +116,85 @@ class PaymentsTest : BaseAndroidTest() {
             amount = BigDecimal("542.37"),
             bsb = "123456",
             sourceAccountId = 42
+        ) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testPaymentTransfer() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val body = readStringFromJson(app, R.raw.payment_transfer_response)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == PaymentsAPI.URL_TRANSFER) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        payments.transferPayment(
+            amount = BigDecimal("542.37"),
+            description = "Visible to both sides",
+            destinationAccountId = 43,
+            sourceAccountId = 42,
+            paymentDate = "2020-12-25"
+        ) { resource ->
+
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val response = resource.data
+            assertNotNull(response)
+
+            assertEquals(BigDecimal("542.37"), response?.amount)
+            assertEquals(43L, response?.destinationAccountId)
+            assertEquals("Everyday Txn", response?.destinationAccountName)
+            assertEquals(42L, response?.sourceAccountId)
+            assertEquals("XXX", response?.transactionReference)
+            assertEquals("scheduled", response?.status)
+            assertEquals("2020-12-25", response?.paymentDate)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(PaymentsAPI.URL_TRANSFER, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testPaymentTransferLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        payments.transferPayment(
+            amount = BigDecimal("542.37"),
+            description = "Visible to both sides",
+            destinationAccountId = 43,
+            sourceAccountId = 42,
+            paymentDate = "2020-12-25"
         ) { resource ->
             assertEquals(Resource.Status.ERROR, resource.status)
             assertNotNull(resource.error)

@@ -21,7 +21,7 @@ import us.frollo.frollosdk.preferences.Preferences
 
 internal class Version(private val pref: Preferences) {
 
-    private var currentVersion = BuildConfig.VERSION_NAME
+    private var currentVersion = BuildConfig.SDK_VERSION_NAME
     private var previousVersion: String? = null
     private var versionHistory: MutableSet<String>
 

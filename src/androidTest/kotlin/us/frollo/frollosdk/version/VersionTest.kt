@@ -44,7 +44,7 @@ class VersionTest {
 
     @Test
     fun testMigrationNeededFalse() {
-        preferences.sdkVersion = BuildConfig.VERSION_NAME
+        preferences.sdkVersion = BuildConfig.SDK_VERSION_NAME
         val version = Version(preferences)
         assertFalse(version.migrationNeeded())
     }
@@ -62,8 +62,8 @@ class VersionTest {
         assertTrue(preferences.sdkVersionHistory.isEmpty())
         val version = Version(preferences)
         assertFalse(version.migrationNeeded())
-        assertEquals(BuildConfig.VERSION_NAME, preferences.sdkVersion)
-        assertEquals(BuildConfig.VERSION_NAME, preferences.sdkVersionHistory[0])
+        assertEquals(BuildConfig.SDK_VERSION_NAME, preferences.sdkVersion)
+        assertEquals(BuildConfig.SDK_VERSION_NAME, preferences.sdkVersionHistory[0])
     }
 
     @Test
@@ -72,7 +72,7 @@ class VersionTest {
         preferences.sdkVersionHistory = mutableListOf("0.1.1", "0.1.2")
         val version = Version(preferences)
         version.migrateVersion()
-        assertEquals(BuildConfig.VERSION_NAME, preferences.sdkVersion)
-        assertEquals(BuildConfig.VERSION_NAME, preferences.sdkVersionHistory[2])
+        assertEquals(BuildConfig.SDK_VERSION_NAME, preferences.sdkVersion)
+        assertEquals(BuildConfig.SDK_VERSION_NAME, preferences.sdkVersionHistory[2])
     }
 }

@@ -31,6 +31,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.BalanceTier
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.CDRProductInformation
+import us.frollo.frollosdk.model.coredata.aggregation.cdr.CDRPermissionDetail
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantLocation
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
@@ -43,7 +44,6 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderEncrypti
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderFormType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderMFAType
-import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderPermission
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategoryType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
@@ -75,6 +75,7 @@ import us.frollo.frollosdk.model.coredata.user.Occupation
 import us.frollo.frollosdk.model.coredata.user.UserStatus
 import us.frollo.frollosdk.model.testAccountFeatureDetailsData
 import us.frollo.frollosdk.model.testAccountFeaturesData
+import us.frollo.frollosdk.model.testCDRPermissionData
 import java.math.BigDecimal
 
 class ConvertersTest {
@@ -379,23 +380,60 @@ class ConvertersTest {
     }
 
     @Test
-    fun testStringToListOfProviderPermission() {
-        val string = "|customer_details|transaction_details|account_details|"
-        val list = Converters.instance.stringToListOfProviderPermission(string)
-        assertNotNull(list)
-        assertTrue(list?.size == 3)
-        assertEquals(ProviderPermission.CUSTOMER_DETAILS, list?.get(0))
-        assertEquals(ProviderPermission.TRANSACTION_DETAILS, list?.get(1))
-        assertEquals(ProviderPermission.ACCOUNT_DETAILS, list?.get(2))
+    fun testStringToListOfCDRPermission() {
+        val json = "[{\"id\":\"account_details\",\"title\":\"Account balance and details\",\"description\":\"We leverage...\",\"required\":\"true\",\"details\":[{\"id\":\"account_name\",\"description\":\"Name of account\"}]},{\"id\":\"transaction_details\",\"title\":\"Transaction and details\",\"description\":\"We leverage...\",\"required\":\"false\",\"details\":[{\"id\":\"transaction_name\",\"description\":\"Name of transaction\"}]}]"
+        val permissions = Converters.instance.stringToListOfCDRPermission(json)
+        assertNotNull(permissions)
+        assertEquals(2, permissions?.size)
+        assertEquals("account_details", permissions?.get(0)?.permissionId)
+        assertEquals("Account balance and details", permissions?.get(0)?.title)
+        assertEquals("We leverage...", permissions?.get(0)?.description)
+        assertEquals(true, permissions?.get(0)?.required)
+        assertEquals(1, permissions?.get(0)?.details?.size)
+        assertEquals("transaction_details", permissions?.get(1)?.permissionId)
+        assertEquals("Transaction and details", permissions?.get(1)?.title)
+        assertEquals("We leverage...", permissions?.get(1)?.description)
+        assertEquals(false, permissions?.get(1)?.required)
+        assertEquals(1, permissions?.get(1)?.details?.size)
 
-        assertNull(Converters.instance.stringToListOfProviderPermission(null))
+        assertNull(Converters.instance.stringToListOfCDRPermission(null))
     }
 
     @Test
-    fun testStringFromListOfProviderPermission() {
-        val list = mutableListOf(ProviderPermission.CUSTOMER_DETAILS, ProviderPermission.TRANSACTION_DETAILS, ProviderPermission.ACCOUNT_DETAILS)
-        val string = Converters.instance.stringFromListOfProviderPermission(list)
-        assertEquals("|customer_details|transaction_details|account_details|", string)
+    fun testStringFromListOfCDRPermission() {
+        val permissions = testCDRPermissionData()
+        val json = Converters.instance.stringFromListOfCDRPermission(permissions)
+        assertEquals("[{\"id\":\"account_details\",\"title\":\"Account balance and details\",\"description\":\"We leverage...\",\"required\":true,\"details\":[{\"id\":\"account_name\",\"description\":\"Name of account\"}]},{\"id\":\"transaction_details\",\"title\":\"Transaction and details\",\"description\":\"We leverage...\",\"required\":false,\"details\":[{\"id\":\"transaction_name\",\"description\":\"Name of transaction\"}]}]", json)
+    }
+
+    @Test
+    fun testStringToListOfCDRPermissionDetail() {
+        val json = "[{\"id\":\"account_name\",\"description\":\"Name of account\"},{\"id\":\"transaction_name\",\"description\":\"Name of transaction\"}]"
+        val details = Converters.instance.stringToListOfCDRPermissionDetail(json)
+        assertNotNull(details)
+        assertEquals(2, details?.size)
+        assertEquals("account_name", details?.get(0)?.detailId)
+        assertEquals("Name of account", details?.get(0)?.description)
+        assertEquals("transaction_name", details?.get(1)?.detailId)
+        assertEquals("Name of transaction", details?.get(1)?.description)
+
+        assertNull(Converters.instance.stringToListOfCDRPermissionDetail(null))
+    }
+
+    @Test
+    fun testStringFromListOfCDRPermissionDetail() {
+        val details = listOf(
+            CDRPermissionDetail(
+                detailId = "account_name",
+                description = "Name of account"
+            ),
+            CDRPermissionDetail(
+                detailId = "transaction_name",
+                description = "Name of transaction"
+            )
+        )
+        val json = Converters.instance.stringFromListOfCDRPermissionDetail(details)
+        assertEquals("[{\"id\":\"account_name\",\"description\":\"Name of account\"},{\"id\":\"transaction_name\",\"description\":\"Name of transaction\"}]", json)
     }
 
     @Test
@@ -610,6 +648,13 @@ class ConvertersTest {
     }
 
     @Test
+    fun testStringFromListOfAccountFeatureDetail() {
+        val details = testAccountFeatureDetailsData()
+        val json = Converters.instance.stringFromListOfAccountFeatureDetail(details)
+        assertEquals("[{\"id\":\"bpay\",\"name\":\"BPAY\",\"image_url\":\"https://image-detail.png\"},{\"id\":\"npp\",\"name\":\"PayID\"}]", json)
+    }
+
+    @Test
     fun testStringToAccountFeatureType() {
         val status = Converters.instance.stringToAccountFeatureType("PAYMENTS")
         assertEquals(AccountFeatureType.PAYMENTS, status)
@@ -639,13 +684,6 @@ class ConvertersTest {
         assertEquals("BPAY", str)
 
         assertEquals("UNKNOWN", Converters.instance.stringFromAccountFeatureSubType(null))
-    }
-
-    @Test
-    fun testStringFromListOfAccountFeatureDetail() {
-        val details = testAccountFeatureDetailsData()
-        val json = Converters.instance.stringFromListOfAccountFeatureDetail(details)
-        assertEquals("[{\"id\":\"bpay\",\"name\":\"BPAY\",\"image_url\":\"https://image-detail.png\"},{\"id\":\"npp\",\"name\":\"PayID\"}]", json)
     }
 
     @Test

@@ -22,6 +22,7 @@
 - Add goalID filter to Transaction API and Transaction model
 - Return Budget ID after budget creation
 - Return Goal ID after goal creation
+- Add CDR permissions data cluster to Provider Model
 
 ### 3.5.0
 

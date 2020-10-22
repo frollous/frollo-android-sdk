@@ -18,9 +18,9 @@ package us.frollo.frollosdk.model.api.aggregation.providers
 
 import androidx.room.ColumnInfo
 import androidx.room.PrimaryKey
+import us.frollo.frollosdk.model.coredata.aggregation.cdr.CDRPermission
 import us.frollo.frollosdk.model.coredata.aggregation.providers.AggregatorType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
-import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderPermission
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 
 /**
@@ -41,6 +41,6 @@ internal data class ProvidersResponse(
     @ColumnInfo(name = "large_logo_url") val largeLogoUrl: String?,
     @ColumnInfo(name = "large_logo_revision") val largeLogoRevision: Int?,
     @ColumnInfo(name = "aggregator_type") val aggregatorType: AggregatorType,
-    @ColumnInfo(name = "permissions") val permissions: List<ProviderPermission>?,
+    @ColumnInfo(name = "permissions") val permissions: List<CDRPermission>?,
     @ColumnInfo(name = "products_available") val productsAvailable: Boolean?
 )

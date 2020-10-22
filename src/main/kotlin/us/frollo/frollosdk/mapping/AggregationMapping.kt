@@ -31,7 +31,6 @@ import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderA
 import us.frollo.frollosdk.model.coredata.aggregation.providers.AggregatorType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
-import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderPermission
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
@@ -59,7 +58,7 @@ internal fun ProviderResponse.toProvider(): Provider =
         loginForm = loginForm,
         encryption = encryption,
         aggregatorType = aggregatorType ?: AggregatorType.UNKNOWN, // This is a required field but sometimes backend sends null hence this workaround instead of making the column nullable in DB.
-        permissions = permissions?.map { ProviderPermission.valueOf(it.toUpperCase()) }?.toList(),
+        permissions = permissions,
         productsAvailable = productsAvailable ?: false
     )
 

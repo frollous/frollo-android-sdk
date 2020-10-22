@@ -13,7 +13,34 @@
 			"credit_card"
 		],
 		"login_url": "https://www.paypal.com/signin/?country.x=US&locale.x=en_US",
-		"aggregator_type": "yodlee"
+		"aggregator_type": "yodlee",
+		"permissions": [
+			{
+				"id": "account_details",
+				"title": "Account balance and details",
+				"description": "We leverage...",
+				"required": true,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			},
+			{
+				"id": "transaction_details",
+				"title": "Transaction and details",
+				"description": "We leverage...",
+				"required": false,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			}
+		],
+		"products_available" : false
 	},
 	{
 		"id": 586,
@@ -30,7 +57,34 @@
 			"loan"
 		],
 		"login_url": "https://onlinebanking.nationwide.co.uk/AccessManagement/Login",
-		"aggregator_type": "yodlee"
+		"aggregator_type": "yodlee",
+		"permissions": [
+			{
+				"id": "account_details",
+				"title": "Account balance and details",
+				"description": "We leverage...",
+				"required": true,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			},
+			{
+				"id": "transaction_details",
+				"title": "Transaction and details",
+				"description": "We leverage...",
+				"required": false,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			}
+		],
+		"products_available" : false
 	},
 	{
 		"id": 591,
@@ -48,7 +102,34 @@
 			"loan"
 		],
 		"login_url": "https://www.my.commbank.com.au/netbank/Logon/Logon.aspx",
-		"aggregator_type": "yodlee"
+		"aggregator_type": "yodlee",
+		"permissions": [
+			{
+				"id": "account_details",
+				"title": "Account balance and details",
+				"description": "We leverage...",
+				"required": true,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			},
+			{
+				"id": "transaction_details",
+				"title": "Transaction and details",
+				"description": "We leverage...",
+				"required": false,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			}
+		],
+		"products_available" : false
 	},
 	{
 		"id": 595,
@@ -66,7 +147,34 @@
 			"loan"
 		],
 		"login_url": "https://www.ing.com.au/securebanking/",
-		"aggregator_type": "yodlee"
+		"aggregator_type": "yodlee",
+		"permissions": [
+			{
+				"id": "account_details",
+				"title": "Account balance and details",
+				"description": "We leverage...",
+				"required": true,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			},
+			{
+				"id": "transaction_details",
+				"title": "Transaction and details",
+				"description": "We leverage...",
+				"required": false,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			}
+		],
+		"products_available" : false
 	},
 	{
 		"id": 597,
@@ -83,7 +191,34 @@
 			"loan"
 		],
 		"login_url": "https://internetbanking.suncorpbank.com.au/",
-		"aggregator_type": "yodlee"
+		"aggregator_type": "yodlee",
+		"permissions": [
+			{
+				"id": "account_details",
+				"title": "Account balance and details",
+				"description": "We leverage...",
+				"required": true,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			},
+			{
+				"id": "transaction_details",
+				"title": "Transaction and details",
+				"description": "We leverage...",
+				"required": false,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			}
+		],
+		"products_available" : false
 	},
 	{
 		"id": 600,
@@ -98,7 +233,34 @@
 			"investment"
 		],
 		"login_url": "https://online.btfunds.com.au/retailinvestor/investor",
-		"aggregator_type": "yodlee"
+		"aggregator_type": "yodlee",
+		"permissions": [
+			{
+				"id": "account_details",
+				"title": "Account balance and details",
+				"description": "We leverage...",
+				"required": true,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			},
+			{
+				"id": "transaction_details",
+				"title": "Transaction and details",
+				"description": "We leverage...",
+				"required": false,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			}
+		],
+		"products_available" : false
 	},
 	{
 		"id": 601,
@@ -116,7 +278,34 @@
 			"loan"
 		],
 		"login_url": "https://online.westpac.com.au/esis/Login/SrvPage",
-		"aggregator_type": "yodlee"
+		"aggregator_type": "yodlee",
+		"permissions": [
+			{
+				"id": "account_details",
+				"title": "Account balance and details",
+				"description": "We leverage...",
+				"required": true,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			},
+			{
+				"id": "transaction_details",
+				"title": "Transaction and details",
+				"description": "We leverage...",
+				"required": false,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			}
+		],
+		"products_available" : false
 	},
 	{
 		"id": 603,
@@ -131,7 +320,34 @@
 			"investment"
 		],
 		"login_url": "https://onlineinvesting.westpac.com.au/",
-		"aggregator_type": "yodlee"
+		"aggregator_type": "yodlee",
+		"permissions": [
+			{
+				"id": "account_details",
+				"title": "Account balance and details",
+				"description": "We leverage...",
+				"required": true,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			},
+			{
+				"id": "transaction_details",
+				"title": "Transaction and details",
+				"description": "We leverage...",
+				"required": false,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			}
+		],
+		"products_available" : false
 	},
 	{
 		"id": 607,
@@ -147,7 +363,34 @@
 			"reward"
 		],
 		"login_url": "https://www.sanford.com.au/sanford/Public/Home/Login.asp",
-		"aggregator_type": "yodlee"
+		"aggregator_type": "yodlee",
+		"permissions": [
+			{
+				"id": "account_details",
+				"title": "Account balance and details",
+				"description": "We leverage...",
+				"required": true,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			},
+			{
+				"id": "transaction_details",
+				"title": "Transaction and details",
+				"description": "We leverage...",
+				"required": false,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			}
+		],
+		"products_available" : false
 	},
 	{
 		"id": 614,
@@ -163,7 +406,34 @@
 			"loan"
 		],
 		"login_url": "https://webauthecc.anz.com/oamfed/idp/initiatesso?providerid=CMCShareInvesting",
-		"aggregator_type": "yodlee"
+		"aggregator_type": "yodlee",
+		"permissions": [
+			{
+				"id": "account_details",
+				"title": "Account balance and details",
+				"description": "We leverage...",
+				"required": true,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			},
+			{
+				"id": "transaction_details",
+				"title": "Transaction and details",
+				"description": "We leverage...",
+				"required": false,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			}
+		],
+		"products_available" : false
 	},
 	{
 		"id": 616,
@@ -179,7 +449,34 @@
 			"insurance"
 		],
 		"login_url": "https://www.mlc.com.au/common/auth/login?",
-		"aggregator_type": "yodlee"
+		"aggregator_type": "yodlee",
+		"permissions": [
+			{
+				"id": "account_details",
+				"title": "Account balance and details",
+				"description": "We leverage...",
+				"required": true,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			},
+			{
+				"id": "transaction_details",
+				"title": "Transaction and details",
+				"description": "We leverage...",
+				"required": false,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			}
+		],
+		"products_available" : false
 	},
 	{
 		"id": 632,
@@ -198,7 +495,34 @@
 			"reward"
 		],
 		"login_url": "https://www.anz.com/INETBANK/login.asp",
-		"aggregator_type": "yodlee"
+		"aggregator_type": "yodlee",
+		"permissions": [
+			{
+				"id": "account_details",
+				"title": "Account balance and details",
+				"description": "We leverage...",
+				"required": true,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			},
+			{
+				"id": "transaction_details",
+				"title": "Transaction and details",
+				"description": "We leverage...",
+				"required": false,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			}
+		],
+		"products_available" : false
 	},
 	{
 		"id": 643,
@@ -213,7 +537,34 @@
 			"investment"
 		],
 		"login_url": "https://www.investoronline.info/iol/iollogon/logon.jsp",
-		"aggregator_type": "yodlee"
+		"aggregator_type": "yodlee",
+		"permissions": [
+			{
+				"id": "account_details",
+				"title": "Account balance and details",
+				"description": "We leverage...",
+				"required": true,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			},
+			{
+				"id": "transaction_details",
+				"title": "Transaction and details",
+				"description": "We leverage...",
+				"required": false,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			}
+		],
+		"products_available" : false
 	},
 	{
 		"id": 644,
@@ -230,7 +581,34 @@
 			"loan"
 		],
 		"login_url": "https://www2.commsec.com.au/Public/HomePage/Login.aspx",
-		"aggregator_type": "yodlee"
+		"aggregator_type": "yodlee",
+		"permissions": [
+			{
+				"id": "account_details",
+				"title": "Account balance and details",
+				"description": "We leverage...",
+				"required": true,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			},
+			{
+				"id": "transaction_details",
+				"title": "Transaction and details",
+				"description": "We leverage...",
+				"required": false,
+				"details": [
+					{
+						"id": "account_name",
+						"description": "Name of account"
+					}
+				]
+			}
+		],
+		"products_available" : false
 	},
 	{
 		"id": 684,

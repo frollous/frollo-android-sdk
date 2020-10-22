@@ -17,6 +17,7 @@
 package us.frollo.frollosdk.model.api.aggregation.providers
 
 import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.model.coredata.aggregation.cdr.CDRPermission
 import us.frollo.frollosdk.model.coredata.aggregation.providers.AggregatorType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderAuthType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderEncryption
@@ -25,6 +26,8 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderMFAType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 
 internal data class ProviderResponse(
+
+    // Fields that are also returned via GET Providers List API response
     @SerializedName("id") val providerId: Long,
     @SerializedName("name") val providerName: String,
     @SerializedName("small_logo_url") val smallLogoUrl: String?,
@@ -36,9 +39,10 @@ internal data class ProviderResponse(
     @SerializedName("large_logo_url") val largeLogoUrl: String?,
     @SerializedName("large_logo_revision") val largeLogoRevision: Int?,
     @SerializedName("aggregator_type") val aggregatorType: AggregatorType,
-    @SerializedName("permissions") val permissions: List<String>?,
+    @SerializedName("permissions") val permissions: List<CDRPermission>?,
     @SerializedName("products_available") val productsAvailable: Boolean?,
 
+    // Fields that are specific to GET Provider API response
     @SerializedName("base_url") val baseUrl: String?,
     @SerializedName("forget_password_url") val forgetPasswordUrl: String?,
     @SerializedName("o_auth_site") val oAuthSite: Boolean?,

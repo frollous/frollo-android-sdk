@@ -31,6 +31,8 @@ import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.BalanceTier
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.CDRProductInformation
+import us.frollo.frollosdk.model.coredata.aggregation.cdr.CDRPermission
+import us.frollo.frollosdk.model.coredata.aggregation.cdr.CDRPermissionDetail
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantLocation
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
@@ -42,7 +44,6 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContaine
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderEncryptionType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderMFAType
-import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderPermission
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategoryType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
@@ -205,10 +206,16 @@ internal class Converters {
     fun stringFromAggregatorType(value: AggregatorType?): String? = value?.name ?: AggregatorType.UNKNOWN.name
 
     @TypeConverter
-    fun stringToListOfProviderPermission(value: String?): List<ProviderPermission>? = value?.split("|")?.filter { it.isNotBlank() }?.map { ProviderPermission.valueOf(it.toUpperCase()) }
+    fun stringToListOfCDRPermission(value: String?): List<CDRPermission>? = if (value == null) null else gson.fromJson<List<CDRPermission>>(value)
 
     @TypeConverter
-    fun stringFromListOfProviderPermission(value: List<ProviderPermission>?): String? = value?.joinToString(separator = "|", prefix = "|", postfix = "|")
+    fun stringFromListOfCDRPermission(value: List<CDRPermission>?): String? = if (value == null) null else gson.toJson(value)
+
+    @TypeConverter
+    fun stringToListOfCDRPermissionDetail(value: String?): List<CDRPermissionDetail>? = if (value == null) null else gson.fromJson<List<CDRPermissionDetail>>(value)
+
+    @TypeConverter
+    fun stringFromListOfCDRPermissionDetail(value: List<CDRPermissionDetail>?): String? = if (value == null) null else gson.toJson(value)
 
     // ProviderAccount
     @TypeConverter

@@ -88,6 +88,10 @@ enum class APIErrorCode(val rawValue: String) {
     @SerializedName("F0113") SUSPENDED_DEVICE("F0113"),
     /** Account Locked */
     @SerializedName("F0114") ACCOUNT_LOCKED("F0114"),
+    /** OTP is required for completing the API request */
+    @SerializedName("F0120") MISSING_OTP("F0120"),
+    /** OTP is invalid */
+    @SerializedName("F0117") INVALID_OTP("F0117"),
 
     // 403 Not authorised
     /** Unauthorised */

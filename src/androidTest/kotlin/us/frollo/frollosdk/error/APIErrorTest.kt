@@ -504,6 +504,16 @@ class APIErrorTest {
     }
 
     @Test
+    fun testAPIErrorPaymentOTPMissing() {
+        validatePaymentErrors(R.raw.error_payment_missing_otp, APIErrorCode.MISSING_OTP)
+    }
+
+    @Test
+    fun testAPIErrorPaymentInvalidOTP() {
+        validatePaymentErrors(R.raw.error_payment_invalid_otp, APIErrorCode.INVALID_OTP)
+    }
+
+    @Test
     fun testAPIErrorPaymentProcessor() {
         validatePaymentErrors(R.raw.error_payment_processor, APIErrorCode.PAYMENT_PROCESSOR_ERROR)
     }

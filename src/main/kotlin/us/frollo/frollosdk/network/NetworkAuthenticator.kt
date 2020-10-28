@@ -81,7 +81,10 @@ internal class NetworkAuthenticator(private val network: NetworkService) : Authe
                 APIErrorType.OTHER_AUTHORISATION -> {
                     network.tokenInvalidated()
                 }
-
+                APIErrorType.SECURITY_CODE_REQUIRED,
+                APIErrorType.INVALID_SECURITY_CODE -> {
+                    return newRequest // For OTP errors, just return the error and do not force logout
+                }
                 else -> {
                     // Any other 401
                     network.tokenInvalidated()

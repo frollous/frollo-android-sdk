@@ -164,7 +164,7 @@ class PaymentsTest : BaseAndroidTest() {
 
             assertEquals(BigDecimal("542.37"), response?.amount)
             assertEquals(43L, response?.destinationAccountId)
-            assertEquals("Everyday Txn", response?.destinationAccountName)
+            assertEquals("Everyday Txn", response?.destinationAccountHolder)
             assertEquals(42L, response?.sourceAccountId)
             assertEquals(34L, response?.transactionId)
             assertEquals("XXX", response?.transactionReference)

@@ -21,6 +21,8 @@
     <string name="FrolloSDK_Error_API_UnknownError">Unknown error occurred on the API</string>
     <string name="FrolloSDK_Error_API_UserAlreadyExists">A user account already exists with this identifier</string>
     <string name="FrolloSDK_Error_API_UserLoggedOut">User is already logged out</string>
+    <string name="FrolloSDK_Error_API_MissingOTP">Missing OTP. A SMS was sent to your phone with your OTP code.</string>
+    <string name="FrolloSDK_Error_API_InvalidOTP">Invalid OTP</string>
 
     <string name="FrolloSDK_Error_Data_API_InvalidData">API request or response data was invalid</string>
     <string name="FrolloSDK_Error_Data_API_PasswordTooShort">Password must be at least 8 characters long</string>

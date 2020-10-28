@@ -30,21 +30,26 @@ import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.error.APIError
 import us.frollo.frollosdk.error.APIErrorType
 import us.frollo.frollosdk.extensions.enqueue
+import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
+import us.frollo.frollosdk.network.api.PaymentsAPI
 import us.frollo.frollosdk.network.api.UserAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
+import java.math.BigDecimal
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class NetworkAuthenticatorTest : BaseAndroidTest() {
 
     private lateinit var userAPI: UserAPI
+    private lateinit var paymentsAPI: PaymentsAPI
 
     override fun initSetup() {
         super.initSetup()
 
         userAPI = network.create(UserAPI::class.java)
+        paymentsAPI = network.create(PaymentsAPI::class.java)
     }
 
     @Test
@@ -438,6 +443,112 @@ class NetworkAuthenticatorTest : BaseAndroidTest() {
         }
 
         signal.await(8, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testInvalidOtpDoesNotForceLogout() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                return MockResponse()
+                    .setResponseCode(401)
+                    .setBody(readStringFromJson(app, R.raw.error_payment_invalid_otp))
+            }
+        })
+
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        val expiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+        preferences.accessTokenExpiry = expiry
+
+        val paymentRequest = PaymentTransferRequest(
+            amount = BigDecimal.TEN,
+            sourceAccountId = 123,
+            destinationAccountId = 456
+        )
+
+        paymentsAPI.transfer(paymentRequest, "123456").enqueue { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+
+            assertEquals(APIErrorType.INVALID_SECURITY_CODE, (resource.error as? APIError)?.type)
+            val request = mockServer.takeRequest()
+            assertEquals("123456", request.getHeader(NetworkHelper.HEADER_OTP))
+            assertEquals("Bearer ExistingAccessToken", request.getHeader("Authorization"))
+            assertNotNull(request.getHeader("X-Api-Version"))
+            assertEquals("us.frollo.frollosdk", request.getHeader("X-Bundle-Id"))
+            assertNotNull(request.getHeader("X-Device-Version"))
+            assertNotNull(request.getHeader("X-Software-Version"))
+            assertNotNull(request.getHeader("User-Agent"))
+
+            assertEquals(1, mockServer.requestCount)
+
+            assertNotNull(preferences.encryptedAccessToken)
+            assertNotNull(preferences.encryptedRefreshToken)
+            assertEquals(expiry, preferences.accessTokenExpiry)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testMissingOtpDoesNotForceLogout() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                return MockResponse()
+                    .setResponseCode(401)
+                    .setBody(readStringFromJson(app, R.raw.error_payment_missing_otp))
+            }
+        })
+
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        val expiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+        preferences.accessTokenExpiry = expiry
+
+        val paymentRequest = PaymentTransferRequest(
+            amount = BigDecimal.TEN,
+            sourceAccountId = 123,
+            destinationAccountId = 456
+        )
+
+        paymentsAPI.transfer(paymentRequest, null).enqueue { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+
+            assertEquals(APIErrorType.SECURITY_CODE_REQUIRED, (resource.error as? APIError)?.type)
+            val request = mockServer.takeRequest()
+            assertNull(request.getHeader(NetworkHelper.HEADER_OTP))
+            assertEquals("Bearer ExistingAccessToken", request.getHeader("Authorization"))
+            assertNotNull(request.getHeader("X-Api-Version"))
+            assertEquals("us.frollo.frollosdk", request.getHeader("X-Bundle-Id"))
+            assertNotNull(request.getHeader("X-Device-Version"))
+            assertNotNull(request.getHeader("X-Software-Version"))
+            assertNotNull(request.getHeader("User-Agent"))
+
+            assertEquals(1, mockServer.requestCount)
+
+            assertNotNull(preferences.encryptedAccessToken)
+            assertNotNull(preferences.encryptedRefreshToken)
+            assertEquals(expiry, preferences.accessTokenExpiry)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
 
         tearDown()
     }

@@ -18,6 +18,7 @@ package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.Header
 import retrofit2.http.POST
 import us.frollo.frollosdk.model.api.payments.PayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.PayAnyoneResponse
@@ -27,6 +28,7 @@ import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
 import us.frollo.frollosdk.model.api.payments.PaymentTransferResponse
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneResponse
+import us.frollo.frollosdk.network.NetworkHelper
 
 internal interface PaymentsAPI {
     companion object {
@@ -44,13 +46,13 @@ internal interface PaymentsAPI {
     // Make Payment APIs
 
     @POST(URL_PAY_ANYONE)
-    fun payAnyone(@Body request: PayAnyoneRequest): Call<PayAnyoneResponse>
+    fun payAnyone(@Body request: PayAnyoneRequest, @Header(NetworkHelper.HEADER_OTP) otp: String?): Call<PayAnyoneResponse>
 
     @POST(URL_TRANSFER)
-    fun transfer(@Body request: PaymentTransferRequest): Call<PaymentTransferResponse>
+    fun transfer(@Body request: PaymentTransferRequest, @Header(NetworkHelper.HEADER_OTP) otp: String?): Call<PaymentTransferResponse>
 
     @POST(URL_BPAY)
-    fun bpayPayment(@Body request: PaymentBPayRequest): Call<PaymentBPayResponse>
+    fun bpayPayment(@Body request: PaymentBPayRequest, @Header(NetworkHelper.HEADER_OTP) otp: String?): Call<PaymentBPayResponse>
 
     // Verify Payment APIs
 

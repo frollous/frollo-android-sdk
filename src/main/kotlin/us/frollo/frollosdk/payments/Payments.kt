@@ -59,6 +59,7 @@ class Payments(network: NetworkService) {
      * @param paymentDate Date of the payment (Optional). See [Payments.DATE_FORMAT_PATTERN]
      * @param reference Reference of the payment (Optional)
      * @param sourceAccountId Account ID of the payment source account
+     * @param securityCode Verification Code / OTP for payment
      * @param completion Optional completion handler with optional error if the request fails else PayAnyoneResponse if success
      */
     fun payAnyone(
@@ -70,6 +71,7 @@ class Payments(network: NetworkService) {
         paymentDate: String? = null,
         reference: String? = null,
         sourceAccountId: Long,
+        securityCode: String? = null,
         completion: OnFrolloSDKCompletionListener<Resource<PayAnyoneResponse>>
     ) {
         val request = PayAnyoneRequest(
@@ -82,7 +84,7 @@ class Payments(network: NetworkService) {
             reference = reference,
             sourceAccountId = sourceAccountId
         )
-        paymentsAPI.payAnyone(request).enqueue { resource ->
+        paymentsAPI.payAnyone(request, otp = securityCode).enqueue { resource ->
             if (resource.status == Resource.Status.ERROR) {
                 Log.e("$TAG#payAnyone", resource.error?.localizedDescription)
             }
@@ -98,6 +100,7 @@ class Payments(network: NetworkService) {
      * @param destinationAccountId Account ID of destination account of the transfer
      * @param sourceAccountId Account ID of source account of the transfer
      * @param paymentDate Date of the payment (Optional). See [Payments.DATE_FORMAT_PATTERN]
+     * @param securityCode Verification Code / OTP for payment
      * @param completion Optional completion handler with optional error if the request fails else PaymentTransferResponse if success
      */
     fun transferPayment(
@@ -106,6 +109,7 @@ class Payments(network: NetworkService) {
         destinationAccountId: Long,
         sourceAccountId: Long,
         paymentDate: String? = null,
+        securityCode: String? = null,
         completion: OnFrolloSDKCompletionListener<Resource<PaymentTransferResponse>>
     ) {
         val request = PaymentTransferRequest(
@@ -115,7 +119,7 @@ class Payments(network: NetworkService) {
             sourceAccountId = sourceAccountId,
             paymentDate = paymentDate
         )
-        paymentsAPI.transfer(request).enqueue { resource ->
+        paymentsAPI.transfer(request, otp = securityCode).enqueue { resource ->
             if (resource.status == Resource.Status.ERROR) {
                 Log.e("$TAG#transferPayment", resource.error?.localizedDescription)
             }
@@ -132,6 +136,7 @@ class Payments(network: NetworkService) {
      * @param sourceAccountId Account ID of source account of the payment
      * @param paymentDate Date of the payment (Optional). See [Payments.DATE_FORMAT_PATTERN]
      * @param reference Reference of the payment (Optional)
+     * @param securityCode Verification Code / OTP for payment
      * @param completion Optional completion handler with optional error if the request fails else PaymentTransferResponse if success
      */
     fun bpayPayment(
@@ -141,6 +146,7 @@ class Payments(network: NetworkService) {
         sourceAccountId: Long,
         paymentDate: String? = null,
         reference: String? = null,
+        securityCode: String? = null,
         completion: OnFrolloSDKCompletionListener<Resource<PaymentBPayResponse>>
     ) {
         val request = PaymentBPayRequest(
@@ -151,7 +157,7 @@ class Payments(network: NetworkService) {
             paymentDate = paymentDate,
             reference = reference
         )
-        paymentsAPI.bpayPayment(request).enqueue { resource ->
+        paymentsAPI.bpayPayment(request, otp = securityCode).enqueue { resource ->
             if (resource.status == Resource.Status.ERROR) {
                 Log.e("$TAG#bpayPayment", resource.error?.localizedDescription)
             }

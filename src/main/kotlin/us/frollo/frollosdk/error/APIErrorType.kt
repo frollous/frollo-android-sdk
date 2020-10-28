@@ -67,6 +67,10 @@ enum class APIErrorType(
     SUSPENDED_USER(R.string.FrolloSDK_Error_API_SuspendedUser),
     /** User account locked */
     ACCOUNT_LOCKED(R.string.FrolloSDK_Error_API_AccountLocked),
+    /** Missing OTP */
+    SECURITY_CODE_REQUIRED(R.string.FrolloSDK_Error_API_MissingOTP),
+    /** Invalid OTP */
+    INVALID_SECURITY_CODE(R.string.FrolloSDK_Error_API_InvalidOTP),
     /** An unknown issue with authorisation has occurred */
     OTHER_AUTHORISATION(R.string.FrolloSDK_Error_API_UnknownAuthorisation),
 

@@ -47,6 +47,8 @@ internal fun Int.toAPIErrorType(errorCode: APIErrorCode?): APIErrorType {
                 APIErrorCode.SUSPENDED_DEVICE -> APIErrorType.SUSPENDED_DEVICE
                 APIErrorCode.SUSPENDED_USER -> APIErrorType.SUSPENDED_USER
                 APIErrorCode.ACCOUNT_LOCKED -> APIErrorType.ACCOUNT_LOCKED
+                APIErrorCode.MISSING_OTP -> APIErrorType.SECURITY_CODE_REQUIRED
+                APIErrorCode.INVALID_OTP -> APIErrorType.INVALID_SECURITY_CODE
                 else -> APIErrorType.OTHER_AUTHORISATION
             }
         }

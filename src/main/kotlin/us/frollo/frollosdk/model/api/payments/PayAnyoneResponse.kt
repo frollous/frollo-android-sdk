@@ -32,8 +32,8 @@ data class PayAnyoneResponse(
     /** Description of the the payment (Optional) */
     @SerializedName("description") val description: String?,
 
-    /** BSB of payee's account of the payment */
-    @SerializedName("destination_bsb") val destinationBSB: String,
+    /** BSB of payee's account of the payment (Optional) */
+    @SerializedName("destination_bsb") val destinationBSB: String?,
 
     /** Account name of payee's account in the payment */
     @SerializedName("destination_account_holder") val destinationAccountHolder: String,
@@ -56,6 +56,6 @@ data class PayAnyoneResponse(
     /** Transaction ID of the payment (Optional) */
     @SerializedName("transaction_id") val transactionId: Long?,
 
-    /** Transaction reference of the payment (Optional) */
-    @SerializedName("transaction_reference") val transactionReference: String?
+    /** Transaction reference of the payment */
+    @SerializedName("transaction_reference") val transactionReference: String
 )

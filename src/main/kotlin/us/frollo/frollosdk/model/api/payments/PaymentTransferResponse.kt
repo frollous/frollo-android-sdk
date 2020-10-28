@@ -36,7 +36,7 @@ data class PaymentTransferResponse(
     @SerializedName("destination_account_id") val destinationAccountId: Long,
 
     /** Account name of destination account in the payment */
-    @SerializedName("destination_account_name") val destinationAccountName: String,
+    @SerializedName("destination_account_holder") val destinationAccountHolder: String,
 
     /** Date of the payment */
     @SerializedName("payment_date") val paymentDate: String,
@@ -53,6 +53,6 @@ data class PaymentTransferResponse(
     /** Transaction ID of the payment (Optional) */
     @SerializedName("transaction_id") val transactionId: Long?,
 
-    /** Transaction reference of the payment (Optional) */
-    @SerializedName("transaction_reference") val transactionReference: String?
+    /** Transaction reference of the payment */
+    @SerializedName("transaction_reference") val transactionReference: String
 )

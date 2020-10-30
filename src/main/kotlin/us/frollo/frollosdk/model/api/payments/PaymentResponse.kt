@@ -1,3 +1,5 @@
 package us.frollo.frollosdk.model.api.payments
 
-interface PaymentResponse
+import java.io.Serializable
+
+interface PaymentResponse : Serializable

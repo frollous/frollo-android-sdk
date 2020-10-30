@@ -55,4 +55,5 @@ data class PaymentTransferResponse(
 
     /** Transaction reference of the payment */
     @SerializedName("transaction_reference") val transactionReference: String
-)
+
+) : PaymentResponse

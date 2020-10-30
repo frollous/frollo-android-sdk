@@ -56,6 +56,7 @@ data class PaymentBPayResponse(
     /** Transaction ID of the payment (Optional) */
     @SerializedName("transaction_id") val transactionId: Long?,
 
-    /** Transaction reference of the payment (Optional) */
-    @SerializedName("transaction_reference") val transactionReference: String?
-)
+    /** Transaction reference of the payment */
+    @SerializedName("transaction_reference") val transactionReference: String
+
+) : PaymentResponse

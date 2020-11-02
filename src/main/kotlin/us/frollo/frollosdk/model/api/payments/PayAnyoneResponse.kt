@@ -44,6 +44,9 @@ data class PayAnyoneResponse(
     /** Date of the payment */
     @SerializedName("payment_date") val paymentDate: String,
 
+    /** Reference of the payment (Optional) */
+    @SerializedName("reference") val reference: String?,
+
     /** Account ID of source account in the payment */
     @SerializedName("source_account_id") val sourceAccountId: Long,
 

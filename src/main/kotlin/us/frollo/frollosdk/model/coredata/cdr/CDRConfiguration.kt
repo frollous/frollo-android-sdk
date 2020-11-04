@@ -17,12 +17,20 @@
 package us.frollo.frollosdk.model.coredata.cdr
 
 import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
-/**
- * Represents key information of CDR Product
- */
+// Declaring the ColumnInfo allows for the renaming of variables without
+// implementing a database migration, as the column name would not change.
+
+@Entity(
+    tableName = "cdr_configuration",
+    indices = [Index("adr_id")]
+)
+
+/** Represents key information of CDR Product */
 data class CDRConfiguration(
 
     /** The ID of the ADR that handles CDR data */

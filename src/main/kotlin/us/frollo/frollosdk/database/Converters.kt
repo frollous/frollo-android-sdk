@@ -57,6 +57,7 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.cdr.CDRPermission
 import us.frollo.frollosdk.model.coredata.cdr.CDRPermissionDetail
 import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
+import us.frollo.frollosdk.model.coredata.cdr.SharingDuration
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -459,4 +460,10 @@ internal class Converters {
 
     @TypeConverter
     fun stringToConsentStatus(value: String?): ConsentStatus? = if (value == null) ConsentStatus.UNKNOWN else ConsentStatus.valueOf(value)
+
+    @TypeConverter
+    fun stringToListOfSharingDuration(value: String?): List<SharingDuration>? = if (value == null) null else gson.fromJson<List<SharingDuration>>(value)
+
+    @TypeConverter
+    fun stringFromListOfSharingDuration(value: List<SharingDuration>?): String? = if (value == null) null else gson.toJson(value)
 }

@@ -31,8 +31,6 @@ import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.BalanceTier
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.CDRProductInformation
-import us.frollo.frollosdk.model.coredata.aggregation.cdr.CDRPermission
-import us.frollo.frollosdk.model.coredata.aggregation.cdr.CDRPermissionDetail
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantLocation
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
@@ -56,6 +54,9 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
+import us.frollo.frollosdk.model.coredata.cdr.CDRPermission
+import us.frollo.frollosdk.model.coredata.cdr.CDRPermissionDetail
+import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -450,4 +451,12 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromMetadata(value: JsonObject?): String? = if (value == null) null else gson.toJson(value)
+
+    // Consent
+
+    @TypeConverter
+    fun stringFromConsentStatus(value: ConsentStatus?): String? = value?.name ?: ConsentStatus.UNKNOWN.name
+
+    @TypeConverter
+    fun stringToConsentStatus(value: String?): ConsentStatus? = if (value == null) ConsentStatus.UNKNOWN else ConsentStatus.valueOf(value)
 }

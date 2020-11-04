@@ -18,10 +18,10 @@ package us.frollo.frollosdk.model.api.aggregation.providers
 
 import androidx.room.ColumnInfo
 import androidx.room.PrimaryKey
-import us.frollo.frollosdk.model.coredata.aggregation.cdr.CDRPermission
 import us.frollo.frollosdk.model.coredata.aggregation.providers.AggregatorType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
+import us.frollo.frollosdk.model.coredata.cdr.CDRPermission
 
 /**
  * This is just an minimized model representing the response of

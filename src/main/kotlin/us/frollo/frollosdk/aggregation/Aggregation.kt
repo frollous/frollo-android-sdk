@@ -459,11 +459,12 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
      * Create a provider account
      *
      * @param providerId ID of the provider which an account should be created for
+     * @param consentId ID of the consent for creating the account
      * @param loginForm Provider login form with validated and encrypted values with the user's details
      * @param completion Optional completion handler with optional error if the request fails else ID of the ProviderAccount created if success
      */
-    fun createProviderAccount(providerId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null) {
-        val request = ProviderAccountCreateRequest(loginForm = loginForm, providerID = providerId)
+    fun createProviderAccount(providerId: Long, consentId: Long? = null, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null) {
+        val request = ProviderAccountCreateRequest(loginForm = loginForm, providerID = providerId, consentId = consentId)
 
         aggregationAPI.createProviderAccount(request).enqueue { resource ->
             when (resource.status) {

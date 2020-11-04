@@ -16,8 +16,8 @@
 
 package us.frollo.frollosdk.model
 
-import us.frollo.frollosdk.model.coredata.aggregation.cdr.CDRPermission
-import us.frollo.frollosdk.model.coredata.aggregation.cdr.CDRPermissionDetail
+import us.frollo.frollosdk.model.coredata.cdr.CDRPermission
+import us.frollo.frollosdk.model.coredata.cdr.CDRPermissionDetail
 
 internal fun testCDRPermissionData(): List<CDRPermission> {
     return listOf(

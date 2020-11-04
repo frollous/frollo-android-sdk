@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Frollo
+ * Copyright 2019 Frollo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.payments
+package us.frollo.frollosdk.database.dao
 
-import java.io.Serializable
+import androidx.room.Dao
 
-interface PaymentResponse : Serializable
+@Dao
+internal interface ConsentDao {
+
+    // TODO
+}

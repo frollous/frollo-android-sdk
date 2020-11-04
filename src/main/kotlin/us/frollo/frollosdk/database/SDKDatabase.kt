@@ -28,6 +28,7 @@ import us.frollo.frollosdk.database.dao.BillDao
 import us.frollo.frollosdk.database.dao.BillPaymentDao
 import us.frollo.frollosdk.database.dao.BudgetDao
 import us.frollo.frollosdk.database.dao.BudgetPeriodDao
+import us.frollo.frollosdk.database.dao.ConsentDao
 import us.frollo.frollosdk.database.dao.GoalDao
 import us.frollo.frollosdk.database.dao.GoalPeriodDao
 import us.frollo.frollosdk.database.dao.ImageDao
@@ -52,6 +53,7 @@ import us.frollo.frollosdk.model.coredata.bills.Bill
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
 import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
+import us.frollo.frollosdk.model.coredata.cdr.Consent
 import us.frollo.frollosdk.model.coredata.goals.Goal
 import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
 import us.frollo.frollosdk.model.coredata.images.Image
@@ -76,7 +78,8 @@ import us.frollo.frollosdk.model.coredata.user.User
         GoalPeriod::class,
         Budget::class,
         BudgetPeriod::class,
-        Image::class
+        Image::class,
+        Consent::class
     ],
     version = 10, exportSchema = true
 )
@@ -101,6 +104,7 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun budgets(): BudgetDao
     internal abstract fun budgetPeriods(): BudgetPeriodDao
     internal abstract fun images(): ImageDao
+    internal abstract fun consents(): ConsentDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"

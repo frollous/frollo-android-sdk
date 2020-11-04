@@ -20,7 +20,7 @@ import androidx.room.ColumnInfo
 import com.google.gson.annotations.SerializedName
 
 /**
- * Data representation of CDR Product
+ * Data representation of CDR Product that belongs to an Account
  */
 data class CDRProduct(
 
@@ -38,7 +38,7 @@ data class CDRProduct(
 )
 
 /**
- * Data representation of CDR Product Information
+ * Data representation of CDR Product Information that belongs to an Account
  */
 data class CDRProductInformation(
 

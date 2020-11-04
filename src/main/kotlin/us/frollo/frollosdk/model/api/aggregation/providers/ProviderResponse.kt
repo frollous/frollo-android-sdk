@@ -17,13 +17,13 @@
 package us.frollo.frollosdk.model.api.aggregation.providers
 
 import com.google.gson.annotations.SerializedName
-import us.frollo.frollosdk.model.coredata.aggregation.cdr.CDRPermission
 import us.frollo.frollosdk.model.coredata.aggregation.providers.AggregatorType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderAuthType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderEncryption
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderMFAType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
+import us.frollo.frollosdk.model.coredata.cdr.CDRPermission
 
 internal data class ProviderResponse(
 

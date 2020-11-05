@@ -18,56 +18,44 @@ package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
 import retrofit2.http.Body
-import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.QueryMap
-import us.frollo.frollosdk.model.api.bills.BillCreateRequest
-import us.frollo.frollosdk.model.api.bills.BillPaymentResponse
-import us.frollo.frollosdk.model.api.bills.BillPaymentUpdateRequest
-import us.frollo.frollosdk.model.api.bills.BillResponse
-import us.frollo.frollosdk.model.api.bills.BillUpdateRequest
-import us.frollo.frollosdk.model.api.bills.BillsResponse
+import us.frollo.frollosdk.model.api.cdr.CDRConfigurationResponse
+import us.frollo.frollosdk.model.api.cdr.ConsentCreateRequest
+import us.frollo.frollosdk.model.api.cdr.ConsentResponse
+import us.frollo.frollosdk.model.api.cdr.ConsentUpdateRequest
+import us.frollo.frollosdk.model.coredata.aggregation.providers.CDRProduct
 
 internal interface CdrAPI {
     companion object {
-        // Bill URLs
-        const val URL_BILLS = "bills"
-        const val URL_BILL = "bills/{bill_id}"
-
-        // Bill Payment URLs
-        const val URL_BILL_PAYMENTS = "bills/payments"
-        const val URL_BILL_PAYMENT = "bills/payments/{bill_payment_id}"
+        const val URL_CDR_CONFIG = "config/cdr"
+        const val URL_CDR_CONSENTS = "cdr/consents"
+        const val URL_CDR_CONSENT = "cdr/consents/{consent_id}"
+        const val URL_CDR_PRODUCTS = "cdr/products"
+        const val URL_CDR_PRODUCT = "cdr/products/{product_id}"
     }
 
-    // Bill API
+    @GET(URL_CDR_CONFIG)
+    fun fetchCDRConfig(): Call<CDRConfigurationResponse>
 
-    @GET(URL_BILLS)
-    fun fetchBills(): Call<BillsResponse>
+    @GET(URL_CDR_PRODUCTS)
+    fun fetchProducts(@QueryMap queryParams: Map<String, String>): Call<List<CDRProduct>>
 
-    @GET(URL_BILL)
-    fun fetchBill(@Path("bill_id") billId: Long): Call<BillResponse>
+    @GET(URL_CDR_PRODUCT)
+    fun fetchProduct(@Path("product_id") productId: Long): Call<CDRProduct>
 
-    @POST(URL_BILLS)
-    fun createBill(@Body request: BillCreateRequest): Call<BillResponse>
+    @GET(URL_CDR_CONSENTS)
+    fun fetchConsents(): Call<List<ConsentResponse>>
 
-    @PUT(URL_BILL)
-    fun updateBill(@Path("bill_id") billId: Long, @Body request: BillUpdateRequest): Call<BillResponse>
+    @GET(URL_CDR_CONSENT)
+    fun fetchConsent(@Path("consent_id") consentId: Long): Call<ConsentResponse>
 
-    @DELETE(URL_BILL)
-    fun deleteBill(@Path("bill_id") billId: Long): Call<Void>
+    @POST(URL_CDR_CONSENTS)
+    fun submitConsent(@Body request: ConsentCreateRequest): Call<ConsentResponse>
 
-    // Bill Payment API
-
-    // Query parameters: {from_date, to_date, skip, count}
-    @GET(URL_BILL_PAYMENTS)
-    fun fetchBillPayments(@QueryMap queryParams: Map<String, String>): Call<List<BillPaymentResponse>>
-
-    @PUT(URL_BILL_PAYMENT)
-    fun updateBillPayment(@Path("bill_payment_id") billPaymentId: Long, @Body request: BillPaymentUpdateRequest): Call<BillPaymentResponse>
-
-    @DELETE(URL_BILL_PAYMENT)
-    fun deleteBillPayment(@Path("bill_payment_id") billPaymentId: Long): Call<Void>
+    @PUT(URL_CDR_CONSENT)
+    fun updateConsent(@Path("consent_id") consentId: Long, @Body request: ConsentUpdateRequest): Call<ConsentResponse>
 }

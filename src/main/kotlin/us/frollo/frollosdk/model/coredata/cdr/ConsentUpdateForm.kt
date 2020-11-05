@@ -22,7 +22,7 @@ import us.frollo.frollosdk.extensions.serializedName
 /**
  * Consent form that can be submitted to update an existing consent with a provider
  */
-internal data class ConsentUpdateForm(
+data class ConsentUpdateForm(
 
     /** The new status for the consent (Optional)*/
     @SerializedName("status") var status: ConsentUpdateStatus? = null,

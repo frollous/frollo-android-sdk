@@ -20,6 +20,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import io.reactivex.Observable
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.extensions.sqlForAccounts
+import us.frollo.frollosdk.extensions.sqlForConsents
 import us.frollo.frollosdk.extensions.sqlForMerchants
 import us.frollo.frollosdk.extensions.sqlForProviderAccounts
 import us.frollo.frollosdk.extensions.sqlForProviders
@@ -47,6 +48,10 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.Tran
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionFilter
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionRelation
+import us.frollo.frollosdk.model.coredata.cdr.CDRConfiguration
+import us.frollo.frollosdk.model.coredata.cdr.Consent
+import us.frollo.frollosdk.model.coredata.cdr.ConsentRelation
+import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.shared.OrderType
 
@@ -507,4 +512,95 @@ fun Aggregation.fetchMerchantsRx(type: MerchantType? = null): Observable<List<Me
  */
 fun Aggregation.fetchMerchantsRx(query: SimpleSQLiteQuery): Observable<List<Merchant>> {
     return db.merchants().loadByQueryRx(query)
+}
+
+/**
+ * Fetch consent by ID from the cache
+ *
+ * @param consentId Unique consent ID to fetch
+ *
+ * @return Rx Observable object of Consent which can be observed using an Observer for future changes as well.
+ */
+fun Aggregation.fetchConsentRx(consentId: Long): Observable<Consent?> {
+    return db.consents().loadRx(consentId)
+}
+
+/**
+ * Fetch consents from the cache
+ *
+ * @param providerId Filter by associated provider ID of the consent (optional)
+ * @param providerAccountId Filter by associated provider account ID of the consent (optional)
+ * @param status Filter by the status of the consent (optional)
+ *
+ * @return Rx Observable object of List<Consent> which can be observed using an Observer for future changes as well.
+ */
+fun Aggregation.fetchConsentsRx(
+    providerId: Long? = null,
+    providerAccountId: Long? = null,
+    status: ConsentStatus? = null
+): Observable<List<Consent>> {
+    return db.consents().loadByQueryRx(sqlForConsents(providerId = providerId, providerAccountId = providerAccountId, status = status))
+}
+
+/**
+ * Advanced method to fetch consents by SQL query from the cache
+ *
+ * @param query SimpleSQLiteQuery: Select query which fetches consents from the cache
+ *
+ * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+ *
+ * @return Rx Observable object of List<Consent> which can be observed using an Observer for future changes as well.
+ */
+fun Aggregation.fetchConsentsRx(query: SimpleSQLiteQuery): Observable<List<Consent>> {
+    return db.consents().loadByQueryRx(query)
+}
+
+/**
+ * Fetch consent by ID from the cache along with other associated data.
+ *
+ * @param consentId Unique consent ID to fetch
+ *
+ * @return Rx Observable object of ConsentRelation which can be observed using an Observer for future changes as well.
+ */
+fun Aggregation.fetchConsentWithRelationRx(consentId: Long): Observable<ConsentRelation?> {
+    return db.consents().loadWithRelationRx(consentId)
+}
+
+/**
+ * Fetch consents from the cache along with other associated data.
+ *
+ * @param providerId Filter by associated provider ID of the consent (optional)
+ * @param providerAccountId Filter by associated provider account ID of the consent (optional)
+ * @param status Filter by the status of the consent (optional)
+ *
+ * @return Rx Observable object of List<ConsentRelation> which can be observed using an Observer for future changes as well.
+ */
+fun Aggregation.fetchConsentsWithRelationRx(
+    providerId: Long? = null,
+    providerAccountId: Long? = null,
+    status: ConsentStatus? = null
+): Observable<List<ConsentRelation>> {
+    return db.consents().loadByQueryWithRelationRx(sqlForConsents(providerId = providerId, providerAccountId = providerAccountId, status = status))
+}
+
+/**
+ * Advanced method to fetch consents by SQL query from the cache along with other associated data.
+ *
+ * @param query SimpleSQLiteQuery: Select query which fetches consents from the cache
+ *
+ * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+ *
+ * @return Rx Observable object of List<ConsentRelation>> which can be observed using an Observer for future changes as well.
+ */
+fun Aggregation.fetchConsentsWithRelationRx(query: SimpleSQLiteQuery): Observable<List<ConsentRelation>> {
+    return db.consents().loadByQueryWithRelationRx(query)
+}
+
+/**
+ * Fetch CDR Configuration from the cache
+ *
+ * @return Rx Observable object of CDRConfiguration which can be observed using an Observer for future changes as well.
+ */
+fun Aggregation.fetchCDRConfigurationRx(): Observable<CDRConfiguration?> {
+    return db.cdrConfiguration().loadRx()
 }

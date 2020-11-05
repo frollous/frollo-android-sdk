@@ -44,8 +44,8 @@ data class Consent(
     /** The provider ID for the consent */
     @ColumnInfo(name = "provider_id") val providerId: Long,
 
-    /** The provider account ID for the consent */
-    @ColumnInfo(name = "provider_account_id") val providerAccountId: Long,
+    /** The provider account ID for the consent (Optional) */
+    @ColumnInfo(name = "provider_account_id") val providerAccountId: Long?,
 
     /** The permissions requested for the consent */
     @ColumnInfo(name = "permissions") val permissions: List<CDRPermission>,

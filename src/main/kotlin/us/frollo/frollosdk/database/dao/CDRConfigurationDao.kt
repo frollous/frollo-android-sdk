@@ -16,10 +16,33 @@
 
 package us.frollo.frollosdk.database.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import io.reactivex.Observable
+import us.frollo.frollosdk.model.coredata.cdr.CDRConfiguration
 
 @Dao
 internal interface CDRConfigurationDao {
 
-    // TODO
+    @Query("SELECT * FROM cdr_configuration LIMIT 1")
+    fun load(): LiveData<CDRConfiguration?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(model: CDRConfiguration)
+
+    @Query("DELETE FROM cdr_configuration WHERE adr_id != :apiAdrId")
+    fun deleteStaleIds(apiAdrId: String)
+
+    @Query("DELETE FROM cdr_configuration")
+    fun clear()
+
+    /**
+     * RxJava Return Types
+     */
+
+    @Query("SELECT * FROM cdr_configuration LIMIT 1")
+    fun loadRx(): Observable<CDRConfiguration?>
 }

@@ -477,11 +477,11 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
      * Create a provider account
      *
      * @param providerId ID of the provider which an account should be created for
-     * @param consentId ID of the consent for creating the account
      * @param loginForm Provider login form with validated and encrypted values with the user's details
+     * @param consentId ID of the consent for creating the account
      * @param completion Optional completion handler with optional error if the request fails else ID of the ProviderAccount created if success
      */
-    fun createProviderAccount(providerId: Long, consentId: Long? = null, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null) {
+    fun createProviderAccount(providerId: Long, loginForm: ProviderLoginForm, consentId: Long? = null, completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null) {
         val request = ProviderAccountCreateRequest(loginForm = loginForm, providerID = providerId, consentId = consentId)
 
         aggregationAPI.createProviderAccount(request).enqueue { resource ->
@@ -523,10 +523,11 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
      *
      * @param providerAccountId ID of the provider account to be updated
      * @param loginForm Provider account login form with validated and encrypted values with the user's details
+     * @param consentId ID of the consent for creating the account
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun updateProviderAccount(providerAccountId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        val request = ProviderAccountUpdateRequest(loginForm = loginForm)
+    fun updateProviderAccount(providerAccountId: Long, loginForm: ProviderLoginForm, consentId: Long? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        val request = ProviderAccountUpdateRequest(loginForm = loginForm, consentId = consentId)
 
         aggregationAPI.updateProviderAccount(providerAccountId, request).enqueue { resource ->
             when (resource.status) {

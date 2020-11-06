@@ -22,5 +22,5 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginFor
 internal data class ProviderAccountCreateRequest(
     @SerializedName("login_form") val loginForm: ProviderLoginForm,
     @SerializedName("provider_id") val providerID: Long,
-    @SerializedName("consent_id") val consentId: Long?,
+    @SerializedName("consent_id") val consentId: Long?
 )

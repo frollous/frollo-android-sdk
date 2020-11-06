@@ -22,6 +22,7 @@ import us.frollo.frollosdk.model.IAdapterModel
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccountRelation
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
+import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderRelation
 
 /** Consent with associated data */
 data class ConsentRelation(
@@ -42,7 +43,7 @@ data class ConsentRelation(
      * Even though its a list this will have only one element. It is requirement of Room database for this to be a list.
      */
     @Relation(parentColumn = "provider_id", entityColumn = "provider_id", entity = Provider::class)
-    var providers: List<Provider>? = null,
+    var providers: List<ProviderRelation>? = null,
 
 ) : IAdapterModel {
 
@@ -54,7 +55,7 @@ data class ConsentRelation(
         }
 
     /** Associated Provider */
-    val provider: Provider?
+    val provider: ProviderRelation?
         get() {
             val models = providers
             return if (models?.isNotEmpty() == true) models[0] else null

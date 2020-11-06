@@ -16,9 +16,13 @@
 
 package us.frollo.frollosdk.mapping
 
+import android.app.Application
+import androidx.test.platform.app.InstrumentationRegistry
 import net.openid.appauth.AuthorizationException
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
+import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.error.APIErrorType
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
@@ -26,6 +30,13 @@ import us.frollo.frollosdk.error.OAuth2ErrorType
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
 
 class ErrorMappingTest {
+
+    private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
+
+    @Before
+    fun setUp() {
+        FrolloSDK.context = app
+    }
 
     @Test
     fun testStringToAPIErrorResponseSuccess() {

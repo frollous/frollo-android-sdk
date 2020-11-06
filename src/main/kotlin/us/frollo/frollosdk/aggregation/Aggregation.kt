@@ -2097,7 +2097,7 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
      * @param consentForm The form that will be submitted
      * @param completion Optional completion handler with optional error if the request fails else ID of the Consent created if success
      */
-    private fun submitConsent(consentForm: ConsentCreateForm, completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null) {
+    fun submitConsent(consentForm: ConsentCreateForm, completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null) {
         val request = consentForm.toConsentCreateRequest()
         cdrAPI.submitConsent(request).enqueue { resource ->
             when (resource.status) {
@@ -2129,7 +2129,7 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
      * @param consentForm The form that will be updated
      * @param completion Optional completion handler with optional error if the request fails
      */
-    private fun updateConsent(consentId: Long, consentForm: ConsentUpdateForm, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun updateConsent(consentId: Long, consentForm: ConsentUpdateForm, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val request = consentForm.toConsentUpdateRequest()
         cdrAPI.updateConsent(consentId, request).enqueue { resource ->
             when (resource.status) {
@@ -2150,7 +2150,7 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
      * @param consentId ID of the consent to be withdrawn
      * @param completion Optional completion handler with optional error if the request fails
      */
-    private fun withdrawConsent(consentId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+    fun withdrawConsent(consentId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
         val consentForm = ConsentUpdateForm(status = ConsentUpdateForm.ConsentUpdateStatus.WITHDRAWN)
         updateConsent(consentId, consentForm, completion)
     }
@@ -2162,7 +2162,7 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
      * @param sharingDuration sharingDuration (in seconds) of the consent that will be updated. This duration will be added to the existing value by host.
      * @param completion Optional completion handler with optional error if the request fails
      */
-    private fun updateConsentSharingPeriod(
+    fun updateConsentSharingPeriod(
         consentId: Long,
         sharingDuration: Long,
         completion: OnFrolloSDKCompletionListener<Result>? = null
@@ -2287,7 +2287,7 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
      * @param productId the ID of the product to filter the products on. (Optional)
      * @param completion Completion handler with optional error if the request fails and CDR Product if succeeds
      */
-    fun fetchCDRProducts(productId: Long, completion: OnFrolloSDKCompletionListener<Resource<CDRProduct>>) {
+    fun fetchCDRProduct(productId: Long, completion: OnFrolloSDKCompletionListener<Resource<CDRProduct>>) {
         cdrAPI.fetchProduct(productId).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.SUCCESS -> {

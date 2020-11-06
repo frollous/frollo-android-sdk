@@ -39,6 +39,7 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
+import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -429,5 +430,14 @@ class ModelExtensionTest {
 
         query = sqlForImageIds()
         assertEquals("SELECT image_id  FROM image", query.sql)
+    }
+
+    @Test
+    fun testSQLForConsents() {
+        var query = sqlForConsents(123, 235, ConsentStatus.ACTIVE)
+        assertEquals("SELECT  *  FROM consent WHERE provider_id = 123 AND provider_account_id = 235 AND status = 'ACTIVE' ", query.sql)
+
+        query = sqlForConsents()
+        assertEquals("SELECT  *  FROM consent", query.sql)
     }
 }

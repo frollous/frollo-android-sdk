@@ -376,6 +376,8 @@ abstract class SDKDatabase : RoomDatabase() {
                 // 3) Alter provider table - add column product_available
                 // 4) Alter transaction_model table - add column goal_id
                 // 5) New table image
+                // 6) New table consent
+                // 7) New table cdr_configuration
 
                 database.execSQL(
                     "UPDATE budget  SET tracking_status = (CASE " +
@@ -437,6 +439,14 @@ abstract class SDKDatabase : RoomDatabase() {
 
                 database.execSQL("CREATE TABLE IF NOT EXISTS `image` (`image_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `image_types` TEXT NOT NULL, `small_image_url` TEXT NOT NULL, `large_image_url` TEXT NOT NULL, PRIMARY KEY(`image_id`))")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_image_image_id` ON `image` (`image_id`)")
+
+                database.execSQL("CREATE TABLE IF NOT EXISTS `consent` (`consent_id` INTEGER NOT NULL, `provider_id` INTEGER NOT NULL, `provider_account_id` INTEGER, `permissions` TEXT NOT NULL, `additional_permissions` TEXT, `authorisation_request_url` TEXT, `confirmation_pdf_url` TEXT, `withdrawal_pdf_url` TEXT, `delete_redundant_data` INTEGER NOT NULL, `sharing_started_at` TEXT, `sharing_stopped_at` TEXT, `sharing_duration` INTEGER, `status` TEXT NOT NULL, PRIMARY KEY(`consent_id`))")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_consent_consent_id` ON `consent` (`consent_id`)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_consent_provider_account_id` ON `consent` (`provider_account_id`)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_consent_provider_id` ON `consent` (`provider_id`)")
+
+                database.execSQL("CREATE TABLE IF NOT EXISTS `cdr_configuration` (`adr_id` TEXT NOT NULL, `adr_name` TEXT NOT NULL, `support_email` TEXT NOT NULL, `sharing_durations` TEXT NOT NULL, PRIMARY KEY(`adr_id`))")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_cdr_configuration_adr_id` ON `cdr_configuration` (`adr_id`)")
             }
         }
     }

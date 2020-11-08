@@ -25,6 +25,10 @@ import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
+import us.frollo.frollosdk.model.api.cdr.CDRConfigurationResponse
+import us.frollo.frollosdk.model.api.cdr.ConsentCreateRequest
+import us.frollo.frollosdk.model.api.cdr.ConsentResponse
+import us.frollo.frollosdk.model.api.cdr.ConsentUpdateRequest
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
@@ -35,6 +39,10 @@ import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionsSummary
+import us.frollo.frollosdk.model.coredata.cdr.CDRConfiguration
+import us.frollo.frollosdk.model.coredata.cdr.Consent
+import us.frollo.frollosdk.model.coredata.cdr.ConsentCreateForm
+import us.frollo.frollosdk.model.coredata.cdr.ConsentUpdateForm
 
 internal fun ProviderResponse.toProvider(): Provider =
     Provider(
@@ -179,3 +187,45 @@ internal fun MerchantResponse.toMerchant(): Merchant =
 
 internal fun TransactionTagResponse.toTransactionTag(): TransactionTag =
     TransactionTag(name = name, count = count, lastUsedAt = lastUsedAt, createdAt = createdAt)
+
+internal fun ConsentResponse.toConsent(): Consent =
+    Consent(
+        consentId = consentId,
+        providerId = providerId,
+        providerAccountId = providerAccountId,
+        permissions = permissions,
+        additionalPermissions = additionalPermissions,
+        authorisationRequestURL = authorisationRequestURL,
+        confirmationPDFURL = confirmationPDFURL,
+        withdrawalPDFURL = withdrawalPDFURL,
+        deleteRedundantData = deleteRedundantData,
+        sharingStartedAt = sharingStartedAt,
+        sharingStoppedAt = sharingStoppedAt,
+        sharingDuration = sharingDuration,
+        status = status
+    )
+
+internal fun ConsentCreateForm.toConsentCreateRequest(): ConsentCreateRequest =
+    ConsentCreateRequest(
+        providerId = providerId,
+        sharingDuration = sharingDuration,
+        permissions = permissions,
+        additionalPermissions = additionalPermissions,
+        existingConsentId = existingConsentId,
+        deleteRedundantData = true
+    )
+
+internal fun ConsentUpdateForm.toConsentUpdateRequest(): ConsentUpdateRequest =
+    ConsentUpdateRequest(
+        status = status,
+        sharingDuration = sharingDuration,
+        deleteRedundantData = deleteRedundantData
+    )
+
+internal fun CDRConfigurationResponse.toCDRConfiguration(): CDRConfiguration =
+    CDRConfiguration(
+        adrId = adrId,
+        adrName = adrName,
+        supportEmail = supportEmail,
+        sharingDurations = sharingDurations
+    )

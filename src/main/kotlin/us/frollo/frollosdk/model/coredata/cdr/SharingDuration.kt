@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Frollo
+ * Copyright 2019 Frollo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,19 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.payments
+package us.frollo.frollosdk.model.coredata.cdr
 
-import java.io.Serializable
+import com.google.gson.annotations.SerializedName
 
-interface PaymentResponse : Serializable
+/** Represents the sharing duration of a consent */
+data class SharingDuration(
+
+    /** The duration (in seconds) for the consent */
+    @SerializedName("duration") val duration: Long,
+
+    /** The display text of the sharing duration */
+    @SerializedName("description") val description: String,
+
+    /** The image URL for the sharing duration image */
+    @SerializedName("image_url") val imageUrl: String
+)

@@ -24,7 +24,8 @@ internal data class AccountUpdateRequest(
     @SerializedName("favourite") val favourite: Boolean? = null,
     @SerializedName("hidden") val hidden: Boolean,
     @SerializedName("included") val included: Boolean,
-    @SerializedName("nick_name") val nickName: String? = null
+    @SerializedName("nick_name") val nickName: String? = null,
+    @SerializedName("product_id") val productId: Long? = null
 ) {
     val valid: Boolean
         get() = !(hidden && included)

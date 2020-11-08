@@ -39,6 +39,7 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
+import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -556,5 +557,15 @@ internal fun sqlForImageIds(imageType: String? = null): SimpleSQLiteQuery {
     val sqlQueryBuilder = SimpleSQLiteQueryBuilder("image")
     sqlQueryBuilder.columns(arrayOf("image_id"))
     imageType?.let { sqlQueryBuilder.appendSelection(selection = "image_types LIKE '%|$it|%'") }
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForConsents(providerId: Long? = null, providerAccountId: Long? = null, status: ConsentStatus? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("consent")
+
+    providerId?.let { sqlQueryBuilder.appendSelection(selection = "provider_id = $it") }
+    providerAccountId?.let { sqlQueryBuilder.appendSelection(selection = "provider_account_id = $it") }
+    status?.let { sqlQueryBuilder.appendSelection(selection = "status = '${ it.name }'") }
+
     return sqlQueryBuilder.create()
 }

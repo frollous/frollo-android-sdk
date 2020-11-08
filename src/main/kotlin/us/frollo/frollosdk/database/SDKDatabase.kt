@@ -28,6 +28,8 @@ import us.frollo.frollosdk.database.dao.BillDao
 import us.frollo.frollosdk.database.dao.BillPaymentDao
 import us.frollo.frollosdk.database.dao.BudgetDao
 import us.frollo.frollosdk.database.dao.BudgetPeriodDao
+import us.frollo.frollosdk.database.dao.CDRConfigurationDao
+import us.frollo.frollosdk.database.dao.ConsentDao
 import us.frollo.frollosdk.database.dao.GoalDao
 import us.frollo.frollosdk.database.dao.GoalPeriodDao
 import us.frollo.frollosdk.database.dao.ImageDao
@@ -52,6 +54,8 @@ import us.frollo.frollosdk.model.coredata.bills.Bill
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
 import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
+import us.frollo.frollosdk.model.coredata.cdr.CDRConfiguration
+import us.frollo.frollosdk.model.coredata.cdr.Consent
 import us.frollo.frollosdk.model.coredata.goals.Goal
 import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
 import us.frollo.frollosdk.model.coredata.images.Image
@@ -76,7 +80,9 @@ import us.frollo.frollosdk.model.coredata.user.User
         GoalPeriod::class,
         Budget::class,
         BudgetPeriod::class,
-        Image::class
+        Image::class,
+        Consent::class,
+        CDRConfiguration::class
     ],
     version = 10, exportSchema = true
 )
@@ -101,6 +107,8 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun budgets(): BudgetDao
     internal abstract fun budgetPeriods(): BudgetPeriodDao
     internal abstract fun images(): ImageDao
+    internal abstract fun consents(): ConsentDao
+    internal abstract fun cdrConfiguration(): CDRConfigurationDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"
@@ -368,6 +376,8 @@ abstract class SDKDatabase : RoomDatabase() {
                 // 3) Alter provider table - add column product_available
                 // 4) Alter transaction_model table - add column goal_id
                 // 5) New table image
+                // 6) New table consent
+                // 7) New table cdr_configuration
 
                 database.execSQL(
                     "UPDATE budget  SET tracking_status = (CASE " +
@@ -429,6 +439,14 @@ abstract class SDKDatabase : RoomDatabase() {
 
                 database.execSQL("CREATE TABLE IF NOT EXISTS `image` (`image_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `image_types` TEXT NOT NULL, `small_image_url` TEXT NOT NULL, `large_image_url` TEXT NOT NULL, PRIMARY KEY(`image_id`))")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_image_image_id` ON `image` (`image_id`)")
+
+                database.execSQL("CREATE TABLE IF NOT EXISTS `consent` (`consent_id` INTEGER NOT NULL, `provider_id` INTEGER NOT NULL, `provider_account_id` INTEGER, `permissions` TEXT NOT NULL, `additional_permissions` TEXT, `authorisation_request_url` TEXT, `confirmation_pdf_url` TEXT, `withdrawal_pdf_url` TEXT, `delete_redundant_data` INTEGER NOT NULL, `sharing_started_at` TEXT, `sharing_stopped_at` TEXT, `sharing_duration` INTEGER, `status` TEXT NOT NULL, PRIMARY KEY(`consent_id`))")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_consent_consent_id` ON `consent` (`consent_id`)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_consent_provider_account_id` ON `consent` (`provider_account_id`)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_consent_provider_id` ON `consent` (`provider_id`)")
+
+                database.execSQL("CREATE TABLE IF NOT EXISTS `cdr_configuration` (`adr_id` TEXT NOT NULL, `adr_name` TEXT NOT NULL, `support_email` TEXT NOT NULL, `sharing_durations` TEXT NOT NULL, PRIMARY KEY(`adr_id`))")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_cdr_configuration_adr_id` ON `cdr_configuration` (`adr_id`)")
             }
         }
     }

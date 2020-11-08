@@ -19,6 +19,10 @@ package us.frollo.frollosdk.mapping
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import us.frollo.frollosdk.model.testAccountResponseData
+import us.frollo.frollosdk.model.testCDRConfigurationData
+import us.frollo.frollosdk.model.testConsentCreateFormData
+import us.frollo.frollosdk.model.testConsentResponseData
+import us.frollo.frollosdk.model.testConsentUpdateFormData
 import us.frollo.frollosdk.model.testMerchantResponseData
 import us.frollo.frollosdk.model.testProviderAccountResponseData
 import us.frollo.frollosdk.model.testProviderResponseData
@@ -75,5 +79,33 @@ class AggregationMappingTest {
         val response = testMerchantResponseData(merchantId = 12345)
         val model = response.toMerchant()
         assertEquals(12345L, model.merchantId)
+    }
+
+    @Test
+    fun testConsentResponseToConsent() {
+        val response = testConsentResponseData(consentId = 12345)
+        val model = response.toConsent()
+        assertEquals(12345L, model.consentId)
+    }
+
+    @Test
+    fun testConsentCreateFormToConsentCreateRequest() {
+        val response = testConsentCreateFormData(providerId = 12345)
+        val model = response.toConsentCreateRequest()
+        assertEquals(12345L, model.providerId)
+    }
+
+    @Test
+    fun testConsentUpdateFormToConsentUpdateRequest() {
+        val response = testConsentUpdateFormData(sharingDuration = 1234500)
+        val model = response.toConsentUpdateRequest()
+        assertEquals(1234500L, model.sharingDuration)
+    }
+
+    @Test
+    fun testCDRConfigurationResponseToCDRConfiguration() {
+        val response = testCDRConfigurationData(adrId = "12345")
+        val model = response.toCDRConfiguration()
+        assertEquals("12345", model.adrId)
     }
 }

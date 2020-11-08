@@ -23,7 +23,8 @@
 		"status": "success",
 		"sub_status": "success",
 		"last_refreshed": "2018-08-06T07:10:42.651+10:00"
-	}
+	},
+	"products_available" : false
 }, {
 	"id": 543,
 	"provider_name": "ME Bank (demo)",
@@ -48,7 +49,8 @@
 		"status": "success",
 		"sub_status": "success",
 		"last_refreshed": "2018-08-06T07:10:42.651+10:00"
-	}
+	},
+	"products_available" : false
 }, {
 	"id": 544,
 	"provider_account_id": 624,
@@ -73,7 +75,8 @@
 		"status": "success",
 		"sub_status": "success",
 		"last_refreshed": "2018-08-06T07:10:42.651+10:00"
-	}
+	},
+	"products_available" : false
 }, {
 	"id": 545,
 	"provider_account_id": 625,
@@ -95,5 +98,6 @@
 		"status": "success",
 		"sub_status": "success",
 		"last_refreshed": "2018-08-06T07:10:42.651+10:00"
-	}
+	},
+	"products_available" : false
 }]

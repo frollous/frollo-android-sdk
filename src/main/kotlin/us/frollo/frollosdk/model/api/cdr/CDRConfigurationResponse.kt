@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.payments
+package us.frollo.frollosdk.model.api.cdr
 
-import java.io.Serializable
+import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.model.coredata.cdr.SharingDuration
 
-interface PaymentResponse : Serializable
+internal data class CDRConfigurationResponse(
+    @SerializedName("adr_id") val adrId: String,
+    @SerializedName("adr_name") val adrName: String,
+    @SerializedName("support_email") val supportEmail: String,
+    @SerializedName("sharing_durations") val sharingDurations: List<SharingDuration>
+)

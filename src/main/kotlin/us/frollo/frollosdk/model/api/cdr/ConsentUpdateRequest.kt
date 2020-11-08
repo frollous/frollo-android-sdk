@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Frollo
+ * Copyright 2020 Frollo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.aggregation.provideraccounts
+package us.frollo.frollosdk.model.api.cdr
 
 import com.google.gson.annotations.SerializedName
-import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
+import us.frollo.frollosdk.model.coredata.cdr.ConsentUpdateForm
 
-internal data class ProviderAccountCreateRequest(
-    @SerializedName("login_form") val loginForm: ProviderLoginForm,
-    @SerializedName("provider_id") val providerID: Long,
-    @SerializedName("consent_id") val consentId: Long?
+internal data class ConsentUpdateRequest(
+
+    /** The new status for the consent (Optional)*/
+    @SerializedName("status") val status: ConsentUpdateForm.ConsentUpdateStatus?,
+
+    /** The new value for the delete redundant data (Optional) */
+    @SerializedName("delete_redundant_data") val deleteRedundantData: Boolean?,
+
+    /** The new value for duration (in seconds) for the consent (Optional) */
+    @SerializedName("sharing_duration") val sharingDuration: Long?
 )

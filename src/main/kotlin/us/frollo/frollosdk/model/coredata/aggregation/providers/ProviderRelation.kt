@@ -20,6 +20,7 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import us.frollo.frollosdk.model.IAdapterModel
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
+import us.frollo.frollosdk.model.coredata.cdr.Consent
 
 /** Provider with associated data */
 data class ProviderRelation(
@@ -30,6 +31,10 @@ data class ProviderRelation(
 
     /** Associated Provider Accounts */
     @Relation(parentColumn = "provider_id", entityColumn = "provider_id", entity = ProviderAccount::class)
-    var providerAccounts: List<ProviderAccount>? = null
+    var providerAccounts: List<ProviderAccount>? = null,
+
+    /** Associated Consents */
+    @Relation(parentColumn = "provider_id", entityColumn = "provider_id", entity = Consent::class)
+    var consents: List<Consent>? = null
 
 ) : IAdapterModel

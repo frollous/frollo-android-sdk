@@ -6,6 +6,7 @@
 
 - Images
 - Payments
+- Consents
 
 #### Changes
 

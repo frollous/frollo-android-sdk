@@ -44,12 +44,14 @@ import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.compareToFindMissingItems
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchMerchants
+import us.frollo.frollosdk.extensions.fetchProducts
 import us.frollo.frollosdk.extensions.fetchSuggestedTags
 import us.frollo.frollosdk.extensions.fetchTransactions
 import us.frollo.frollosdk.extensions.fetchTransactionsSummaryByIDs
 import us.frollo.frollosdk.extensions.fetchTransactionsSummaryByQuery
 import us.frollo.frollosdk.extensions.fetchUserTags
 import us.frollo.frollosdk.extensions.sqlForAccounts
+import us.frollo.frollosdk.extensions.sqlForConsents
 import us.frollo.frollosdk.extensions.sqlForMerchants
 import us.frollo.frollosdk.extensions.sqlForMerchantsIds
 import us.frollo.frollosdk.extensions.sqlForProviderAccounts
@@ -62,6 +64,10 @@ import us.frollo.frollosdk.extensions.sqlForUserTags
 import us.frollo.frollosdk.extensions.toString
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toAccount
+import us.frollo.frollosdk.mapping.toCDRConfiguration
+import us.frollo.frollosdk.mapping.toConsent
+import us.frollo.frollosdk.mapping.toConsentCreateRequest
+import us.frollo.frollosdk.mapping.toConsentUpdateRequest
 import us.frollo.frollosdk.mapping.toMerchant
 import us.frollo.frollosdk.mapping.toProvider
 import us.frollo.frollosdk.mapping.toProviderAccount
@@ -82,6 +88,8 @@ import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagUpdateReques
 import us.frollo.frollosdk.model.api.aggregation.transactioncategories.TransactionCategoryResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
+import us.frollo.frollosdk.model.api.cdr.CDRConfigurationResponse
+import us.frollo.frollosdk.model.api.cdr.ConsentResponse
 import us.frollo.frollosdk.model.api.shared.PaginatedResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountClassification
@@ -95,6 +103,8 @@ import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccountRelation
+import us.frollo.frollosdk.model.coredata.aggregation.providers.CDRProduct
+import us.frollo.frollosdk.model.coredata.aggregation.providers.CDRProductCategory
 import us.frollo.frollosdk.model.coredata.aggregation.providers.Provider
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderRelation
@@ -109,10 +119,17 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionFi
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionPaginationInfo
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionRelation
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionsSummary
+import us.frollo.frollosdk.model.coredata.cdr.CDRConfiguration
+import us.frollo.frollosdk.model.coredata.cdr.Consent
+import us.frollo.frollosdk.model.coredata.cdr.ConsentCreateForm
+import us.frollo.frollosdk.model.coredata.cdr.ConsentRelation
+import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
+import us.frollo.frollosdk.model.coredata.cdr.ConsentUpdateForm
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.AggregationAPI
+import us.frollo.frollosdk.network.api.CdrAPI
 
 /**
  * Manages all aggregation data including accounts, transactions, categories and merchants.
@@ -126,6 +143,7 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
     }
 
     private val aggregationAPI: AggregationAPI = network.create(AggregationAPI::class.java)
+    private val cdrAPI: CdrAPI = network.create(CdrAPI::class.java)
 
     private var refreshingMerchantIDs = setOf<Long>()
     private var refreshingProviderIDs = setOf<Long>()
@@ -248,7 +266,7 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
     /**
      * Refresh all available providers from the host.
      *
-     * Includes beta and supported providers. Unsupported and Disabled providers must be fetched by ID.
+     * Includes Beta, Supported, Coming Soon and Outage providers. Unsupported and Disabled providers must be fetched by ID.
      *
      * @param completion Optional completion handler with optional error if the request fails
      */
@@ -460,10 +478,11 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
      *
      * @param providerId ID of the provider which an account should be created for
      * @param loginForm Provider login form with validated and encrypted values with the user's details
+     * @param consentId ID of the consent for creating the account
      * @param completion Optional completion handler with optional error if the request fails else ID of the ProviderAccount created if success
      */
-    fun createProviderAccount(providerId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null) {
-        val request = ProviderAccountCreateRequest(loginForm = loginForm, providerID = providerId)
+    fun createProviderAccount(providerId: Long, loginForm: ProviderLoginForm, consentId: Long? = null, completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null) {
+        val request = ProviderAccountCreateRequest(loginForm = loginForm, providerID = providerId, consentId = consentId)
 
         aggregationAPI.createProviderAccount(request).enqueue { resource ->
             when (resource.status) {
@@ -504,10 +523,11 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
      *
      * @param providerAccountId ID of the provider account to be updated
      * @param loginForm Provider account login form with validated and encrypted values with the user's details
+     * @param consentId ID of the consent for creating the account
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun updateProviderAccount(providerAccountId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        val request = ProviderAccountUpdateRequest(loginForm = loginForm)
+    fun updateProviderAccount(providerAccountId: Long, loginForm: ProviderLoginForm, consentId: Long? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        val request = ProviderAccountUpdateRequest(loginForm = loginForm, consentId = consentId)
 
         aggregationAPI.updateProviderAccount(providerAccountId, request).enqueue { resource ->
             when (resource.status) {
@@ -1945,6 +1965,341 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
                 uiThread { completion?.invoke(Result.success()) }
             }
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    // Consents
+
+    /**
+     * Fetch consent by ID from the cache
+     *
+     * @param consentId Unique consent ID to fetch
+     *
+     * @return LiveData object of Resource<Consent> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchConsent(consentId: Long): LiveData<Consent?> {
+        return db.consents().load(consentId)
+    }
+
+    /**
+     * Fetch consents from the cache
+     *
+     * @param providerId Filter by associated provider ID of the consent (optional)
+     * @param providerAccountId Filter by associated provider account ID of the consent (optional)
+     * @param status Filter by the status of the consent (optional)
+     *
+     * @return LiveData object of Resource<List<Consent> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchConsents(
+        providerId: Long? = null,
+        providerAccountId: Long? = null,
+        status: ConsentStatus? = null
+    ): LiveData<List<Consent>> {
+        return db.consents().loadByQuery(sqlForConsents(providerId = providerId, providerAccountId = providerAccountId, status = status))
+    }
+
+    /**
+     * Advanced method to fetch consents by SQL query from the cache
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches consents from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<Consent>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchConsents(query: SimpleSQLiteQuery): LiveData<List<Consent>> {
+        return db.consents().loadByQuery(query)
+    }
+
+    /**
+     * Fetch consent by ID from the cache along with other associated data.
+     *
+     * @param consentId Unique consent ID to fetch
+     *
+     * @return LiveData object of Resource<ConsentRelation> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchConsentWithRelation(consentId: Long): LiveData<ConsentRelation?> {
+        return db.consents().loadWithRelation(consentId)
+    }
+
+    /**
+     * Fetch consents from the cache along with other associated data.
+     *
+     * @param providerId Filter by associated provider ID of the consent (optional)
+     * @param providerAccountId Filter by associated provider account ID of the consent (optional)
+     * @param status Filter by the status of the consent (optional)
+     *
+     * @return LiveData object of Resource<List<ConsentRelation> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchConsentsWithRelation(
+        providerId: Long? = null,
+        providerAccountId: Long? = null,
+        status: ConsentStatus? = null
+    ): LiveData<List<ConsentRelation>> {
+        return db.consents().loadByQueryWithRelation(
+            sqlForConsents(providerId = providerId, providerAccountId = providerAccountId, status = status)
+        )
+    }
+
+    /**
+     * Advanced method to fetch consents by SQL query from the cache along with other associated data.
+     *
+     * @param query SimpleSQLiteQuery: Select query which fetches consents from the cache
+     *
+     * Note: Please check [SimpleSQLiteQueryBuilder] to build custom SQL queries
+     *
+     * @return LiveData object of Resource<List<ConsentRelation>> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchConsentsWithRelation(query: SimpleSQLiteQuery): LiveData<List<ConsentRelation>> {
+        return db.consents().loadByQueryWithRelation(query)
+    }
+
+    /**
+     * Refresh all available consents from the host.
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun refreshConsents(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        cdrAPI.fetchConsents().enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshConsents", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleConsentsResponse(response = resource.data, completion = completion)
+                }
+            }
+        }
+    }
+
+    /**
+     * Refresh a specific consent by ID from the host
+     *
+     * @param consentId ID of the consent to fetch
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun refreshConsent(consentId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        cdrAPI.fetchConsent(consentId).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshConsent", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleConsentResponse(response = resource.data, completion = completion)
+                }
+            }
+        }
+    }
+
+    /**
+     * Submits consent form for a specific provider
+     *
+     * @param consentForm The form that will be submitted
+     * @param completion Optional completion handler with optional error if the request fails else ID of the Consent created if success
+     */
+    fun submitConsent(consentForm: ConsentCreateForm, completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null) {
+        val request = consentForm.toConsentCreateRequest()
+        cdrAPI.submitConsent(request).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#submitConsent", resource.error?.localizedDescription)
+                    completion?.invoke(Resource.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    // Since submitting a consent might affect other consents for the user, we need to refresh all of them
+                    refreshConsents { // This call will anyways add the newly created consent to the cache. Hence no need to call handleConsentResponse.
+                        when (it.status) {
+                            Result.Status.SUCCESS -> {
+                                completion?.invoke(Resource.success(resource.data?.consentId))
+                            }
+                            Result.Status.ERROR -> {
+                                completion?.invoke(Resource.error(it.error))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates consent form for a specific provider
+     *
+     * @param consentId ID of the consent to be updated
+     * @param consentForm The form that will be updated
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun updateConsent(consentId: Long, consentForm: ConsentUpdateForm, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        val request = consentForm.toConsentUpdateRequest()
+        cdrAPI.updateConsent(consentId, request).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#updateConsent", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleConsentResponse(resource.data, completion)
+                }
+            }
+        }
+    }
+
+    /**
+     * Withdraws a consent deleting all its data
+     *
+     * @param consentId ID of the consent to be withdrawn
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun withdrawConsent(consentId: Long, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        val consentForm = ConsentUpdateForm(status = ConsentUpdateForm.ConsentUpdateStatus.WITHDRAWN)
+        updateConsent(consentId, consentForm, completion)
+    }
+
+    /**
+     * Updates a consent sharing period
+     *
+     * @param consentId ID of the consent to be withdrawn
+     * @param sharingDuration sharingDuration (in seconds) of the consent that will be updated. This duration will be added to the existing value by host.
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun updateConsentSharingPeriod(
+        consentId: Long,
+        sharingDuration: Long,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
+        val consentForm = ConsentUpdateForm(sharingDuration = sharingDuration)
+        updateConsent(consentId, consentForm, completion)
+    }
+
+    private fun handleConsentsResponse(response: List<ConsentResponse>?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        response?.let {
+            doAsync {
+                val models = response.map { it.toConsent() }
+                db.consents().insertAll(*models.toTypedArray())
+
+                val apiIds = models.map { it.consentId }.toList()
+                val staleIds = db.consents().getStaleIds(apiIds.toLongArray())
+
+                if (staleIds.isNotEmpty()) {
+                    db.consents().deleteMany(staleIds.toLongArray())
+                }
+
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    private fun handleConsentResponse(response: ConsentResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        response?.let {
+            doAsync {
+                val model = response.toConsent()
+
+                db.consents().insert(model)
+
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    // CDR Configuration
+
+    /**
+     * Fetch CDR Configuration from the cache
+     *
+     * @return LiveData object of Resource<CDRConfiguration> which can be observed using an Observer for future changes as well.
+     */
+    fun fetchCDRConfiguration(): LiveData<CDRConfiguration?> {
+        return db.cdrConfiguration().load()
+    }
+
+    /**
+     * Refresh CDR Configuration from the host.
+     *
+     * @param completion Optional completion handler with optional error if the request fails
+     */
+    fun refreshCDRConfiguration(completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        cdrAPI.fetchCDRConfig().enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#refreshCDRConfiguration", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    handleCDRConfigurationResponse(response = resource.data, completion = completion)
+                }
+            }
+        }
+    }
+
+    private fun handleCDRConfigurationResponse(response: CDRConfigurationResponse?, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        response?.let {
+            doAsync {
+                db.cdrConfiguration().insert(response.toCDRConfiguration())
+                db.cdrConfiguration().deleteStaleIds(response.adrId)
+
+                uiThread { completion?.invoke(Result.success()) }
+            }
+        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    // CDR Products
+
+    /**
+     * Fetch CDR products from server. CDR products can be filtered, sorted and ordered based on the parameters provided.
+     *
+     * @param providerId the ID of the provider to filter the products on. (Optional)
+     * @param providerAccountId the ID of the provider account to filter the products on. (Optional)
+     * @param accountId the ID of the account to filter the products on. (Optional)
+     * @param productCategory Product Category to filter the products on. See [CDRProductCategory] for more details. (Optional)
+     * @param productName Name of the product to filter the products on. (Optional)
+     * @param completion Completion handler with optional error if the request fails and list of CDR Products if succeeds
+     */
+    fun fetchCDRProducts(
+        providerId: Long? = null,
+        providerAccountId: Long? = null,
+        accountId: Long? = null,
+        productCategory: CDRProductCategory? = null,
+        productName: String? = null,
+        completion: OnFrolloSDKCompletionListener<Resource<List<CDRProduct>>>
+    ) {
+        cdrAPI.fetchProducts(
+            providerId = providerId,
+            providerAccountId = providerAccountId,
+            accountId = accountId,
+            productCategory = productCategory,
+            productName = productName
+        ).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.SUCCESS -> {
+                    completion.invoke(resource)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#fetchCDRProducts", resource.error?.localizedDescription)
+                    completion.invoke(resource)
+                }
+            }
+        }
+    }
+
+    /**
+     * Fetch CDR product by ID from the server
+     *
+     * @param productId the ID of the product to filter the products on. (Optional)
+     * @param completion Completion handler with optional error if the request fails and CDR Product if succeeds
+     */
+    fun fetchCDRProduct(productId: Long, completion: OnFrolloSDKCompletionListener<Resource<CDRProduct>>) {
+        cdrAPI.fetchProduct(productId).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.SUCCESS -> {
+                    completion.invoke(resource)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#fetchCDRProduct", resource.error?.localizedDescription)
+                    completion.invoke(resource)
+                }
+            }
+        }
     }
 
     // Internal methods

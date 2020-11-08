@@ -22,7 +22,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import us.frollo.frollosdk.model.IAdapterModel
-import us.frollo.frollosdk.model.coredata.aggregation.cdr.CDRPermission
+import us.frollo.frollosdk.model.coredata.cdr.CDRPermission
 
 // Declaring the ColumnInfo allows for the renaming of variables without
 // implementing a database migration, as the column name would not change.

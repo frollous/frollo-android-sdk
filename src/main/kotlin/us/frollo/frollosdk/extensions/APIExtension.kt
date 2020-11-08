@@ -30,6 +30,8 @@ import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.ReportsResponse
 import us.frollo.frollosdk.model.api.shared.PaginatedResponse
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
+import us.frollo.frollosdk.model.coredata.aggregation.providers.CDRProduct
+import us.frollo.frollosdk.model.coredata.aggregation.providers.CDRProductCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionFilter
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
@@ -42,6 +44,7 @@ import us.frollo.frollosdk.model.coredata.surveys.Survey
 import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.network.api.BillsAPI
 import us.frollo.frollosdk.network.api.BudgetsAPI
+import us.frollo.frollosdk.network.api.CdrAPI
 import us.frollo.frollosdk.network.api.GoalsAPI
 import us.frollo.frollosdk.network.api.ImagesAPI
 import us.frollo.frollosdk.network.api.ReportsAPI
@@ -244,4 +247,22 @@ internal fun ImagesAPI.fetchImages(imageType: String? = null): Call<List<ImageRe
     val queryMap = mutableMapOf<String, String>()
     imageType?.let { queryMap["image_type"] = it }
     return fetchImages(queryMap)
+}
+
+// CDR Products
+
+internal fun CdrAPI.fetchProducts(
+    providerId: Long? = null,
+    providerAccountId: Long? = null,
+    accountId: Long? = null,
+    productCategory: CDRProductCategory? = null,
+    productName: String? = null
+): Call<List<CDRProduct>> {
+    val queryMap = mutableMapOf<String, String>()
+    providerId?.let { queryMap["provider_id"] = it.toString() }
+    providerAccountId?.let { queryMap["provider_account_id"] = it.toString() }
+    accountId?.let { queryMap["account_id"] = it.toString() }
+    productCategory?.let { queryMap["product_category"] = it.toString() }
+    productName?.let { queryMap["name"] = it }
+    return fetchProducts(queryMap)
 }

@@ -31,7 +31,6 @@ import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.BalanceTier
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.CDRProductInformation
-import us.frollo.frollosdk.model.coredata.aggregation.cdr.CDRPermissionDetail
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantLocation
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshAdditionalStatus
@@ -56,6 +55,9 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
+import us.frollo.frollosdk.model.coredata.cdr.CDRPermissionDetail
+import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
+import us.frollo.frollosdk.model.coredata.cdr.SharingDuration
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -1100,5 +1102,47 @@ class ConvertersTest {
         }
         val json = Converters.instance.stringFromMetadata(metadata)
         assertEquals("{\"seen\":true}", json)
+    }
+
+    @Test
+    fun testStringToConsentStatus() {
+        val status = Converters.instance.stringToConsentStatus("ACTIVE")
+        assertEquals(ConsentStatus.ACTIVE, status)
+
+        assertEquals(ConsentStatus.UNKNOWN, Converters.instance.stringToConsentStatus(null))
+    }
+
+    @Test
+    fun testStringFromConsentStatus() {
+        val str = Converters.instance.stringFromConsentStatus(ConsentStatus.ACTIVE)
+        assertEquals("ACTIVE", str)
+
+        assertEquals("UNKNOWN", Converters.instance.stringFromConsentStatus(null))
+    }
+
+    @Test
+    fun testStringToListOfSharingDuration() {
+        val json = "[{\"duration\":1234500,\"description\":\"Account Details\",\"image_url\":\"http://app.image.png\"},{\"duration\":2345678,\"description\":\"Transaction Details\",\"image_url\":\"http://app.image.png\"}]"
+        val info = Converters.instance.stringToListOfSharingDuration(json)
+        assertNotNull(info)
+        assertTrue(info?.size == 2)
+        assertEquals(1234500L, info?.first()?.duration)
+        assertEquals("Account Details", info?.first()?.description)
+        assertEquals("http://app.image.png", info?.first()?.imageUrl)
+        assertEquals(2345678L, info?.get(1)?.duration)
+        assertEquals("Transaction Details", info?.get(1)?.description)
+        assertEquals("http://app.image.png", info?.get(1)?.imageUrl)
+
+        assertNull(Converters.instance.stringToListOfCDRProductInformation(null))
+    }
+
+    @Test
+    fun testStringFromListOfSharingDuration() {
+        val info = listOf(
+            SharingDuration(1234500, "Account Details", "http://app.image.png"),
+            SharingDuration(2345678, "Transaction Details", "http://app.image.png")
+        )
+        val json = Converters.instance.stringFromListOfSharingDuration(info)
+        assertEquals("[{\"duration\":1234500,\"description\":\"Account Details\",\"image_url\":\"http://app.image.png\"},{\"duration\":2345678,\"description\":\"Transaction Details\",\"image_url\":\"http://app.image.png\"}]", json)
     }
 }

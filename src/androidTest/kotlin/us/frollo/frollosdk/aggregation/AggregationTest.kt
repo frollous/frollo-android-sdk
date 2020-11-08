@@ -38,6 +38,8 @@ import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.mapping.toAccount
+import us.frollo.frollosdk.mapping.toCDRConfiguration
+import us.frollo.frollosdk.mapping.toConsent
 import us.frollo.frollosdk.mapping.toGoal
 import us.frollo.frollosdk.mapping.toGoalPeriod
 import us.frollo.frollosdk.mapping.toMerchant
@@ -51,15 +53,21 @@ import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
+import us.frollo.frollosdk.model.coredata.aggregation.providers.CDRProductCategory
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TagsSortType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionDescription
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionFilter
+import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.model.loginFormFilledData
 import us.frollo.frollosdk.model.testAccountResponseData
+import us.frollo.frollosdk.model.testCDRConfigurationData
+import us.frollo.frollosdk.model.testConsentCreateFormData
+import us.frollo.frollosdk.model.testConsentResponseData
+import us.frollo.frollosdk.model.testConsentUpdateFormData
 import us.frollo.frollosdk.model.testGoalPeriodResponseData
 import us.frollo.frollosdk.model.testGoalResponseData
 import us.frollo.frollosdk.model.testMerchantResponseData
@@ -69,6 +77,7 @@ import us.frollo.frollosdk.model.testTransactionCategoryResponseData
 import us.frollo.frollosdk.model.testTransactionResponseData
 import us.frollo.frollosdk.model.testTransactionTagData
 import us.frollo.frollosdk.network.api.AggregationAPI
+import us.frollo.frollosdk.network.api.CdrAPI
 import us.frollo.frollosdk.test.R
 import us.frollo.frollosdk.testutils.randomBoolean
 import us.frollo.frollosdk.testutils.randomUUID
@@ -134,6 +143,9 @@ class AggregationTest : BaseAndroidTest() {
         database.providers().insert(testProviderResponseData(providerId = 123).toProvider())
         database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
         database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 235, providerId = 123).toProviderAccount())
+        database.consents().insert(testConsentResponseData(consentId = 345, providerId = 123).toConsent())
+        database.consents().insert(testConsentResponseData(consentId = 346, providerId = 123).toConsent())
+        database.consents().insert(testConsentResponseData(consentId = 347, providerId = 124).toConsent())
 
         val testObserver = aggregation.fetchProviderWithRelation(providerId = 123).test()
         testObserver.awaitValue()
@@ -144,10 +156,9 @@ class AggregationTest : BaseAndroidTest() {
         assertEquals(2, model?.providerAccounts?.size)
         assertEquals(234L, model?.providerAccounts?.get(0)?.providerAccountId)
         assertEquals(235L, model?.providerAccounts?.get(1)?.providerAccountId)
-
-        val data = testProviderResponseData()
-        val list = mutableListOf(testProviderResponseData(), data, testProviderResponseData())
-        database.providers().insertAll(*list.map { it.toProvider() }.toList().toTypedArray())
+        assertEquals(2, model?.consents?.size)
+        assertEquals(345L, model?.consents?.get(0)?.consentId)
+        assertEquals(346L, model?.consents?.get(1)?.consentId)
 
         tearDown()
     }
@@ -159,6 +170,9 @@ class AggregationTest : BaseAndroidTest() {
         database.providers().insert(testProviderResponseData(providerId = 123).toProvider())
         database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
         database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 235, providerId = 123).toProviderAccount())
+        database.consents().insert(testConsentResponseData(consentId = 345, providerId = 123).toConsent())
+        database.consents().insert(testConsentResponseData(consentId = 346, providerId = 123).toConsent())
+        database.consents().insert(testConsentResponseData(consentId = 347, providerId = 124).toConsent())
 
         val testObserver = aggregation.fetchProvidersWithRelation().test()
         testObserver.awaitValue()
@@ -171,6 +185,9 @@ class AggregationTest : BaseAndroidTest() {
         assertEquals(2, model?.providerAccounts?.size)
         assertEquals(234L, model?.providerAccounts?.get(0)?.providerAccountId)
         assertEquals(235L, model?.providerAccounts?.get(1)?.providerAccountId)
+        assertEquals(2, model?.consents?.size)
+        assertEquals(345L, model?.consents?.get(0)?.consentId)
+        assertEquals(346L, model?.consents?.get(1)?.consentId)
 
         tearDown()
     }
@@ -201,7 +218,7 @@ class AggregationTest : BaseAndroidTest() {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            assertEquals(431, models?.size)
+            assertEquals(50, models?.size)
 
             signal.countDown()
         }
@@ -248,26 +265,26 @@ class AggregationTest : BaseAndroidTest() {
                     return MockResponse()
                         .setResponseCode(200)
                         .setBody(readStringFromJson(app, R.raw.providers_valid))
-                } else if (request?.trimmedPath == "aggregation/providers/8069") {
+                } else if (request?.trimmedPath == "aggregation/providers/614") {
                     return MockResponse()
                         .setResponseCode(200)
-                        .setBody(readStringFromJson(app, R.raw.provider_id_8069))
+                        .setBody(readStringFromJson(app, R.raw.provider_id_614))
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
-        aggregation.refreshProvider(8069L) { result ->
+        aggregation.refreshProvider(614L) { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
             assertNull(result.error)
 
-            val testObserver = aggregation.fetchProvider(8069L).test()
+            val testObserver = aggregation.fetchProvider(614L).test()
             testObserver.awaitValue()
             val model = testObserver.value().data
             assertNotNull(model)
-            assertEquals(8069L, model?.providerId)
+            assertEquals(614L, model?.providerId)
             assertEquals(ProviderStatus.SUPPORTED, model?.providerStatus)
-            assertEquals("https://example.com/australiansuper-logo600pxw.png", model?.largeLogoUrl)
+            assertEquals("https://shareinvesting.anz.com/forgotpassword.aspx", model?.forgetPasswordUrl)
 
             signal1.countDown()
         }
@@ -284,11 +301,11 @@ class AggregationTest : BaseAndroidTest() {
             testObserver.awaitValue()
             val models = testObserver.value().data
             assertNotNull(models)
-            assertEquals(431, models?.size)
-            val model = models?.find { it.providerId == 8069L }
-            assertEquals(8069L, model?.providerId)
+            assertEquals(50, models?.size)
+            val model = models?.find { it.providerId == 614L }
+            assertEquals(614L, model?.providerId)
             assertEquals(ProviderStatus.SUPPORTED, model?.providerStatus)
-            assertEquals("https://example.com/australiansuper-logo600pxw.png", models?.find { it.providerId == 8069L }?.largeLogoUrl)
+            assertEquals("https://shareinvesting.anz.com/forgotpassword.aspx", models?.find { it.providerId == 614L }?.forgetPasswordUrl)
 
             signal2.countDown()
         }
@@ -427,6 +444,9 @@ class AggregationTest : BaseAndroidTest() {
         database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
         database.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
         database.accounts().insert(testAccountResponseData(accountId = 346, providerAccountId = 234).toAccount())
+        database.consents().insert(testConsentResponseData(consentId = 456, providerId = 123, providerAccountId = 234).toConsent())
+        database.consents().insert(testConsentResponseData(consentId = 457, providerId = 123, providerAccountId = 235).toConsent())
+        database.consents().insert(testConsentResponseData(consentId = 458, providerId = 124, providerAccountId = 236).toConsent())
 
         val testObserver = aggregation.fetchProviderAccountWithRelation(providerAccountId = 234).test()
         testObserver.awaitValue()
@@ -438,6 +458,8 @@ class AggregationTest : BaseAndroidTest() {
         assertEquals(2, model?.accounts?.size)
         assertEquals(345L, model?.accounts?.get(0)?.accountId)
         assertEquals(346L, model?.accounts?.get(1)?.accountId)
+        assertEquals(1, model?.consents?.size)
+        assertEquals(456L, model?.consents?.get(0)?.consentId)
 
         tearDown()
     }
@@ -450,6 +472,9 @@ class AggregationTest : BaseAndroidTest() {
         database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
         database.accounts().insert(testAccountResponseData(accountId = 345, providerAccountId = 234).toAccount())
         database.accounts().insert(testAccountResponseData(accountId = 346, providerAccountId = 234).toAccount())
+        database.consents().insert(testConsentResponseData(consentId = 456, providerId = 123, providerAccountId = 234).toConsent())
+        database.consents().insert(testConsentResponseData(consentId = 457, providerId = 123, providerAccountId = 235).toConsent())
+        database.consents().insert(testConsentResponseData(consentId = 458, providerId = 124, providerAccountId = 236).toConsent())
 
         val testObserver = aggregation.fetchProviderAccountsWithRelation().test()
         testObserver.awaitValue()
@@ -463,6 +488,8 @@ class AggregationTest : BaseAndroidTest() {
         assertEquals(2, model?.accounts?.size)
         assertEquals(345L, model?.accounts?.get(0)?.accountId)
         assertEquals(346L, model?.accounts?.get(1)?.accountId)
+        assertEquals(1, model?.consents?.size)
+        assertEquals(456L, model?.consents?.get(0)?.consentId)
 
         tearDown()
     }
@@ -1077,7 +1104,7 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals(AccountFeatureType.PAYMENTS, first?.features?.get(0)?.featureId)
             assertEquals("Payments", first?.features?.get(0)?.name)
             assertEquals("https://image.png", first?.features?.get(0)?.imageUrl)
-            assertEquals(2, first?.features?.get(0)?.details?.size)
+            assertEquals(3, first?.features?.get(0)?.details?.size)
             assertEquals(AccountFeatureSubType.BPAY, first?.features?.get(0)?.details?.get(0)?.detailId)
             assertEquals("BPAY", first?.features?.get(0)?.details?.get(0)?.name)
             assertEquals("https://image-detail.png", first?.features?.get(0)?.details?.get(0)?.imageUrl)
@@ -3562,7 +3589,7 @@ class AggregationTest : BaseAndroidTest() {
             testObserver5.awaitValue()
             val models = testObserver5.value().data
             assertNotNull(models)
-            assertEquals(431, models?.size)
+            assertEquals(50, models?.size)
 
             val testObserver6 = aggregation.fetchProvider(providerId = 123).test()
             testObserver6.awaitValue()
@@ -3593,6 +3620,565 @@ class AggregationTest : BaseAndroidTest() {
 
         val request = mockServer.takeRequest()
         assertEquals(AggregationAPI.URL_PROVIDERS, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    // Consent Tests
+
+    @Test
+    fun testFetchConsentByID() {
+        initSetup()
+
+        val data = testConsentResponseData()
+        val list = mutableListOf(testConsentResponseData(), data, testConsentResponseData())
+        database.consents().insertAll(*list.map { it.toConsent() }.toList().toTypedArray())
+
+        val testObserver = aggregation.fetchConsent(data.consentId).test()
+        testObserver.awaitValue()
+        assertEquals(data.consentId, testObserver.value()?.consentId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchConsents() {
+        initSetup()
+
+        val data1 = testConsentResponseData(providerId = 123, providerAccountId = 234, status = ConsentStatus.ACTIVE)
+        val data2 = testConsentResponseData(providerId = 123, providerAccountId = 235, status = ConsentStatus.PENDING)
+        val data3 = testConsentResponseData(providerId = 123, providerAccountId = 236, status = ConsentStatus.WITHDRAWN)
+        val data4 = testConsentResponseData(providerId = 124, providerAccountId = 237, status = ConsentStatus.ACTIVE)
+        val list = mutableListOf(data1, data2, data3, data4)
+
+        database.consents().insertAll(*list.map { it.toConsent() }.toList().toTypedArray())
+
+        var testObserver = aggregation.fetchConsents().test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value())
+        assertEquals(4, testObserver.value()?.size)
+
+        testObserver = aggregation.fetchConsents(providerId = 123).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value())
+        assertEquals(3, testObserver.value()?.size)
+
+        testObserver = aggregation.fetchConsents(status = ConsentStatus.ACTIVE).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value())
+        assertEquals(2, testObserver.value()?.size)
+
+        testObserver = aggregation.fetchConsents(providerId = 123, providerAccountId = 235, status = ConsentStatus.PENDING).test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value())
+        assertEquals(1, testObserver.value()?.size)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchConsentByIDWithRelation() {
+        initSetup()
+
+        database.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 235, providerId = 123).toProviderAccount())
+        database.consents().insert(testConsentResponseData(consentId = 345, providerId = 123, providerAccountId = 234).toConsent())
+        database.consents().insert(testConsentResponseData(consentId = 346, providerId = 123, providerAccountId = 235).toConsent())
+
+        val testObserver = aggregation.fetchConsentWithRelation(consentId = 345).test()
+        testObserver.awaitValue()
+
+        val model = testObserver.value()
+
+        assertEquals(123L, model?.provider?.provider?.providerId)
+        assertEquals(1, model?.providerAccounts?.size)
+        assertEquals(234L, model?.providerAccount?.providerAccount?.providerAccountId)
+        assertEquals(345L, model?.consent?.consentId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchConsentsWithRelation() {
+        initSetup()
+
+        database.providers().insert(testProviderResponseData(providerId = 123).toProvider())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 234, providerId = 123).toProviderAccount())
+        database.providerAccounts().insert(testProviderAccountResponseData(providerAccountId = 235, providerId = 123).toProviderAccount())
+        database.consents().insert(testConsentResponseData(consentId = 345, providerId = 123, providerAccountId = 234).toConsent())
+        database.consents().insert(testConsentResponseData(consentId = 346, providerId = 123, providerAccountId = 235).toConsent())
+
+        val testObserver = aggregation.fetchConsentsWithRelation().test()
+        testObserver.awaitValue()
+        assertNotNull(testObserver.value())
+        assertEquals(2, testObserver.value()?.size)
+
+        val model = testObserver.value()?.first()
+
+        assertEquals(123L, model?.provider?.provider?.providerId)
+        assertEquals(1, model?.providerAccounts?.size)
+        assertEquals(234L, model?.providerAccount?.providerAccount?.providerAccountId)
+        assertEquals(345L, model?.consent?.consentId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshConsents() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val body = readStringFromJson(app, R.raw.consents_valid)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == CdrAPI.URL_CDR_CONSENTS) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshConsents { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchConsents().test()
+            testObserver.awaitValue()
+            val models = testObserver.value()
+            assertNotNull(models)
+            assertEquals(8, models?.size)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(CdrAPI.URL_CDR_CONSENTS, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshConsentsFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        aggregation.refreshConsents { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshConsentByID() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val body = readStringFromJson(app, R.raw.consent_id_353)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == "cdr/consents/353") {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshConsent(353L) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchConsent(353L).test()
+            testObserver.awaitValue()
+            val model = testObserver.value()
+            assertNotNull(model)
+            assertEquals(353L, model?.consentId)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("cdr/consents/353", request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshConsentByIdFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        aggregation.refreshConsent(353L) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testSubmitConsent() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val refreshBody = readStringFromJson(app, R.raw.consents_valid)
+        val submitBody = readStringFromJson(app, R.raw.consent_created)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == CdrAPI.URL_CDR_CONSENTS) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(if (request.method == "POST") submitBody else refreshBody)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.submitConsent(testConsentCreateFormData()) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+            assertEquals(410L, resource.data)
+
+            val testObserver = aggregation.fetchConsents().test()
+            testObserver.awaitValue()
+            val models = testObserver.value()
+            assertNotNull(models)
+            assertEquals(8, models?.size)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(CdrAPI.URL_CDR_CONSENTS, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testSubmitConsentFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        aggregation.submitConsent(testConsentCreateFormData()) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testUpdateConsent() {
+        initSetup()
+
+        val signal1 = CountDownLatch(1)
+
+        val refreshBody = readStringFromJson(app, R.raw.consent_fetched)
+        val updateBody = readStringFromJson(app, R.raw.consent_updated)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == "cdr/consents/39") {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(if (request.method == "PUT") updateBody else refreshBody)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshConsent(consentId = 39) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchConsent(consentId = 39).test()
+            testObserver.awaitValue()
+            assertEquals(15642000L, testObserver.value()?.sharingDuration)
+
+            signal1.countDown()
+        }
+
+        signal1.await(3, TimeUnit.SECONDS)
+
+        val signal2 = CountDownLatch(1)
+
+        aggregation.updateConsent(consentId = 39, testConsentUpdateFormData()) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchConsent(consentId = 39).test()
+            testObserver.awaitValue()
+            assertEquals(17532000L, testObserver.value()?.sharingDuration)
+
+            signal2.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("cdr/consents/39", request.trimmedPath)
+
+        signal2.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testUpdateConsentFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        aggregation.updateConsent(consentId = 39, testConsentUpdateFormData()) { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchProductsByAccountID() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val body = readStringFromJson(app, R.raw.products_account_id_542)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == "${CdrAPI.URL_CDR_PRODUCTS}?account_id=542") {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.fetchCDRProducts(accountId = 542) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val models = resource.data
+            assertNotNull(models)
+            assertEquals(131, models?.size)
+            assertEquals(22580L, models?.first()?.providerId)
+            assertEquals(CDRProductCategory.RESIDENTIAL_MORTGAGES, models?.first()?.productCategory)
+            assertEquals("Fixed Rate Investment Property Loan Interest Only", models?.first()?.name)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("${CdrAPI.URL_CDR_PRODUCTS}?account_id=542", request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchProductsByAccountIdFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        aggregation.fetchCDRProducts(accountId = 542) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchProductByID() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val body = readStringFromJson(app, R.raw.product_id_65)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == "cdr/products/65") {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.fetchCDRProduct(productId = 65) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val model = resource.data
+            assertNotNull(model)
+            assertEquals(65L, model?.productId)
+            assertEquals(CDRProductCategory.TRANSACTION_AND_SAVINGS_ACCOUNTS, model?.productCategory)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("cdr/products/65", request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchProductByIdFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        aggregation.fetchCDRProducts(accountId = 542) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchCDRConfiguration() {
+        initSetup()
+
+        database.cdrConfiguration().insert(testCDRConfigurationData(adrId = "12345").toCDRConfiguration())
+
+        val testObserver = aggregation.fetchCDRConfiguration().test()
+        testObserver.awaitValue()
+        assertEquals("12345", testObserver.value()?.adrId)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshCDRConfiguration() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val body = readStringFromJson(app, R.raw.cdr_configuration)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == CdrAPI.URL_CDR_CONFIG) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.refreshCDRConfiguration { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
+
+            val testObserver = aggregation.fetchCDRConfiguration().test()
+            testObserver.awaitValue()
+            val model = testObserver.value()
+            assertNotNull(model)
+            assertEquals("ADBK0001", model?.adrId)
+            assertEquals("ACME", model?.adrName)
+            assertEquals("suppert@acme.com", model?.supportEmail)
+            assertEquals(1, model?.sharingDurations?.size)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(CdrAPI.URL_CDR_CONFIG, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshCDRConfigurationFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        aggregation.refreshCDRConfiguration { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
+        }
 
         signal.await(3, TimeUnit.SECONDS)
 

@@ -20,6 +20,7 @@ import android.content.Context
 import android.os.Handler
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.jakewharton.threetenabp.AndroidThreeTen
+import okhttp3.ResponseBody
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
@@ -30,6 +31,7 @@ import us.frollo.frollosdk.authentication.AuthenticationType.OAuth2
 import us.frollo.frollosdk.authentication.OAuth2Authentication
 import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.authentication.TokenInjector
+import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.bills.Bills
 import us.frollo.frollosdk.budgets.Budgets
@@ -42,6 +44,7 @@ import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.error.FrolloSDKError
 import us.frollo.frollosdk.events.Events
+import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.notify
 import us.frollo.frollosdk.extensions.toString
 import us.frollo.frollosdk.goals.Goals
@@ -51,6 +54,7 @@ import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
 import us.frollo.frollosdk.network.NetworkService
+import us.frollo.frollosdk.network.api.ResponseDataAPI
 import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.notifications.Notifications
 import us.frollo.frollosdk.payments.Payments
@@ -177,6 +181,7 @@ object FrolloSDK {
     internal var refreshTimer: Timer? = null
         private set
     private var deviceLastUpdated: LocalDateTime? = null
+    private var responseDataAPI: ResponseDataAPI? = null
 
     internal lateinit var context: Context
 
@@ -285,6 +290,9 @@ object FrolloSDK {
             // 20. Setup Payments
             _payments = Payments(network)
 
+            // 21. Setup Response Data API Service
+            responseDataAPI = network.create(ResponseDataAPI::class.java)
+
             if (version.migrationNeeded()) {
                 version.migrateVersion()
             }
@@ -294,6 +302,20 @@ object FrolloSDK {
         } catch (e: Exception) {
             val error = FrolloSDKError("Setup failed : ${e.message}")
             completion.invoke(Result.error(error))
+        }
+    }
+
+    fun downloadResponseData(url: String, completion: OnFrolloSDKCompletionListener<Resource<ResponseBody>>) {
+        responseDataAPI?.fetchResponseData(url)?.enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.SUCCESS -> {
+                    completion.invoke(resource)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#downloadResponseData", resource.error?.localizedDescription)
+                    completion.invoke(resource)
+                }
+            }
         }
     }
 

@@ -523,11 +523,10 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
      *
      * @param providerAccountId ID of the provider account to be updated
      * @param loginForm Provider account login form with validated and encrypted values with the user's details
-     * @param consentId ID of the consent for creating the account
      * @param completion Optional completion handler with optional error if the request fails
      */
-    fun updateProviderAccount(providerAccountId: Long, loginForm: ProviderLoginForm, consentId: Long? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        val request = ProviderAccountUpdateRequest(loginForm = loginForm, consentId = consentId)
+    fun updateProviderAccount(providerAccountId: Long, loginForm: ProviderLoginForm, completion: OnFrolloSDKCompletionListener<Result>? = null) {
+        val request = ProviderAccountUpdateRequest(loginForm = loginForm)
 
         aggregationAPI.updateProviderAccount(providerAccountId, request).enqueue { resource ->
             when (resource.status) {
@@ -2095,6 +2094,8 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
     /**
      * Submits consent form for a specific provider
      *
+     * NOTE: Use the same method to update sharing duration for a CDR Consent
+     *
      * @param consentForm The form that will be submitted
      * @param completion Optional completion handler with optional error if the request fails else ID of the Consent created if success
      */
@@ -2125,6 +2126,8 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
 
     /**
      * Updates consent form for a specific provider
+     *
+     * NOTE: Do not use this method to update sharing duration for a CDR Consent. Use [Aggregation.submitConsent] instead by passing the existing consent ID.
      *
      * @param consentId ID of the consent to be updated
      * @param consentForm The form that will be updated
@@ -2157,9 +2160,9 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
     }
 
     /**
-     * Updates a consent sharing period
+     * Updates a consent sharing period for YODLEE provider ONLY
      *
-     * @param consentId ID of the consent to be withdrawn
+     * @param consentId ID of the consent to be updated
      * @param sharingDuration sharingDuration (in seconds) of the consent that will be updated. This duration will be added to the existing value by host.
      * @param completion Optional completion handler with optional error if the request fails
      */

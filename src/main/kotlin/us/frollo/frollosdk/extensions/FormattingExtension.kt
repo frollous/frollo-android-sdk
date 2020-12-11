@@ -32,7 +32,7 @@ import java.util.Locale
  *
  * @param formatPattern Date format pattern of the string
  */
-fun LocalDate.toString(formatPattern: String): String =
+internal fun LocalDate.toString(formatPattern: String): String =
     DateTimeFormatter.ofPattern(formatPattern).format(this)
 
 /**
@@ -40,7 +40,7 @@ fun LocalDate.toString(formatPattern: String): String =
  *
  * @param formatPattern Date format pattern of the string
  */
-fun Date.toString(formatPattern: String): String =
+internal fun Date.toString(formatPattern: String): String =
     SimpleDateFormat(formatPattern, Locale.getDefault()).format(this)
 
 /**
@@ -48,7 +48,7 @@ fun Date.toString(formatPattern: String): String =
  *
  * @param formatPattern Date format pattern of the string to validate against
  */
-fun String.isValidDateFormat(formatPattern: String): Boolean {
+internal fun String.isValidDateFormat(formatPattern: String): Boolean {
     val formatter = DateTimeFormatter.ofPattern(formatPattern)
     try {
         formatter.parse(this) // if not valid, it will throw DateTimeParseException
@@ -66,7 +66,7 @@ fun String.isValidDateFormat(formatPattern: String): Boolean {
  * @param from Date format pattern of the from date string
  * @param to Date format pattern of the to date string
  */
-fun String.changeDateFormat(from: String, to: String): String {
+internal fun String.changeDateFormat(from: String, to: String): String {
     var dateStr = ""
 
     try {
@@ -114,7 +114,7 @@ internal fun getWeekInMonth(dayOfMonth: Int): Int {
  *
  * @param pattern Date format pattern of the string
  */
-fun String.toLocalDate(pattern: String): LocalDate {
+internal fun String.toLocalDate(pattern: String): LocalDate {
     val formatter = DateTimeFormatterBuilder()
         .appendPattern(pattern)
         .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)

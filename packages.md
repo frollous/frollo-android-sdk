@@ -44,6 +44,10 @@ Convenient extension methods for use of the app
 
 Tracking and managing goals
 
+# Package us.frollo.frollosdk.images
+
+Manages caching and refreshing of images
+
 # Package us.frollo.frollosdk.logging
 
 Frollo SDK logging
@@ -55,6 +59,10 @@ Manages refreshing and caching of messages.
 # Package us.frollo.frollosdk.model
 
 Frollo SDK data models
+
+# Package us.frollo.frollosdk.model.api.payments
+
+Frollo SDK payment models
 
 # Package us.frollo.frollosdk.model.api.shared
 
@@ -96,9 +104,17 @@ Frollo SDK bill and bill payment models
 
 Frollo SDK budget models
 
+# Package us.frollo.frollosdk.model.coredata.cdr
+
+Frollo SDK CDR models
+
 # Package us.frollo.frollosdk.model.coredata.goals
 
 Frollo SDK goal models
+
+# Package us.frollo.frollosdk.model.coredata.images
+
+Frollo SDK image models
 
 # Package us.frollo.frollosdk.model.coredata.messages
 
@@ -135,6 +151,10 @@ Frollo SDK OAuth2 models
 # Package us.frollo.frollosdk.notifications
 
 Manages registration for and handling of incoming push notifications.
+
+# Package us.frollo.frollosdk.payments
+
+Manages all aspects of payments.
 
 # Package us.frollo.frollosdk.reports
 

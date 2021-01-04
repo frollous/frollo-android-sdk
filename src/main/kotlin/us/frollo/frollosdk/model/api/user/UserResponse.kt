@@ -24,6 +24,7 @@ import us.frollo.frollosdk.model.coredata.user.Gender
 import us.frollo.frollosdk.model.coredata.user.HouseholdType
 import us.frollo.frollosdk.model.coredata.user.Industry
 import us.frollo.frollosdk.model.coredata.user.Occupation
+import us.frollo.frollosdk.model.coredata.user.RegisterStep
 import us.frollo.frollosdk.model.coredata.user.UserStatus
 
 internal data class UserResponse(
@@ -34,7 +35,7 @@ internal data class UserResponse(
     @SerializedName("status") val status: UserStatus,
     @SerializedName("primary_currency") val primaryCurrency: String,
     @SerializedName("valid_password") val validPassword: Boolean,
-    @SerializedName("register_complete") val registerComplete: Boolean,
+    @SerializedName("register_steps") val registerSteps: List<RegisterStep>?,
     @SerializedName("registration_date") val registrationDate: String,
     @SerializedName("facebook_id") val facebookId: String?,
     @SerializedName("attribution") val attribution: Attribution?,

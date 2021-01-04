@@ -16,6 +16,8 @@ The Frollo Android SDK is broken down into multiple components that reflect the 
 * [Events](#events) - Triggering of events and sequences from user actions
 * [Messages](#messages) - Nudges and other customisable messaging to inform the user and keep them on track
 * [Surveys](#surveys) - Questions and feedback from the user
+* [Payments](#payments) - Manages payments
+* [Images](#images) - Upload images for budgets, goals etc..
 
 ### Authentication
 
@@ -58,7 +60,7 @@ Account data can come from many different sources including:
 * Open banking
 * Direct integrations
 
-An institution is referred to as a [Provider](us.frollo.frollosdk.model.coredata.aggregation.providers/-provider/index.html) and the login or connection to that provider as a [ProviderAccount](us.frollo.frollosdk.model.coredata.aggregation.provideraccounts/-provideraccount/index.html). The actual account data is referred to as an [Account](us.frollo.frollosdk.model.coredata.aggregation.accounts/-account/index.html) as each provider account may have multiple accounts linked to it. An example would be:
+An institution is referred to as a [Provider](us.frollo.frollosdk.model.coredata.aggregation.providers/-provider/index.html) and the login or connection to that provider as a [ProviderAccount](us.frollo.frollosdk.model.coredata.aggregation.provideraccounts/-provider-account/index.html). The actual account data is referred to as an [Account](us.frollo.frollosdk.model.coredata.aggregation.accounts/-account/index.html) as each provider account may have multiple accounts linked to it. An example would be:
 
 * **Provider**: ANZ
    * **Provider Account**: user@example.com
@@ -76,7 +78,7 @@ Supported account types include:
 * Rewards and Loyalty
 * Credit / Financial Scores
 
-Transactions can support tagging for personalisation at a granular level or allow for spending breakdown to be mesaured at higher level through automatic categorisation and allocation to "buckets". Buckets include income, living, lifestyle and savings. Naming of these buckets can be changed at the UI level and allocation between them can be determined by configuration of the host tenant. These are referred to as a [BudgetCategory](enums/budgetcategory.html) in the API.
+Transactions can support tagging for personalisation at a granular level or allow for spending breakdown to be mesaured at higher level through automatic categorisation and allocation to "buckets". Buckets include income, living, lifestyle and savings. Naming of these buckets can be changed at the UI level and allocation between them can be determined by configuration of the host tenant. These are referred to as a [BudgetCategory](us.frollo.frollosdk.model.coredata.shared/-budget-category/index.html) in the API.
 
 The following features are part of aggregation:
 
@@ -88,9 +90,9 @@ The following features are part of aggregation:
 * Merchant information
 * Searching of transactions
 
-Note: Aggregation refers the the aggregated view of accounts seen within Frollo, wether this includes accounts from external aggregation partners will depend on how your tenant is configured.
+Note: Aggregation refers the the aggregated view of accounts seen within Frollo, whether this includes accounts from external aggregation partners will depend on how your tenant is configured.
 
-See [Aggregation](us.frollo.frollosdk.auth/-aggregation/index.html) for more details.
+See [Aggregation](us.frollo.frollosdk.aggregation/-aggregation/index.html) for more details.
 
 ### Bills
 
@@ -104,7 +106,7 @@ The following features are part of bills:
 * Payments forecasting
 * Manual bills
 
-See [Bills](us.frollo.frollosdk.auth/-bills/index.html) for more details.
+See [Bills](us.frollo.frollosdk.bills/-bills/index.html) for more details.
 
 ### Budget and Pay Day
 
@@ -116,9 +118,11 @@ The following features are part of budgets and pay day:
 * Set multiple budgets
 * Set budgets by category, merchant or bucket
 
-See [Budgets](us.frollo.frollosdk.auth/-budgets/index.html) for more details.
+See [Budgets](us.frollo.frollosdk.budgets/-budgets/index.html) for more details.
 
-*Pay Day is Coming Soon to SDK*
+### Payday
+
+*Payday is Coming Soon to SDK*
 
 ### Reports
 
@@ -133,7 +137,7 @@ The following features are part of reports:
 * Historical spend - breakdown the spend of a user for them to explore and find where money is going
 * Tracking against a budget - if available a budget value will be returned to allow the user to visually see how they're tracking
 
-See [Reports](us.frollo.frollosdk.auth/-reports/index.html) for more details.
+See [Reports](us.frollo.frollosdk.reports/-reports/index.html) for more details.
 
 ### Goals
 
@@ -146,13 +150,13 @@ The following features are part of goals and challenges:
 * Save towards a date, amount or open-ended target
 * See a breakdown of each period's progress towards a goal and calculate how to get back on track
  
-See [Goals](goals.html) for more details.
+See [Goals](us.frollo.frollosdk.goals/-goals/index.html) for more details.
 
 ### Events
 
 Events allow user actions to drive changes or chains of actions on the Frollo host. For example a user could reach some fitness goals using HealthKit and trigger an event to increase their lifestyle budget for the next week as a reward.
 
-See [Events](us.frollo.frollosdk.auth/-events/index.html) for more details.
+See [Events](us.frollo.frollosdk.events/-events/index.html) for more details.
 
 ### Messages
 
@@ -165,7 +169,7 @@ The following features are supported as part of messages:
 * Driving the user to deep linked content in a consuming app
 * Chaining and trumping of messages to ensure the user doesn't get bombarded with duplicates and only has relevant content at the right time
 
-See [Messages](us.frollo.frollosdk.auth/-messages/index.html) for more details
+See [Messages](us.frollo.frollosdk.messages/-messages/index.html) for more details
 
 ### Surveys
 
@@ -179,5 +183,16 @@ The following features are supported as part of surveys:
 * Custom input (freeform) answers
 * Triggering events based on answers
 
-See [Surveys](us.frollo.frollosdk.auth/-surveys/index.html) for more details
+See [Surveys](us.frollo.frollosdk.surveys/-surveys/index.html) for more details
 
+### Payments
+
+Payments help the user to pay via Account Number & BSB, BPay, NPP or Transfer.
+
+See [Payments](us.frollo.frollosdk.payments/-payments/index.html) for more details.
+
+### Images
+
+Images help the user to upload images for his budgets, goals etc..
+
+See [Images](us.frollo.frollosdk.images/-images/index.html) for more details.

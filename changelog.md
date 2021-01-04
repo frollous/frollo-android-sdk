@@ -13,7 +13,6 @@
 - Optimize Transactions advanced filtering and searching
 - Add Account Features & CDR Product Information to Account API Response
 - Migrate from Application Context to ContentProvider Context
-- Upgrade Host API Version to 2.11
 - Added Fetch methods that return Rx Observable
 - Provider availability status
 - Add dueAmount parameter to Create Bill method
@@ -25,6 +24,8 @@
 - Return Goal ID after goal creation
 - Add CDR permissions data cluster to Provider Model
 - Add OTP Header to Make Payment API requests
+- Upgrade Host API Version to 2.12
+- User Register Steps
 
 ### 3.5.0
 

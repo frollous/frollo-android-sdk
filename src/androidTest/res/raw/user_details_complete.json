@@ -29,7 +29,26 @@
     "enabled": true
   }],
   "facebook_id": "1234567890",
-  "register_complete": true,
+  "register_steps": [
+    {
+      "key": "kyc",
+      "index": 0,
+      "required": true,
+      "completed": true
+    },
+    {
+      "key": "survey",
+      "index": 1,
+      "required": true,
+      "completed": false
+    },
+    {
+      "key": "otp",
+      "index": 2,
+      "required": false,
+      "completed": false
+    }
+  ],
   "registration_date": "2019-01-01",
   "mobile_number": "0411111111",
   "valid_password": true,

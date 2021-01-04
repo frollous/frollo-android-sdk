@@ -378,6 +378,7 @@ abstract class SDKDatabase : RoomDatabase() {
                 // 5) New table image
                 // 6) New table consent
                 // 7) New table cdr_configuration
+                // 8) Alter table user - Drop column register_complete and add column register_steps
 
                 database.execSQL(
                     "UPDATE budget  SET tracking_status = (CASE " +
@@ -447,6 +448,17 @@ abstract class SDKDatabase : RoomDatabase() {
 
                 database.execSQL("CREATE TABLE IF NOT EXISTS `cdr_configuration` (`adr_id` TEXT NOT NULL, `adr_name` TEXT NOT NULL, `support_email` TEXT NOT NULL, `sharing_durations` TEXT NOT NULL, PRIMARY KEY(`adr_id`))")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_cdr_configuration_adr_id` ON `cdr_configuration` (`adr_id`)")
+
+                // START - Drop column register_complete and add column register_steps
+                database.execSQL("BEGIN TRANSACTION")
+                database.execSQL("DROP INDEX IF EXISTS `index_user_user_id`")
+                database.execSQL("ALTER TABLE user RENAME TO original_user")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `user` (`user_id` INTEGER NOT NULL, `first_name` TEXT, `email` TEXT NOT NULL, `email_verified` INTEGER NOT NULL, `status` TEXT NOT NULL, `primary_currency` TEXT NOT NULL, `valid_password` INTEGER NOT NULL, `register_steps` TEXT, `registration_date` TEXT NOT NULL, `facebook_id` TEXT, `attribution` TEXT, `last_name` TEXT, `mobile_number` TEXT, `gender` TEXT, `household_size` INTEGER, `marital_status` TEXT, `occupation` TEXT, `industry` TEXT, `date_of_birth` TEXT, `driver_license` TEXT, `features` TEXT, `c_address_line_1` TEXT, `c_address_line_2` TEXT, `c_address_suburb` TEXT, `c_address_postcode` TEXT, `p_address_line_1` TEXT, `p_address_line_2` TEXT, `p_address_suburb` TEXT, `p_address_postcode` TEXT, PRIMARY KEY(`user_id`))")
+                database.execSQL("INSERT INTO user(user_id, first_name, email, email_verified, status, primary_currency, valid_password, registration_date, facebook_id, attribution, last_name, mobile_number, gender, household_size, marital_status, occupation, industry, date_of_birth, driver_license, features, c_address_line_1, c_address_line_2, c_address_suburb, c_address_postcode, p_address_line_1, p_address_line_2, p_address_suburb, p_address_postcode) SELECT user_id, first_name, email, email_verified, status, primary_currency, valid_password, registration_date, facebook_id, attribution, last_name, mobile_number, gender, household_size, marital_status, occupation, industry, date_of_birth, driver_license, features, c_address_line_1, c_address_line_2, c_address_suburb, c_address_postcode, p_address_line_1, p_address_line_2, p_address_suburb, p_address_postcode  FROM original_user")
+                database.execSQL("DROP TABLE original_user")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_user_user_id` ON `user` (`user_id`)")
+                database.execSQL("COMMIT")
+                // END - Drop column register_complete and add column register_steps
             }
         }
     }

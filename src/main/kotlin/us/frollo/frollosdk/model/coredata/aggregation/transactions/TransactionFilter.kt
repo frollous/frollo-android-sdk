@@ -66,6 +66,9 @@ data class TransactionFilter(
     var size: Long? = null
 ) {
 
+    /**
+     * Convert [TransactionFilter] to query map
+     */
     fun getQueryMap(): Map<String, String> {
         val queryMap = mutableMapOf<String, String>()
         transactionIds?.let { if (it.isNotEmpty()) queryMap.put("transaction_ids", it.joinToString(",")) }

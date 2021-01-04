@@ -26,6 +26,7 @@ import us.frollo.frollosdk.model.coredata.user.Gender
 import us.frollo.frollosdk.model.coredata.user.HouseholdType
 import us.frollo.frollosdk.model.coredata.user.Industry
 import us.frollo.frollosdk.model.coredata.user.Occupation
+import us.frollo.frollosdk.model.coredata.user.RegisterStep
 import us.frollo.frollosdk.model.coredata.user.UserStatus
 import us.frollo.frollosdk.testutils.randomNumber
 import us.frollo.frollosdk.testutils.randomString
@@ -43,7 +44,7 @@ internal fun testUserResponseData(userId: Long? = null): UserResponse {
         status = UserStatus.ACTIVE,
         primaryCurrency = "AUD",
         validPassword = true,
-        registerComplete = true,
+        registerSteps = listOf(RegisterStep(key = "survey", index = 0, required = true, completed = false)),
         registrationDate = today("yyyy-MM"),
         facebookId = randomNumber().toString(),
         attribution = Attribution(adGroup = randomString(8), campaign = randomString(8), creative = randomString(8), network = randomString(8)),
@@ -71,7 +72,7 @@ internal fun UserResponse.testModifyUserResponseData(firstName: String): UserRes
         status = status,
         primaryCurrency = primaryCurrency,
         validPassword = validPassword,
-        registerComplete = registerComplete,
+        registerSteps = registerSteps,
         registrationDate = registrationDate,
         facebookId = facebookId,
         attribution = attribution,

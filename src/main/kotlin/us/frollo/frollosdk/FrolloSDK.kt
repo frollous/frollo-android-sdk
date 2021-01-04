@@ -305,6 +305,9 @@ object FrolloSDK {
         }
     }
 
+    /**
+     * Fetch Raw data response with an authenticated request
+     */
     fun downloadResponseData(url: String, completion: OnFrolloSDKCompletionListener<Resource<ResponseBody>>) {
         responseDataAPI?.fetchResponseData(url)?.enqueue { resource ->
             when (resource.status) {

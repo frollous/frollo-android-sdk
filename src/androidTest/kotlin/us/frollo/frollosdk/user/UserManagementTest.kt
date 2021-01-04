@@ -42,6 +42,11 @@ import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.coredata.user.Attribution
+import us.frollo.frollosdk.model.coredata.user.Gender
+import us.frollo.frollosdk.model.coredata.user.HouseholdType
+import us.frollo.frollosdk.model.coredata.user.Industry
+import us.frollo.frollosdk.model.coredata.user.Occupation
+import us.frollo.frollosdk.model.coredata.user.UserStatus
 import us.frollo.frollosdk.model.testUserResponseData
 import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.network.api.UserAPI
@@ -199,8 +204,39 @@ class UserManagementTest : BaseAndroidTest() {
             testObserver.awaitValue()
             assertNotNull(testObserver.value().data)
 
-            val expectedResponse = Gson().fromJson<UserResponse>(body)!!
-            assertEquals(expectedResponse.toUser(), testObserver.value().data)
+            val user = testObserver.value().data
+            assertEquals(12345L, user?.userId)
+            assertEquals("Jacob", user?.firstName)
+            assertEquals("Frollo", user?.lastName)
+            assertEquals(true, user?.emailVerified)
+            assertEquals(UserStatus.ACTIVE, user?.status)
+            assertEquals("AUD", user?.primaryCurrency)
+            assertEquals(Gender.MALE, user?.gender)
+            assertEquals("1990-01", user?.dateOfBirth)
+            assertEquals("41 McLaren Street", user?.currentAddress?.lineOne)
+            assertEquals("Frollo Level 1", user?.currentAddress?.lineTwo)
+            assertEquals("North Sydney", user?.currentAddress?.suburb)
+            assertEquals("2060", user?.currentAddress?.postcode)
+            assertEquals("Bay 9 Middlemiss St", user?.previousAddress?.lineOne)
+            assertEquals("Frollo Unit 13", user?.previousAddress?.lineTwo)
+            assertEquals("Lavender Bay", user?.previousAddress?.suburb)
+            assertEquals("2060", user?.previousAddress?.postcode)
+            assertEquals(HouseholdType.SINGLE, user?.householdType)
+            assertEquals(Occupation.COMMUNITY_AND_PERSONAL_SERVICE_WORKERS, user?.occupation)
+            assertEquals(Industry.ELECTRICITY_GAS_WATER_AND_WASTE_SERVICES, user?.industry)
+            assertEquals(2, user?.householdSize)
+            assertEquals("aggregation", user?.features?.get(0)?.feature)
+            assertEquals(true, user?.features?.get(0)?.enabled)
+            assertEquals("1234567890", user?.facebookId)
+            assertEquals("2019-01-01", user?.registrationDate)
+            assertEquals("0411111111", user?.mobileNumber)
+            assertEquals(true, user?.validPassword)
+            assertEquals("Organic", user?.attribution?.network)
+            assertEquals(3, user?.registerSteps?.size)
+            assertEquals("survey", user?.registerSteps?.get(1)?.key)
+            assertEquals(1, user?.registerSteps?.get(1)?.index)
+            assertEquals(true, user?.registerSteps?.get(1)?.required)
+            assertEquals(false, user?.registerSteps?.get(1)?.completed)
 
             signal.countDown()
         }

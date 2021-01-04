@@ -56,8 +56,8 @@ data class User(
     /** User has a valid password */
     @ColumnInfo(name = "valid_password") val validPassword: Boolean,
 
-    /** Has user completed all registration steps */
-    @ColumnInfo(name = "register_complete") val registerComplete: Boolean,
+    /** An array of [RegisterStep] decoded from a json array stored in the database. (Optional) */
+    @ColumnInfo(name = "register_steps") val registerSteps: List<RegisterStep>?,
 
     /** Date user registered (format pattern - yyyy-MM-dd) */
     @ColumnInfo(name = "registration_date") val registrationDate: String,

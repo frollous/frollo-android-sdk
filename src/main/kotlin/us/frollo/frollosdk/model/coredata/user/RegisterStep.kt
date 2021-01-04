@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Frollo
+ * Copyright 2019 Frollo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,26 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.payments
+package us.frollo.frollosdk.model.coredata.user
 
-import java.io.Serializable
+import com.google.gson.annotations.SerializedName
 
 /**
- * PaymentResponse interface
+ * Register Steps
+ *
+ * Represents registration steps which are required
  */
-interface PaymentResponse : Serializable
+data class RegisterStep(
+
+    /** Step key */
+    @SerializedName("key") var key: String,
+
+    /** Step index */
+    @SerializedName("index") var index: Int,
+
+    /** Step required flag */
+    @SerializedName("required") var required: Boolean,
+
+    /** Step completed flag */
+    @SerializedName("completed") var completed: Boolean
+)

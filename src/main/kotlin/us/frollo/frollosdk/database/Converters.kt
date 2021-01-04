@@ -74,6 +74,7 @@ import us.frollo.frollosdk.model.coredata.user.Gender
 import us.frollo.frollosdk.model.coredata.user.HouseholdType
 import us.frollo.frollosdk.model.coredata.user.Industry
 import us.frollo.frollosdk.model.coredata.user.Occupation
+import us.frollo.frollosdk.model.coredata.user.RegisterStep
 import us.frollo.frollosdk.model.coredata.user.UserStatus
 import java.math.BigDecimal
 
@@ -148,6 +149,12 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromAttribution(value: Attribution?): String? = if (value == null) null else gson.toJson(value)
+
+    @TypeConverter
+    fun stringToListOfRegisterStep(value: String?): List<RegisterStep>? = if (value == null) null else gson.fromJson<List<RegisterStep>>(value)
+
+    @TypeConverter
+    fun stringFromListOfRegisterStep(value: List<RegisterStep>?): String? = if (value == null) null else gson.toJson(value)
 
     // Message
     @TypeConverter

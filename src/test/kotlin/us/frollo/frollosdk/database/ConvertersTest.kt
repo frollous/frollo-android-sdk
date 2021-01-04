@@ -74,6 +74,7 @@ import us.frollo.frollosdk.model.coredata.user.Gender
 import us.frollo.frollosdk.model.coredata.user.HouseholdType
 import us.frollo.frollosdk.model.coredata.user.Industry
 import us.frollo.frollosdk.model.coredata.user.Occupation
+import us.frollo.frollosdk.model.coredata.user.RegisterStep
 import us.frollo.frollosdk.model.coredata.user.UserStatus
 import us.frollo.frollosdk.model.testAccountFeatureDetailsData
 import us.frollo.frollosdk.model.testAccountFeaturesData
@@ -219,6 +220,43 @@ class ConvertersTest {
         val attr = Attribution(network = "organic", campaign = "frollo")
         val json = Converters.instance.stringFromAttribution(attr)
         assertEquals("{\"network\":\"organic\",\"campaign\":\"frollo\"}", json)
+    }
+
+    @Test
+    fun testStringToListOfRegisterStep() {
+        val json = "[{\"key\":\"kyc\",\"index\":0,\"required\":true,\"completed\":true},{\"key\":\"survey\",\"index\":1,\"required\":true,\"completed\":false}]"
+        val steps = Converters.instance.stringToListOfRegisterStep(json)
+        assertNotNull(steps)
+        assertEquals(2, steps?.size)
+        assertEquals("kyc", steps?.get(0)?.key)
+        assertEquals(0, steps?.get(0)?.index)
+        assertEquals(true, steps?.get(0)?.required)
+        assertEquals(true, steps?.get(0)?.completed)
+        assertEquals("survey", steps?.get(1)?.key)
+        assertEquals(1, steps?.get(1)?.index)
+        assertEquals(true, steps?.get(1)?.required)
+        assertEquals(false, steps?.get(1)?.completed)
+        assertNull(Converters.instance.stringToListOfRegisterStep(null))
+    }
+
+    @Test
+    fun testStringFromListOfRegisterStep() {
+        val steps = listOf(
+            RegisterStep(
+                key = "kyc",
+                index = 0,
+                required = true,
+                completed = true
+            ),
+            RegisterStep(
+                key = "survey",
+                index = 1,
+                required = true,
+                completed = false
+            )
+        )
+        val json = Converters.instance.stringFromListOfRegisterStep(steps)
+        assertEquals("[{\"key\":\"kyc\",\"index\":0,\"required\":true,\"completed\":true},{\"key\":\"survey\",\"index\":1,\"required\":true,\"completed\":false}]", json)
     }
 
     @Test

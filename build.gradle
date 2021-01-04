@@ -81,11 +81,15 @@ android {
             prefix = "us.frollo.frollosdk.preferences"
             suppress = true
         }
+        packageOptions {
+            prefix = "us.frollo.frollosdk.FrolloSDKInitProvider"
+            suppress = true
+        }
     }
 }
 
 buildscript {
-    ext.kotlin_version_internal = '1.4.20'
+    ext.kotlin_version_internal = '1.4.21'
 
     repositories {
         google()
@@ -128,9 +132,9 @@ dependencies {
 
     // Android Arch Components
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
-    implementation "androidx.room:room-runtime:2.2.5"
-    implementation 'androidx.room:room-rxjava2:2.2.5'
-    kapt "androidx.room:room-compiler:2.2.5"
+    implementation "androidx.room:room-runtime:2.2.6"
+    implementation 'androidx.room:room-rxjava2:2.2.6'
+    kapt "androidx.room:room-compiler:2.2.6"
 
     // Anko (https://github.com/Kotlin/anko)
     implementation "org.jetbrains.anko:anko:0.10.8"

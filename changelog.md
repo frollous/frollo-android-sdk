@@ -25,7 +25,7 @@
 - Add CDR permissions data cluster to Provider Model
 - Add OTP Header to Make Payment API requests
 - Upgrade Host API Version to 2.12
-- User Register Steps
+- User Register Steps, new Address model and Tax Information
 
 ### 3.5.0
 

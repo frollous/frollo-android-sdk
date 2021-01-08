@@ -68,6 +68,7 @@ import us.frollo.frollosdk.model.coredata.messages.OpenMode
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
+import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.coredata.user.FeatureFlag
 import us.frollo.frollosdk.model.coredata.user.Gender
@@ -155,6 +156,12 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromListOfRegisterStep(value: List<RegisterStep>?): String? = if (value == null) null else gson.toJson(value)
+
+    @TypeConverter
+    fun stringToAddress(value: String?): Address? = if (value == null) null else gson.fromJson(value)
+
+    @TypeConverter
+    fun stringFromAddress(value: Address?): String? = if (value == null) null else gson.toJson(value)
 
     // Message
     @TypeConverter

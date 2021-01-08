@@ -32,11 +32,16 @@ internal data class UserUpdateRequest(
     @SerializedName("last_name") val lastName: String? = null,
     @SerializedName("mobile_number") val mobileNumber: String? = null,
     @SerializedName("gender") val gender: Gender? = null,
-    @SerializedName("address") val currentAddress: Address? = null,
+    @SerializedName("address") val address: Address? = null,
+    @SerializedName("mailing_address") val mailingAddress: Address? = null,
     @SerializedName("household_size") val householdSize: Int? = null,
     @SerializedName("marital_status") val householdType: HouseholdType? = null,
     @SerializedName("occupation") val occupation: Occupation? = null,
     @SerializedName("industry") val industry: Industry? = null,
     @SerializedName("date_of_birth") val dateOfBirth: String? = null, // yyyy-MM or yyyy-MM-dd
-    @SerializedName("driver_license") val driverLicense: String? = null
+    @SerializedName("driver_license") val driverLicense: String? = null,
+    @SerializedName("foreign_tax") val foreignTax: Boolean? = null,
+    @SerializedName("tax_residency") val taxResidency: String? = null,
+    @SerializedName("tfn") val tfn: String? = null,
+    @SerializedName("tin") val tin: String? = null
 )

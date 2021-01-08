@@ -40,15 +40,19 @@ internal data class UserResponse(
     @SerializedName("facebook_id") val facebookId: String?,
     @SerializedName("attribution") val attribution: Attribution?,
     @SerializedName("last_name") val lastName: String?,
-    @SerializedName("mobile_number") var mobileNumber: String?,
+    @SerializedName("mobile_number") val mobileNumber: String?,
     @SerializedName("gender") val gender: Gender?,
-    @SerializedName("address") val currentAddress: Address?,
-    @SerializedName("previous_address") val previousAddress: Address?,
+    @SerializedName("address") val address: Address?,
+    @SerializedName("mailing_address") val mailingAddress: Address?,
     @SerializedName("household_size") val householdSize: Int?,
     @SerializedName("marital_status") val householdType: HouseholdType?,
     @SerializedName("occupation") val occupation: Occupation?,
     @SerializedName("industry") val industry: Industry?,
     @SerializedName("date_of_birth") val dateOfBirth: String?, // yyyy-MM or yyyy-MM-dd
     @SerializedName("driver_license") val driverLicense: String?,
-    @SerializedName("features") val features: List<FeatureFlag>?
+    @SerializedName("features") val features: List<FeatureFlag>?,
+    @SerializedName("foreign_tax") val foreignTax: Boolean?,
+    @SerializedName("tax_residency") val taxResidency: String?,
+    @SerializedName("tfn") val tfn: String?,
+    @SerializedName("tin") val tin: String?
 )

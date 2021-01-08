@@ -129,7 +129,7 @@ class UserManagement(
             lastName = lastName,
             email = email,
             password = password,
-            currentAddress = if (postcode?.isNotBlank() == true) Address(postcode = postcode) else null,
+            address = if (postcode?.isNotBlank() == true) Address(postcode = postcode) else null,
             mobileNumber = mobileNumber,
             dateOfBirth = dateOfBirth?.toString("yyyy-MM"),
             clientId = clientId

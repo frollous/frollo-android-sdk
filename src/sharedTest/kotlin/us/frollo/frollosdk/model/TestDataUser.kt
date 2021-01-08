@@ -51,15 +51,19 @@ internal fun testUserResponseData(userId: Long? = null): UserResponse {
         lastName = randomUUID(),
         mobileNumber = "0411111111",
         gender = Gender.MALE,
-        currentAddress = Address(lineOne = "41 McLaren Street", lineTwo = "Frollo Level 1", suburb = "North Sydney", postcode = "2060"),
-        previousAddress = Address(lineOne = "Bay 9 Middlemiss St", lineTwo = "Frollo Unit 13", suburb = "Lavender Bay", postcode = "2060"),
+        address = testAddressData(),
+        mailingAddress = testAddressData(),
         householdSize = 1,
         householdType = HouseholdType.SINGLE,
         occupation = Occupation.COMMUNITY_AND_PERSONAL_SERVICE_WORKERS,
         industry = Industry.ELECTRICITY_GAS_WATER_AND_WASTE_SERVICES,
         dateOfBirth = "1990-01",
         driverLicense = "12345678",
-        features = listOf(FeatureFlag(feature = "aggregation", enabled = true))
+        features = listOf(FeatureFlag(feature = "aggregation", enabled = true)),
+        foreignTax = false,
+        tin = "12345",
+        tfn = "12345678",
+        taxResidency = "AU"
     )
 }
 
@@ -79,15 +83,36 @@ internal fun UserResponse.testModifyUserResponseData(firstName: String): UserRes
         lastName = lastName,
         mobileNumber = mobileNumber,
         gender = gender,
-        currentAddress = currentAddress,
-        previousAddress = previousAddress,
+        address = testAddressData(),
+        mailingAddress = testAddressData(),
         householdSize = householdSize,
         householdType = householdType,
         occupation = occupation,
         industry = industry,
         dateOfBirth = dateOfBirth,
         driverLicense = driverLicense,
-        features = features
+        features = features,
+        foreignTax = false,
+        tin = "12345",
+        tfn = "12345678",
+        taxResidency = "AU"
+    )
+}
+
+internal fun testAddressData(): Address {
+    return Address(
+        buildingName = "100 Mount",
+        unitNumber = "Unit 3, Level 33",
+        streetNumber = "100",
+        streetName = "Mount",
+        streetType = "street",
+        suburb = "North Sydney",
+        town = "Sydney",
+        region = "Greater Sydney",
+        state = "NSW",
+        country = "AU",
+        postcode = "2060",
+        longForm = "Frollo, Level 33, 100 Mount St, North Sydney, NSW, 2060, Australia"
     )
 }
 
@@ -97,7 +122,7 @@ internal fun testValidRegisterData(): UserRegisterRequest {
         firstName = name,
         lastName = randomUUID(),
         mobileNumber = "0411111111",
-        currentAddress = Address(postcode = "2060"),
+        address = Address(postcode = "2060"),
         dateOfBirth = "1990-01",
         email = "$name@frollo.us",
         password = randomString(8),

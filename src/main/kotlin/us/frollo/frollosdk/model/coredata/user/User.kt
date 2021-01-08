@@ -17,7 +17,6 @@
 package us.frollo.frollosdk.model.coredata.user
 
 import androidx.room.ColumnInfo
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -77,11 +76,11 @@ data class User(
     /** Gender of the user (optional) */
     @ColumnInfo(name = "gender") var gender: Gender?,
 
-    /** Current address of the user */
-    @Embedded(prefix = "c_address_") var currentAddress: Address?,
+    /** Address of the user */
+    @ColumnInfo(name = "address") var address: Address?,
 
-    /** Previous address of the user */
-    @Embedded(prefix = "p_address_") var previousAddress: Address?,
+    /** Mailing address of the user */
+    @ColumnInfo(name = "mailing_address") var mailingAddress: Address?,
 
     /** Number of people in the household (optional) */
     @ColumnInfo(name = "household_size") var householdSize: Int?,
@@ -102,5 +101,17 @@ data class User(
     @ColumnInfo(name = "driver_license") var driverLicense: String?,
 
     /** A list of [FeatureFlag] decoded from a json array stored in the database. (Optional) */
-    @ColumnInfo(name = "features") val features: List<FeatureFlag>?
+    @ColumnInfo(name = "features") val features: List<FeatureFlag>?,
+
+    /** Foreign tax user (optional) */
+    @ColumnInfo(name = "foreign_tax") var foreignTax: Boolean?,
+
+    /** Tax residency (optional) */
+    @ColumnInfo(name = "tax_residency") var taxResidency: String?,
+
+    /** Tax file number (optional) */
+    @ColumnInfo(name = "tfn") var tfn: String?,
+
+    /** Tax identification number (optional) */
+    @ColumnInfo(name = "tin") var tin: String?
 )

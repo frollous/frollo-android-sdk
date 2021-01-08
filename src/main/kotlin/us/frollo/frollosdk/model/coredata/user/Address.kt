@@ -16,19 +16,35 @@
 
 package us.frollo.frollosdk.model.coredata.user
 
-import androidx.room.ColumnInfo
 import com.google.gson.annotations.SerializedName
 
 /**
  * Address of the user
  */
 data class Address(
-    /** Address first line of the user (optional) */
-    @ColumnInfo(name = "line_1") @SerializedName("line_1") var lineOne: String? = null,
-    /** Address second line of the user (optional) */
-    @ColumnInfo(name = "line_2") @SerializedName("line_2") var lineTwo: String? = null,
-    /** Suburb of the user (optional) */
-    @ColumnInfo(name = "suburb") @SerializedName("suburb") var suburb: String? = null,
-    /** Postcode (optional) */
-    @ColumnInfo(name = "postcode") @SerializedName("postcode") var postcode: String? = null
+
+    /** Address building name. (Optional) */
+    @SerializedName("building_name") var buildingName: String? = null,
+    /** Address unit number. (Optional) */
+    @SerializedName("unit_number") var unitNumber: String? = null,
+    /** Address street number. (Optional) */
+    @SerializedName("street_number") var streetNumber: String? = null,
+    /** Address street name. (Optional) */
+    @SerializedName("street_name") var streetName: String? = null,
+    /** Address street type. (Optional) */
+    @SerializedName("street_type") var streetType: String? = null,
+    /** Address suburb name. (Optional) */
+    @SerializedName("suburb") var suburb: String? = null,
+    /** Address town name. (Optional) */
+    @SerializedName("town") var town: String? = null,
+    /** Address region. (Optional) */
+    @SerializedName("region") var region: String? = null,
+    /** Address state. (Optional) */
+    @SerializedName("state") var state: String? = null,
+    /** Address country. (Optional) */
+    @SerializedName("country") var country: String? = null,
+    /** Address postcode. (Optional) */
+    @SerializedName("postal_code") var postcode: String? = null,
+    /** Full address in formatted form. (Optional) */
+    @SerializedName("long_form") var longForm: String? = null,
 )

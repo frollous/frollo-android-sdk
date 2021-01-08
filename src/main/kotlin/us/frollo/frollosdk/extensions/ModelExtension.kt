@@ -62,13 +62,18 @@ internal fun User.updateRequest(): UserUpdateRequest =
         lastName = lastName,
         mobileNumber = mobileNumber,
         gender = gender,
-        currentAddress = currentAddress,
+        address = address,
+        mailingAddress = mailingAddress,
         householdSize = householdSize,
         householdType = householdType,
         occupation = occupation,
         industry = industry,
         dateOfBirth = dateOfBirth,
-        driverLicense = driverLicense
+        driverLicense = driverLicense,
+        foreignTax = foreignTax,
+        taxResidency = taxResidency,
+        tfn = tfn,
+        tin = tin
     )
 
 internal fun sqlForMessages(messageTypes: List<String>? = null, read: Boolean? = null, contentType: ContentType? = null): SimpleSQLiteQuery {

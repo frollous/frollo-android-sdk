@@ -39,13 +39,17 @@ import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.api.device.DeviceUpdateRequest
 import us.frollo.frollosdk.model.api.user.UserChangePasswordRequest
+import us.frollo.frollosdk.model.api.user.UserConfirmDetailsRequest
 import us.frollo.frollosdk.model.api.user.UserMigrationRequest
+import us.frollo.frollosdk.model.api.user.UserOTPRequest
 import us.frollo.frollosdk.model.api.user.UserRegisterRequest
 import us.frollo.frollosdk.model.api.user.UserResetPasswordRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
+import us.frollo.frollosdk.model.api.user.UserUnconfirmedDetailsResponse
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
 import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.model.coredata.user.Attribution
+import us.frollo.frollosdk.model.coredata.user.OtpMethodType
 import us.frollo.frollosdk.model.coredata.user.User
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.DeviceAPI
@@ -151,10 +155,12 @@ class UserManagement(
     /**
      * Updates the user details on the server. This should be called whenever details or statistics about a user are to be altered, e.g. changing email.
      *
+     * @param user user data to be updated
+     * @param securityCode Verification Code / OTP for updating sensitive information
      * @param completion A completion handler once the API has returned and the cache has been updated. Returns any error that occurred during the process.
      */
-    fun updateUser(user: User, completion: OnFrolloSDKCompletionListener<Result>) {
-        userAPI.updateUser(user.updateRequest()).enqueue { resource ->
+    fun updateUser(user: User, securityCode: String? = null, completion: OnFrolloSDKCompletionListener<Result>) {
+        userAPI.updateUser(user.updateRequest(), otp = securityCode).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#updateUser", resource.error?.localizedDescription)
@@ -340,6 +346,66 @@ class UserManagement(
         } else {
             val error = DataError(type = DataErrorType.API, subType = DataErrorSubType.PASSWORD_TOO_SHORT)
             completion.invoke(Result.error(error))
+        }
+    }
+
+    /**
+     * Request new OTP for the user.
+     *
+     * @param method Method by which the OTP will be sent to the user. eg. SMS
+     * @param completion A completion handler once the API has returned. Returns any error that occurred during the process.
+     */
+    fun requestNewOtp(method: OtpMethodType, completion: OnFrolloSDKCompletionListener<Result>) {
+        userAPI.requestOtp(UserOTPRequest(method)).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#requestNewOtp", resource.error?.localizedDescription)
+                    completion.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    completion.invoke(Result.success())
+                }
+            }
+        }
+    }
+
+    /**
+     * Fetch all the unconfirmed user details from the host.
+     *
+     * @param completion A completion handler once the API has returned. Returns any error that occurred during the process else Resource<UserUnconfirmedDetailsResponse> if success.
+     */
+    fun fetchUnconfirmedUserDetails(completion: OnFrolloSDKCompletionListener<Resource<UserUnconfirmedDetailsResponse>>) {
+        userAPI.fetchUnconfirmedUserDetails().enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#fetchUnconfirmedUserDetails", resource.error?.localizedDescription)
+                    completion.invoke(resource)
+                }
+                Resource.Status.SUCCESS -> {
+                    completion.invoke(resource)
+                }
+            }
+        }
+    }
+
+    /**
+     * Confirm user details.
+     *
+     * @param mobileNumber Mobile number to be confirmed/ verified
+     * @param securityCode Verification code/OTP for confirming sensitive information
+     * @param completion A completion handler once the API has returned. Returns any error that occurred during the process.
+     */
+    fun confirmUserDetails(mobileNumber: String, securityCode: String? = null, completion: OnFrolloSDKCompletionListener<Result>) {
+        userAPI.confirmUserDetails(UserConfirmDetailsRequest(mobileNumber), otp = securityCode).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#confirmUserDetails", resource.error?.localizedDescription)
+                    completion.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    completion.invoke(Result.success())
+                }
+            }
         }
     }
 

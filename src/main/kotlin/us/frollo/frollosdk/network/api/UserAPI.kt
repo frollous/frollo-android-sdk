@@ -20,14 +20,19 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import us.frollo.frollosdk.model.api.user.UserChangePasswordRequest
+import us.frollo.frollosdk.model.api.user.UserConfirmDetailsRequest
 import us.frollo.frollosdk.model.api.user.UserMigrationRequest
+import us.frollo.frollosdk.model.api.user.UserOTPRequest
 import us.frollo.frollosdk.model.api.user.UserRegisterRequest
 import us.frollo.frollosdk.model.api.user.UserResetPasswordRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
+import us.frollo.frollosdk.model.api.user.UserUnconfirmedDetailsResponse
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
+import us.frollo.frollosdk.network.NetworkHelper
 
 internal interface UserAPI {
     companion object {
@@ -37,6 +42,8 @@ internal interface UserAPI {
         const val URL_CHANGE_PASSWORD = "user"
         const val URL_DELETE_USER = "user"
         const val URL_MIGRATE_USER = "user/migrate"
+        const val URL_REQUEST_OTP = "user/otp"
+        const val URL_CONFIRM_DETAILS = "user/details/confirm"
     }
 
     @POST(URL_REGISTER)
@@ -46,7 +53,7 @@ internal interface UserAPI {
     fun fetchUser(): Call<UserResponse>
 
     @PUT(URL_USER_DETAILS)
-    fun updateUser(@Body request: UserUpdateRequest): Call<UserResponse>
+    fun updateUser(@Body request: UserUpdateRequest, @Header(NetworkHelper.HEADER_OTP) otp: String? = null): Call<UserResponse>
 
     @POST(URL_PASSWORD_RESET)
     fun resetPassword(@Body request: UserResetPasswordRequest): Call<Void>
@@ -59,4 +66,13 @@ internal interface UserAPI {
 
     @POST(URL_MIGRATE_USER)
     fun migrateUser(@Body request: UserMigrationRequest): Call<Void>
+
+    @POST(URL_REQUEST_OTP)
+    fun requestOtp(@Body request: UserOTPRequest): Call<Void>
+
+    @GET(URL_CONFIRM_DETAILS)
+    fun fetchUnconfirmedUserDetails(): Call<UserUnconfirmedDetailsResponse>
+
+    @PUT(URL_CONFIRM_DETAILS)
+    fun confirmUserDetails(@Body request: UserConfirmDetailsRequest, @Header(NetworkHelper.HEADER_OTP) otp: String?): Call<Void>
 }

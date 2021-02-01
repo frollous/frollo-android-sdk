@@ -1,5 +1,11 @@
 ## Changelog
 
+### 3.7.0
+
+#### Changes
+
+- Request OTP and verify user mobile number
+
 ### 3.6.0
 
 #### Features

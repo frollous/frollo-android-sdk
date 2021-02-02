@@ -1,7 +1,6 @@
 package us.frollo.frollosdk.model.coredata.contacts
 
 import com.google.gson.annotations.SerializedName
-import us.frollo.frollosdk.model.IAdapterModel
 import java.io.Serializable
 
 /** Represents the payment details of a contact */

@@ -3,16 +3,17 @@ package us.frollo.frollosdk.model.coredata.contacts
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
-enum class ContactBillerCRNType {
+/** Indicates the type of the Biller CRN */
+enum class CRNType {
 
-    /** PayID type is telephone */
-    @SerializedName("fixed_crn") FIXED_CRN,
+    /** Fixed */
+    @SerializedName("fixed_crn") FIXED,
 
-    /** PayID type is email */
-    @SerializedName("variable_crn") VARIABLE_CRN,
+    /** Variable */
+    @SerializedName("variable_crn") VARIABLE,
 
-    /** PayID type is org identifier*/
-    @SerializedName("intelligent_crn") INTELLIGENT_CRN;
+    /** Intelligent */
+    @SerializedName("intelligent_crn") INTELLIGENT;
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

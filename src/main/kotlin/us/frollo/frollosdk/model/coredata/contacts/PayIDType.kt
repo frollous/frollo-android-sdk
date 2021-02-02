@@ -3,17 +3,19 @@ package us.frollo.frollosdk.model.coredata.contacts
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
-enum class ContactPayIdType {
+/** Indicates the type of the Pay ID */
+enum class PayIDType {
+
     /** PayID type is telephone */
-    @SerializedName("telephone") TELEPHONE,
+    @SerializedName("telephone") PHONE_NUMBER,
 
     /** PayID type is email */
     @SerializedName("email") EMAIL,
 
     /** PayID type is org identifier*/
-    @SerializedName("org_identifier") ORG_IDENTIFIER,
+    @SerializedName("org_identifier") ORGANISATION_ID,
 
-    /** PayID type is abn */
+    /** PayID type is ABN */
     @SerializedName("abn") ABN;
 
     /** Enum to serialized string */

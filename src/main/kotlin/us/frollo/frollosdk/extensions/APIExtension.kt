@@ -24,6 +24,7 @@ import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummar
 import us.frollo.frollosdk.model.api.bills.BillPaymentResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetPeriodResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
+import us.frollo.frollosdk.model.api.contacts.ContactResponse
 import us.frollo.frollosdk.model.api.goals.GoalResponse
 import us.frollo.frollosdk.model.api.images.ImageResponse
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
@@ -34,6 +35,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.CDRProduct
 import us.frollo.frollosdk.model.coredata.aggregation.providers.CDRProductCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionFilter
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
+import us.frollo.frollosdk.model.coredata.contacts.PaymentMethod
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
@@ -45,6 +47,7 @@ import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.network.api.BillsAPI
 import us.frollo.frollosdk.network.api.BudgetsAPI
 import us.frollo.frollosdk.network.api.CdrAPI
+import us.frollo.frollosdk.network.api.ContactsAPI
 import us.frollo.frollosdk.network.api.GoalsAPI
 import us.frollo.frollosdk.network.api.ImagesAPI
 import us.frollo.frollosdk.network.api.ReportsAPI
@@ -265,4 +268,12 @@ internal fun CdrAPI.fetchProducts(
     productCategory?.let { queryMap["product_category"] = it.toString() }
     productName?.let { queryMap["name"] = it }
     return fetchProducts(queryMap)
+}
+
+// Contacts
+
+internal fun ContactsAPI.fetchContacts(paymentMethod: PaymentMethod? = null): Call<PaginatedResponse<ContactResponse>> {
+    val queryMap = mutableMapOf<String, String>()
+    paymentMethod?.let { queryMap["type"] = paymentMethod.toString() }
+    return fetchContacts(queryMap)
 }

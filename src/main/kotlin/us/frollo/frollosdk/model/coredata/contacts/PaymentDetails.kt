@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 /** Represents the payment details of a contact */
+/* NOTE: Any update to PaymentDetails ensure you update ContactDeserializer & ContactSerializer */
 sealed class PaymentDetails : Serializable {
 
     /** Represents the payment details of a PayAnyone contact */
@@ -54,4 +55,19 @@ sealed class PaymentDetails : Serializable {
         /** Bank details of the contact */
         @SerializedName("bank_details") val bankDetails: BankDetails
     ) : PaymentDetails()
+
+    companion object {
+        internal fun jsonIsPayAnyone(json: String): Boolean {
+            return json.contains("account_number") && json.contains("bsb")
+        }
+        internal fun jsonIsBiller(json: String): Boolean {
+            return json.contains("biller_code") && json.contains("crn")
+        }
+        internal fun jsonIsPayID(json: String): Boolean {
+            return json.contains("payid") && json.contains("id_type")
+        }
+        internal fun jsonIsInternational(json: String): Boolean {
+            return json.contains("beneficiary") && json.contains("bank_details")
+        }
+    }
 }

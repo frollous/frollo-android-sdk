@@ -9,5 +9,5 @@ internal data class ContactCreateUpdateRequest(
     @SerializedName("nick_name") val nickName: String,
     @SerializedName("description") val description: String?,
     @SerializedName("payment_method") val paymentMethod: PaymentMethod,
-    @SerializedName("payment_details") val paymentDetails: PaymentDetails
+    @SerializedName("payment_details") val paymentDetails: PaymentDetails? // NOTE: Any update to paymentDetails field ensure you update ContactSerializer
 )

@@ -44,7 +44,7 @@ data class Contact(
     /** Payment Method of the contact */
     @ColumnInfo(name = "payment_method") var paymentMethod: PaymentMethod,
 
-    /** Payment Details of the contact  */
-    @ColumnInfo(name = "payment_details") var paymentDetails: PaymentDetails
+    /** Payment Details of the contact */
+    @ColumnInfo(name = "payment_details") var paymentDetails: PaymentDetails?
 
 ) : IAdapterModel

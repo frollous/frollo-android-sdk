@@ -58,6 +58,8 @@ import us.frollo.frollosdk.model.coredata.cdr.CDRPermission
 import us.frollo.frollosdk.model.coredata.cdr.CDRPermissionDetail
 import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
 import us.frollo.frollosdk.model.coredata.cdr.SharingDuration
+import us.frollo.frollosdk.model.coredata.contacts.PaymentDetails
+import us.frollo.frollosdk.model.coredata.contacts.PaymentMethod
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -480,4 +482,49 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromListOfSharingDuration(value: List<SharingDuration>?): String? = if (value == null) null else gson.toJson(value)
+
+    // Contact
+
+    @TypeConverter
+    fun stringToPaymentMethod(value: String?): PaymentMethod? = if (value == null) PaymentMethod.PAY_ANYONE else PaymentMethod.valueOf(value)
+
+    @TypeConverter
+    fun stringFromPaymentMethod(value: PaymentMethod?): String? = value?.name ?: PaymentMethod.PAY_ANYONE.name
+
+    @TypeConverter
+    fun stringToPaymentDetails(value: String?): PaymentDetails? {
+        return value?.let {
+            when {
+                PaymentDetails.jsonIsPayAnyone(it) -> {
+                    gson.fromJson<PaymentDetails.PayAnyone>(it)
+                }
+                PaymentDetails.jsonIsBiller(it) -> {
+                    gson.fromJson<PaymentDetails.Biller>(it)
+                }
+                PaymentDetails.jsonIsPayID(it) -> {
+                    gson.fromJson<PaymentDetails.PayID>(it)
+                }
+                PaymentDetails.jsonIsInternational(it) -> {
+                    gson.fromJson<PaymentDetails.International>(it)
+                }
+                else -> {
+                    null
+                }
+            }
+        }
+    }
+
+    @TypeConverter
+    fun stringFromPaymentDetails(value: PaymentDetails?): String? {
+        return value?.let {
+            when (it) {
+                is PaymentDetails.PayAnyone,
+                is PaymentDetails.Biller,
+                is PaymentDetails.PayID,
+                is PaymentDetails.International -> {
+                    gson.toJson(it)
+                }
+            }
+        }
+    }
 }

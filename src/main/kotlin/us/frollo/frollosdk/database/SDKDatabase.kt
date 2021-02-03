@@ -30,6 +30,7 @@ import us.frollo.frollosdk.database.dao.BudgetDao
 import us.frollo.frollosdk.database.dao.BudgetPeriodDao
 import us.frollo.frollosdk.database.dao.CDRConfigurationDao
 import us.frollo.frollosdk.database.dao.ConsentDao
+import us.frollo.frollosdk.database.dao.ContactDao
 import us.frollo.frollosdk.database.dao.GoalDao
 import us.frollo.frollosdk.database.dao.GoalPeriodDao
 import us.frollo.frollosdk.database.dao.ImageDao
@@ -56,6 +57,7 @@ import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
 import us.frollo.frollosdk.model.coredata.cdr.CDRConfiguration
 import us.frollo.frollosdk.model.coredata.cdr.Consent
+import us.frollo.frollosdk.model.coredata.contacts.Contact
 import us.frollo.frollosdk.model.coredata.goals.Goal
 import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
 import us.frollo.frollosdk.model.coredata.images.Image
@@ -82,9 +84,10 @@ import us.frollo.frollosdk.model.coredata.user.User
         BudgetPeriod::class,
         Image::class,
         Consent::class,
-        CDRConfiguration::class
+        CDRConfiguration::class,
+        Contact::class
     ],
-    version = 10, exportSchema = true
+    version = 11, exportSchema = true
 )
 
 @TypeConverters(Converters::class)
@@ -109,6 +112,7 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun images(): ImageDao
     internal abstract fun consents(): ConsentDao
     internal abstract fun cdrConfiguration(): CDRConfigurationDao
+    internal abstract fun contacts(): ContactDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"
@@ -126,7 +130,7 @@ abstract class SDKDatabase : RoomDatabase() {
             Room.databaseBuilder(context, SDKDatabase::class.java, DATABASE_NAME)
                 .allowMainThreadQueries() // Needed for some tests
                 // .fallbackToDestructiveMigration()
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
                 .build()
 
         // Copy-paste of auto-generated SQLs from room schema json file
@@ -459,6 +463,12 @@ abstract class SDKDatabase : RoomDatabase() {
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_user_user_id` ON `user` (`user_id`)")
                 database.execSQL("COMMIT")
                 // END - Drop column register_complete and add column register_steps
+            }
+        }
+
+        private val MIGRATION_10_11: Migration = object : Migration(10, 11) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // TODO: To be implemented
             }
         }
     }

@@ -34,6 +34,10 @@ import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.base.LiveDataCallAdapterFactory
 import us.frollo.frollosdk.core.AppInfo
 import us.frollo.frollosdk.keystore.Keystore
+import us.frollo.frollosdk.model.api.contacts.ContactCreateUpdateRequest
+import us.frollo.frollosdk.model.coredata.contacts.Contact
+import us.frollo.frollosdk.network.deserializer.ContactDeserializer
+import us.frollo.frollosdk.network.serializer.ContactRequestSerializer
 import us.frollo.frollosdk.preferences.Preferences
 
 class NetworkService internal constructor(
@@ -78,6 +82,8 @@ class NetworkService internal constructor(
 
     private fun createRetrofit(baseUrl: String, isTokenEndpoint: Boolean): Retrofit {
         val gson = GsonBuilder()
+            .registerTypeAdapter(Contact::class.java, ContactDeserializer)
+            .registerTypeAdapter(ContactCreateUpdateRequest::class.java, ContactRequestSerializer)
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .enableComplexMapKeySerialization()
             .create()

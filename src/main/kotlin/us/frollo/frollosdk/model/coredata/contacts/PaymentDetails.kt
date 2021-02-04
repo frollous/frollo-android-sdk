@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 /** Represents the payment details of a contact */
-/* NOTE: Any update to PaymentDetails ensure you update ContactDeserializer & ContactSerializer */
+/* NOTE: Any update to PaymentDetails ensure you update ContactResponseDeserializer & ContactRequestSerializer */
 sealed class PaymentDetails : Serializable {
 
     /** Represents the payment details of a PayAnyone contact */
@@ -43,7 +43,7 @@ sealed class PaymentDetails : Serializable {
         @SerializedName("name") var name: String?,
 
         /** The payId type of the contact */
-        @SerializedName("id_type") var idType: PayIDType
+        @SerializedName("type") var type: PayIDType
     ) : PaymentDetails()
 
     /** Represents the payment details of a International Payment contact */
@@ -64,7 +64,7 @@ sealed class PaymentDetails : Serializable {
             return json.contains("biller_code") && json.contains("crn")
         }
         internal fun jsonIsPayID(json: String): Boolean {
-            return json.contains("payid") && json.contains("id_type")
+            return json.contains("payid") && json.contains("type")
         }
         internal fun jsonIsInternational(json: String): Boolean {
             return json.contains("beneficiary") && json.contains("bank_details")

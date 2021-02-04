@@ -14,5 +14,8 @@ internal data class ContactResponse(
     @SerializedName("nick_name") val nickName: String,
     @SerializedName("description") val description: String?,
     @SerializedName("payment_method") val paymentMethod: PaymentMethod,
-    @SerializedName("payment_details") val paymentDetails: PaymentDetails? // NOTE: Any update to paymentDetails field ensure you update ContactDeserializer
+
+    // DO NOT add @SerializedName("payment_details") to this field as it cannot be directly
+    // de-serialized as PaymentDetails is abstract and hence we are using ContactResponseDeserializer to initialize this field
+    var paymentDetails: PaymentDetails? // NOTE: Any update to paymentDetails field ensure you update ContactResponseDeserializer
 )

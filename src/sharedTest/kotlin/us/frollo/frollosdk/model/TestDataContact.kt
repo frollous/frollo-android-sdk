@@ -77,7 +77,7 @@ internal fun testPayIDDetailsData(): PaymentDetails.PayID {
     return PaymentDetails.PayID(
         name = randomString(20),
         payId = randomString(20),
-        idType = PayIDType.values().randomElement()
+        type = PayIDType.values().randomElement()
     )
 }
 

@@ -1252,12 +1252,12 @@ class ConvertersTest {
         assertEquals("Tenstra Inc", billerDetails?.billerName)
         assertEquals(CRNType.FIXED, billerDetails?.crnType)
 
-        val payIDJson = "{\"name\":\"J GILBERT\",\"payid\":\"j.gilbert@frollo.com\",\"id_type\":\"email\"}"
+        val payIDJson = "{\"name\":\"J GILBERT\",\"payid\":\"j.gilbert@frollo.com\",\"type\":\"email\"}"
         val payIDDetails = Converters.instance.stringToPaymentDetails(payIDJson) as? PaymentDetails.PayID
         assertNotNull(payIDDetails)
         assertEquals("j.gilbert@frollo.com", payIDDetails?.payId)
         assertEquals("J GILBERT", payIDDetails?.name)
-        assertEquals(PayIDType.EMAIL, payIDDetails?.idType)
+        assertEquals(PayIDType.EMAIL, payIDDetails?.type)
 
         val internationalJson = "{\"beneficiary\":{\"name\":\"Anne Maria\",\"country\":\"New Zeland\",\"message\":\"Test message new\"},\"bank_details\":{\"country\":\"New Zeland\",\"account_number\":\"12345666\",\"bank_address\":{\"address\":\"ABC 666\"},\"bic\":\"777\",\"fed_wire_number\":\"1234566\",\"sort_code\":\"666\",\"chip_number\":\"555\",\"routing_number\":\"444\",\"legal_entity_identifier\":\"123666\"}}"
         val internationalDetails = Converters.instance.stringToPaymentDetails(internationalJson) as? PaymentDetails.International
@@ -1300,10 +1300,10 @@ class ConvertersTest {
         val payIDDetails = PaymentDetails.PayID(
             name = "J GILBERT",
             payId = "j.gilbert@frollo.com",
-            idType = PayIDType.EMAIL
+            type = PayIDType.EMAIL
         )
         val payIDJson = Converters.instance.stringFromPaymentDetails(payIDDetails)
-        assertEquals("{\"payid\":\"j.gilbert@frollo.com\",\"name\":\"J GILBERT\",\"id_type\":\"email\"}", payIDJson)
+        assertEquals("{\"payid\":\"j.gilbert@frollo.com\",\"name\":\"J GILBERT\",\"type\":\"email\"}", payIDJson)
 
         val internationalDetails = PaymentDetails.International(
             beneficiary = Beneficiary(

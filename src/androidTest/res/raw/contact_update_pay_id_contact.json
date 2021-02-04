@@ -2,7 +2,7 @@
     "id": 4,
     "name": "Johnathan Gilbert",
     "nick_name": "Johnny",
-    "payment_method": "payid",
+    "payment_method": "pay_id",
     "payment_details": {
         "name": "J GILBERT",
         "payid": "j.gilbert@frollo.com",

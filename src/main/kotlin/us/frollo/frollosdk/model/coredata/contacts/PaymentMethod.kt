@@ -12,7 +12,7 @@ enum class PaymentMethod {
     @SerializedName("pay_anyone") PAY_ANYONE,
 
     /** Pay ID type */
-    @SerializedName("payid") PAY_ID,
+    @SerializedName("pay_id") PAY_ID,
 
     /** BPay type */
     @SerializedName("bpay") BPAY,

@@ -94,7 +94,7 @@ class ContactRequestSerializerTest {
         val jsonObject = ContactRequestSerializer.serialize(payIDRequest, ContactCreateUpdateRequest::class.java, null).asJsonObject
         assertEquals("Johnathan Gilbert", jsonObject["name"].toStringTrimmed())
         assertEquals("Johnny", jsonObject["nick_name"].toStringTrimmed())
-        assertEquals("payid", jsonObject["payment_method"].toStringTrimmed())
+        assertEquals("pay_id", jsonObject["payment_method"].toStringTrimmed())
         assertNull(jsonObject["description"])
         val paymentDetailsJsonObject = jsonObject["payment_details"].asJsonObject
         assertEquals("j.gilbert@frollo.com", paymentDetailsJsonObject["payid"].toStringTrimmed())

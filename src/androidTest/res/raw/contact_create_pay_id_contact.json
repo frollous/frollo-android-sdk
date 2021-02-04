@@ -2,7 +2,7 @@
     "id": 4,
     "name": "Johnathan Smith",
     "nick_name": "Johnny Boy",
-    "payment_method": "payid",
+    "payment_method": "pay_id",
     "payment_details": {
         "name": "J SMITH",
         "payid": "0412345678",

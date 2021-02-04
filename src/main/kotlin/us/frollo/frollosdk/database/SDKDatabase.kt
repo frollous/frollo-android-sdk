@@ -468,7 +468,10 @@ abstract class SDKDatabase : RoomDatabase() {
 
         private val MIGRATION_10_11: Migration = object : Migration(10, 11) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                // TODO: To be implemented
+                // New changes in this migration:
+                // 1) New table - contact
+                database.execSQL("CREATE TABLE IF NOT EXISTS `contact` (`contact_id` INTEGER NOT NULL, `created_date` TEXT NOT NULL, `modified_date` TEXT NOT NULL, `verified` INTEGER NOT NULL, `related_provider_account_ids` TEXT, `name` TEXT NOT NULL, `nick_name` TEXT NOT NULL, `description` TEXT, `payment_method` TEXT NOT NULL, `payment_details` TEXT, PRIMARY KEY(`contact_id`))")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_contact_contact_id` ON `contact` (`contact_id`)")
             }
         }
     }

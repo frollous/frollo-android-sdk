@@ -58,6 +58,13 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.cdr.CDRPermissionDetail
 import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
 import us.frollo.frollosdk.model.coredata.cdr.SharingDuration
+import us.frollo.frollosdk.model.coredata.contacts.BankAddress
+import us.frollo.frollosdk.model.coredata.contacts.BankDetails
+import us.frollo.frollosdk.model.coredata.contacts.Beneficiary
+import us.frollo.frollosdk.model.coredata.contacts.CRNType
+import us.frollo.frollosdk.model.coredata.contacts.PayIDType
+import us.frollo.frollosdk.model.coredata.contacts.PaymentDetails
+import us.frollo.frollosdk.model.coredata.contacts.PaymentMethod
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -1210,5 +1217,115 @@ class ConvertersTest {
         )
         val json = Converters.instance.stringFromListOfSharingDuration(info)
         assertEquals("[{\"duration\":1234500,\"description\":\"Account Details\",\"image_url\":\"http://app.image.png\"},{\"duration\":2345678,\"description\":\"Transaction Details\",\"image_url\":\"http://app.image.png\"}]", json)
+    }
+
+    @Test
+    fun testStringToPaymentMethod() {
+        val status = Converters.instance.stringToPaymentMethod("BPAY")
+        assertEquals(PaymentMethod.BPAY, status)
+
+        assertEquals(PaymentMethod.PAY_ANYONE, Converters.instance.stringToPaymentMethod(null))
+    }
+
+    @Test
+    fun testStringFromPaymentMethod() {
+        val str = Converters.instance.stringFromPaymentMethod(PaymentMethod.BPAY)
+        assertEquals("BPAY", str)
+
+        assertEquals("PAY_ANYONE", Converters.instance.stringFromPaymentMethod(null))
+    }
+
+    @Test
+    fun testStringToPaymentDetails() {
+        val payAnyoneJson = "{\"account_holder\":\"Mr Johnathan Smith\",\"bsb\":\"100-123\",\"account_number\":\"12345678\"}"
+        val payAnyoneDetails = Converters.instance.stringToPaymentDetails(payAnyoneJson) as? PaymentDetails.PayAnyone
+        assertNotNull(payAnyoneDetails)
+        assertEquals("Mr Johnathan Smith", payAnyoneDetails?.accountHolder)
+        assertEquals("12345678", payAnyoneDetails?.accountNumber)
+        assertEquals("100-123", payAnyoneDetails?.bsb)
+
+        val billerJson = "{\"biller_code\":\"2275362\",\"crn\":\"723647803\",\"biller_name\":\"Tenstra Inc\",\"crn_type\":\"fixed_crn\"}"
+        val billerDetails = Converters.instance.stringToPaymentDetails(billerJson) as? PaymentDetails.Biller
+        assertNotNull(billerDetails)
+        assertEquals("2275362", billerDetails?.billerCode)
+        assertEquals("723647803", billerDetails?.crn)
+        assertEquals("Tenstra Inc", billerDetails?.billerName)
+        assertEquals(CRNType.FIXED, billerDetails?.crnType)
+
+        val payIDJson = "{\"name\":\"J GILBERT\",\"payid\":\"j.gilbert@frollo.com\",\"type\":\"email\"}"
+        val payIDDetails = Converters.instance.stringToPaymentDetails(payIDJson) as? PaymentDetails.PayID
+        assertNotNull(payIDDetails)
+        assertEquals("j.gilbert@frollo.com", payIDDetails?.payId)
+        assertEquals("J GILBERT", payIDDetails?.name)
+        assertEquals(PayIDType.EMAIL, payIDDetails?.type)
+
+        val internationalJson = "{\"beneficiary\":{\"name\":\"Anne Maria\",\"country\":\"New Zeland\",\"message\":\"Test message new\"},\"bank_details\":{\"country\":\"New Zeland\",\"account_number\":\"12345666\",\"bank_address\":{\"address\":\"ABC 666\"},\"bic\":\"777\",\"fed_wire_number\":\"1234566\",\"sort_code\":\"666\",\"chip_number\":\"555\",\"routing_number\":\"444\",\"legal_entity_identifier\":\"123666\"}}"
+        val internationalDetails = Converters.instance.stringToPaymentDetails(internationalJson) as? PaymentDetails.International
+        assertNotNull(internationalDetails)
+        assertEquals("Anne Maria", internationalDetails?.beneficiary?.name)
+        assertEquals("New Zeland", internationalDetails?.beneficiary?.country)
+        assertEquals("Test message new", internationalDetails?.beneficiary?.message)
+        assertEquals("New Zeland", internationalDetails?.bankDetails?.country)
+        assertEquals("12345666", internationalDetails?.bankDetails?.accountNumber)
+        assertEquals("ABC 666", internationalDetails?.bankDetails?.bankAddress?.address)
+        assertEquals("777", internationalDetails?.bankDetails?.bic)
+        assertEquals("1234566", internationalDetails?.bankDetails?.fedWireNumber)
+        assertEquals("666", internationalDetails?.bankDetails?.sortCode)
+        assertEquals("555", internationalDetails?.bankDetails?.chipNumber)
+        assertEquals("444", internationalDetails?.bankDetails?.routingNumber)
+        assertEquals("123666", internationalDetails?.bankDetails?.legalEntityIdentifier)
+
+        assertNull(Converters.instance.stringToPaymentDetails(null))
+    }
+
+    @Test
+    fun testStringFromPaymentDetails() {
+        val payAnyoneDetails = PaymentDetails.PayAnyone(
+            accountHolder = "Mr Johnathan Smith",
+            accountNumber = "12345678",
+            bsb = "100-123"
+        )
+        val payAnyoneJson = Converters.instance.stringFromPaymentDetails(payAnyoneDetails)
+        assertEquals("{\"account_holder\":\"Mr Johnathan Smith\",\"bsb\":\"100-123\",\"account_number\":\"12345678\"}", payAnyoneJson)
+
+        val billerDetails = PaymentDetails.Biller(
+            billerCode = "2275362",
+            crn = "723647803",
+            billerName = "Tenstra Inc",
+            crnType = CRNType.FIXED
+        )
+        val billerJson = Converters.instance.stringFromPaymentDetails(billerDetails)
+        assertEquals("{\"biller_code\":\"2275362\",\"crn\":\"723647803\",\"biller_name\":\"Tenstra Inc\",\"crn_type\":\"fixed_crn\"}", billerJson)
+
+        val payIDDetails = PaymentDetails.PayID(
+            name = "J GILBERT",
+            payId = "j.gilbert@frollo.com",
+            type = PayIDType.EMAIL
+        )
+        val payIDJson = Converters.instance.stringFromPaymentDetails(payIDDetails)
+        assertEquals("{\"payid\":\"j.gilbert@frollo.com\",\"name\":\"J GILBERT\",\"type\":\"email\"}", payIDJson)
+
+        val internationalDetails = PaymentDetails.International(
+            beneficiary = Beneficiary(
+                name = "Anne Maria",
+                country = "New Zeland",
+                message = "Test message new"
+            ),
+            bankDetails = BankDetails(
+                country = "New Zeland",
+                accountNumber = "12345666",
+                bankAddress = BankAddress(
+                    address = "ABC 666"
+                ),
+                bic = "777",
+                fedWireNumber = "1234566",
+                sortCode = "666",
+                chipNumber = "555",
+                routingNumber = "444",
+                legalEntityIdentifier = "123666"
+            )
+        )
+        val internationalJson = Converters.instance.stringFromPaymentDetails(internationalDetails)
+        assertEquals("{\"beneficiary\":{\"name\":\"Anne Maria\",\"country\":\"New Zeland\",\"message\":\"Test message new\"},\"bank_details\":{\"country\":\"New Zeland\",\"account_number\":\"12345666\",\"bank_address\":{\"address\":\"ABC 666\"},\"bic\":\"777\",\"fed_wire_number\":\"1234566\",\"sort_code\":\"666\",\"chip_number\":\"555\",\"routing_number\":\"444\",\"legal_entity_identifier\":\"123666\"}}", internationalJson)
     }
 }

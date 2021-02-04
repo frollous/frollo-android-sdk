@@ -19,6 +19,7 @@ package us.frollo.frollosdk.testutils
 import android.content.Context
 import android.util.Log
 import androidx.annotation.RawRes
+import com.google.gson.JsonElement
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 import org.threeten.bp.LocalDateTime
@@ -106,4 +107,8 @@ fun String.getDateTimeStamp(): Long {
         Log.d("", "error parsing date")
     }
     return 0
+}
+
+fun JsonElement.toStringTrimmed(): String {
+    return toString().replace("\"", "") // Removing quotes for the json element
 }

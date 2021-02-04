@@ -6,8 +6,8 @@ import us.frollo.frollosdk.extensions.serializedName
 /** Indicates the type of the Pay ID */
 enum class PayIDType {
 
-    /** PayID type is telephone */
-    @SerializedName("telephone") PHONE_NUMBER,
+    /** PayID type is mobile */
+    @SerializedName("mobile") MOBILE,
 
     /** PayID type is email */
     @SerializedName("email") EMAIL,

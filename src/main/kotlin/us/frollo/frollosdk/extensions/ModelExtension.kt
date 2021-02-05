@@ -40,6 +40,7 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
+import us.frollo.frollosdk.model.coredata.contacts.PaymentMethod
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -571,6 +572,29 @@ internal fun sqlForConsents(providerId: Long? = null, providerAccountId: Long? =
     providerId?.let { sqlQueryBuilder.appendSelection(selection = "provider_id = $it") }
     providerAccountId?.let { sqlQueryBuilder.appendSelection(selection = "provider_account_id = $it") }
     status?.let { sqlQueryBuilder.appendSelection(selection = "status = '${ it.name }'") }
+
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForContacts(paymentMethod: PaymentMethod? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("contact")
+
+    paymentMethod?.let { sqlQueryBuilder.appendSelection(selection = "payment_method = '${ it.name }'") }
+
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForContactIdsToGetStaleIds(
+    before: Long? = null,
+    after: Long? = null,
+    paymentMethod: PaymentMethod? = null
+): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("contact")
+    sqlQueryBuilder.columns(arrayOf("contact_id"))
+
+    before?.let { sqlQueryBuilder.appendSelection(selection = "contact_id > $it") }
+    after?.let { sqlQueryBuilder.appendSelection(selection = "contact_id <= $it") }
+    paymentMethod?.let { sqlQueryBuilder.appendSelection(selection = "payment_method = '${ it.name }'") }
 
     return sqlQueryBuilder.create()
 }

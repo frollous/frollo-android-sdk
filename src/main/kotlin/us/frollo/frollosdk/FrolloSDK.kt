@@ -35,6 +35,7 @@ import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.bills.Bills
 import us.frollo.frollosdk.budgets.Budgets
+import us.frollo.frollosdk.contacts.Contacts
 import us.frollo.frollosdk.core.ACTION.ACTION_AUTHENTICATION_CHANGED
 import us.frollo.frollosdk.core.ARGUMENT.ARG_AUTHENTICATION_STATUS
 import us.frollo.frollosdk.core.AppInfo
@@ -159,6 +160,12 @@ object FrolloSDK {
     val payments: Payments
         get() = _payments ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
+    /**
+     * Contacts - Managing contacts. See [Contacts] for details
+     */
+    val contacts: Contacts
+        get() = _contacts ?: throw IllegalAccessException(SDK_NOT_SETUP)
+
     private var _setup = false
     private var _aggregation: Aggregation? = null
     private var _messages: Messages? = null
@@ -172,6 +179,7 @@ object FrolloSDK {
     private var _images: Images? = null
     private var _userManagement: UserManagement? = null
     private var _payments: Payments? = null
+    private var _contacts: Contacts? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
@@ -292,6 +300,9 @@ object FrolloSDK {
 
             // 21. Setup Response Data API Service
             responseDataAPI = network.create(ResponseDataAPI::class.java)
+
+            // 22. Setup Contacts
+            _contacts = Contacts(network, database)
 
             if (version.migrationNeeded()) {
                 version.migrateVersion()
@@ -453,6 +464,7 @@ object FrolloSDK {
         bills.refreshBills()
         userManagement.updateDevice()
         images.refreshImages()
+        contacts.refreshContactsWithPagination()
     }
 
     private fun resumeScheduledRefreshing() {

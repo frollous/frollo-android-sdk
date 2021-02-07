@@ -272,8 +272,16 @@ internal fun CdrAPI.fetchProducts(
 
 // Contacts
 
-internal fun ContactsAPI.fetchContacts(paymentMethod: PaymentMethod? = null): Call<PaginatedResponse<ContactResponse>> {
+internal fun ContactsAPI.fetchContacts(
+    paymentMethod: PaymentMethod? = null,
+    after: Long? = null,
+    before: Long? = null,
+    size: Long? = null
+): Call<PaginatedResponse<ContactResponse>> {
     val queryMap = mutableMapOf<String, String>()
     paymentMethod?.let { queryMap["type"] = paymentMethod.toString() }
+    after?.let { queryMap.put("after", it.toString()) }
+    before?.let { queryMap.put("before", it.toString()) }
+    size?.let { queryMap.put("size", it.toString()) }
     return fetchContacts(queryMap)
 }

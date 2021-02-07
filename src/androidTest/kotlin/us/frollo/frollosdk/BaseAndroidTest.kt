@@ -28,6 +28,7 @@ import us.frollo.frollosdk.authentication.OAuth2Authentication
 import us.frollo.frollosdk.authentication.OAuth2Helper
 import us.frollo.frollosdk.bills.Bills
 import us.frollo.frollosdk.budgets.Budgets
+import us.frollo.frollosdk.contacts.Contacts
 import us.frollo.frollosdk.core.AppInfo
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.testSDKConfig
@@ -78,6 +79,7 @@ abstract class BaseAndroidTest {
     lateinit var budgets: Budgets
     lateinit var images: Images
     lateinit var payments: Payments
+    lateinit var contacts: Contacts
     lateinit var appInfo: AppInfo
 
     val scopes = listOf("offline_access", "openid", "email")
@@ -129,6 +131,7 @@ abstract class BaseAndroidTest {
         budgets = Budgets(network, database)
         images = Images(network, database)
         payments = Payments(network)
+        contacts = Contacts(network, database)
 
         AndroidThreeTen.init(app)
     }

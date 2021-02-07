@@ -40,6 +40,7 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
+import us.frollo.frollosdk.model.coredata.contacts.PaymentMethod
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTarget
@@ -439,5 +440,23 @@ class ModelExtensionTest {
 
         query = sqlForConsents()
         assertEquals("SELECT  *  FROM consent", query.sql)
+    }
+
+    @Test
+    fun testSQLForContacts() {
+        var query = sqlForContacts(paymentMethod = PaymentMethod.PAY_ANYONE)
+        assertEquals("SELECT  *  FROM contact WHERE payment_method = 'PAY_ANYONE' ", query.sql)
+
+        query = sqlForContacts()
+        assertEquals("SELECT  *  FROM contact", query.sql)
+    }
+
+    @Test
+    fun testSQLForContactIdsToGetStaleIds() {
+        var query = sqlForContactIdsToGetStaleIds(before = 100, after = 200, paymentMethod = PaymentMethod.PAY_ANYONE)
+        assertEquals("SELECT contact_id  FROM contact WHERE contact_id > 100 AND contact_id <= 200 AND payment_method = 'PAY_ANYONE' ", query.sql)
+
+        query = sqlForContactIdsToGetStaleIds()
+        assertEquals("SELECT contact_id  FROM contact", query.sql)
     }
 }

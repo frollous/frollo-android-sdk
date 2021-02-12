@@ -19,20 +19,20 @@ package us.frollo.frollosdk.model.coredata.user.payid
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
-/** Status of the PayID */
-enum class UserPayIdStatus {
+/** Status of the PayID configured for an account */
+enum class UserPayIdAccountStatus {
 
-    /** PayID is available for use */
-    @SerializedName("available") AVAILABLE,
+    /** PayID is active */
+    @SerializedName("ACTIVE") ACTIVE,
 
-    /** PayID is already in use somewhere */
-    @SerializedName("registered") REGISTERED,
+    /** PayID is portable */
+    @SerializedName("PORTABLE") PORTABLE,
 
-    /** PayID is not confirmed by the user yet */
-    @SerializedName("unconfirmed") UNCONFIRMED,
+    /** PayID is de-registered */
+    @SerializedName("DEREGISTERED") DEREGISTERED,
 
-    /** Undetermined */
-    @SerializedName("unknown") UNKNOWN;
+    /** PayID is disabled */
+    @SerializedName("DISABLED") DISABLED;
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

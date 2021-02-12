@@ -23,6 +23,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
 import us.frollo.frollosdk.model.api.user.UserChangePasswordRequest
 import us.frollo.frollosdk.model.api.user.UserConfirmDetailsRequest
 import us.frollo.frollosdk.model.api.user.UserMigrationRequest
@@ -32,9 +33,9 @@ import us.frollo.frollosdk.model.api.user.UserResetPasswordRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.api.user.UserUnconfirmedDetailsResponse
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
+import us.frollo.frollosdk.model.api.user.payid.UserPayIdAccountResponse
 import us.frollo.frollosdk.model.api.user.payid.UserPayIdOTPRequest
 import us.frollo.frollosdk.model.api.user.payid.UserPayIdOTPResponse
-import us.frollo.frollosdk.model.api.user.payid.UserPayIdRegisterRemoveResponse
 import us.frollo.frollosdk.model.api.user.payid.UserPayIdRegisterRequest
 import us.frollo.frollosdk.model.api.user.payid.UserPayIdRemoveRequest
 import us.frollo.frollosdk.model.api.user.payid.UserPayIdResponse
@@ -53,6 +54,7 @@ internal interface UserAPI {
         const val URL_PAYID = "user/payid"
         const val URL_PAYID_REMOVE = "user/payid/remove"
         const val URL_PAYID_OTP = "user/payid/otp"
+        const val URL_PAYID_ACCOUNT = "user/payid/account/{account_id}"
     }
 
     @POST(URL_REGISTER)
@@ -92,8 +94,11 @@ internal interface UserAPI {
     fun requestPayIdOtp(@Body request: UserPayIdOTPRequest): Call<UserPayIdOTPResponse>
 
     @POST(URL_PAYID)
-    fun registerPayId(@Body request: UserPayIdRegisterRequest): Call<UserPayIdRegisterRemoveResponse>
+    fun registerPayId(@Body request: UserPayIdRegisterRequest): Call<Void>
 
     @POST(URL_PAYID_REMOVE)
-    fun removePayId(@Body request: UserPayIdRemoveRequest): Call<UserPayIdRegisterRemoveResponse>
+    fun removePayId(@Body request: UserPayIdRemoveRequest): Call<Void>
+
+    @GET(URL_PAYID_ACCOUNT)
+    fun fetchPayIdsForAccount(@Path("account_id") id: Long): Call<List<UserPayIdAccountResponse>>
 }

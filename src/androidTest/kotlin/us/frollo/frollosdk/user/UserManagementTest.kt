@@ -49,6 +49,7 @@ import us.frollo.frollosdk.model.coredata.user.Industry
 import us.frollo.frollosdk.model.coredata.user.Occupation
 import us.frollo.frollosdk.model.coredata.user.OtpMethodType
 import us.frollo.frollosdk.model.coredata.user.UserStatus
+import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdAccountStatus
 import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdOTPMethodType
 import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdStatus
 import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdType
@@ -1011,6 +1012,53 @@ class UserManagementTest : BaseAndroidTest() {
     }
 
     @Test
+    fun testFetchPayIDsForAccount() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        val body = readStringFromJson(app, R.raw.user_get_payids_for_account)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == "user/payid/account/12345") {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        userManagement.fetchPayIdsForAccount(12345L) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val models = resource.data
+            assertEquals(2, models?.size)
+            assertEquals("+61411111111", models?.get(0)?.payId)
+            assertEquals(UserPayIdAccountStatus.ACTIVE, models?.get(0)?.status)
+            assertEquals(UserPayIdType.MOBILE, models?.get(0)?.type)
+            assertEquals("Frollo", models?.get(0)?.name)
+            assertEquals("2021-01-28T05:24:40.597Z", models?.get(0)?.createdAt)
+            assertEquals("2021-01-28T05:24:40.597Z", models?.get(0)?.updatedAt)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals("user/payid/account/12345", request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
     fun testRequestPayIdOtp() {
         initSetup()
 
@@ -1062,13 +1110,11 @@ class UserManagementTest : BaseAndroidTest() {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        val body = readStringFromJson(app, R.raw.user_register_payid)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_PAYID) {
                     return MockResponse()
-                        .setResponseCode(200)
-                        .setBody(body)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }
@@ -1106,13 +1152,11 @@ class UserManagementTest : BaseAndroidTest() {
         preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
         preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
 
-        val body = readStringFromJson(app, R.raw.user_register_payid)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 if (request?.trimmedPath == UserAPI.URL_PAYID_REMOVE) {
                     return MockResponse()
-                        .setResponseCode(200)
-                        .setBody(body)
+                        .setResponseCode(204)
                 }
                 return MockResponse().setResponseCode(404)
             }

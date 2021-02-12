@@ -47,6 +47,7 @@ import us.frollo.frollosdk.model.api.user.UserResetPasswordRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.api.user.UserUnconfirmedDetailsResponse
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
+import us.frollo.frollosdk.model.api.user.payid.UserPayIdAccountResponse
 import us.frollo.frollosdk.model.api.user.payid.UserPayIdOTPRequest
 import us.frollo.frollosdk.model.api.user.payid.UserPayIdOTPResponse
 import us.frollo.frollosdk.model.api.user.payid.UserPayIdRegisterRequest
@@ -457,6 +458,26 @@ class UserManagement(
             when (resource.status) {
                 Resource.Status.ERROR -> {
                     Log.e("$TAG#fetchPayIds", resource.error?.localizedDescription)
+                    completion.invoke(resource)
+                }
+                Resource.Status.SUCCESS -> {
+                    completion.invoke(resource)
+                }
+            }
+        }
+    }
+
+    /**
+     * Fetch all the PayIDs associated with the specified account.
+     *
+     * @param accountId ID of the account for which the payIDs need to be fetche
+     * @param completion Completion handler with optional error if the request fails or the data if succeeds
+     */
+    fun fetchPayIdsForAccount(accountId: Long, completion: OnFrolloSDKCompletionListener<Resource<List<UserPayIdAccountResponse>>>) {
+        userAPI.fetchPayIdsForAccount(accountId).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#fetchPayIdsForAccount", resource.error?.localizedDescription)
                     completion.invoke(resource)
                 }
                 Resource.Status.SUCCESS -> {

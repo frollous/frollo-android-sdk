@@ -49,6 +49,9 @@ import us.frollo.frollosdk.model.coredata.user.Industry
 import us.frollo.frollosdk.model.coredata.user.Occupation
 import us.frollo.frollosdk.model.coredata.user.OtpMethodType
 import us.frollo.frollosdk.model.coredata.user.UserStatus
+import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdOTPMethodType
+import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdStatus
+import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdType
 import us.frollo.frollosdk.model.testUserResponseData
 import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.network.api.UserAPI
@@ -957,6 +960,176 @@ class UserManagementTest : BaseAndroidTest() {
 
         val request = mockServer.takeRequest()
         assertEquals(UserAPI.URL_CONFIRM_DETAILS, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchPayIDs() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        val body = readStringFromJson(app, R.raw.user_get_payids)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == UserAPI.URL_PAYID) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        userManagement.fetchPayIds { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val models = resource.data
+            assertEquals(2, models?.size)
+            assertEquals("+6412345678", models?.get(0)?.payId)
+            assertEquals(UserPayIdStatus.AVAILABLE, models?.get(0)?.status)
+            assertEquals(UserPayIdType.MOBILE, models?.get(0)?.type)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_PAYID, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRequestPayIdOtp() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        val body = readStringFromJson(app, R.raw.user_request_payid_otp)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == UserAPI.URL_PAYID_OTP) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        userManagement.requestOtpForPayIdRegistration("user@example.com", UserPayIdOTPMethodType.EMAIL) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val models = resource.data
+            assertEquals("VE86849f8805b0906b4a8360bce8c025db", resource.data?.trackingId)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_PAYID_OTP, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRegisterPayId() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        val body = readStringFromJson(app, R.raw.user_register_payid)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == UserAPI.URL_PAYID) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        userManagement.registerPayId(
+            accountId = 325,
+            payId = "+61411111111",
+            type = UserPayIdType.MOBILE,
+            trackingId = "VE20db0310501c4d7cc347c8d897967039",
+            otpCode = "444684"
+        ) { resource ->
+            assertEquals(Result.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_PAYID, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRemovePayId() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        val body = readStringFromJson(app, R.raw.user_register_payid)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == UserAPI.URL_PAYID_REMOVE) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        userManagement.removePayId(
+            payId = "+61411111111",
+            type = UserPayIdType.MOBILE
+        ) { resource ->
+            assertEquals(Result.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(UserAPI.URL_PAYID_REMOVE, request.trimmedPath)
 
         signal.await(3, TimeUnit.SECONDS)
 

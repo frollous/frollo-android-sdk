@@ -47,10 +47,17 @@ import us.frollo.frollosdk.model.api.user.UserResetPasswordRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.api.user.UserUnconfirmedDetailsResponse
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
+import us.frollo.frollosdk.model.api.user.payid.UserPayIdOTPRequest
+import us.frollo.frollosdk.model.api.user.payid.UserPayIdOTPResponse
+import us.frollo.frollosdk.model.api.user.payid.UserPayIdRegisterRequest
+import us.frollo.frollosdk.model.api.user.payid.UserPayIdRemoveRequest
+import us.frollo.frollosdk.model.api.user.payid.UserPayIdResponse
 import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.coredata.user.OtpMethodType
 import us.frollo.frollosdk.model.coredata.user.User
+import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdOTPMethodType
+import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdType
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.network.api.UserAPI
@@ -436,5 +443,116 @@ class UserManagement(
 
     internal fun reset(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         if (FrolloSDK.isSetup) FrolloSDK.reset(completion)
+    }
+
+    // PayID Management
+
+    /**
+     * Fetch all the PayIDs.
+     *
+     * @param completion Completion handler with optional error if the request fails or the data if succeeds
+     */
+    fun fetchPayIds(completion: OnFrolloSDKCompletionListener<Resource<List<UserPayIdResponse>>>) {
+        userAPI.fetchPayIDs().enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#fetchPayIds", resource.error?.localizedDescription)
+                    completion.invoke(resource)
+                }
+                Resource.Status.SUCCESS -> {
+                    completion.invoke(resource)
+                }
+            }
+        }
+    }
+
+    /**
+     * Request OTP for PayID Registration.
+     *
+     * @param payId Value of the PayID to be registered
+     * @param methodType Method by which the OTP will be sent to the user. eg. SMS
+     * @param completion Completion handler with optional error if the request fails or the data if succeeds
+     */
+    fun requestOtpForPayIdRegistration(payId: String, methodType: UserPayIdOTPMethodType, completion: OnFrolloSDKCompletionListener<Resource<UserPayIdOTPResponse>>) {
+        userAPI.requestPayIdOtp(UserPayIdOTPRequest(methodType, payId)).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#requestOtpForPayIdRegistration", resource.error?.localizedDescription)
+                    completion.invoke(resource)
+                }
+                Resource.Status.SUCCESS -> {
+                    completion.invoke(resource)
+                }
+            }
+        }
+    }
+
+    /**
+     * Register PayID.
+     *
+     * @param accountId ID of the account that the PayID should be associated with
+     * @param payId Value of the payID
+     * @param type Type of the PayID. See [UserPayIdType] for allowed types.
+     * @param trackingId Tracking ID for the register. Available after calling the method [UserManagement.requestOtpForPayIdRegistration]
+     * @param otpCode Security code sent to the user after
+     * @param completion Completion handler with optional error if the request fails
+     */
+    fun registerPayId(
+        accountId: Long,
+        payId: String,
+        type: UserPayIdType,
+        trackingId: String,
+        otpCode: String,
+        completion: OnFrolloSDKCompletionListener<Result>
+    ) {
+        userAPI.registerPayId(
+            UserPayIdRegisterRequest(
+                accountId = accountId,
+                payId = payId,
+                type = type,
+                trackingId = trackingId,
+                securityCode = otpCode
+            )
+        ).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#registerPayId", resource.error?.localizedDescription)
+                    completion.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    completion.invoke(Result.success())
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove PayID.
+     *
+     * @param payId Value of the PayID to be removed
+     * @param type Type of the PayID to be removed. See [UserPayIdType] for allowed types.
+     * @param completion Completion handler with optional error if the request fails
+     */
+    fun removePayId(
+        payId: String,
+        type: UserPayIdType,
+        completion: OnFrolloSDKCompletionListener<Result>
+    ) {
+        userAPI.removePayId(
+            UserPayIdRemoveRequest(
+                payId = payId,
+                type = type,
+            )
+        ).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#removePayId", resource.error?.localizedDescription)
+                    completion.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    completion.invoke(Result.success())
+                }
+            }
+        }
     }
 }

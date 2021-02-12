@@ -32,6 +32,12 @@ import us.frollo.frollosdk.model.api.user.UserResetPasswordRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
 import us.frollo.frollosdk.model.api.user.UserUnconfirmedDetailsResponse
 import us.frollo.frollosdk.model.api.user.UserUpdateRequest
+import us.frollo.frollosdk.model.api.user.payid.UserPayIdOTPRequest
+import us.frollo.frollosdk.model.api.user.payid.UserPayIdOTPResponse
+import us.frollo.frollosdk.model.api.user.payid.UserPayIdRegisterRemoveResponse
+import us.frollo.frollosdk.model.api.user.payid.UserPayIdRegisterRequest
+import us.frollo.frollosdk.model.api.user.payid.UserPayIdRemoveRequest
+import us.frollo.frollosdk.model.api.user.payid.UserPayIdResponse
 import us.frollo.frollosdk.network.NetworkHelper
 
 internal interface UserAPI {
@@ -44,6 +50,9 @@ internal interface UserAPI {
         const val URL_MIGRATE_USER = "user/migrate"
         const val URL_REQUEST_OTP = "user/otp"
         const val URL_CONFIRM_DETAILS = "user/details/confirm"
+        const val URL_PAYID = "user/payid"
+        const val URL_PAYID_REMOVE = "user/payid/remove"
+        const val URL_PAYID_OTP = "user/payid/otp"
     }
 
     @POST(URL_REGISTER)
@@ -75,4 +84,16 @@ internal interface UserAPI {
 
     @PUT(URL_CONFIRM_DETAILS)
     fun confirmUserDetails(@Body request: UserConfirmDetailsRequest, @Header(NetworkHelper.HEADER_OTP) otp: String?): Call<Void>
+
+    @GET(URL_PAYID)
+    fun fetchPayIDs(): Call<List<UserPayIdResponse>>
+
+    @POST(URL_PAYID_OTP)
+    fun requestPayIdOtp(@Body request: UserPayIdOTPRequest): Call<UserPayIdOTPResponse>
+
+    @POST(URL_PAYID)
+    fun registerPayId(@Body request: UserPayIdRegisterRequest): Call<UserPayIdRegisterRemoveResponse>
+
+    @POST(URL_PAYID_REMOVE)
+    fun removePayId(@Body request: UserPayIdRemoveRequest): Call<UserPayIdRegisterRemoveResponse>
 }

@@ -27,5 +27,6 @@ internal data class PayAnyoneRequest(
     @SerializedName("source_account_id") val sourceAccountId: Long,
     @SerializedName("payment_date") val paymentDate: String? = null, // yyyy-MM-dd
     @SerializedName("description") val description: String? = null,
-    @SerializedName("reference") val reference: String? = null
+    @SerializedName("reference") val reference: String? = null,
+    @SerializedName("override_method") val overrideMethod: String? = null
 )

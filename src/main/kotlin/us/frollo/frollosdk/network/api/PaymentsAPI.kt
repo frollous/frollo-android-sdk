@@ -24,6 +24,8 @@ import us.frollo.frollosdk.model.api.payments.PayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.PayAnyoneResponse
 import us.frollo.frollosdk.model.api.payments.PaymentBPayRequest
 import us.frollo.frollosdk.model.api.payments.PaymentBPayResponse
+import us.frollo.frollosdk.model.api.payments.PaymentPayIdRequest
+import us.frollo.frollosdk.model.api.payments.PaymentPayIdResponse
 import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
 import us.frollo.frollosdk.model.api.payments.PaymentTransferResponse
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneRequest
@@ -41,6 +43,12 @@ internal interface PaymentsAPI {
 
         // BPay URLs
         const val URL_BPAY = "payments/bpay"
+
+        // NPP URLs
+        const val URL_NPP = "payments/npp"
+
+        // PayID URLs
+        const val URL_PAY_ID = "payments/payid"
     }
 
     // Make Payment APIs
@@ -53,6 +61,12 @@ internal interface PaymentsAPI {
 
     @POST(URL_BPAY)
     fun bpayPayment(@Body request: PaymentBPayRequest, @Header(NetworkHelper.HEADER_OTP) otp: String?): Call<PaymentBPayResponse>
+
+    @POST(URL_NPP)
+    fun nppPayment(@Body request: PayAnyoneRequest, @Header(NetworkHelper.HEADER_OTP) otp: String?): Call<PayAnyoneResponse>
+
+    @POST(URL_PAY_ID)
+    fun payIdPayment(@Body request: PaymentPayIdRequest, @Header(NetworkHelper.HEADER_OTP) otp: String?): Call<PaymentPayIdResponse>
 
     // Verify Payment APIs
 

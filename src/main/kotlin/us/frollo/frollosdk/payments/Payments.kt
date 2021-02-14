@@ -24,10 +24,13 @@ import us.frollo.frollosdk.model.api.payments.PayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.PayAnyoneResponse
 import us.frollo.frollosdk.model.api.payments.PaymentBPayRequest
 import us.frollo.frollosdk.model.api.payments.PaymentBPayResponse
+import us.frollo.frollosdk.model.api.payments.PaymentPayIdRequest
+import us.frollo.frollosdk.model.api.payments.PaymentPayIdResponse
 import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
 import us.frollo.frollosdk.model.api.payments.PaymentTransferResponse
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneResponse
+import us.frollo.frollosdk.model.coredata.contacts.PayIDType
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.PaymentsAPI
 import java.math.BigDecimal
@@ -160,6 +163,94 @@ class Payments(network: NetworkService) {
         paymentsAPI.bpayPayment(request, otp = securityCode).enqueue { resource ->
             if (resource.status == Resource.Status.ERROR) {
                 Log.e("$TAG#bpayPayment", resource.error?.localizedDescription)
+            }
+            completion.invoke(resource)
+        }
+    }
+
+    /**
+     * PayID Payment
+     *
+     * @param payId Value of the PayID
+     * @param type Type of the PayID
+     * @param payIDName Name of the PayID holder
+     * @param amount Amount of the payment
+     * @param description Description of the payment (Optional)
+     * @param paymentDate Date of the payment (Optional). See [Payments.DATE_FORMAT_PATTERN]
+     * @param reference Reference of the payment (Optional)
+     * @param sourceAccountId Account ID of the payment source account
+     * @param securityCode Verification Code / OTP for payment
+     * @param completion Optional completion handler with optional error if the request fails else PayAnyoneResponse if success
+     */
+    fun payIdPayment(
+        payId: String,
+        type: PayIDType,
+        payIDName: String,
+        amount: BigDecimal,
+        description: String? = null,
+        paymentDate: String? = null,
+        reference: String? = null,
+        sourceAccountId: Long,
+        securityCode: String? = null,
+        completion: OnFrolloSDKCompletionListener<Resource<PaymentPayIdResponse>>
+    ) {
+        val request = PaymentPayIdRequest(
+            payId = payId,
+            payIdType = type,
+            payIdName = payIDName,
+            amount = amount,
+            description = description,
+            paymentDate = paymentDate,
+            reference = reference,
+            sourceAccountId = sourceAccountId
+        )
+        paymentsAPI.payIdPayment(request, otp = securityCode).enqueue { resource ->
+            if (resource.status == Resource.Status.ERROR) {
+                Log.e("$TAG#payAnyoneNPPPayment", resource.error?.localizedDescription)
+            }
+            completion.invoke(resource)
+        }
+    }
+
+    /**
+     * Pay Anyone NPP Payment
+     *
+     * @param accountHolder Name of the payee's bank account
+     * @param accountNumber Account number of the payee
+     * @param amount Amount of the payment
+     * @param bsb BSB of payee's bank
+     * @param description Description of the payment (Optional)
+     * @param paymentDate Date of the payment (Optional). See [Payments.DATE_FORMAT_PATTERN]
+     * @param reference Reference of the payment (Optional)
+     * @param sourceAccountId Account ID of the payment source account
+     * @param securityCode Verification Code / OTP for payment
+     * @param completion Optional completion handler with optional error if the request fails else PayAnyoneResponse if success
+     */
+    fun payAnyoneNppPayment(
+        accountHolder: String,
+        accountNumber: String,
+        amount: BigDecimal,
+        bsb: String,
+        description: String? = null,
+        paymentDate: String? = null,
+        reference: String? = null,
+        sourceAccountId: Long,
+        securityCode: String? = null,
+        completion: OnFrolloSDKCompletionListener<Resource<PayAnyoneResponse>>
+    ) {
+        val request = PayAnyoneRequest(
+            accountHolder = accountHolder,
+            accountNumber = accountNumber,
+            amount = amount,
+            bsb = bsb,
+            description = description,
+            paymentDate = paymentDate,
+            reference = reference,
+            sourceAccountId = sourceAccountId
+        )
+        paymentsAPI.nppPayment(request, otp = securityCode).enqueue { resource ->
+            if (resource.status == Resource.Status.ERROR) {
+                Log.e("$TAG#payAnyoneNPPPayment", resource.error?.localizedDescription)
             }
             completion.invoke(resource)
         }

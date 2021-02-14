@@ -42,6 +42,7 @@ import us.frollo.frollosdk.extensions.fromJson
 import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import us.frollo.frollosdk.model.api.user.UserResponse
+import us.frollo.frollosdk.model.coredata.contacts.PayIDType
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.coredata.user.Gender
 import us.frollo.frollosdk.model.coredata.user.HouseholdType
@@ -52,7 +53,6 @@ import us.frollo.frollosdk.model.coredata.user.UserStatus
 import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdAccountStatus
 import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdOTPMethodType
 import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdStatus
-import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdType
 import us.frollo.frollosdk.model.testUserResponseData
 import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.network.api.UserAPI
@@ -998,7 +998,7 @@ class UserManagementTest : BaseAndroidTest() {
             assertEquals(2, models?.size)
             assertEquals("+6412345678", models?.get(0)?.payId)
             assertEquals(UserPayIdStatus.AVAILABLE, models?.get(0)?.status)
-            assertEquals(UserPayIdType.MOBILE, models?.get(0)?.type)
+            assertEquals(PayIDType.MOBILE, models?.get(0)?.type)
 
             signal.countDown()
         }
@@ -1042,7 +1042,7 @@ class UserManagementTest : BaseAndroidTest() {
             assertEquals(2, models?.size)
             assertEquals("+61411111111", models?.get(0)?.payId)
             assertEquals(UserPayIdAccountStatus.ACTIVE, models?.get(0)?.status)
-            assertEquals(UserPayIdType.MOBILE, models?.get(0)?.type)
+            assertEquals(PayIDType.MOBILE, models?.get(0)?.type)
             assertEquals("Frollo", models?.get(0)?.name)
             assertEquals("2021-01-28T05:24:40.597Z", models?.get(0)?.createdAt)
             assertEquals("2021-01-28T05:24:40.597Z", models?.get(0)?.updatedAt)
@@ -1123,7 +1123,7 @@ class UserManagementTest : BaseAndroidTest() {
         userManagement.registerPayId(
             accountId = 325,
             payId = "+61411111111",
-            type = UserPayIdType.MOBILE,
+            type = PayIDType.MOBILE,
             trackingId = "VE20db0310501c4d7cc347c8d897967039",
             otpCode = "444684"
         ) { resource ->
@@ -1164,7 +1164,7 @@ class UserManagementTest : BaseAndroidTest() {
 
         userManagement.removePayId(
             payId = "+61411111111",
-            type = UserPayIdType.MOBILE
+            type = PayIDType.MOBILE
         ) { resource ->
             assertEquals(Result.Status.SUCCESS, resource.status)
             assertNull(resource.error)

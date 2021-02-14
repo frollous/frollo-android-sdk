@@ -22,7 +22,7 @@ import java.math.BigDecimal
 /**
  * PayAnyoneResponse
  *
- * Represents the response after pay anyone is successful
+ * Represents the response after pay anyone payment is successful
  */
 data class PayAnyoneResponse(
 
@@ -38,8 +38,8 @@ data class PayAnyoneResponse(
     /** Account name of payee's account in the payment */
     @SerializedName("destination_account_holder") val destinationAccountHolder: String,
 
-    /** Account number of payee's account in the payment */
-    @SerializedName("destination_account_number") val destinationAccountNumber: String,
+    /** Account number of payee's account in the payment (Optional) */
+    @SerializedName("destination_account_number") val destinationAccountNumber: String?,
 
     /** Date of the payment */
     @SerializedName("payment_date") val paymentDate: String,
@@ -60,6 +60,9 @@ data class PayAnyoneResponse(
     @SerializedName("transaction_id") val transactionId: Long?,
 
     /** Transaction reference of the payment */
-    @SerializedName("transaction_reference") val transactionReference: String
+    @SerializedName("transaction_reference") val transactionReference: String,
+
+    /** Payment is duplicate (Optional) - returned only for NPP payment */
+    @SerializedName("is_duplicate") val isDuplicate: Boolean?
 
 ) : PaymentResponse

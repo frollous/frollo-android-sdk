@@ -17,8 +17,8 @@
 package us.frollo.frollosdk.model.api.user.payid
 
 import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.model.coredata.contacts.PayIDType
 import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdStatus
-import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdType
 
 /**
  * Data representation of User PayID Response
@@ -32,5 +32,5 @@ data class UserPayIdResponse(
     @SerializedName("status") val status: UserPayIdStatus,
 
     /** Pay ID type */
-    @SerializedName("type") val type: UserPayIdType
+    @SerializedName("type") val type: PayIDType
 )

@@ -22,7 +22,7 @@ import java.math.BigDecimal
 /**
  * PaymentBPayResponse
  *
- * Represents the response after pay anyone is successful
+ * Represents the response after bpay payment is successful
  */
 data class PaymentBPayResponse(
 
@@ -57,6 +57,9 @@ data class PaymentBPayResponse(
     @SerializedName("transaction_id") val transactionId: Long?,
 
     /** Transaction reference of the payment */
-    @SerializedName("transaction_reference") val transactionReference: String
+    @SerializedName("transaction_reference") val transactionReference: String,
+
+    /** Payment is duplicate (Optional) - returned only for NPP payment */
+    @SerializedName("is_duplicate") val isDuplicate: Boolean?
 
 ) : PaymentResponse

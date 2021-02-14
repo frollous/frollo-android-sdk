@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.user.payid
+package us.frollo.frollosdk.model.api.payments
 
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.contacts.PayIDType
+import java.math.BigDecimal
 
-internal data class UserPayIdRegisterRequest(
-    @SerializedName("account_id") val accountId: Long,
+internal data class PaymentPayIdRequest(
     @SerializedName("payid") val payId: String,
-    @SerializedName("type") val type: PayIDType,
-    @SerializedName("tracking_id") val trackingId: String,
-    @SerializedName("code") val securityCode: String
+    @SerializedName("type") val payIdType: PayIDType,
+    @SerializedName("account_holder") val payIdName: String,
+    @SerializedName("amount") val amount: BigDecimal,
+    @SerializedName("source_account_id") val sourceAccountId: Long,
+    @SerializedName("payment_date") val paymentDate: String? = null, // yyyy-MM-dd
+    @SerializedName("description") val description: String? = null,
+    @SerializedName("reference") val reference: String? = null
 )

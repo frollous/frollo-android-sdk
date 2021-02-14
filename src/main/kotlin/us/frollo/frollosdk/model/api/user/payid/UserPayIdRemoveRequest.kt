@@ -17,9 +17,9 @@
 package us.frollo.frollosdk.model.api.user.payid
 
 import com.google.gson.annotations.SerializedName
-import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdType
+import us.frollo.frollosdk.model.coredata.contacts.PayIDType
 
 internal data class UserPayIdRemoveRequest(
     @SerializedName("payid") val payId: String,
-    @SerializedName("type") val type: UserPayIdType
+    @SerializedName("type") val type: PayIDType
 )

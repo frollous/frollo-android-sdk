@@ -17,8 +17,8 @@
 package us.frollo.frollosdk.model.api.user.payid
 
 import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.model.coredata.contacts.PayIDType
 import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdAccountStatus
-import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdType
 
 /**
  * Data representation of User PayID Response configured on a given account.
@@ -32,7 +32,7 @@ data class UserPayIdAccountResponse(
     @SerializedName("payid_status") val status: UserPayIdAccountStatus,
 
     /** The creditor PayID identifier type. */
-    @SerializedName("type") val type: UserPayIdType,
+    @SerializedName("type") val type: PayIDType,
 
     /** The name of the payID; shown to external parties */
     @SerializedName("payid_name") val name: String,

@@ -30,6 +30,8 @@ import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
 import us.frollo.frollosdk.model.api.payments.PaymentTransferResponse
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneResponse
+import us.frollo.frollosdk.model.api.payments.VerifyPayIdRequest
+import us.frollo.frollosdk.model.api.payments.VerifyPayIdResponse
 import us.frollo.frollosdk.model.coredata.contacts.PayIDType
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.PaymentsAPI
@@ -280,6 +282,27 @@ class Payments(network: NetworkService) {
         paymentsAPI.verifyPayAnyone(request).enqueue { resource ->
             if (resource.status == Resource.Status.ERROR) {
                 Log.e("$TAG#verifyPayAnyone", resource.error?.localizedDescription)
+            }
+            completion.invoke(resource)
+        }
+    }
+
+    /**
+     * Verify PayID
+     *
+     * @param payId Name of the payee's bank account
+     * @param type Account number of the payee
+     * @param completion Optional completion handler with optional error if the request fails else VerifyPayIdResponse if success
+     */
+    fun verifyPayId(
+        payId: String,
+        type: PayIDType,
+        completion: OnFrolloSDKCompletionListener<Resource<VerifyPayIdResponse>>
+    ) {
+        val request = VerifyPayIdRequest(payId = payId, type = type)
+        paymentsAPI.verifyPayId(request).enqueue { resource ->
+            if (resource.status == Resource.Status.ERROR) {
+                Log.e("$TAG#verifyPayId", resource.error?.localizedDescription)
             }
             completion.invoke(resource)
         }

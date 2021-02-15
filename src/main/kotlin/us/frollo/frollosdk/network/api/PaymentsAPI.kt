@@ -30,6 +30,8 @@ import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
 import us.frollo.frollosdk.model.api.payments.PaymentTransferResponse
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneResponse
+import us.frollo.frollosdk.model.api.payments.VerifyPayIdRequest
+import us.frollo.frollosdk.model.api.payments.VerifyPayIdResponse
 import us.frollo.frollosdk.network.NetworkHelper
 
 internal interface PaymentsAPI {
@@ -49,6 +51,7 @@ internal interface PaymentsAPI {
 
         // PayID URLs
         const val URL_PAY_ID = "payments/payid"
+        const val URL_VERIFY_PAY_ID = "payments/verify/payid"
     }
 
     // Make Payment APIs
@@ -72,4 +75,7 @@ internal interface PaymentsAPI {
 
     @POST(URL_VERIFY_PAY_ANYONE)
     fun verifyPayAnyone(@Body request: VerifyPayAnyoneRequest): Call<VerifyPayAnyoneResponse>
+
+    @POST(URL_VERIFY_PAY_ID)
+    fun verifyPayId(@Body request: VerifyPayIdRequest): Call<VerifyPayIdResponse>
 }

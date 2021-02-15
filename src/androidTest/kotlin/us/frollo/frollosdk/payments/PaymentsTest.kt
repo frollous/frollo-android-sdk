@@ -583,4 +583,73 @@ class PaymentsTest : BaseAndroidTest() {
 
         tearDown()
     }
+
+    @Test
+    fun testVerifyPayIdInvalid() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val body = readStringFromJson(app, R.raw.payment_verify_payid_response)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == PaymentsAPI.URL_VERIFY_PAY_ID) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        payments.verifyPayId(
+            payId = "+61411111111",
+            type = PayIDType.MOBILE
+        ) { resource ->
+
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val response = resource.data
+            assertNotNull(response)
+
+            assertEquals("John Doe", response?.name)
+            assertEquals("+61411111111", response?.payId)
+            assertEquals(PayIDType.MOBILE, response?.type)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(PaymentsAPI.URL_VERIFY_PAY_ID, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testVerifyPayIdFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        payments.verifyPayId(
+            payId = "+61411111111",
+            type = PayIDType.MOBILE
+        ) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
 }

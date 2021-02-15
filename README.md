@@ -2,18 +2,18 @@
 
 ### Requirements
 
-- Android Studio 4.1.1+
-- Kotlin version 1.4.21+
-- Gradle tools plugin version 4.1.1+ - In your project level **build.gradle**
+- Android Studio 4.1.2+
+- Kotlin version 1.4.30+
+- Gradle tools plugin version 4.1.2+ - In your project level **build.gradle**
     ```
     dependencies {
-        classpath "com.android.tools.build:gradle:4.1.1"
+        classpath "com.android.tools.build:gradle:4.1.2"
         //..
     }
     ```
 - Gradle version must be 6.5+
 
-    Modify Gradle version in your **gradle_wrapper.properties** as below
+    Modify Gradle version in your **gradle-wrapper.properties** as below
 
     ```
     distributionUrl=https\://services.gradle.org/distributions/gradle-6.5-all.zip

@@ -6,10 +6,10 @@ apply plugin: 'org.jetbrains.dokka-android'
 apply from: "ktlint.gradle"
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         minSdkVersion 23 // Android 6.0 (Marshmallow)
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "3.7.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

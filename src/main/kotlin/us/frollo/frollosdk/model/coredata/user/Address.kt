@@ -17,12 +17,17 @@
 package us.frollo.frollosdk.model.coredata.user
 
 import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.model.coredata.kyc.AddressType
 
 /**
  * Address of the user
  */
 data class Address(
 
+    /** Address ID (Optional) */
+    @SerializedName("address_id") var addressId: String? = null,
+    /** Address type (Optional) */
+    @SerializedName("address_type") var addressType: AddressType? = null,
     /** Address building name. (Optional) */
     @SerializedName("building_name") var buildingName: String? = null,
     /** Address unit number. (Optional) */

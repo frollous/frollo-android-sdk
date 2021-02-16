@@ -37,6 +37,7 @@ import us.frollo.frollosdk.events.Events
 import us.frollo.frollosdk.goals.Goals
 import us.frollo.frollosdk.images.Images
 import us.frollo.frollosdk.keystore.Keystore
+import us.frollo.frollosdk.kyc.KYC
 import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.TokenAPI
@@ -80,6 +81,7 @@ abstract class BaseAndroidTest {
     lateinit var images: Images
     lateinit var payments: Payments
     lateinit var contacts: Contacts
+    lateinit var kyc: KYC
     lateinit var appInfo: AppInfo
 
     val scopes = listOf("offline_access", "openid", "email")
@@ -132,6 +134,7 @@ abstract class BaseAndroidTest {
         images = Images(network, database)
         payments = Payments(network)
         contacts = Contacts(network, database)
+        kyc = KYC(network)
 
         AndroidThreeTen.init(app)
     }

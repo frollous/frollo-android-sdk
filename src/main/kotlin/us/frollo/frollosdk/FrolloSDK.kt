@@ -51,6 +51,7 @@ import us.frollo.frollosdk.extensions.toString
 import us.frollo.frollosdk.goals.Goals
 import us.frollo.frollosdk.images.Images
 import us.frollo.frollosdk.keystore.Keystore
+import us.frollo.frollosdk.kyc.KYC
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
@@ -166,6 +167,12 @@ object FrolloSDK {
     val contacts: Contacts
         get() = _contacts ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
+    /**
+     * KYC - Managing user KYC. See [KYC] for details
+     */
+    val kyc: KYC
+        get() = _kyc ?: throw IllegalAccessException(SDK_NOT_SETUP)
+
     private var _setup = false
     private var _aggregation: Aggregation? = null
     private var _messages: Messages? = null
@@ -180,6 +187,7 @@ object FrolloSDK {
     private var _userManagement: UserManagement? = null
     private var _payments: Payments? = null
     private var _contacts: Contacts? = null
+    private var _kyc: KYC? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
@@ -303,6 +311,9 @@ object FrolloSDK {
 
             // 22. Setup Contacts
             _contacts = Contacts(network, database)
+
+            // 23. Setup KYC
+            _kyc = KYC(network)
 
             if (version.migrationNeeded()) {
                 version.migrateVersion()

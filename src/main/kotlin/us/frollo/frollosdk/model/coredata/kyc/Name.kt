@@ -26,17 +26,17 @@ data class Name(
      * determined from a document scan, or is un-parsable in some way.
      * The service will attempt to convert it to it’s constituent parts where possible
      */
-    @SerializedName("display_name") var displayName: String?,
+    @SerializedName("display_name") var displayName: String? = null,
 
     /** Family name / Surname of the individual (Optional) */
-    @SerializedName("family_name") var familyName: String?,
+    @SerializedName("family_name") var familyName: String? = null,
 
     /** First / Given name (Optional) */
-    @SerializedName("given_name") var givenName: String?,
+    @SerializedName("given_name") var givenName: String? = null,
 
     /** Mr/Ms/Dr/Dame/Dato/etc (Optional) */
-    @SerializedName("honourific") var honourific: String?,
+    @SerializedName("honourific") var honourific: String? = null,
 
     /** Middle name(s) / Initials (Optional) */
-    @SerializedName("middle_name") var middleName: String?
+    @SerializedName("middle_name") var middleName: String? = null
 )

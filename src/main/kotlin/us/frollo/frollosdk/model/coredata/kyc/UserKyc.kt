@@ -19,29 +19,29 @@ package us.frollo.frollosdk.model.coredata.kyc
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.user.Address
 
-internal data class UserKyc(
+data class UserKyc(
 
     /** List of addresses */
-    @SerializedName("addresses") var addresses: List<Address>?,
+    @SerializedName("addresses") var addresses: List<Address>? = null,
 
     /** Date of birth */
-    @SerializedName("date_of_birth") var dateOfBirth: DateOfBirth?,
+    @SerializedName("date_of_birth") var dateOfBirth: DateOfBirth? = null,
 
     /** Email */
     @SerializedName("email") var email: String,
 
     /** Gender */
-    @SerializedName("gender") var gender: String?,
+    @SerializedName("gender") var gender: String? = null,
 
     /** Mobile number */
-    @SerializedName("mobile_number") var mobileNumber: String?,
+    @SerializedName("mobile_number") var mobileNumber: String? = null,
 
     /** Name */
-    @SerializedName("name") var name: Name?,
+    @SerializedName("name") var name: Name? = null,
 
     /** List of Identity Documents */
-    @SerializedName("identity_docs") var identityDocuments: List<IdentityDocument>?,
+    @SerializedName("identity_docs") var identityDocuments: List<IdentityDocument>? = null,
 
     /** KYC status */
-    @SerializedName("status") val status: KycStatus?
+    @SerializedName("status") val status: KycStatus? = null
 )

@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.coredata.kyc
+package us.frollo.frollosdk.network.api
 
-import com.google.gson.annotations.SerializedName
+import retrofit2.Call
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import us.frollo.frollosdk.model.coredata.kyc.UserKyc
 
-/** Data representation of Date of Birth object */
-data class DateOfBirth(
-
-    /** Date of birth in yyyy-MM-dd format */
-    @SerializedName("date_of_birth") var dateOfBirth: String? = null, // yyyy-MM-dd
-
-    /** Year of birth or “unknown”. This will be auto-extracted if dateOfBirth is supplied. */
-    @SerializedName("year_of_birth") var yearOfBirth: String? = null
-) {
+internal interface KycAPI {
     companion object {
-        /** Date format for date associated with DateOfBirth */
-        const val DATE_FORMAT_PATTERN = "yyyy-MM-dd"
+        const val URL_KYC = "user/kyc"
+        const val URL_KYC_CREATE_VERIFY = "user/kyc/create_verify"
     }
+
+    @GET(URL_KYC)
+    fun fetchKyc(): Call<UserKyc>
+
+    @POST(URL_KYC_CREATE_VERIFY)
+    fun submitKyc(@Body request: UserKyc): Call<UserKyc>
 }

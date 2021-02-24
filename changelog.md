@@ -6,6 +6,7 @@
 
 - PayID - Create & Manage
 - Payments via PayID
+- KYC
 
 #### Changes
 

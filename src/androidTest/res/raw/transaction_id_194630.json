@@ -6,6 +6,7 @@
 	"included": true,
 	"transaction_date": "2019-02-14",
 	"post_date": "2018-07-29",
+    "external_id": "9052BB2B-5C6B-4079-98D7-7008BE480243",
 	"amount": {
 		"amount": "-59.00",
 		"currency": "AUD"
@@ -16,7 +17,11 @@
 		"user": "Occi"
 	},
 	"budget_category": "lifestyle",
-	"category_id": 77,
+    "category": {
+        "id": 77,
+        "name": "Travel/Entertainment",
+        "image_url": "https://example.com/image.png"
+    },
 	"memo": "Remind me",
 	"merchant": {
 		"id": 238,
@@ -35,5 +40,6 @@
       		"latitude": -33.827499,
       		"longitude": 151.201699
     	}
-	}
+	},
+    "user_tags": ["tag1", "tag2"]
 }

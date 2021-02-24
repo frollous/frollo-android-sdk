@@ -19,6 +19,7 @@ package us.frollo.frollosdk.model.api.aggregation.transactions
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Balance
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantDetails
+import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.CategoryDetails
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionDescription
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
@@ -36,7 +37,7 @@ internal data class TransactionResponse(
     @SerializedName("included") var included: Boolean,
     @SerializedName("memo") var memo: String?,
     @SerializedName("account_id") val accountId: Long,
-    @SerializedName("category_id") var categoryId: Long,
+    @SerializedName("category") var category: CategoryDetails,
     @SerializedName("merchant") val merchant: MerchantDetails,
     @SerializedName("bill_id") var billId: Long?,
     @SerializedName("bill_payment_id") var billPaymentId: Long?,

@@ -17,7 +17,11 @@
 				"simple": "Coles"
 			},
 			"budget_category": "living",
-			"category_id": 66,
+			"category": {
+				"id": 66,
+				"name": "Groceries",
+				"image_url": "https://example.com/image.png"
+			},
 			"merchant": {
 				"id": 44,
 				"name": "Coles",
@@ -42,7 +46,11 @@
 				"simple": "Cash Withdrawal"
 			},
 			"budget_category": "one_off",
-			"category_id": 80,
+			"category": {
+				"id": 80,
+				"name": "ATM/Cash Withdrawals",
+				"image_url": "https://example.com/image.png"
+			},
 			"merchant": {
 				"id": 24,
 				"name": "Cash Withdrawal"
@@ -64,7 +72,11 @@
 				"simple": "IGA grocery stores"
 			},
 			"budget_category": "living",
-			"category_id": 66,
+			"category": {
+				"id": 66,
+				"name": "Groceries",
+				"image_url": "https://example.com/image.png"
+			},
 			"merchant": {
 				"id": 23,
 				"name": "IGA grocery stores",

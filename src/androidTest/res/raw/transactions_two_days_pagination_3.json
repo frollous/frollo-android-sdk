@@ -17,7 +17,11 @@
 				"simple": "Cash Withdrawal"
 			},
 			"budget_category": "one_off",
-			"category_id": 80,
+			"category": {
+				"id": 80,
+				"name": "ATM/Cash Withdrawals",
+				"image_url": "https://example.com/image.png"
+			},
 			"merchant": {
 				"id": 24,
 				"name": "Cash Withdrawal"
@@ -40,7 +44,11 @@
 				"simple": "IGA grocery stores"
 			},
 			"budget_category": "living",
-			"category_id": 66,
+			"category": {
+				"id": 66,
+				"name": "Groceries",
+				"image_url": "https://example.com/image.png"
+			},
 			"merchant": {
 				"id": 23,
 				"name": "IGA grocery stores",
@@ -64,7 +72,11 @@
 				"simple": "The Occidental Hotel"
 			},
 			"budget_category": "lifestyle",
-			"category_id": 77,
+			"category": {
+				"id": 77,
+				"name": "Travel/Entertainment",
+				"image_url": "https://example.com/image.png"
+			},
 			"merchant": {
 				"id": 238,
 				"name": "The Occidental Hotel",
@@ -90,7 +102,11 @@
 				"user": "Occi"
 			},
 			"budget_category": "lifestyle",
-			"category_id": 77,
+			"category": {
+				"id": 77,
+				"name": "Travel/Entertainment",
+				"image_url": "https://example.com/image.png"
+			},
 			"memo": "Remind me",
 			"merchant": {
 				"id": 238,

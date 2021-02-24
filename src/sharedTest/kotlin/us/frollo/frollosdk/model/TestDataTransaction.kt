@@ -21,6 +21,7 @@ import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummar
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Balance
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantDetails
 import us.frollo.frollosdk.model.coredata.aggregation.tags.TransactionTag
+import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.CategoryDetails
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBaseType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionDescription
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionStatus
@@ -52,7 +53,7 @@ internal fun testTransactionResponseData(
         baseType = baseType ?: TransactionBaseType.UNKNOWN,
         billId = randomNumber().toLong(),
         billPaymentId = randomNumber().toLong(),
-        categoryId = categoryId ?: randomNumber(10000..20000).toLong(),
+        category = testCategoryDetails(categoryId),
         merchant = testMerchantDetails(merchantId),
         budgetCategory = budgetCategory ?: BudgetCategory.ONE_OFF,
         description = description ?: TransactionDescription(original = randomUUID(), user = null, simple = null),
@@ -88,4 +89,11 @@ internal fun testTransactionTagData(name: String? = null, createdAt: String? = n
         createdAt = createdAt ?: Date().toString(),
         lastUsedAt = lastUsedAt ?: Date().toString(),
         count = randomNumber().toLong()
+    )
+
+internal fun testCategoryDetails(categoryId: Long? = null): CategoryDetails =
+    CategoryDetails(
+        id = categoryId ?: randomNumber(10000..20000).toLong(),
+        name = randomUUID(),
+        imageUrl = randomUUID()
     )

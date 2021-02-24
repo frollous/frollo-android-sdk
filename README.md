@@ -37,12 +37,12 @@ To integrate Frollo Android SDK to your Android app use the following steps:
 #### Integration using AAR file
 
 1. Goto File > New > New Module > Import JAR/AAR Package
-2. Select the file frollo-android-sdk-release-3.6.0.aar and Finish
+2. Select the file frollo-android-sdk-release-3.7.0.aar and Finish
 3. Add below line to the dependencies in your **app/build.gradle** file
     ```
     dependencies {
         //..
-        implementation project(":frollo-android-sdk-release-3.6.0")
+        implementation project(":frollo-android-sdk-release-3.7.0")
     }
     ```
 4. Copy the provided frollosdk.gradle file to your project's root directory
@@ -94,7 +94,7 @@ To integrate Frollo Android SDK to your Android app use the following steps:
     
       `git fetch`    
             
-      `git checkout release/3.6.0` (replace the version number with the most stable version number)
+      `git checkout release/3.7.0` (replace the version number with the most stable version number)
 
 2. Add _frollo-android-sdk_ module to your **settings.gradle** file
 
@@ -135,7 +135,7 @@ To integrate Frollo Android SDK to your Android app use the following steps:
     ```
     dependencies {
         //..
-        implementation(name: 'frollo-android-sdk-release-3.6.0', ext: 'aar')
+        implementation(name: 'frollo-android-sdk-release-3.7.0', ext: 'aar')
     }
     ```
 3. Add below to your project level **build.gradle** file

@@ -2,9 +2,15 @@
 
 ### 3.7.0
 
+#### Features
+
+- PayID - Create & Manage
+- Payments via PayID
+
 #### Changes
 
 - Request OTP and verify user mobile number
+- Update Host API version to v2.13
 
 ### 3.6.0
 

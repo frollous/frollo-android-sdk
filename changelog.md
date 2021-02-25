@@ -1,5 +1,11 @@
 ## Changelog
 
+### 3.8.0
+
+#### Changes
+
+- TBD
+
 ### 3.7.0
 
 #### Features

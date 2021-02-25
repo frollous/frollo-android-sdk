@@ -25,7 +25,7 @@ import us.frollo.frollosdk.model.coredata.kyc.UserKyc
 internal interface KycAPI {
     companion object {
         const val URL_KYC = "user/kyc"
-        const val URL_KYC_CREATE_VERIFY = "user/kyc/create_verify"
+        const val URL_KYC_CREATE_VERIFY = "user/kyc/create/verify"
     }
 
     @GET(URL_KYC)

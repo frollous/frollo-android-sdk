@@ -43,7 +43,7 @@ data class IdentityDocument(
     @SerializedName("region") var region: String? = null,
 
     /** List of extra data for the document */
-    @SerializedName("extra_data") var extraData: List<IdentityExtraData>? = null,
+    @SerializedName("extra_data") var extraData: MutableList<IdentityExtraData>? = null,
 
     /** The issued date of the document (if known) in yyyy-MM-dd format */
     @SerializedName("id_issued") var idIssued: String? = null

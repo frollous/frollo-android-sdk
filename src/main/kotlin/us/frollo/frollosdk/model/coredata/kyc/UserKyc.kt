@@ -22,7 +22,7 @@ import us.frollo.frollosdk.model.coredata.user.Address
 data class UserKyc(
 
     /** List of addresses */
-    @SerializedName("addresses") var addresses: List<Address>? = null,
+    @SerializedName("addresses") var addresses: MutableList<Address>? = null,
 
     /** Date of birth */
     @SerializedName("date_of_birth") var dateOfBirth: DateOfBirth? = null,
@@ -40,7 +40,7 @@ data class UserKyc(
     @SerializedName("name") var name: Name? = null,
 
     /** List of Identity Documents */
-    @SerializedName("identity_docs") var identityDocuments: List<IdentityDocument>? = null,
+    @SerializedName("identity_docs") var identityDocuments: MutableList<IdentityDocument>? = null,
 
     /** KYC status */
     @SerializedName("status") val status: KycStatus? = null

@@ -28,9 +28,9 @@ data class UserKyc(
     @SerializedName("date_of_birth") var dateOfBirth: DateOfBirth? = null,
 
     /** Email */
-    @SerializedName("email") var email: String,
+    @SerializedName("email") var email: String? = null,
 
-    /** Gender */
+    /** Gender. Allowed values - M, F, U, O (Male, Female, Unspecified, Other) */
     @SerializedName("gender") var gender: String? = null,
 
     /** Mobile number */

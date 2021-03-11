@@ -18,6 +18,7 @@ package us.frollo.frollosdk
 
 import android.content.Context
 import android.os.Handler
+import android.os.Looper
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.jakewharton.threetenabp.AndroidThreeTen
 import okhttp3.ResponseBody
@@ -433,8 +434,8 @@ object FrolloSDK {
      */
     fun refreshData() {
         refreshPrimary()
-        Handler().postDelayed({ refreshSecondary() }, 3000)
-        Handler().postDelayed({ refreshSystem() }, 20000)
+        Handler(Looper.getMainLooper()).postDelayed({ refreshSecondary() }, 3000)
+        Handler(Looper.getMainLooper()).postDelayed({ refreshSystem() }, 20000)
 
         resumeScheduledRefreshing()
     }

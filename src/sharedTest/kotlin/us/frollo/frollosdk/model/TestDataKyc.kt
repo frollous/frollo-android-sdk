@@ -25,7 +25,7 @@ import us.frollo.frollosdk.model.coredata.kyc.UserKyc
 
 internal fun testKycResponseData(): UserKyc {
     return UserKyc(
-        addresses = listOf(testAddressData()),
+        addresses = mutableListOf(testAddressData()),
         dateOfBirth = DateOfBirth(
             dateOfBirth = "1991-01-01",
             yearOfBirth = "1991"
@@ -40,7 +40,7 @@ internal fun testKycResponseData(): UserKyc {
             honourific = "Dr",
             middleName = "K"
         ),
-        identityDocuments = listOf(
+        identityDocuments = mutableListOf(
             IdentityDocument(
                 country = "AU",
                 idExpiry = "2022-12-12",

@@ -39,6 +39,7 @@ import us.frollo.frollosdk.model.api.contacts.ContactResponse
 import us.frollo.frollosdk.network.deserializer.ContactResponseDeserializer
 import us.frollo.frollosdk.network.serializer.ContactRequestSerializer
 import us.frollo.frollosdk.preferences.Preferences
+import java.util.concurrent.TimeUnit
 
 class NetworkService internal constructor(
     internal val oAuth2Helper: OAuth2Helper,
@@ -89,6 +90,9 @@ class NetworkService internal constructor(
             .create()
 
         val httpClientBuilder = OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(
                 if (isTokenEndpoint)
                     tokenInterceptor

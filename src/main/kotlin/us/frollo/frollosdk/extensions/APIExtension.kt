@@ -38,6 +38,7 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.contacts.PaymentMethod
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
+import us.frollo.frollosdk.model.coredata.managedproduct.ManagedProduct
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.reports.TransactionReportPeriod
@@ -50,6 +51,7 @@ import us.frollo.frollosdk.network.api.CdrAPI
 import us.frollo.frollosdk.network.api.ContactsAPI
 import us.frollo.frollosdk.network.api.GoalsAPI
 import us.frollo.frollosdk.network.api.ImagesAPI
+import us.frollo.frollosdk.network.api.ManagedProductsAPI
 import us.frollo.frollosdk.network.api.ReportsAPI
 import us.frollo.frollosdk.network.api.SurveysAPI
 
@@ -284,4 +286,30 @@ internal fun ContactsAPI.fetchContacts(
     before?.let { queryMap.put("before", it.toString()) }
     size?.let { queryMap.put("size", it.toString()) }
     return fetchContacts(queryMap)
+}
+
+// Managed Products
+
+internal fun ManagedProductsAPI.fetchAvailableProducts(
+    after: Long? = null,
+    before: Long? = null,
+    size: Long? = null
+): Call<PaginatedResponse<ManagedProduct>> {
+    val queryMap = mutableMapOf<String, String>()
+    after?.let { queryMap.put("after", it.toString()) }
+    before?.let { queryMap.put("before", it.toString()) }
+    size?.let { queryMap.put("size", it.toString()) }
+    return fetchAvailableProducts(queryMap)
+}
+
+internal fun ManagedProductsAPI.fetchManagedProducts(
+    after: Long? = null,
+    before: Long? = null,
+    size: Long? = null
+): Call<PaginatedResponse<ManagedProduct>> {
+    val queryMap = mutableMapOf<String, String>()
+    after?.let { queryMap.put("after", it.toString()) }
+    before?.let { queryMap.put("before", it.toString()) }
+    size?.let { queryMap.put("size", it.toString()) }
+    return fetchManagedProducts(queryMap)
 }

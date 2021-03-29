@@ -451,7 +451,8 @@ internal fun Bundle.toNotificationPayload(): NotificationPayload =
         getString(NotificationPayloadNames.LINK.toString()),
         getString(NotificationPayloadNames.TRANSACTION_IDS.toString()),
         getString(NotificationPayloadNames.USER_EVENT_ID.toString()),
-        getString(NotificationPayloadNames.USER_MESSAGE_ID.toString())
+        getString(NotificationPayloadNames.USER_MESSAGE_ID.toString()),
+        getString(NotificationPayloadNames.ONBOARDING_STEP.toString())
     )
 
 internal fun Map<String, String>.toNotificationPayload(): NotificationPayload =
@@ -460,11 +461,19 @@ internal fun Map<String, String>.toNotificationPayload(): NotificationPayload =
         get(NotificationPayloadNames.LINK.toString()),
         get(NotificationPayloadNames.TRANSACTION_IDS.toString()),
         get(NotificationPayloadNames.USER_EVENT_ID.toString()),
-        get(NotificationPayloadNames.USER_MESSAGE_ID.toString())
+        get(NotificationPayloadNames.USER_MESSAGE_ID.toString()),
+        get(NotificationPayloadNames.ONBOARDING_STEP.toString())
     )
 
-internal fun createNotificationPayload(event: String? = null, link: String? = null, transactionIDs: String? = null, userEventID: String? = null, userMessageID: String? = null) =
-    NotificationPayload(
+internal fun createNotificationPayload(
+    event: String? = null,
+    link: String? = null,
+    transactionIDs: String? = null,
+    userEventID: String? = null,
+    userMessageID: String? = null,
+    onboardingStep: String? = null,
+): NotificationPayload {
+    return NotificationPayload(
         event = event,
         link = link,
         transactionIDs = transactionIDs
@@ -474,8 +483,10 @@ internal fun createNotificationPayload(event: String? = null, link: String? = nu
             ?.map { it.toLong() }
             ?.toList(),
         userEventID = userEventID?.trim()?.toLong(),
-        userMessageID = userMessageID?.trim()?.toLong()
+        userMessageID = userMessageID?.trim()?.toLong(),
+        onboardingStep = onboardingStep
     )
+}
 
 internal fun String.toBudgetCategory(): BudgetCategory? {
     return when (this) {

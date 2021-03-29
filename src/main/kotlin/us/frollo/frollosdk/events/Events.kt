@@ -19,7 +19,9 @@ package us.frollo.frollosdk.events
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.ACTION.ACTION_BUDGET_CURRENT_PERIOD_READY
+import us.frollo.frollosdk.core.ACTION.ACTION_ONBOARDING_STEP_COMPLETED
 import us.frollo.frollosdk.core.ACTION.ACTION_REFRESH_TRANSACTIONS
+import us.frollo.frollosdk.core.ARGUMENT.ARG_ONBOARDING_STEP_NAME
 import us.frollo.frollosdk.core.ARGUMENT.ARG_TRANSACTION_IDS
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.error.FrolloSDKError
@@ -92,6 +94,17 @@ class Events(network: NetworkService) {
             EventNames.BUDGET_CURRENT_PERIOD_READY.toString() -> {
                 Log.i("$TAG#handleEvent", "Current budget period ready event received")
                 notify(action = ACTION_BUDGET_CURRENT_PERIOD_READY)
+                completion?.invoke(true, null)
+            }
+            EventNames.ONBOARDING_STEP_COMPLETED.toString() -> {
+                Log.i("$TAG#handleEvent", "Onboarding step complete event received")
+                notificationPayload?.onboardingStep?.let {
+                    notify(
+                        action = ACTION_ONBOARDING_STEP_COMPLETED,
+                        extrasKey = ARG_ONBOARDING_STEP_NAME,
+                        extrasData = it
+                    )
+                }
                 completion?.invoke(true, null)
             }
             else -> {

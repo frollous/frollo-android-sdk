@@ -35,11 +35,13 @@ import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.core.ACTION.ACTION_BUDGET_CURRENT_PERIOD_READY
+import us.frollo.frollosdk.core.ACTION.ACTION_ONBOARDING_STEP_COMPLETED
 import us.frollo.frollosdk.core.ACTION.ACTION_REFRESH_TRANSACTIONS
 import us.frollo.frollosdk.core.ARGUMENT
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
+import us.frollo.frollosdk.model.testOnboardingStepNotificationPayload
 import us.frollo.frollosdk.model.testTransactionUpdatedNotificationPayload
 import us.frollo.frollosdk.network.api.EventsAPI
 import us.frollo.frollosdk.testutils.trimmedPath
@@ -51,6 +53,7 @@ class EventsTest : BaseAndroidTest() {
 
     private var notifyFlag = false
     private var transactionIds: LongArray? = null
+    private var onboardingStep: String? = null
 
     override fun initSetup() {
         super.initSetup()
@@ -66,6 +69,7 @@ class EventsTest : BaseAndroidTest() {
 
         transactionIds = null
         notifyFlag = false
+        onboardingStep = null
     }
 
     @Test
@@ -179,6 +183,30 @@ class EventsTest : BaseAndroidTest() {
     }
 
     @Test
+    fun testHandleOnboardingStepCompletedEvent() {
+        initSetup()
+
+        val lbm = LocalBroadcastManager.getInstance(app)
+        lbm.registerReceiver(receiver, IntentFilter(ACTION_ONBOARDING_STEP_COMPLETED))
+
+        val payload = testOnboardingStepNotificationPayload()
+
+        events.handleEvent("ONBOARDING_STEP_COMPLETED", notificationPayload = payload) { handled, error ->
+            assertNull(error)
+            assertTrue(handled)
+        }
+
+        wait(3)
+
+        assertTrue(notifyFlag)
+        assertEquals("account_opening", onboardingStep)
+
+        lbm.unregisterReceiver(receiver)
+
+        tearDown()
+    }
+
+    @Test
     fun testEventNotHandled() {
         initSetup()
 
@@ -194,6 +222,7 @@ class EventsTest : BaseAndroidTest() {
         override fun onReceive(context: Context, intent: Intent) {
             notifyFlag = true
             transactionIds = intent.getLongArrayExtra(ARGUMENT.ARG_TRANSACTION_IDS)
+            onboardingStep = intent.getStringExtra(ARGUMENT.ARG_ONBOARDING_STEP_NAME)
         }
     }
 }

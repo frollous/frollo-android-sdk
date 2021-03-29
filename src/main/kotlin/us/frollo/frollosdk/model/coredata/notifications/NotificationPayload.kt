@@ -21,5 +21,6 @@ internal data class NotificationPayload(
     val link: String? = null,
     val transactionIDs: List<Long>? = null,
     val userEventID: Long? = null,
-    val userMessageID: Long? = null
+    val userMessageID: Long? = null,
+    val onboardingStep: String? = null
 )

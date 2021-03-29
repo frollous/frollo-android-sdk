@@ -30,7 +30,8 @@ class ModelExtensionAndroidTest {
             Pair("link", "frollo://"),
             Pair("transaction_ids", "[1,2,3]"),
             Pair("user_event_id", "1234"),
-            Pair("user_message_id", "5678")
+            Pair("user_message_id", "5678"),
+            Pair("onboarding_step", "account_opening")
         )
 
         val payload = bundle.toNotificationPayload()
@@ -42,6 +43,7 @@ class ModelExtensionAndroidTest {
         Assert.assertEquals(3L, payload.transactionIDs?.get(2))
         Assert.assertEquals(1234L, payload.userEventID)
         Assert.assertEquals(5678L, payload.userMessageID)
+        Assert.assertEquals("account_opening", payload.onboardingStep)
     }
 
     @Test
@@ -51,7 +53,8 @@ class ModelExtensionAndroidTest {
             Pair("link", "frollo://"),
             Pair("transaction_ids", "[1,2,3]"),
             Pair("user_event_id", "1234"),
-            Pair("user_message_id", "5678")
+            Pair("user_message_id", "5678"),
+            Pair("onboarding_step", "account_opening")
         )
 
         val payload = map.toNotificationPayload()
@@ -63,6 +66,7 @@ class ModelExtensionAndroidTest {
         Assert.assertEquals(3L, payload.transactionIDs?.get(2))
         Assert.assertEquals(1234L, payload.userEventID)
         Assert.assertEquals(5678L, payload.userMessageID)
+        Assert.assertEquals("account_opening", payload.onboardingStep)
     }
 
     @Test
@@ -76,5 +80,6 @@ class ModelExtensionAndroidTest {
         Assert.assertNull(payload.transactionIDs)
         Assert.assertNull(payload.userEventID)
         Assert.assertNull(payload.userMessageID)
+        Assert.assertNull(payload.onboardingStep)
     }
 }

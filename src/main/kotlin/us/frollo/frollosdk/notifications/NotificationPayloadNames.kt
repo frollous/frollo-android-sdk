@@ -24,7 +24,8 @@ internal enum class NotificationPayloadNames {
     @SerializedName("link") LINK,
     @SerializedName("transaction_ids") TRANSACTION_IDS,
     @SerializedName("user_event_id") USER_EVENT_ID,
-    @SerializedName("user_message_id") USER_MESSAGE_ID;
+    @SerializedName("user_message_id") USER_MESSAGE_ID,
+    @SerializedName("onboarding_step") ONBOARDING_STEP;
 
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =

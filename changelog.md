@@ -2,9 +2,13 @@
 
 ### 3.8.0
 
+#### Features
+
+- Managed Products
+
 #### Changes
 
-- TBD
+- Increase HttpClient Read, Write, Connect timeout to 30 seconds
 
 ### 3.7.0
 

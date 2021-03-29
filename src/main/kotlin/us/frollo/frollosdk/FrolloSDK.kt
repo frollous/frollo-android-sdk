@@ -54,6 +54,7 @@ import us.frollo.frollosdk.images.Images
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.kyc.KYC
 import us.frollo.frollosdk.logging.Log
+import us.frollo.frollosdk.managedproducts.ManagedProducts
 import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
 import us.frollo.frollosdk.network.NetworkService
@@ -174,6 +175,12 @@ object FrolloSDK {
     val kyc: KYC
         get() = _kyc ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
+    /**
+     * Managed Products - Manages Products. See [ManagedProducts] for details
+     */
+    val managedProducts: ManagedProducts
+        get() = _managedProducts ?: throw IllegalAccessException(SDK_NOT_SETUP)
+
     private var _setup = false
     private var _aggregation: Aggregation? = null
     private var _messages: Messages? = null
@@ -189,6 +196,7 @@ object FrolloSDK {
     private var _payments: Payments? = null
     private var _contacts: Contacts? = null
     private var _kyc: KYC? = null
+    private var _managedProducts: ManagedProducts? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
@@ -315,6 +323,9 @@ object FrolloSDK {
 
             // 23. Setup KYC
             _kyc = KYC(network)
+
+            // 24. Setup Managed Products
+            _managedProducts = ManagedProducts(network)
 
             if (version.migrationNeeded()) {
                 version.migrateVersion()

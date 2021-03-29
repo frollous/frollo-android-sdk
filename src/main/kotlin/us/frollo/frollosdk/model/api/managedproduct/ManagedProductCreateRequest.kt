@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.coredata.notifications
+package us.frollo.frollosdk.model.api.managedproduct
 
-internal data class NotificationPayload(
-    val event: String? = null,
-    val link: String? = null,
-    val transactionIDs: List<Long>? = null,
-    val userEventID: Long? = null,
-    val userMessageID: Long? = null,
-    val onboardingStep: String? = null
+import com.google.gson.annotations.SerializedName
+
+internal data class ManagedProductCreateRequest(
+    @SerializedName("product_id") val productId: Long,
+    @SerializedName("accepted_terms_conditions_ids") val acceptedTermsConditionsIds: List<Long>
 )

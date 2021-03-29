@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Frollo
+ * Copyright 2020 Frollo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.coredata.notifications
+package us.frollo.frollosdk.base
 
-internal data class NotificationPayload(
-    val event: String? = null,
-    val link: String? = null,
-    val transactionIDs: List<Long>? = null,
-    val userEventID: Long? = null,
-    val userMessageID: Long? = null,
-    val onboardingStep: String? = null
+/**
+ * Result with information of contact pagination
+ *
+ * @param before Before cursor (ID of data) for pagination (Optional)
+ * @param after After cursor (ID of data) for pagination (Optional)
+ * @param total Total count (Optional)
+ */
+data class PaginationInfo(
+    val before: Long? = null,
+    val after: Long? = null,
+    val total: Long? = null
 )

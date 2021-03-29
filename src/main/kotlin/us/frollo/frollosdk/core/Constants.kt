@@ -32,6 +32,11 @@ object ARGUMENT {
      * Key for transaction IDs sent with [ACTION.ACTION_REFRESH_TRANSACTIONS] broadcast.
      */
     const val ARG_TRANSACTION_IDS = "arg_transaction_ids"
+
+    /**
+     * Key for Onboarding Step name sent with [ACTION.ACTION_ONBOARDING_STEP_COMPLETED] broadcast.
+     */
+    const val ARG_ONBOARDING_STEP_NAME = "arg_onboarding_step_name"
 }
 
 /** Intent Actions */
@@ -59,6 +64,12 @@ object ACTION {
      * Listen to this to detect when the Current Budget Period is ready.
      */
     const val ACTION_BUDGET_CURRENT_PERIOD_READY = "us.frollo.frollosdk.ACTION_BUDGET_CURRENT_PERIOD_READY"
+
+    /**
+     * Local Broadcast triggered when an Onboarding Step is completed.
+     * Listen to this to detect when an Onboarding Step is completed.
+     */
+    const val ACTION_ONBOARDING_STEP_COMPLETED = "us.frollo.frollosdk.ACTION_ONBOARDING_STEP_COMPLETED"
 }
 
 internal object LIMIT {

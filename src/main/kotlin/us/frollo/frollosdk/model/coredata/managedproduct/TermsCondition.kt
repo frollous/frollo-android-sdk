@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.coredata.notifications
+package us.frollo.frollosdk.model.coredata.managedproduct
 
-internal data class NotificationPayload(
-    val event: String? = null,
-    val link: String? = null,
-    val transactionIDs: List<Long>? = null,
-    val userEventID: Long? = null,
-    val userMessageID: Long? = null,
-    val onboardingStep: String? = null
+import com.google.gson.annotations.SerializedName
+
+/** Data representation of [TermsCondition] of a [ManagedProduct] */
+data class TermsCondition(
+
+    /** Unique ID of [TermsCondition] */
+    @SerializedName("id") val termsId: Long,
+
+    /** Name of [TermsCondition] */
+    @SerializedName("name") val name: String,
+
+    /** URL of [TermsCondition] */
+    @SerializedName("url") val url: String?
 )

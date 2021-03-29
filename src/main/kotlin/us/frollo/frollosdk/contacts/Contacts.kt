@@ -543,7 +543,7 @@ class Contacts(network: NetworkService, internal val db: SDKDatabase) {
     }
 
     /**
-     * Cancel a specific contact by ID from the host
+     * Delete a specific contact by ID from the host
      *
      * @param contactId ID of the contact to be deleted
      * @param completion Optional completion handler with optional error if the request fails

@@ -48,3 +48,9 @@ internal fun testTransactionUpdatedNotificationPayload() =
         transactionIDs = listOf(45123, 986, 7000072),
         userEventID = 98765L
     )
+
+internal fun testOnboardingStepNotificationPayload() =
+    NotificationPayload(
+        event = "ONBOARDING_STEP_COMPLETED",
+        onboardingStep = "account_opening"
+    )

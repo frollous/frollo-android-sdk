@@ -25,11 +25,11 @@ enum class UserPayIdStatus {
     /** PayID is available for use */
     @SerializedName("available") AVAILABLE,
 
-    /** PayID is already in use somewhere */
-    @SerializedName("registered") REGISTERED,
-
     /** PayID is not confirmed by the user yet */
     @SerializedName("unconfirmed") UNCONFIRMED,
+
+    /** PayID is already in use somewhere */
+    @SerializedName("registered") REGISTERED,
 
     /** Undetermined */
     @SerializedName("unknown") UNKNOWN;

@@ -1,9 +1,11 @@
 package us.frollo.frollosdk.model.coredata.contacts
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
 /** Indicates the type of the Pay ID */
+@Keep
 enum class PayIDType {
 
     /** PayID type is mobile */

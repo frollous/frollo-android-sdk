@@ -5,6 +5,7 @@
 #### Features
 
 - Managed Products
+- Cards
 
 #### Changes
 

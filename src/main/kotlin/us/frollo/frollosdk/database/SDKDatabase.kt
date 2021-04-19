@@ -29,6 +29,7 @@ import us.frollo.frollosdk.database.dao.BillPaymentDao
 import us.frollo.frollosdk.database.dao.BudgetDao
 import us.frollo.frollosdk.database.dao.BudgetPeriodDao
 import us.frollo.frollosdk.database.dao.CDRConfigurationDao
+import us.frollo.frollosdk.database.dao.CardDao
 import us.frollo.frollosdk.database.dao.ConsentDao
 import us.frollo.frollosdk.database.dao.ContactDao
 import us.frollo.frollosdk.database.dao.GoalDao
@@ -55,6 +56,7 @@ import us.frollo.frollosdk.model.coredata.bills.Bill
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
 import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
+import us.frollo.frollosdk.model.coredata.cards.Card
 import us.frollo.frollosdk.model.coredata.cdr.CDRConfiguration
 import us.frollo.frollosdk.model.coredata.cdr.Consent
 import us.frollo.frollosdk.model.coredata.contacts.Contact
@@ -85,9 +87,10 @@ import us.frollo.frollosdk.model.coredata.user.User
         Image::class,
         Consent::class,
         CDRConfiguration::class,
-        Contact::class
+        Contact::class,
+        Card::class
     ],
-    version = 11, exportSchema = true
+    version = 12, exportSchema = true
 )
 
 @TypeConverters(Converters::class)
@@ -113,6 +116,7 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun consents(): ConsentDao
     internal abstract fun cdrConfiguration(): CDRConfigurationDao
     internal abstract fun contacts(): ContactDao
+    internal abstract fun cards(): CardDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"
@@ -130,7 +134,7 @@ abstract class SDKDatabase : RoomDatabase() {
             Room.databaseBuilder(context, SDKDatabase::class.java, DATABASE_NAME)
                 .allowMainThreadQueries() // Needed for some tests
                 // .fallbackToDestructiveMigration()
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12)
                 .build()
 
         // Copy-paste of auto-generated SQLs from room schema json file
@@ -472,6 +476,16 @@ abstract class SDKDatabase : RoomDatabase() {
                 // 1) New table - contact
                 database.execSQL("CREATE TABLE IF NOT EXISTS `contact` (`contact_id` INTEGER NOT NULL, `created_date` TEXT NOT NULL, `modified_date` TEXT NOT NULL, `verified` INTEGER NOT NULL, `related_provider_account_ids` TEXT, `name` TEXT NOT NULL, `nick_name` TEXT NOT NULL, `description` TEXT, `payment_method` TEXT NOT NULL, `payment_details` TEXT, PRIMARY KEY(`contact_id`))")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_contact_contact_id` ON `contact` (`contact_id`)")
+            }
+        }
+
+        private val MIGRATION_11_12: Migration = object : Migration(11, 12) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // New changes in this migration:
+                // 1) New table - card
+                database.execSQL("CREATE TABLE IF NOT EXISTS `card` (`card_id` INTEGER NOT NULL, `account_id` INTEGER NOT NULL, `status` TEXT NOT NULL, `design_type` TEXT NOT NULL, `created_at` TEXT NOT NULL, `cancelled_at` TEXT, `name` TEXT, `nick_name` TEXT, `pan_last_digits` TEXT, `expiry_date` TEXT, `cardholder_name` TEXT, `type` TEXT, `issuer` TEXT, `pin_set_at` TEXT, PRIMARY KEY(`card_id`))")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_card_card_id` ON `card` (`card_id`)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_card_account_id` ON `card` (`account_id`)")
             }
         }
     }

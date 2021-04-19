@@ -55,6 +55,10 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
+import us.frollo.frollosdk.model.coredata.cards.CardDesignType
+import us.frollo.frollosdk.model.coredata.cards.CardIssuer
+import us.frollo.frollosdk.model.coredata.cards.CardStatus
+import us.frollo.frollosdk.model.coredata.cards.CardType
 import us.frollo.frollosdk.model.coredata.cdr.CDRPermissionDetail
 import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
 import us.frollo.frollosdk.model.coredata.cdr.SharingDuration
@@ -1327,5 +1331,69 @@ class ConvertersTest {
         )
         val internationalJson = Converters.instance.stringFromPaymentDetails(internationalDetails)
         assertEquals("{\"beneficiary\":{\"name\":\"Anne Maria\",\"country\":\"New Zeland\",\"message\":\"Test message new\"},\"bank_details\":{\"country\":\"New Zeland\",\"account_number\":\"12345666\",\"bank_address\":{\"address\":\"ABC 666\"},\"bic\":\"777\",\"fed_wire_number\":\"1234566\",\"sort_code\":\"666\",\"chip_number\":\"555\",\"routing_number\":\"444\",\"legal_entity_identifier\":\"123666\"}}", internationalJson)
+    }
+
+    @Test
+    fun testStringToCardStatus() {
+        val status = Converters.instance.stringToCardStatus("ACTIVE")
+        assertEquals(CardStatus.ACTIVE, status)
+
+        assertEquals(CardStatus.PENDING, Converters.instance.stringToCardStatus(null))
+    }
+
+    @Test
+    fun testStringFromCardStatus() {
+        val str = Converters.instance.stringFromCardStatus(CardStatus.ACTIVE)
+        assertEquals("ACTIVE", str)
+
+        assertEquals("PENDING", Converters.instance.stringFromCardStatus(null))
+    }
+
+    @Test
+    fun testStringToCardDesignType() {
+        val status = Converters.instance.stringToCardDesignType("DEFAULT")
+        assertEquals(CardDesignType.DEFAULT, status)
+
+        assertEquals(CardDesignType.DEFAULT, Converters.instance.stringToCardDesignType(null))
+    }
+
+    @Test
+    fun testStringFromCardDesignType() {
+        val str = Converters.instance.stringFromCardDesignType(CardDesignType.DEFAULT)
+        assertEquals("DEFAULT", str)
+
+        assertEquals("DEFAULT", Converters.instance.stringFromCardDesignType(null))
+    }
+
+    @Test
+    fun testStringToCardType() {
+        val status = Converters.instance.stringToCardType("CREDIT")
+        assertEquals(CardType.CREDIT, status)
+
+        assertNull(Converters.instance.stringToCardType(null))
+    }
+
+    @Test
+    fun testStringFromCardType() {
+        val str = Converters.instance.stringFromCardType(CardType.CREDIT)
+        assertEquals("CREDIT", str)
+
+        assertNull(Converters.instance.stringFromCardType(null))
+    }
+
+    @Test
+    fun testStringToCardIssuer() {
+        val status = Converters.instance.stringToCardIssuer("VISA")
+        assertEquals(CardIssuer.VISA, status)
+
+        assertNull(Converters.instance.stringToCardIssuer(null))
+    }
+
+    @Test
+    fun testStringFromCardIssuer() {
+        val str = Converters.instance.stringFromCardIssuer(CardIssuer.VISA)
+        assertEquals("VISA", str)
+
+        assertNull(Converters.instance.stringFromCardIssuer(null))
     }
 }

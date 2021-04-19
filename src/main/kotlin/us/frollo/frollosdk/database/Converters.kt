@@ -54,6 +54,10 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
+import us.frollo.frollosdk.model.coredata.cards.CardDesignType
+import us.frollo.frollosdk.model.coredata.cards.CardIssuer
+import us.frollo.frollosdk.model.coredata.cards.CardStatus
+import us.frollo.frollosdk.model.coredata.cards.CardType
 import us.frollo.frollosdk.model.coredata.cdr.CDRPermission
 import us.frollo.frollosdk.model.coredata.cdr.CDRPermissionDetail
 import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
@@ -527,4 +531,30 @@ internal class Converters {
             }
         }
     }
+
+    // Card
+
+    @TypeConverter
+    fun stringToCardStatus(value: String?): CardStatus? = if (value == null) CardStatus.PENDING else CardStatus.valueOf(value)
+
+    @TypeConverter
+    fun stringFromCardStatus(value: CardStatus?): String? = value?.name ?: CardStatus.PENDING.name
+
+    @TypeConverter
+    fun stringToCardDesignType(value: String?): CardDesignType? = if (value == null) CardDesignType.DEFAULT else CardDesignType.valueOf(value)
+
+    @TypeConverter
+    fun stringFromCardDesignType(value: CardDesignType?): String? = value?.name ?: CardDesignType.DEFAULT.name
+
+    @TypeConverter
+    fun stringToCardType(value: String?): CardType? = if (value == null) null else CardType.valueOf(value)
+
+    @TypeConverter
+    fun stringFromCardType(value: CardType?): String? = value?.name
+
+    @TypeConverter
+    fun stringToCardIssuer(value: String?): CardIssuer? = if (value == null) null else CardIssuer.valueOf(value)
+
+    @TypeConverter
+    fun stringFromCardIssuer(value: CardIssuer?): String? = value?.name
 }

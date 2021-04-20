@@ -39,6 +39,7 @@ import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.mapping.toAccount
 import us.frollo.frollosdk.mapping.toCDRConfiguration
+import us.frollo.frollosdk.mapping.toCard
 import us.frollo.frollosdk.mapping.toConsent
 import us.frollo.frollosdk.mapping.toGoal
 import us.frollo.frollosdk.mapping.toGoalPeriod
@@ -65,6 +66,7 @@ import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.model.loginFormFilledData
 import us.frollo.frollosdk.model.testAccountResponseData
 import us.frollo.frollosdk.model.testCDRConfigurationData
+import us.frollo.frollosdk.model.testCardResponseData
 import us.frollo.frollosdk.model.testConsentCreateFormData
 import us.frollo.frollosdk.model.testConsentResponseData
 import us.frollo.frollosdk.model.testConsentUpdateFormData
@@ -3556,6 +3558,7 @@ class AggregationTest : BaseAndroidTest() {
         database.transactions().insert(testTransactionResponseData(transactionId = 456, accountId = 345).toTransaction())
         database.goals().insert(testGoalResponseData(goalId = 789, accountId = 345).toGoal())
         database.goalPeriods().insert(testGoalPeriodResponseData(goalPeriodId = 1012, goalId = 789).toGoalPeriod())
+        database.cards().insert(testCardResponseData(cardId = 819, accountId = 345).toCard())
 
         val testObserver1 = aggregation.fetchProvider(providerId = 123).test()
         testObserver1.awaitValue()
@@ -3580,6 +3583,10 @@ class AggregationTest : BaseAndroidTest() {
         val testObserver11 = goals.fetchGoalPeriod(goalPeriodId = 1012).test()
         testObserver11.awaitValue()
         assertEquals(1012L, testObserver11.value().data?.goalPeriodId)
+
+        val testObserver14 = cards.fetchCard(cardId = 819).test()
+        testObserver14.awaitValue()
+        assertEquals(819L, testObserver14.value()?.cardId)
 
         aggregation.refreshProviders { result ->
             assertEquals(Result.Status.SUCCESS, result.status)
@@ -3614,6 +3621,10 @@ class AggregationTest : BaseAndroidTest() {
             val testObserver13 = goals.fetchGoalPeriod(goalPeriodId = 1012).test()
             testObserver13.awaitValue()
             assertNull(testObserver13.value().data)
+
+            val testObserver15 = cards.fetchCard(cardId = 819).test()
+            testObserver15.awaitValue()
+            assertNull(testObserver15.value())
 
             signal.countDown()
         }

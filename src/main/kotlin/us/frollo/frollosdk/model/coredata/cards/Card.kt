@@ -44,27 +44,37 @@ data class Card(
     @ColumnInfo(name = "account_id") val accountId: Long,
 
     /** Indicates the current status of the card */
-    @ColumnInfo(name = "status") val status: CardStatus,
+    @ColumnInfo(name = "status") var status: CardStatus,
 
     /** The design type of the card */
     @ColumnInfo(name = "design_type") val designType: CardDesignType,
 
-    /** Date on which the card was created / ordered. See [Card.DATE_FORMAT_PATTERN] for the date format pattern */
+    /**
+     * Date on which the card was created / ordered
+     *
+     * Date format for this field is ISO8601
+     * example 2011-12-03T10:15:30+01:00
+     */
     @ColumnInfo(name = "created_at") val createdDate: String,
 
-    /** Date the card was cancelled (Optional). See [Card.DATE_FORMAT_PATTERN] for the date format pattern */
+    /**
+     * Date the card was cancelled (Optional)
+     *
+     * Date format for this field is ISO8601
+     * example 2011-12-03T10:15:30+01:00
+     */
     @ColumnInfo(name = "cancelled_at") val cancelledDate: String?,
 
     /** Name of the card (optional) */
     @ColumnInfo(name = "name") val name: String?,
 
     /** Nick name of the card (optional) */
-    @ColumnInfo(name = "nick_name") val nickName: String?,
+    @ColumnInfo(name = "nick_name") var nickName: String?,
 
     /** Last 4 digits of the card's Primary Account Number (Optional) */
     @ColumnInfo(name = "pan_last_digits") val panLastDigits: String?,
 
-    /** Date on which the card will expire (Optional). See [Card.DATE_FORMAT_PATTERN] for the date format pattern */
+    /** Date on which the card will expire (Optional). Date Format: MM/yy or MM/yyyy */
     @ColumnInfo(name = "expiry_date") val expiryDate: String?,
 
     /** Name of the card holder (Optional) */
@@ -76,14 +86,12 @@ data class Card(
     /** Issuer of the card */
     @ColumnInfo(name = "issuer") val issuer: CardIssuer?,
 
-    /** Date on which the pin was set (Optional). See [Card.DATE_FORMAT_PATTERN] for the date format pattern */
+    /**
+     * Date on which the pin was set (Optional)
+     *
+     * Date format for this field is ISO8601
+     * example 2011-12-03T10:15:30+01:00
+     */
     @ColumnInfo(name = "pin_set_at") val pinSetDate: String?
 
-) : IAdapterModel {
-
-    companion object {
-
-        /** Date format for dates associated with Card */
-        const val DATE_FORMAT_PATTERN = "yyyy-MM-dd"
-    }
-}
+) : IAdapterModel

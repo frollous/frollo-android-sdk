@@ -138,7 +138,6 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
 
     companion object {
         private const val TAG = "Aggregation"
-        private const val TRANSACTION_BATCH_SIZE = 200 // API MAX SIZE IS 500.
         private const val MERCHANT_BATCH_SIZE = 500 // DO NOT INCREASE THIS. API MAX SIZE IS 500.
     }
 
@@ -2370,6 +2369,9 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
 
             val goalIds = db.goals().getIdsByAccountIds(accountIds)
             removeCachedGoals(goalIds)
+
+            val cardIds = db.cards().getIdsByAccountIds(accountIds)
+            removeCachedCards(cardIds)
         }
     }
 
@@ -2400,6 +2402,13 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
     private fun removeCachedGoalPeriods(goalPeriodIds: LongArray) {
         if (goalPeriodIds.isNotEmpty()) {
             db.goalPeriods().deleteMany(goalPeriodIds)
+        }
+    }
+
+    // WARNING: Do not call this method on the main thread
+    private fun removeCachedCards(cardIds: LongArray) {
+        if (cardIds.isNotEmpty()) {
+            db.cards().deleteMany(cardIds)
         }
     }
 }

@@ -131,17 +131,14 @@ class CardDaoTest {
     }
 
     @Test
-    fun testGetIdsByQuery() {
-        val data1 = testCardResponseData(cardId = 100)
-        val data2 = testCardResponseData(cardId = 101)
-        val data3 = testCardResponseData(cardId = 102)
-        val data4 = testCardResponseData(cardId = 103)
-        val list = mutableListOf(data1, data2, data3, data4)
+    fun testGetIds() {
+        val data1 = testCardResponseData(cardId = 101)
+        val data2 = testCardResponseData(cardId = 102)
+        val list = mutableListOf(data1, data2)
 
         db.cards().insertAll(*list.map { it.toCard() }.toTypedArray())
 
-        val query = SimpleSQLiteQuery("SELECT card_id FROM card WHERE card_id IN (101,102)")
-        val ids = db.cards().getIdsByQuery(query).sorted()
+        val ids = db.cards().getIds().sorted()
 
         assertEquals(2, ids.size)
         assertTrue(ids.containsAll(mutableListOf(101L, 102L)))

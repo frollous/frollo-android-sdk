@@ -36,6 +36,7 @@ import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.bills.Bills
 import us.frollo.frollosdk.budgets.Budgets
+import us.frollo.frollosdk.cards.Cards
 import us.frollo.frollosdk.contacts.Contacts
 import us.frollo.frollosdk.core.ACTION.ACTION_AUTHENTICATION_CHANGED
 import us.frollo.frollosdk.core.ARGUMENT.ARG_AUTHENTICATION_STATUS
@@ -181,6 +182,12 @@ object FrolloSDK {
     val managedProducts: ManagedProducts
         get() = _managedProducts ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
+    /**
+     * Cards - Managing all aspects of cards. See [Cards] for details
+     */
+    val cards: Cards
+        get() = _cards ?: throw IllegalAccessException(SDK_NOT_SETUP)
+
     private var _setup = false
     private var _aggregation: Aggregation? = null
     private var _messages: Messages? = null
@@ -197,6 +204,7 @@ object FrolloSDK {
     private var _contacts: Contacts? = null
     private var _kyc: KYC? = null
     private var _managedProducts: ManagedProducts? = null
+    private var _cards: Cards? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
@@ -326,6 +334,9 @@ object FrolloSDK {
 
             // 24. Setup Managed Products
             _managedProducts = ManagedProducts(network)
+
+            // 25. Setup Cards
+            _cards = Cards(network, database)
 
             if (version.migrationNeeded()) {
                 version.migrateVersion()
@@ -475,6 +486,7 @@ object FrolloSDK {
         val fromDate = now.minusMonths(1).withDayOfMonth(1).toString(BillPayment.DATE_FORMAT_PATTERN)
         bills.refreshBillPayments(fromDate = fromDate, toDate = toDate)
         goals.refreshGoals()
+        cards.refreshCards()
     }
 
     /**

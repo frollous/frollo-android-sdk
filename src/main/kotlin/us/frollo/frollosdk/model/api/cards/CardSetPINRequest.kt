@@ -20,5 +20,5 @@ import com.google.gson.annotations.SerializedName
 
 internal data class CardSetPINRequest(
     @SerializedName("kid") val keyId: String,
-    @SerializedName("encrypted_pin") val encryptedCardPIN: String
+    @SerializedName("encrypted_pin") val encryptedPIN: String
 )

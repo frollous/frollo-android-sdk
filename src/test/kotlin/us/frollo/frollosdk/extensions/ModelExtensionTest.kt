@@ -39,6 +39,7 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
+import us.frollo.frollosdk.model.coredata.cards.CardStatus
 import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
 import us.frollo.frollosdk.model.coredata.contacts.PaymentMethod
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
@@ -458,5 +459,14 @@ class ModelExtensionTest {
 
         query = sqlForContactIdsToGetStaleIds()
         assertEquals("SELECT contact_id  FROM contact", query.sql)
+    }
+
+    @Test
+    fun testSQLForCards() {
+        var query = sqlForCards(status = CardStatus.ACTIVE, accountId = 12345)
+        assertEquals("SELECT  *  FROM card WHERE status = 'ACTIVE' AND account_id = 12345 ", query.sql)
+
+        query = sqlForCards()
+        assertEquals("SELECT  *  FROM card", query.sql)
     }
 }

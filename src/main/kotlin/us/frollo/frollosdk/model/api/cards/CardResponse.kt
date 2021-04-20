@@ -27,14 +27,14 @@ internal data class CardResponse(
     @SerializedName("account_id") val accountId: Long,
     @SerializedName("status") val status: CardStatus,
     @SerializedName("design_type") val designType: CardDesignType,
-    @SerializedName("created_at") val createdDate: String, // yyyy-MM-dd
-    @SerializedName("cancelled_at") val cancelledDate: String?, // yyyy-MM-dd
+    @SerializedName("created_at") val createdDate: String, // Eg: 2011-12-03T10:15:30+01:00
+    @SerializedName("cancelled_at") val cancelledDate: String?, // Eg: 2011-12-03T10:15:30+01:00
     @SerializedName("name") val name: String?,
     @SerializedName("nick_name") val nickName: String?,
     @SerializedName("pan_last_digits") val panLastDigits: String?,
-    @SerializedName("expiry_date") val expiryDate: String?, // yyyy-MM-dd
+    @SerializedName("expiry_date") val expiryDate: String?, // MM/yy or MM/yyyy
     @SerializedName("cardholder_name") val cardholderName: String?,
     @SerializedName("type") val type: CardType?,
     @SerializedName("issuer") val issuer: CardIssuer?,
-    @SerializedName("pin_set_at") val pinSetDate: String? // yyyy-MM-dd
+    @SerializedName("pin_set_at") val pinSetDate: String? // Eg: 2011-12-03T10:15:30+01:00
 )

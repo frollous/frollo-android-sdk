@@ -39,6 +39,7 @@ import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
+import us.frollo.frollosdk.model.coredata.cards.CardStatus
 import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
 import us.frollo.frollosdk.model.coredata.contacts.PaymentMethod
 import us.frollo.frollosdk.model.coredata.goals.GoalFrequency
@@ -606,6 +607,15 @@ internal fun sqlForContactIdsToGetStaleIds(
     before?.let { sqlQueryBuilder.appendSelection(selection = "contact_id > $it") }
     after?.let { sqlQueryBuilder.appendSelection(selection = "contact_id <= $it") }
     paymentMethod?.let { sqlQueryBuilder.appendSelection(selection = "payment_method = '${ it.name }'") }
+
+    return sqlQueryBuilder.create()
+}
+
+internal fun sqlForCards(status: CardStatus? = null, accountId: Long? = null): SimpleSQLiteQuery {
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("card")
+
+    status?.let { sqlQueryBuilder.appendSelection(selection = "status = '${ it.name }'") }
+    accountId?.let { sqlQueryBuilder.appendSelection(selection = "account_id = $it") }
 
     return sqlQueryBuilder.create()
 }

@@ -42,8 +42,8 @@ internal interface CardDao {
     @RawQuery(observedEntities = [Card::class])
     fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<Card>>
 
-    @RawQuery
-    fun getIdsByQuery(queryStr: SupportSQLiteQuery): MutableList<Long>
+    @Query("SELECT card_id FROM card")
+    fun getIds(): MutableList<Long>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: Card): LongArray

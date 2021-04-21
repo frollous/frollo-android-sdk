@@ -41,7 +41,6 @@ import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.model.oauth.OAuth2Scope
 import us.frollo.frollosdk.model.oauth.OAuthTokenRequest
 import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
-import us.frollo.frollosdk.model.oauth.OAuthTokenRevokeRequest
 import us.frollo.frollosdk.network.ApiResponse
 import us.frollo.frollosdk.network.ErrorResponseType
 import us.frollo.frollosdk.network.api.TokenAPI
@@ -348,8 +347,7 @@ class OAuth2Authentication(
     fun logout(completion: OnFrolloSDKCompletionListener<Result>? = null) {
         // Revoke the refresh token if possible
         authToken?.getRefreshToken()?.let { refreshToken ->
-            val request = OAuthTokenRevokeRequest(clientId = oAuth2Helper.config.clientId, token = refreshToken)
-
+            val request = oAuth2Helper.getTokenRevokeRequest(refreshToken)
             revokeTokenAPI?.revokeToken(request)?.enqueue { resource ->
                 if (resource.status == Resource.Status.ERROR) {
                     Log.d("$TAG#logout", resource.error?.localizedDescription)

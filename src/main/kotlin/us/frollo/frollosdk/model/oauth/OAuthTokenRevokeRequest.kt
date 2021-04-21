@@ -20,5 +20,6 @@ import com.google.gson.annotations.SerializedName
 
 internal data class OAuthTokenRevokeRequest(
     @SerializedName("client_id") val clientId: String,
-    @SerializedName("token") val token: String
+    @SerializedName("token") val token: String,
+    @SerializedName("domain") val domain: String
 )

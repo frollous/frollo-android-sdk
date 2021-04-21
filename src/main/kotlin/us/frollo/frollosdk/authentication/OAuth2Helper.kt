@@ -26,6 +26,7 @@ import us.frollo.frollosdk.authentication.AuthenticationType.OAuth2
 import us.frollo.frollosdk.core.FrolloSDKConfiguration
 import us.frollo.frollosdk.model.oauth.OAuthGrantType
 import us.frollo.frollosdk.model.oauth.OAuthTokenRequest
+import us.frollo.frollosdk.model.oauth.OAuthTokenRevokeRequest
 
 /**
  * @suppress
@@ -118,4 +119,11 @@ class OAuth2Helper(val config: FrolloSDKConfiguration) {
         toolBarColor?.let { intentBuilder.setToolbarColor(it) }
         return intentBuilder.build()
     }
+
+    internal fun getTokenRevokeRequest(refreshToken: String) =
+        OAuthTokenRevokeRequest(
+            clientId = config.clientId,
+            token = refreshToken,
+            domain = domain
+        )
 }

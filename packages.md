@@ -24,6 +24,14 @@ Manages bills and bill payments
 
 Manages budgets
 
+# Package us.frollo.frollosdk.cards
+
+Manages cards
+
+# Package us.frollo.frollosdk.contacts
+
+Manages contacts
+
 # Package us.frollo.frollosdk.core
 
 Frollo SDK core classes
@@ -48,9 +56,17 @@ Tracking and managing goals
 
 Manages caching and refreshing of images
 
+# Package us.frollo.frollosdk.kyc
+
+Manages user KYC
+
 # Package us.frollo.frollosdk.logging
 
 Frollo SDK logging
+
+# Package us.frollo.frollosdk.managedproducts
+
+Manages Products
 
 # Package us.frollo.frollosdk.messages
 
@@ -60,6 +76,10 @@ Manages refreshing and caching of messages.
 
 Frollo SDK data models
 
+# Package us.frollo.frollosdk.model.api.cards
+
+Frollo SDK card models
+
 # Package us.frollo.frollosdk.model.api.payments
 
 Frollo SDK payment models
@@ -67,6 +87,14 @@ Frollo SDK payment models
 # Package us.frollo.frollosdk.model.api.shared
 
 Frollo SDK shared models
+
+# Package us.frollo.frollosdk.model.api.user
+
+Frollo SDK user models
+
+# Package us.frollo.frollosdk.model.api.user.payid
+
+Frollo SDK PayID models
 
 # Package us.frollo.frollosdk.model.coredata.aggregation.accounts
 
@@ -104,9 +132,17 @@ Frollo SDK bill and bill payment models
 
 Frollo SDK budget models
 
+# Package us.frollo.frollosdk.model.coredata.cards
+
+Frollo SDK card models
+
 # Package us.frollo.frollosdk.model.coredata.cdr
 
 Frollo SDK CDR models
+
+# Package us.frollo.frollosdk.model.coredata.contacts
+
+Frollo SDK contact models
 
 # Package us.frollo.frollosdk.model.coredata.goals
 
@@ -115,6 +151,14 @@ Frollo SDK goal models
 # Package us.frollo.frollosdk.model.coredata.images
 
 Frollo SDK image models
+
+# Package us.frollo.frollosdk.model.coredata.kyc
+
+Frollo SDK kyc models
+
+# Package us.frollo.frollosdk.model.coredata.managedproduct
+
+Frollo SDK managed product models
 
 # Package us.frollo.frollosdk.model.coredata.messages
 
@@ -135,6 +179,10 @@ Frollo SDK survey models
 # Package us.frollo.frollosdk.model.coredata.user
 
 Frollo SDK user models
+
+# Package us.frollo.frollosdk.model.coredata.user.payid
+
+Frollo SDK PayID models
 
 # Package us.frollo.frollosdk.model.display.aggregation.providers
 

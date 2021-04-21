@@ -28,6 +28,7 @@ import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.model.api.managedproduct.ManagedProductCreateRequest
 import us.frollo.frollosdk.model.api.shared.PaginatedResponse
 import us.frollo.frollosdk.model.coredata.managedproduct.ManagedProduct
+import us.frollo.frollosdk.model.coredata.managedproduct.TermsCondition
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.ManagedProductsAPI
 
@@ -139,7 +140,7 @@ class ManagedProducts(network: NetworkService) {
      * Create a managed product using a product from the available products
      *
      * @param productId ID of [ManagedProduct] to create
-     * @param acceptedTermsConditionsIds: Array of IDs of [TermsConditions] for [ManagedProduct] to create
+     * @param acceptedTermsConditionsIds: Array of IDs of [TermsCondition] for [ManagedProduct] to create
      * @param completion Completion handler with optional error if the request fails else data if success
      */
     fun createManagedProduct(

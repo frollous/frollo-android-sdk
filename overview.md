@@ -196,3 +196,27 @@ See [Payments](us.frollo.frollosdk.payments/-payments/index.html) for more detai
 Images help the user to upload images for his budgets, goals etc..
 
 See [Images](us.frollo.frollosdk.images/-images/index.html) for more details.
+
+### Contacts
+
+TBD
+
+See [Contacts](us.frollo.frollosdk.contacts/-contacts/index.html) for more details.
+
+### Cards
+
+TBD
+
+See [Cards](us.frollo.frollosdk.cards/-cards/index.html) for more details.
+
+### KYC
+
+TBD
+
+See [KYC](us.frollo.frollosdk.kyc/-kyc/index.html) for more details.
+
+### Managed Products
+
+TBD
+
+See [ManagedProducts](us.frollo.frollosdk.managedproducts/-managedproducts/index.html) for more details.

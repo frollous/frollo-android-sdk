@@ -101,6 +101,7 @@ class FrolloSDKAndroidUnitTest {
             assertNull(result.error)
 
             assertTrue(FrolloSDK.isSetup)
+            assertNotNull(FrolloSDK.logger)
             assertNotNull(FrolloSDK.oAuth2Authentication)
             assertNotNull(FrolloSDK.aggregation)
             assertNotNull(FrolloSDK.messages)
@@ -118,6 +119,17 @@ class FrolloSDKAndroidUnitTest {
             assertNotNull(FrolloSDK.kyc)
             assertNotNull(FrolloSDK.managedProducts)
             assertNotNull(FrolloSDK.cards)
+        }
+    }
+
+    @Test
+    fun testSDKLogManagerThrowsErrorBeforeSetup() {
+        assertFalse(FrolloSDK.isSetup)
+
+        try {
+            FrolloSDK.logger
+        } catch (e: IllegalAccessException) {
+            assertEquals(FrolloSDK.SDK_NOT_SETUP, e.localizedMessage)
         }
     }
 

@@ -55,6 +55,7 @@ import us.frollo.frollosdk.images.Images
 import us.frollo.frollosdk.keystore.Keystore
 import us.frollo.frollosdk.kyc.KYC
 import us.frollo.frollosdk.logging.Log
+import us.frollo.frollosdk.logging.LogManager
 import us.frollo.frollosdk.managedproducts.ManagedProducts
 import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.model.coredata.bills.BillPayment
@@ -188,7 +189,14 @@ object FrolloSDK {
     val cards: Cards
         get() = _cards ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
+    /**
+     * Log Manager - Manages logging to the host. See [LogManager] for details
+     */
+    val logger: LogManager
+        get() = _logger ?: throw IllegalAccessException(SDK_NOT_SETUP)
+
     private var _setup = false
+    private var _logger: LogManager? = null
     private var _aggregation: Aggregation? = null
     private var _messages: Messages? = null
     private var _events: Events? = null
@@ -269,6 +277,8 @@ object FrolloSDK {
             Log.deviceName = deviceInfo.deviceName
             Log.deviceType = deviceInfo.deviceType
             Log.logLevel = configuration.logLevel
+            // Setup Log Manager
+            _logger = LogManager()
 
             // 8. Setup authentication stack
             when (configuration.authenticationType) {

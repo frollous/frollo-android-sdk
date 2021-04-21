@@ -20,6 +20,7 @@ import us.frollo.frollosdk.mapping.toAPIErrorResponse
 import us.frollo.frollosdk.mapping.toAPIErrorType
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import us.frollo.frollosdk.model.api.shared.APIErrorResponse
+import java.lang.StringBuilder
 
 /**
  * Represents errors that can be returned from the API
@@ -50,7 +51,20 @@ class APIError(
 
     /** Localized description */
     override val localizedDescription: String?
-        get() = type.toLocalizedString(context)
+        get() {
+            val apiErrorMessage = StringBuilder()
+            errorResponse?.errorCode?.let {
+                apiErrorMessage.append(it).append(" ")
+            }
+            errorResponse?.errorMessage?.let {
+                apiErrorMessage.append(it)
+            }
+            var description = type.toLocalizedString(context)
+            if (apiErrorMessage.isNotBlank()) {
+                description = description.plus("\n\n$apiErrorMessage")
+            }
+            return description
+        }
 
     /** Debug description */
     override val debugDescription: String?

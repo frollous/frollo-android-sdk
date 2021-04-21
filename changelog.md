@@ -10,6 +10,9 @@
 #### Changes
 
 - Increase HttpClient Read, Write, Connect timeout to 30 seconds
+- Add domain parameter to revoke token API
+- Expose logger to the client app to help the app to log any errors to the host
+- Add API error code and message to API Error Descriptions
 
 ### 3.7.0
 

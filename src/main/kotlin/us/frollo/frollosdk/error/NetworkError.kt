@@ -41,7 +41,7 @@ class NetworkError(private val t: Throwable? = null) : FrolloSDKError(t?.message
     override val localizedDescription: String?
         get() {
             var msg = type.toLocalizedString(context)
-            t?.let { msg = msg.plus(" | ${it.message}") }
+            t?.let { msg = msg.plus("\n\n${it.message}") }
             return msg
         }
 

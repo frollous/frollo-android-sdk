@@ -1,7 +1,7 @@
 {
 	"data": [{
-		"budget_id": 6,
-		"id": 85,
+		"budget_id": 704,
+		"id": 3722,
 		"start_date": "2021-03-01",
 		"end_date": "2021-03-31",
 		"target_amount": "127.00",
@@ -10,8 +10,8 @@
 		"tracking_status": "below",
 		"index": 8
 	}, {
-		"budget_id": 6,
-		"id": 86,
+		"budget_id": 704,
+		"id": 3723,
 		"start_date": "2021-04-01",
 		"end_date": "2021-04-30",
 		"target_amount": "127.00",
@@ -20,8 +20,8 @@
 		"tracking_status": "below",
 		"index": 9
 	}, {
-		"budget_id": 8,
-		"id": 87,
+		"budget_id": 704,
+		"id": 3724,
 		"start_date": "2021-05-01",
 		"end_date": "2021-05-31",
 		"target_amount": "127.00",
@@ -32,9 +32,10 @@
 	}],
 	"paging": {
 		"cursors": {
-			"before": null,
+			"before": "1614556800_3722",
 			"after": null
 		},
-		"total": 3
+		"previous": "https://api-staging.frollo.us/api/v2/budget/cycles/periods/?before=1612137600_3721\u0026size=9\u0026",
+		"total": 11
 	}
 }

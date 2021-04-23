@@ -36,6 +36,7 @@ import us.frollo.frollosdk.model.coredata.bills.BillPaymentStatus
 import us.frollo.frollosdk.model.coredata.bills.BillStatus
 import us.frollo.frollosdk.model.coredata.bills.BillType
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
+import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
 import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetTrackingStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
@@ -148,14 +149,19 @@ internal fun sqlForTransactionIdsToGetStaleIds(
 
     /**
      * Following code creates a filter predicate that will be applied to cached transactions to update
-     * Predicate 1: Considers all transactions before first day of the transaction list (first day - 1)
-     * Predicate 2: Considers all transactions of first day and after first ID of transaction list
-     * Predicate 3: Considers all transactions after last day of the transaction list (last day + 1)
-     * Predicate 4: Considers all transactions of last day and before last ID of transaction list
+     *
+     * Predicate 1: Considers All transactions before the date of first transaction (date of first transaction - 1) (as the list is descending)
+     * Predicate 2: Considers All transactions of the date of first transaction but <= ID of the first transaction.
+     * Predicate 3: Considers All transactions after the date of last transaction (date of last transaction + 1) (as the list is descending)
+     * Predicate 4: All transactions of the date of last transaction but >= ID of the last transaction.
      * Predicate 5: Predicate 1 OR Predicate 2 (Upper limit Predicate)
      * Predicate 6: Predicate 2 OR Predicate 4 (Lower limit Predicate)
      * Predicate 7: Predicate 5 AND Predicate 6 (Satisfy both upper and lower limit) (Final filter predicate to apply in query)
+     *
+     * More explanation: https://frollo.atlassian.net/wiki/spaces/DEV/pages/2301493342/Transaction+Response+Handling
      */
+
+    // TODO: Need to consider one more edge case - https://frollo.atlassian.net/browse/SDK-590
 
     // Filter by before cursor in paginated response
     if (beforeDateString != null && beforeId != null && dayBeforeFirstDate != null) {
@@ -533,36 +539,118 @@ internal fun sqlForBudgetIds(
     return sqlQueryBuilder.create()
 }
 
-internal fun sqlForBudgetPeriodIds(
-    budgetId: Long,
+internal fun sqlForBudgetPeriodIdsToGetStaleIds(
+    beforeDateString: String? = null,
+    afterDateString: String? = null,
+    beforeId: Long? = null,
+    afterId: Long? = null,
+    budgetId: Long? = null,
+    budgetStatus: BudgetStatus? = null,
     fromDate: String? = null,
     toDate: String? = null
 ): SimpleSQLiteQuery {
-    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("budget_period")
-    sqlQueryBuilder.columns(arrayOf("budget_period_id"))
-    sqlQueryBuilder.appendSelection(selection = "budget_id = $budgetId ")
-    ifNotNull(fromDate, toDate) { startDate, endDate ->
-        sqlQueryBuilder.appendSelection(selection = "(start_date BETWEEN Date('$startDate') AND Date('$endDate'))")
+
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("budget_period", aliasName = "bp")
+    sqlQueryBuilder.columns(arrayOf("bp.budget_period_id"))
+    sqlQueryBuilder.appendJoin("LEFT JOIN budget b ON bp.budget_id = b.budget_id")
+
+    val beforeDate = beforeDateString?.toLocalDate(BudgetPeriod.DATE_FORMAT_PATTERN)
+    val dayAfterFirstDate = beforeDate?.plusDays(1)?.toString(BudgetPeriod.DATE_FORMAT_PATTERN)
+    val afterDate = afterDateString?.toLocalDate(BudgetPeriod.DATE_FORMAT_PATTERN)
+    val dayBeforeLastDate = afterDate?.minusDays(1)?.toString(BudgetPeriod.DATE_FORMAT_PATTERN)
+
+    /**
+     * Following code creates a filter predicate that will be applied to cached budget periods to update
+     *
+     * Predicate 1: Considers All budget periods after the date of first budget period (date of first budget period + 1) (as the list is ascending)
+     * Predicate 2: Considers All budget periods of the date of first budget period but >= ID of the first budget period.
+     * Predicate 3: Considers All budget periods before the date of last budget period (date of last budget period - 1) (as the list is ascending)
+     * Predicate 4: Considers All budget periods of the date of last budget period but <= ID of the last budget period.
+     * Predicate 5: Predicate 1 OR Predicate 2 (Upper limit Predicate)
+     * Predicate 6: Predicate 2 OR Predicate 4 (Lower limit Predicate)
+     * Predicate 7: Predicate 5 AND Predicate 6 (Satisfy both upper and lower limit) (Final filter predicate to apply in query)
+     *
+     * More explanation: https://frollo.atlassian.net/wiki/spaces/DEV/pages/2301526130/Budget+Period+Response+Handling
+     */
+
+    // TODO: Need to consider one more edge case - https://frollo.atlassian.net/browse/SDK-590
+
+    // Filter by before cursor in paginated response
+    if (beforeDateString != null && beforeId != null && dayAfterFirstDate != null) {
+        val selection = "(bp.start_date >= '$dayAfterFirstDate' " +
+            "OR (bp.start_date = '$beforeDateString' AND bp.budget_period_id >= $beforeId))"
+        sqlQueryBuilder.appendSelection(selection)
     }
+
+    // Filter by after cursor in paginated response
+    if (afterDateString != null && afterId != null && dayBeforeLastDate != null) {
+        val selection = "(bp.start_date <= '$dayBeforeLastDate' " +
+            "OR (bp.start_date = '$afterDateString' AND bp.budget_period_id <= $afterId))"
+        sqlQueryBuilder.appendSelection(selection)
+    }
+
+    // Append other filters to the query
+    appendBudgetPeriodFiltersToSqlQuery(
+        sqlQueryBuilder = sqlQueryBuilder,
+        budgetId = budgetId,
+        budgetStatus = budgetStatus,
+        fromDate = fromDate,
+        toDate = toDate
+    )
+
     return sqlQueryBuilder.create()
 }
 
 internal fun sqlForBudgetPeriods(
     budgetId: Long? = null,
+    budgetStatus: BudgetStatus? = null,
     trackingStatus: BudgetTrackingStatus? = null,
     fromDate: String? = null,
     toDate: String? = null
 ): SimpleSQLiteQuery {
-    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("budget_period")
+    val sqlQueryBuilder = SimpleSQLiteQueryBuilder("budget_period", aliasName = "bp")
+    sqlQueryBuilder.columns(arrayOf("bp.*"))
+    sqlQueryBuilder.appendJoin("LEFT JOIN budget b ON bp.budget_id = b.budget_id")
 
-    budgetId?.let { sqlQueryBuilder.appendSelection(selection = "budget_id = $it") }
-    trackingStatus?.let { sqlQueryBuilder.appendSelection(selection = "tracking_status = '${ it.name }'") }
-    ifNotNull(fromDate, toDate) {
-        from, to ->
-        sqlQueryBuilder.appendSelection(selection = "(start_date BETWEEN Date('$from') AND Date('$to'))")
-    }
+    appendBudgetPeriodFiltersToSqlQuery(
+        sqlQueryBuilder = sqlQueryBuilder,
+        budgetId = budgetId,
+        budgetStatus = budgetStatus,
+        trackingStatus = trackingStatus,
+        fromDate = fromDate,
+        toDate = toDate
+    )
 
     return sqlQueryBuilder.create()
+}
+
+private fun appendBudgetPeriodFiltersToSqlQuery(
+    sqlQueryBuilder: SimpleSQLiteQueryBuilder,
+    budgetId: Long? = null,
+    budgetStatus: BudgetStatus? = null,
+    trackingStatus: BudgetTrackingStatus? = null,
+    fromDate: String? = null,
+    toDate: String? = null
+) {
+    budgetId?.let {
+        sqlQueryBuilder.appendSelection(selection = "bp.budget_id = $it")
+    } ?: run {
+        // BudgetStatus filter is applicable only when fetching ALL budgets not for a specific budget.
+        budgetStatus?.let { sqlQueryBuilder.appendSelection(selection = "b.status = '${ it.name }'") }
+    }
+    trackingStatus?.let { sqlQueryBuilder.appendSelection(selection = "bp.tracking_status = '${ it.name }'") }
+
+    when {
+        fromDate?.isNotBlank() == true && (toDate == null || toDate.isBlank()) -> {
+            sqlQueryBuilder.appendSelection(selection = "bp.start_date >= '$fromDate'")
+        }
+        (fromDate == null || fromDate.isBlank()) && toDate?.isNotBlank() == true -> {
+            sqlQueryBuilder.appendSelection(selection = "bp.start_date <= '$toDate'")
+        }
+        fromDate?.isNotBlank() == true && toDate?.isNotBlank() == true -> {
+            sqlQueryBuilder.appendSelection(selection = "(bp.start_date BETWEEN Date('$fromDate') AND Date('$toDate'))")
+        }
+    }
 }
 
 internal fun sqlForImages(imageType: String? = null): SimpleSQLiteQuery {

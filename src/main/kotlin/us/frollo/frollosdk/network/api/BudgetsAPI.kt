@@ -28,6 +28,7 @@ import us.frollo.frollosdk.model.api.budgets.BudgetCreateRequest
 import us.frollo.frollosdk.model.api.budgets.BudgetPeriodResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetUpdateRequest
+import us.frollo.frollosdk.model.api.shared.PaginatedResponse
 
 internal interface BudgetsAPI {
 
@@ -36,7 +37,8 @@ internal interface BudgetsAPI {
         const val URL_BUDGET = "$URL_BUDGETS/{budget_id}"
 
         // Budget Period URLs
-        const val URL_BUDGET_PERIODS = "$URL_BUDGETS/{budget_id}/periods"
+        const val URL_BUDGET_PERIODS = "$URL_BUDGETS/periods"
+        const val URL_BUDGET_PERIODS_BY_BUDGET = "$URL_BUDGETS/{budget_id}/periods"
         const val URL_BUDGET_PERIOD = "$URL_BUDGETS/{budget_id}/periods/{period_id}"
     }
 
@@ -57,8 +59,12 @@ internal interface BudgetsAPI {
     fun deleteBudget(@Path("budget_id") budgetId: Long): Call<Void>
 
     // Budget Period API
+
     @GET(URL_BUDGET_PERIODS)
-    fun fetchBudgetPeriods(@Path("budget_id") budgetId: Long, @QueryMap queryParams: Map<String, String>): Call<List<BudgetPeriodResponse>>
+    fun fetchAllBudgetPeriods(@QueryMap queryParams: Map<String, String>): Call<PaginatedResponse<BudgetPeriodResponse>>
+
+    @GET(URL_BUDGET_PERIODS_BY_BUDGET)
+    fun fetchBudgetPeriodsByBudgetID(@Path("budget_id") budgetId: Long, @QueryMap queryParams: Map<String, String>): Call<PaginatedResponse<BudgetPeriodResponse>>
 
     @GET(URL_BUDGET_PERIOD)
     fun fetchBudgetPeriod(@Path("budget_id") budgetId: Long, @Path("period_id") periodId: Long): Call<BudgetPeriodResponse>

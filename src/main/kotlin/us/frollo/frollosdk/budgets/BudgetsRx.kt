@@ -280,6 +280,7 @@ fun Budgets.fetchBudgetPeriodRx(budgetPeriodId: Long): Observable<BudgetPeriod?>
  * @param trackingStatus Filter by the tracking status (optional)
  * @param fromDate Start date (inclusive) to fetch budgets from (optional). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
  * @param toDate End date (inclusive) to fetch budgets up to (optional). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
+ * @param budgetStatus Filter by  status of the Budget (optional)
  *
  * @return Rx Observable object of List<BudgetPeriod> which can be observed using an Observer for future changes as well.
  */
@@ -287,9 +288,18 @@ fun Budgets.fetchBudgetPeriodsRx(
     budgetId: Long? = null,
     trackingStatus: BudgetTrackingStatus? = null,
     fromDate: String? = null,
-    toDate: String? = null
+    toDate: String? = null,
+    budgetStatus: BudgetStatus? = null
 ): Observable<List<BudgetPeriod>> {
-    return db.budgetPeriods().loadByQueryRx(sqlForBudgetPeriods(budgetId, trackingStatus, fromDate, toDate))
+    return db.budgetPeriods().loadByQueryRx(
+        sqlForBudgetPeriods(
+            budgetId = budgetId,
+            trackingStatus = trackingStatus,
+            fromDate = fromDate,
+            toDate = toDate,
+            budgetStatus = budgetStatus
+        )
+    )
 }
 
 /**
@@ -324,6 +334,7 @@ fun Budgets.fetchBudgetPeriodsWithRelationRx(query: SimpleSQLiteQuery): Observab
  * @param trackingStatus Filter by the tracking status (optional)
  * @param fromDate Start date (inclusive) to fetch budgets from (optional). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
  * @param toDate End date (inclusive) to fetch budgets up to (optional). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
+ * @param budgetStatus Filter by  status of the Budget (optional)
  *
  * @return Rx Observable object of List<BudgetPeriodRelation> which can be observed using an Observer for future changes as well.
  */
@@ -331,9 +342,18 @@ fun Budgets.fetchBudgetPeriodsWithRelationRx(
     budgetId: Long? = null,
     trackingStatus: BudgetTrackingStatus? = null,
     fromDate: String? = null,
-    toDate: String? = null
+    toDate: String? = null,
+    budgetStatus: BudgetStatus? = null
 ): Observable<List<BudgetPeriodRelation>> {
-    return db.budgetPeriods().loadByQueryWithRelationRx(sqlForBudgetPeriods(budgetId, trackingStatus, fromDate, toDate))
+    return db.budgetPeriods().loadByQueryWithRelationRx(
+        sqlForBudgetPeriods(
+            budgetId = budgetId,
+            trackingStatus = trackingStatus,
+            fromDate = fromDate,
+            toDate = toDate,
+            budgetStatus = budgetStatus
+        )
+    )
 }
 
 /**

@@ -384,20 +384,74 @@ class ModelExtensionTest {
 
     @Test
     fun testSQLForBudgetPeriodIds() {
-        var query = sqlForBudgetPeriodIds(123, "2019-11-20", "2019-11-23")
-        assertEquals("SELECT budget_period_id  FROM budget_period WHERE budget_id = 123  AND (start_date BETWEEN Date('2019-11-20') AND Date('2019-11-23')) ", query.sql)
+        val budgetId: Long = 200
+        val budgetStatus = BudgetStatus.ACTIVE
+        val trackingStatus = BudgetTrackingStatus.ABOVE
+        val fromDate = "2019-03-01"
+        val toDate = "2019-03-31"
 
-        query = sqlForBudgetPeriodIds(123)
-        assertEquals("SELECT budget_period_id  FROM budget_period WHERE budget_id = 123  ", query.sql)
+        // Days between after & before is N
+        var query = sqlForBudgetPeriodIdsToGetStaleIds(
+            beforeDateString = "2019-01-01",
+            afterDateString = "2019-02-01",
+            beforeId = 200,
+            afterId = 300,
+            budgetId = budgetId,
+            budgetStatus = budgetStatus,
+            fromDate = fromDate,
+            toDate = toDate
+        )
+        assertEquals("SELECT bp.budget_period_id  FROM budget_period AS bp LEFT JOIN budget b ON bp.budget_id = b.budget_id  WHERE (bp.start_date >= '2019-01-02' OR (bp.start_date = '2019-01-01' AND bp.budget_period_id >= 200)) AND (bp.start_date <= '2019-01-31' OR (bp.start_date = '2019-02-01' AND bp.budget_period_id <= 300)) AND bp.budget_id = 200 AND (bp.start_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
+
+        // First page
+        query = sqlForBudgetPeriodIdsToGetStaleIds(
+            afterDateString = "2019-01-01",
+            afterId = 300,
+            budgetId = budgetId,
+            budgetStatus = budgetStatus,
+            fromDate = fromDate,
+            toDate = toDate
+        )
+        assertEquals("SELECT bp.budget_period_id  FROM budget_period AS bp LEFT JOIN budget b ON bp.budget_id = b.budget_id  WHERE (bp.start_date <= '2018-12-31' OR (bp.start_date = '2019-01-01' AND bp.budget_period_id <= 300)) AND bp.budget_id = 200 AND (bp.start_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
+
+        // Last page
+        query = sqlForBudgetPeriodIdsToGetStaleIds(
+            beforeDateString = "2019-02-01",
+            beforeId = 200,
+            budgetId = budgetId,
+            budgetStatus = budgetStatus,
+            fromDate = fromDate,
+            toDate = toDate
+        )
+        assertEquals("SELECT bp.budget_period_id  FROM budget_period AS bp LEFT JOIN budget b ON bp.budget_id = b.budget_id  WHERE (bp.start_date >= '2019-02-02' OR (bp.start_date = '2019-02-01' AND bp.budget_period_id >= 200)) AND bp.budget_id = 200 AND (bp.start_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
+
+        // Single page with filters
+        query = sqlForBudgetPeriodIdsToGetStaleIds(
+            budgetId = budgetId,
+            budgetStatus = budgetStatus,
+            fromDate = fromDate,
+            toDate = toDate
+        )
+        assertEquals("SELECT bp.budget_period_id  FROM budget_period AS bp LEFT JOIN budget b ON bp.budget_id = b.budget_id  WHERE bp.budget_id = 200 AND (bp.start_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
+
+        // Single page, No filters
+        query = sqlForBudgetPeriodIdsToGetStaleIds()
+        assertEquals("SELECT bp.budget_period_id  FROM budget_period AS bp LEFT JOIN budget b ON bp.budget_id = b.budget_id ", query.sql)
     }
 
     @Test
-    fun testSQLForBudgetPeriod() {
-        var query = sqlForBudgetPeriods(123, BudgetTrackingStatus.EQUAL)
-        assertEquals("SELECT  *  FROM budget_period WHERE budget_id = 123 AND tracking_status = 'EQUAL' ", query.sql)
+    fun testSQLForBudgetPeriods() {
+        var query = sqlForBudgetPeriods(
+            budgetId = 200,
+            budgetStatus = BudgetStatus.ACTIVE,
+            trackingStatus = BudgetTrackingStatus.ABOVE,
+            fromDate = "2019-03-01",
+            toDate = "2019-03-31"
+        )
+        assertEquals("SELECT bp.*  FROM budget_period AS bp LEFT JOIN budget b ON bp.budget_id = b.budget_id  WHERE bp.budget_id = 200 AND bp.tracking_status = 'ABOVE' AND (bp.start_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
 
-        query = sqlForBudgetPeriods(123)
-        assertEquals("SELECT  *  FROM budget_period WHERE budget_id = 123 ", query.sql)
+        query = sqlForBudgetPeriods()
+        assertEquals("SELECT bp.*  FROM budget_period AS bp LEFT JOIN budget b ON bp.budget_id = b.budget_id ", query.sql)
     }
 
     @Test

@@ -29,6 +29,8 @@ import org.jetbrains.anko.uiThread
 import org.threeten.bp.LocalDate
 import org.threeten.bp.temporal.TemporalAdjusters
 import us.frollo.frollosdk.base.PaginatedResult
+import us.frollo.frollosdk.base.PaginationInfo
+import us.frollo.frollosdk.base.PaginationInfoDatedCursor
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
@@ -98,7 +100,6 @@ import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountStatus
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountSubType
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
-import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantPaginationInfo
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.MerchantType
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.AccountRefreshStatus
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
@@ -116,7 +117,6 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.Tran
 import us.frollo.frollosdk.model.coredata.aggregation.transactioncategories.TransactionCategoryType
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.Transaction
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionFilter
-import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionPaginationInfo
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionRelation
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionsSummary
 import us.frollo.frollosdk.model.coredata.cdr.CDRConfiguration
@@ -976,11 +976,11 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
      * Refresh transactions from the host
      *
      * @param transactionFilter [TransactionFilter] object to filter transactions
-     * @param completion Optional completion handler with optional error if the request fails
+     * @param completion Optional completion handler with optional error if the request fails else pagination data is success
      */
     fun refreshTransactionsWithPagination(
         transactionFilter: TransactionFilter? = null,
-        completion: OnFrolloSDKCompletionListener<PaginatedResult<TransactionPaginationInfo>>? = null
+        completion: OnFrolloSDKCompletionListener<PaginatedResult<PaginationInfoDatedCursor>>? = null
     ) {
         aggregationAPI.fetchTransactions(transactionFilter).enqueue { resource ->
             when (resource.status) {
@@ -1068,7 +1068,7 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
 
     private fun refreshNextTransactions(
         transactionFilter: TransactionFilter,
-        completion: OnFrolloSDKCompletionListener<PaginatedResult<TransactionPaginationInfo>>? = null
+        completion: OnFrolloSDKCompletionListener<PaginatedResult<PaginationInfoDatedCursor>>? = null
     ) {
         refreshTransactionsWithPagination(transactionFilter) { result ->
             when (result) {
@@ -1272,7 +1272,7 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
     private fun handleRefreshTransactionsWithPaginationResponse(
         paginatedResponse: PaginatedResponse<TransactionResponse>?,
         transactionFilter: TransactionFilter?,
-        completion: OnFrolloSDKCompletionListener<PaginatedResult<TransactionPaginationInfo>>? = null
+        completion: OnFrolloSDKCompletionListener<PaginatedResult<PaginationInfoDatedCursor>>? = null
     ) {
         paginatedResponse?.data?.let { transactions ->
             if (transactions.isEmpty()) {
@@ -1329,7 +1329,7 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
 
                 uiThread {
                     val paginationInfo = PaginatedResult.Success(
-                        TransactionPaginationInfo(
+                        PaginationInfoDatedCursor(
                             before = paginatedResponse.paging.cursors?.before,
                             after = paginatedResponse.paging.cursors?.after,
                             total = paginatedResponse.paging.total,
@@ -1798,7 +1798,7 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
         before: Long? = null,
         after: Long? = null,
         batchSize: Long? = MERCHANT_BATCH_SIZE.toLong(),
-        completion: OnFrolloSDKCompletionListener<PaginatedResult<MerchantPaginationInfo>>? = null
+        completion: OnFrolloSDKCompletionListener<PaginatedResult<PaginationInfo>>? = null
     ) {
         if (merchantIds.isEmpty()) {
             completion?.invoke(PaginatedResult.Success())
@@ -1817,7 +1817,7 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
                             handleMerchantsResponseByIds(response = response.data)
 
                             uiThread {
-                                val paginationInfo = MerchantPaginationInfo(
+                                val paginationInfo = PaginationInfo(
                                     before = response.paging.cursors?.before?.toLong(),
                                     after = response.paging.cursors?.after?.toLong()
                                 )
@@ -1847,7 +1847,7 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
         before: Long? = null,
         after: Long? = null,
         batchSize: Long? = MERCHANT_BATCH_SIZE.toLong(),
-        completion: OnFrolloSDKCompletionListener<PaginatedResult<MerchantPaginationInfo>>? = null
+        completion: OnFrolloSDKCompletionListener<PaginatedResult<PaginationInfo>>? = null
     ) {
 
         aggregationAPI.fetchMerchants(before = before, after = after, size = batchSize).enqueue { resource ->
@@ -1922,7 +1922,7 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
         response: List<MerchantResponse>?,
         before: Long?,
         after: Long?,
-        completion: OnFrolloSDKCompletionListener<PaginatedResult<MerchantPaginationInfo>>? = null
+        completion: OnFrolloSDKCompletionListener<PaginatedResult<PaginationInfo>>? = null
     ) {
         response?.let {
             doAsync {
@@ -1948,7 +1948,7 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
                 }
 
                 uiThread {
-                    val paginationInfo = MerchantPaginationInfo(before = before, after = after)
+                    val paginationInfo = PaginationInfo(before = before, after = after)
                     completion?.invoke(PaginatedResult.Success(paginationInfo))
                 }
             }

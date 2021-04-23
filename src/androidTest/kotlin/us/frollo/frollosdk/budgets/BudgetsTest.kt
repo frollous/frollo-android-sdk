@@ -28,6 +28,7 @@ import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import us.frollo.frollosdk.BaseAndroidTest
+import us.frollo.frollosdk.base.PaginatedResult
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.error.DataError
@@ -791,20 +792,28 @@ class BudgetsTest : BaseAndroidTest() {
     fun testFetchBudgetPeriods() {
         initSetup()
 
-        val data1 = testBudgetPeriodResponseData(budgetPeriodId = 100, budgetId = 200, trackingStatus = BudgetTrackingStatus.EQUAL)
-        val data2 = testBudgetPeriodResponseData(budgetPeriodId = 101, budgetId = 200, trackingStatus = BudgetTrackingStatus.ABOVE)
-        val data3 = testBudgetPeriodResponseData(budgetPeriodId = 102, budgetId = 201, trackingStatus = BudgetTrackingStatus.EQUAL)
-        val data4 = testBudgetPeriodResponseData(budgetPeriodId = 103, budgetId = 200, trackingStatus = BudgetTrackingStatus.EQUAL)
-        val data5 = testBudgetPeriodResponseData(budgetPeriodId = 104, budgetId = 201, trackingStatus = BudgetTrackingStatus.EQUAL)
-        val list = mutableListOf(data1, data2, data3, data4, data5)
+        val data1 = testBudgetResponseData(budgetId = 200, status = BudgetStatus.ACTIVE)
+        val data2 = testBudgetResponseData(budgetId = 201, status = BudgetStatus.COMPLETED)
+        val budgetsList = mutableListOf(data1, data2)
 
-        database.budgetPeriods().insertAll(*list.map { it.toBudgetPeriod() }.toList().toTypedArray())
+        database.budgets().insertAll(*budgetsList.map { it.toBudget() }.toTypedArray())
 
-        val testObserver = budgets.fetchBudgetPeriods(budgetId = 200, trackingStatus = BudgetTrackingStatus.EQUAL).test()
+        val data3 = testBudgetPeriodResponseData(budgetPeriodId = 100, budgetId = 200, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data4 = testBudgetPeriodResponseData(budgetPeriodId = 101, budgetId = 200, trackingStatus = BudgetTrackingStatus.ABOVE)
+        val data5 = testBudgetPeriodResponseData(budgetPeriodId = 102, budgetId = 201, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data6 = testBudgetPeriodResponseData(budgetPeriodId = 103, budgetId = 200, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val data7 = testBudgetPeriodResponseData(budgetPeriodId = 104, budgetId = 201, trackingStatus = BudgetTrackingStatus.EQUAL)
+        val list = mutableListOf(data3, data4, data5, data6, data7)
+
+        database.budgetPeriods().insertAll(*list.map { it.toBudgetPeriod() }.toTypedArray())
+
+        val testObserver = budgets.fetchBudgetPeriods(trackingStatus = BudgetTrackingStatus.EQUAL, budgetStatus = BudgetStatus.ACTIVE).test()
 
         testObserver.awaitValue()
         assertNotNull(testObserver.value().data)
         assertEquals(2, testObserver.value().data?.size)
+        assertEquals(100L, testObserver.value().data?.get(0)?.budgetPeriodId)
+        assertEquals(103L, testObserver.value().data?.get(1)?.budgetPeriodId)
 
         tearDown()
     }
@@ -827,49 +836,157 @@ class BudgetsTest : BaseAndroidTest() {
     }
 
     @Test
-    fun testRefreshBudgetPeriods() {
+    fun testRefreshAllBudgetPeriodsWithPagination() {
         initSetup()
 
-        val signal = CountDownLatch(1)
-        val budgetId: Long = 6
-        val requestPath = "budgets/$budgetId/periods"
+        val fromDate = "2020-07-01"
+        val toDate = "2021-08-31"
+        val status = BudgetStatus.ACTIVE
+        val requestPath1 = "${BudgetsAPI.URL_BUDGET_PERIODS}?from_date=$fromDate&to_date=$toDate&status=$status"
+        val requestPath2 = "${BudgetsAPI.URL_BUDGET_PERIODS}?from_date=$fromDate&to_date=$toDate&after=1612137600_3706&status=$status"
+        val requestPath3 = "${BudgetsAPI.URL_BUDGET_PERIODS}?from_date=$fromDate&to_date=$toDate&after=1619827200_3724&status=$status"
 
-        val body = readStringFromJson(app, R.raw.budget_periods_daily)
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == requestPath) {
+                if (request?.trimmedPath == requestPath1) {
                     return MockResponse()
                         .setResponseCode(200)
-                        .setBody(body)
+                        .setBody(readStringFromJson(app, R.raw.budget_periods_page_1))
+                } else if (request?.trimmedPath == requestPath2) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.budget_periods_page_2))
+                } else if (request?.trimmedPath == requestPath3) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.budget_periods_page_3))
                 }
                 return MockResponse().setResponseCode(404)
             }
         })
 
-        budgets.refreshBudgetPeriods(budgetId = budgetId) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        val data1 = testBudgetResponseData(budgetId = 701, type = BudgetType.TRANSACTION_CATEGORY, typeValue = "65", status = BudgetStatus.ACTIVE)
+        val data2 = testBudgetResponseData(budgetId = 702, type = BudgetType.TRANSACTION_CATEGORY, typeValue = "64", status = BudgetStatus.ACTIVE)
+        val data3 = testBudgetResponseData(budgetId = 703, type = BudgetType.TRANSACTION_CATEGORY, typeValue = "63", status = BudgetStatus.ACTIVE)
+        val data4 = testBudgetResponseData(budgetId = 704, type = BudgetType.TRANSACTION_CATEGORY, typeValue = "62", status = BudgetStatus.ACTIVE)
+        val list1 = mutableListOf(data1, data2, data3, data4)
+        database.budgets().insertAll(*list1.map { it.toBudget() }.toTypedArray())
 
-            val testObserver = budgets.fetchBudgetPeriods(budgetId = budgetId).test()
+        val data5 = testBudgetPeriodResponseData(budgetPeriodId = 3718, startDate = "2020-11-01", currentAmount = BigDecimal("12.00"), trackingStatus = BudgetTrackingStatus.BELOW) // Updating budget period
+        val data6 = testBudgetPeriodResponseData(budgetPeriodId = 600, budgetId = 702, startDate = "2021-03-01") // Deleting budget period
+        val data7 = testBudgetPeriodResponseData(budgetPeriodId = 500, startDate = "2020-06-11") // Ignored budget period
+        val list2 = mutableListOf(data5, data6, data7)
+        database.budgetPeriods().insertAll(*list2.map { it.toBudgetPeriod() }.toTypedArray())
 
-            testObserver.awaitValue()
-            assertNotNull(testObserver.value().data)
-            assertEquals(15, testObserver.value().data?.size)
+        var after: String? = null
 
-            val period = testObserver.value().data?.first()
-            assertEquals(85L, period?.budgetPeriodId)
-            assertEquals(6L, period?.budgetId)
-            assertEquals(BigDecimal("111.42"), period?.currentAmount)
-            assertEquals("2019-11-22", period?.endDate)
-            assertEquals(BigDecimal("173.5"), period?.requiredAmount)
-            assertEquals("2019-11-21", period?.startDate)
-            assertEquals(BigDecimal("15.62"), period?.targetAmount)
-            assertEquals(BudgetTrackingStatus.BELOW, period?.trackingStatus)
+        val signal1 = CountDownLatch(1)
+        budgets.refreshAllBudgetPeriodsWithPagination(
+            budgetStatus = status,
+            fromDate = fromDate,
+            toDate = toDate,
+            after = after
+        ) { result ->
+            assertTrue(result is PaginatedResult.Success)
+            assertNull((result as PaginatedResult.Success).paginationInfo?.before)
+            assertEquals("1612137600_3706", result.paginationInfo?.after)
+            assertEquals(3706L, result.paginationInfo?.afterId)
+            assertEquals("2021-02-01", result.paginationInfo?.afterDate)
+
+            after = result.paginationInfo?.after
+
+            val testObserver1 = budgets.fetchBudgetPeriodsWithRelation().test()
+            testObserver1.awaitValue()
+            val fetchedBudgetPeriods = testObserver1.value().data
+            assertEquals(11, fetchedBudgetPeriods?.size)
+
+            val testObserver2 = budgets.fetchBudgetPeriod(3718).test()
+            testObserver2.awaitValue()
+            val updatedBudgetPeriod = testObserver2.value().data
+            assertNotNull(updatedBudgetPeriod)
+            assertEquals(BigDecimal("200.00"), updatedBudgetPeriod?.currentAmount)
+            assertEquals(BudgetTrackingStatus.ABOVE, updatedBudgetPeriod?.trackingStatus)
+
+            signal1.countDown()
+        }
+        signal1.await(3, TimeUnit.SECONDS)
+
+        val signal2 = CountDownLatch(1)
+        budgets.refreshAllBudgetPeriodsWithPagination(
+            budgetStatus = status,
+            fromDate = fromDate,
+            toDate = toDate,
+            after = after
+        ) { result ->
+            assertTrue(result is PaginatedResult.Success)
+            assertEquals("1612137600_3721", (result as PaginatedResult.Success).paginationInfo?.before)
+            assertEquals(3721L, result.paginationInfo?.beforeId)
+            assertEquals("2021-02-01", result.paginationInfo?.beforeDate)
+            assertEquals("1619827200_3724", result.paginationInfo?.after)
+            assertEquals(3724L, result.paginationInfo?.afterId)
+            assertEquals("2021-05-01", result.paginationInfo?.afterDate)
+
+            after = result.paginationInfo?.after
+
+            val testObserver1 = budgets.fetchBudgetPeriodsWithRelation().test()
+            testObserver1.awaitValue()
+            val fetchedBudgetPeriods = testObserver1.value().data
+            assertEquals(19, fetchedBudgetPeriods?.size)
+
+            val testObserver2 = budgets.fetchBudgetPeriod(600L).test()
+            testObserver2.awaitValue()
+            val budgetPeriod = testObserver2.value().data
+            assertNull(budgetPeriod)
+
+            signal2.countDown()
+        }
+        signal2.await(3, TimeUnit.SECONDS)
+
+        val signal3 = CountDownLatch(1)
+        budgets.refreshAllBudgetPeriodsWithPagination(
+            budgetStatus = status,
+            fromDate = fromDate,
+            toDate = toDate,
+            after = after
+        ) { result ->
+            assertTrue(result is PaginatedResult.Success)
+            assertEquals("1622505600_3704", (result as PaginatedResult.Success).paginationInfo?.before)
+            assertEquals(3704L, result.paginationInfo?.beforeId)
+            assertEquals("2021-06-01", result.paginationInfo?.beforeDate)
+            assertNull(result.paginationInfo?.after)
+
+            val testObserver1 = budgets.fetchBudgetPeriodsWithRelation().test()
+            testObserver1.awaitValue()
+            val fetchedBudgetPeriods = testObserver1.value().data
+            assertEquals(25, fetchedBudgetPeriods?.size)
+
+            val testObserver2 = budgets.fetchBudgetPeriod(500L).test()
+            testObserver2.awaitValue()
+            val budgetPeriod = testObserver2.value().data
+            assertNotNull(budgetPeriod)
+
+            signal3.countDown()
+        }
+        signal3.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshAllBudgetPeriodsFailsIfLoggedOut() {
+        initSetup()
+
+        clearLoggedInPreferences()
+        val signal = CountDownLatch(1)
+
+        budgets.refreshAllBudgetPeriodsWithPagination { result ->
+            assertTrue(result is PaginatedResult.Error)
+            assertNotNull((result as PaginatedResult.Error).error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
             signal.countDown()
         }
-
-        val request = mockServer.takeRequest()
-        assertEquals(requestPath, request.trimmedPath)
 
         signal.await(3, TimeUnit.SECONDS)
 
@@ -877,17 +994,123 @@ class BudgetsTest : BaseAndroidTest() {
     }
 
     @Test
-    fun testRefreshBudgetPeriodsFailsIfLoggedOut() {
+    fun testRefreshBudgetPeriodsByBudgetIdWithPagination() {
+        initSetup()
+
+        val fromDate = "2020-07-01"
+        val toDate = "2021-05-31"
+        val budgetId = 704L
+        val requestPath1 = "${BudgetsAPI.URL_BUDGETS}/$budgetId/periods?from_date=$fromDate&to_date=$toDate"
+        val requestPath2 = "${BudgetsAPI.URL_BUDGETS}/$budgetId/periods?from_date=$fromDate&to_date=$toDate&after=1612137600_3706"
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath1) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.budget_periods_by_budget_id_page_1))
+                } else if (request?.trimmedPath == requestPath2) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(readStringFromJson(app, R.raw.budget_periods_by_budget_id_page_2))
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        val data1 = testBudgetResponseData(budgetId = 703, type = BudgetType.TRANSACTION_CATEGORY, typeValue = "63", status = BudgetStatus.ACTIVE)
+        val data2 = testBudgetResponseData(budgetId = 704, type = BudgetType.TRANSACTION_CATEGORY, typeValue = "62", status = BudgetStatus.ACTIVE)
+        val list1 = mutableListOf(data1, data2)
+        database.budgets().insertAll(*list1.map { it.toBudget() }.toTypedArray())
+
+        val data3 = testBudgetPeriodResponseData(budgetPeriodId = 3718, startDate = "2020-11-01", currentAmount = BigDecimal("12.00"), trackingStatus = BudgetTrackingStatus.BELOW) // Updating budget period
+        val data4 = testBudgetPeriodResponseData(budgetPeriodId = 600, budgetId = 704, startDate = "2021-03-01") // Deleting budget period
+        val data5 = testBudgetPeriodResponseData(budgetPeriodId = 500, budgetId = 703, startDate = "2020-06-11") // Ignored budget period (outside date range different budget id)
+        val data6 = testBudgetPeriodResponseData(budgetPeriodId = 501, budgetId = 703, startDate = "2020-09-11") // Ignored budget period (inside date range different budget id)
+        val data7 = testBudgetPeriodResponseData(budgetPeriodId = 502, budgetId = 704, startDate = "2021-06-11") // Ignored budget period (outside date range but same budget id)
+        val list2 = mutableListOf(data3, data4, data5, data6, data7)
+        database.budgetPeriods().insertAll(*list2.map { it.toBudgetPeriod() }.toTypedArray())
+
+        var after: String? = null
+
+        val signal1 = CountDownLatch(1)
+        budgets.refreshBudgetPeriodsByBudgetIdWithPagination(
+            budgetId = budgetId,
+            fromDate = fromDate,
+            toDate = toDate,
+            after = after
+        ) { result ->
+            assertTrue(result is PaginatedResult.Success)
+            assertNull((result as PaginatedResult.Success).paginationInfo?.before)
+            assertEquals("1612137600_3706", result.paginationInfo?.after)
+            assertEquals(3706L, result.paginationInfo?.afterId)
+            assertEquals("2021-02-01", result.paginationInfo?.afterDate)
+
+            after = result.paginationInfo?.after
+
+            val testObserver1 = budgets.fetchBudgetPeriodsWithRelation().test()
+            testObserver1.awaitValue()
+            val fetchedBudgetPeriods = testObserver1.value().data
+            assertEquals(12, fetchedBudgetPeriods?.size)
+
+            val testObserver2 = budgets.fetchBudgetPeriod(3718).test()
+            testObserver2.awaitValue()
+            val updatedBudgetPeriod = testObserver2.value().data
+            assertNotNull(updatedBudgetPeriod)
+            assertEquals(BigDecimal("200.00"), updatedBudgetPeriod?.currentAmount)
+            assertEquals(BudgetTrackingStatus.ABOVE, updatedBudgetPeriod?.trackingStatus)
+
+            signal1.countDown()
+        }
+        signal1.await(3, TimeUnit.SECONDS)
+
+        val signal2 = CountDownLatch(1)
+        budgets.refreshBudgetPeriodsByBudgetIdWithPagination(
+            budgetId = budgetId,
+            fromDate = fromDate,
+            toDate = toDate,
+            after = after
+        ) { result ->
+            assertTrue(result is PaginatedResult.Success)
+            assertEquals("1614556800_3722", (result as PaginatedResult.Success).paginationInfo?.before)
+            assertEquals(3722L, result.paginationInfo?.beforeId)
+            assertEquals("2021-03-01", result.paginationInfo?.beforeDate)
+            assertNull(result.paginationInfo?.after)
+
+            after = result.paginationInfo?.after
+
+            val testObserver1 = budgets.fetchBudgetPeriodsWithRelation().test()
+            testObserver1.awaitValue()
+            val fetchedBudgetPeriods = testObserver1.value().data
+            assertEquals(15, fetchedBudgetPeriods?.size)
+            // assertEquals(14, fetchedBudgetPeriods?.size) // TODO: Uncomment and remove above line when https://frollo.atlassian.net/browse/SDK-590 is resolved
+
+            // TODO: Uncomment when https://frollo.atlassian.net/browse/SDK-590 is resolved
+            /*val testObserver2 = budgets.fetchBudgetPeriod(600L).test()
+            testObserver2.awaitValue()
+            val budgetPeriod = testObserver2.value().data
+            assertNull(budgetPeriod)*/
+
+            signal2.countDown()
+        }
+        signal2.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testRefreshBudgetPeriodsByBudgetIdFailsIfLoggedOut() {
         initSetup()
 
         clearLoggedInPreferences()
         val signal = CountDownLatch(1)
 
-        budgets.refreshBudgetPeriods(budgetId = 6) { result ->
-            assertEquals(Result.Status.ERROR, result.status)
-            assertNotNull(result.error)
+        budgets.refreshBudgetPeriodsByBudgetIdWithPagination(budgetId = 704) { result ->
+            assertTrue(result is PaginatedResult.Error)
+            assertNotNull((result as PaginatedResult.Error).error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
             signal.countDown()
         }
 
@@ -961,12 +1184,10 @@ class BudgetsTest : BaseAndroidTest() {
         initSetup()
 
         val signal = CountDownLatch(2)
-        val budgetId: Long = 6
-        val requestPath = "budgets/$budgetId/periods"
 
         mockServer.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == requestPath) {
+                if (request?.trimmedPath == BudgetsAPI.URL_BUDGET_PERIODS) {
                     return MockResponse()
                         .setResponseCode(200)
                         .setBody(readStringFromJson(app, R.raw.budget_periods_daily))
@@ -985,13 +1206,12 @@ class BudgetsTest : BaseAndroidTest() {
             signal.countDown()
         }
 
-        budgets.refreshBudgetPeriods(budgetId) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
+        budgets.refreshAllBudgetPeriodsWithPagination { result ->
+            assertTrue(result is PaginatedResult.Success)
             signal.countDown()
         }
 
-        signal.await(3, TimeUnit.SECONDS)
+        signal.await(120, TimeUnit.SECONDS)
 
         val testObserver = budgets.fetchBudgetWithRelation(6).test()
 
@@ -999,132 +1219,9 @@ class BudgetsTest : BaseAndroidTest() {
         val model = testObserver.value().data
         assertNotNull(model)
         assertEquals(6L, model?.budget?.budgetId)
-        assertEquals(model?.periods?.get(0)?.budgetPeriodId, 85L)
-
-        tearDown()
-    }
-
-    @Test
-    fun testRefreshBudgetPeriodsUpdatesExistingWithToAndFrom() {
-        initSetup()
-
-        // testLinkingRemoveCachedCascade for budget periods as well
-        val signal = CountDownLatch(1)
-        val budgetId: Long = 6
-        val periodId: Long = 85
-        val requestPath = "budgets/$budgetId/periods?from_date=2019-11-20&to_date=2019-11-23"
-
-        val data11 = testBudgetPeriodResponseData(budgetPeriodId = 85, budgetId = 100, trackingStatus = BudgetTrackingStatus.EQUAL)
-        val data12 = testBudgetPeriodResponseData(budgetPeriodId = 101, budgetId = 6, trackingStatus = BudgetTrackingStatus.ABOVE)
-        // below line tests removing of cached budget periods
-        val data13 = testBudgetPeriodResponseData(budgetPeriodId = 102, budgetId = 6, trackingStatus = BudgetTrackingStatus.EQUAL, fromDate = "2019-11-21", toDate = "2019-11-21")
-        val data14 = testBudgetPeriodResponseData(budgetPeriodId = 103, budgetId = 200, trackingStatus = BudgetTrackingStatus.EQUAL)
-        val data15 = testBudgetPeriodResponseData(budgetPeriodId = 104, budgetId = 201, trackingStatus = BudgetTrackingStatus.EQUAL)
-        val periods = mutableListOf(data11, data12, data13, data14, data15)
-
-        database.budgetPeriods().insertAll(*periods.map { it.toBudgetPeriod() }.toList().toTypedArray())
-
-        val body = readStringFromJson(app, R.raw.budget_periods_daily)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == requestPath) {
-                    return MockResponse()
-                        .setResponseCode(200)
-                        .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        val testObserverX = budgets.fetchBudgetPeriod(periodId).test()
-        testObserverX.awaitValue()
-        assertEquals(100L, testObserverX.value().data?.budgetId) // initially 100
-
-        budgets.refreshBudgetPeriods(budgetId = budgetId, fromDate = "2019-11-20", toDate = "2019-11-23") { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            val testObserver = budgets.fetchBudgetPeriod(periodId).test()
-            val testObserver2 = budgets.fetchBudgetPeriods().test()
-            val testObserver3 = budgets.fetchBudgetPeriod(102).test()
-
-            testObserver.awaitValue()
-            testObserver2.awaitValue()
-            testObserver3.awaitValue()
-            assertNotNull(testObserver.value().data)
-            assertEquals(6L, testObserver.value().data?.budgetId) // changed from 100 to 6
-            assertEquals(18, testObserver2.value().data?.size) // 15 from api + 5existing -1 in from & to date removed and -1 budgetPeriodId 85 updated
-            assertNull(testObserver3.value().data)
-
-            signal.countDown()
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(requestPath, request.trimmedPath)
-
-        signal.await(3, TimeUnit.SECONDS)
-
-        tearDown()
-    }
-
-    @Test
-    fun testRefreshBudgetPeriodsUpdatesExisting() {
-        initSetup()
-
-        val signal = CountDownLatch(1)
-        val budgetId: Long = 6
-        val periodId: Long = 85
-        val requestPath = "budgets/$budgetId/periods"
-
-        val data11 = testBudgetPeriodResponseData(budgetPeriodId = 85, budgetId = 100, trackingStatus = BudgetTrackingStatus.EQUAL)
-        val data12 = testBudgetPeriodResponseData(budgetPeriodId = 101, budgetId = 6, trackingStatus = BudgetTrackingStatus.ABOVE)
-        // below line tests removing of cached budget periods
-        val data13 = testBudgetPeriodResponseData(budgetPeriodId = 102, budgetId = 6, trackingStatus = BudgetTrackingStatus.EQUAL, fromDate = "2019-11-21", toDate = "2019-11-21")
-        val data14 = testBudgetPeriodResponseData(budgetPeriodId = 103, budgetId = 200, trackingStatus = BudgetTrackingStatus.EQUAL)
-        val data15 = testBudgetPeriodResponseData(budgetPeriodId = 104, budgetId = 201, trackingStatus = BudgetTrackingStatus.EQUAL)
-        val periods = mutableListOf(data11, data12, data13, data14, data15)
-
-        database.budgetPeriods().insertAll(*periods.map { it.toBudgetPeriod() }.toList().toTypedArray())
-
-        val body = readStringFromJson(app, R.raw.budget_periods_daily)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == requestPath) {
-                    return MockResponse()
-                        .setResponseCode(200)
-                        .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        val testObserverX = budgets.fetchBudgetPeriod(periodId).test()
-        testObserverX.awaitValue()
-        assertEquals(100L, testObserverX.value().data?.budgetId) // initially 100
-
-        budgets.refreshBudgetPeriods(budgetId = budgetId) { result ->
-            assertEquals(Result.Status.SUCCESS, result.status)
-            assertNull(result.error)
-
-            val testObserver = budgets.fetchBudgetPeriod(periodId).test()
-            val testObserver2 = budgets.fetchBudgetPeriods().test()
-            val testObserver3 = budgets.fetchBudgetPeriod(102).test()
-
-            testObserver.awaitValue()
-            testObserver2.awaitValue()
-            testObserver3.awaitValue()
-            assertNotNull(testObserver.value().data)
-            assertEquals(6L, testObserver.value().data?.budgetId) // changed from 100 to 6
-            assertEquals(17, testObserver2.value().data?.size) // 15 from api + 5existing -2 as only 2 with this budgetId in database -1 as 85 is common
-            assertNull(testObserver3.value().data)
-
-            signal.countDown()
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(requestPath, request.trimmedPath)
-
-        signal.await(3, TimeUnit.SECONDS)
+        assertEquals(2, model?.periods?.size)
+        assertEquals(85L, model?.periods?.get(0)?.budgetPeriodId)
+        assertEquals(86L, model?.periods?.get(1)?.budgetPeriodId)
 
         tearDown()
     }

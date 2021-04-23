@@ -34,6 +34,7 @@ import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.CDRProduct
 import us.frollo.frollosdk.model.coredata.aggregation.providers.CDRProductCategory
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionFilter
+import us.frollo.frollosdk.model.coredata.budgets.BudgetStatus
 import us.frollo.frollosdk.model.coredata.budgets.BudgetType
 import us.frollo.frollosdk.model.coredata.contacts.PaymentMethod
 import us.frollo.frollosdk.model.coredata.goals.GoalStatus
@@ -236,14 +237,26 @@ internal fun BudgetsAPI.fetchBudgets(
 }
 
 internal fun BudgetsAPI.fetchBudgetPeriods(
-    budgetId: Long,
+    budgetId: Long? = null,
+    budgetStatus: BudgetStatus? = null,
     fromDate: String? = null,
-    toDate: String? = null
-): Call<List<BudgetPeriodResponse>> {
+    toDate: String? = null,
+    before: String? = null,
+    after: String? = null,
+    size: Long? = null
+): Call<PaginatedResponse<BudgetPeriodResponse>> {
     val queryMap = mutableMapOf<String, String>()
     fromDate?.let { queryMap["from_date"] = it }
     toDate?.let { queryMap["to_date"] = it }
-    return fetchBudgetPeriods(budgetId, queryMap)
+    after?.let { queryMap.put("after", it) }
+    before?.let { queryMap.put("before", it) }
+    size?.let { queryMap.put("size", it.toString()) }
+    return budgetId?.let {
+        fetchBudgetPeriodsByBudgetID(budgetId = it, queryMap)
+    } ?: run {
+        budgetStatus?.let { queryMap["status"] = it.toString() } // This query parameter is supported only for fetchAllBudgetPeriods API
+        fetchAllBudgetPeriods(queryMap)
+    }
 }
 
 // Images

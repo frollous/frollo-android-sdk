@@ -30,7 +30,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
-import us.frollo.frollosdk.extensions.sqlForBudgetPeriodIds
 import us.frollo.frollosdk.extensions.sqlForBudgetPeriods
 import us.frollo.frollosdk.mapping.toBudget
 import us.frollo.frollosdk.mapping.toBudgetPeriod
@@ -294,13 +293,14 @@ class BudgetPeriodDaoTest {
 
     @Test
     fun testBudgetPeriodGetIds() {
-
         db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 456, budgetId = 123).toBudgetPeriod())
         db.budgetPeriods().insert(testBudgetPeriodResponseData(budgetPeriodId = 4561, budgetId = 123).toBudgetPeriod())
 
-        val testObserver = db.budgetPeriods().getIds(sqlForBudgetPeriodIds(123))
+        val query1 = SimpleSQLiteQuery("SELECT * FROM budget_period WHERE budget_id = 123")
+        val testObserver = db.budgetPeriods().getIdsByQuery(query1)
         // test data start date 2019-02-01
-        val testObserver2 = db.budgetPeriods().getIds(sqlForBudgetPeriodIds(123, "2019-01-02", "2019-02-10"))
+        val query2 = SimpleSQLiteQuery("SELECT * FROM budget_period WHERE budget_id = 123 AND (start_date BETWEEN Date('2019-01-02') AND Date('2019-02-10'))")
+        val testObserver2 = db.budgetPeriods().getIdsByQuery(query2)
 
         assertEquals(2, testObserver.size)
         assertEquals(456, testObserver[0])

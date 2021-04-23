@@ -41,7 +41,7 @@ internal interface BudgetPeriodDao {
     fun loadByQuery(queryStr: SupportSQLiteQuery): LiveData<List<BudgetPeriod>>
 
     @RawQuery
-    fun getIds(queryStr: SupportSQLiteQuery): LongArray
+    fun getIdsByQuery(queryStr: SupportSQLiteQuery): LongArray
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg models: BudgetPeriod): LongArray

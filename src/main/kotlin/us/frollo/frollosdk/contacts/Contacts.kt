@@ -21,6 +21,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.base.PaginatedResult
+import us.frollo.frollosdk.base.PaginationInfo
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
@@ -37,7 +38,6 @@ import us.frollo.frollosdk.model.api.contacts.ContactInternationalCreateUpdateRe
 import us.frollo.frollosdk.model.api.contacts.ContactResponse
 import us.frollo.frollosdk.model.coredata.contacts.CRNType
 import us.frollo.frollosdk.model.coredata.contacts.Contact
-import us.frollo.frollosdk.model.coredata.contacts.ContactPaginationInfo
 import us.frollo.frollosdk.model.coredata.contacts.PayIDType
 import us.frollo.frollosdk.model.coredata.contacts.PaymentDetails
 import us.frollo.frollosdk.model.coredata.contacts.PaymentMethod
@@ -124,7 +124,7 @@ class Contacts(network: NetworkService, internal val db: SDKDatabase) {
         after: Long? = null,
         before: Long? = null,
         size: Long? = null,
-        completion: OnFrolloSDKCompletionListener<PaginatedResult<ContactPaginationInfo>>? = null
+        completion: OnFrolloSDKCompletionListener<PaginatedResult<PaginationInfo>>? = null
     ) {
         contactsAPI.fetchContacts(
             paymentMethod = paymentMethod,
@@ -592,7 +592,7 @@ class Contacts(network: NetworkService, internal val db: SDKDatabase) {
         paymentMethod: PaymentMethod?,
         after: Long?,
         before: Long?,
-        completion: OnFrolloSDKCompletionListener<PaginatedResult<ContactPaginationInfo>>?
+        completion: OnFrolloSDKCompletionListener<PaginatedResult<PaginationInfo>>?
     ) {
         response?.let {
             doAsync {
@@ -621,7 +621,7 @@ class Contacts(network: NetworkService, internal val db: SDKDatabase) {
                 }
 
                 uiThread {
-                    val paginationInfo = ContactPaginationInfo(before = before, after = after)
+                    val paginationInfo = PaginationInfo(before = before, after = after)
                     completion?.invoke(PaginatedResult.Success(paginationInfo))
                 }
             }

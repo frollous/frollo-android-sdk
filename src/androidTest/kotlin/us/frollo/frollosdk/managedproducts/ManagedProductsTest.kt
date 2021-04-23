@@ -158,7 +158,7 @@ class ManagedProductsTest : BaseAndroidTest() {
             signal.countDown()
         }
 
-        signal.await(120, TimeUnit.SECONDS)
+        signal.await(3, TimeUnit.SECONDS)
 
         assertEquals(1, mockServer.requestCount)
 

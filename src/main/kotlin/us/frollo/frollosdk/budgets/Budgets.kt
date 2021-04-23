@@ -22,16 +22,19 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import com.google.gson.JsonObject
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import us.frollo.frollosdk.base.PaginatedResult
+import us.frollo.frollosdk.base.PaginationInfoDatedCursor
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
+import us.frollo.frollosdk.core.LIMIT
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.fetchBudgetPeriods
 import us.frollo.frollosdk.extensions.fetchBudgets
 import us.frollo.frollosdk.extensions.sqlForBudgetIds
-import us.frollo.frollosdk.extensions.sqlForBudgetPeriodIds
+import us.frollo.frollosdk.extensions.sqlForBudgetPeriodIdsToGetStaleIds
 import us.frollo.frollosdk.extensions.sqlForBudgetPeriods
 import us.frollo.frollosdk.extensions.sqlForBudgets
 import us.frollo.frollosdk.logging.Log
@@ -41,6 +44,7 @@ import us.frollo.frollosdk.model.api.budgets.BudgetCreateRequest
 import us.frollo.frollosdk.model.api.budgets.BudgetPeriodResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetResponse
 import us.frollo.frollosdk.model.api.budgets.BudgetUpdateRequest
+import us.frollo.frollosdk.model.api.shared.PaginatedResponse
 import us.frollo.frollosdk.model.coredata.budgets.Budget
 import us.frollo.frollosdk.model.coredata.budgets.BudgetFrequency
 import us.frollo.frollosdk.model.coredata.budgets.BudgetPeriod
@@ -528,6 +532,7 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
      * @param trackingStatus Filter by the tracking status (optional)
      * @param fromDate Start date (inclusive) to fetch budgets from (optional). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
      * @param toDate End date (inclusive) to fetch budgets up to (optional). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param budgetStatus Filter by  status of the Budget (optional)
      *
      * @return LiveData object of Resource<List<BudgetPeriod>> which can be observed using an Observer for future changes as well.
      */
@@ -535,9 +540,20 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
         budgetId: Long? = null,
         trackingStatus: BudgetTrackingStatus? = null,
         fromDate: String? = null,
-        toDate: String? = null
+        toDate: String? = null,
+        budgetStatus: BudgetStatus? = null
     ): LiveData<Resource<List<BudgetPeriod>>> =
-        Transformations.map(db.budgetPeriods().loadByQuery(sqlForBudgetPeriods(budgetId, trackingStatus, fromDate, toDate))) { models ->
+        Transformations.map(
+            db.budgetPeriods().loadByQuery(
+                sqlForBudgetPeriods(
+                    budgetId = budgetId,
+                    trackingStatus = trackingStatus,
+                    fromDate = fromDate,
+                    toDate = toDate,
+                    budgetStatus = budgetStatus
+                )
+            )
+        ) { models ->
             Resource.success(models)
         }
 
@@ -575,6 +591,7 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
      * @param trackingStatus Filter by the tracking status (optional)
      * @param fromDate Start date (inclusive) to fetch budgets from (optional). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
      * @param toDate End date (inclusive) to fetch budgets up to (optional). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param budgetStatus Filter by  status of the Budget (optional)
      *
      * @return LiveData object of Resource<List<BudgetPeriodRelation>> which can be observed using an Observer for future changes as well.
      */
@@ -582,9 +599,20 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
         budgetId: Long? = null,
         trackingStatus: BudgetTrackingStatus? = null,
         fromDate: String? = null,
-        toDate: String? = null
+        toDate: String? = null,
+        budgetStatus: BudgetStatus? = null
     ): LiveData<Resource<List<BudgetPeriodRelation>>> =
-        Transformations.map(db.budgetPeriods().loadByQueryWithRelation(sqlForBudgetPeriods(budgetId, trackingStatus, fromDate, toDate))) { models ->
+        Transformations.map(
+            db.budgetPeriods().loadByQueryWithRelation(
+                sqlForBudgetPeriods(
+                    budgetId = budgetId,
+                    trackingStatus = trackingStatus,
+                    fromDate = fromDate,
+                    toDate = toDate,
+                    budgetStatus = budgetStatus
+                )
+            )
+        ) { models ->
             Resource.success(models)
         }
 
@@ -622,22 +650,100 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
     }
 
     /**
+     * Refresh All budget periods
+     *
+     * @param budgetStatus Filter budget periods to be refreshed by [BudgetStatus] (Optional)
+     * @param fromDate Start date to refresh budget periods from (inclusive). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param toDate End date to refresh budget periods up to (inclusive). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
+     * @param after after field to get next list in pagination. Format is "<epoch_date>_<budget_period_id>"
+     * @param before before field to get previous list in pagination. Format is "<epoch_date>_<budget_period_id>"
+     * @param size Count of objects to returned from the API (page size)
+     * @param completion Optional completion handler with optional error if the request fails  else pagination data is success (Optional)
+     */
+    fun refreshAllBudgetPeriodsWithPagination(
+        budgetStatus: BudgetStatus? = null,
+        fromDate: String? = null,
+        toDate: String? = null,
+        after: String? = null,
+        before: String? = null,
+        size: Long? = null,
+        completion: OnFrolloSDKCompletionListener<PaginatedResult<PaginationInfoDatedCursor>>? = null
+    ) {
+        refreshBudgetPeriodsWithPagination(
+            budgetStatus = budgetStatus,
+            fromDate = fromDate,
+            toDate = toDate,
+            before = before,
+            after = after,
+            size = size,
+            completion = completion
+        )
+    }
+
+    /**
      * Refresh a budget periods by budget id from the host
      *
      * @param budgetId ID of the budget to fetch
      * @param fromDate Start date to refresh budget periods from (inclusive). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
      * @param toDate End date to refresh budget periods up to (inclusive). Please use [BudgetPeriod.DATE_FORMAT_PATTERN] for the format pattern.
-     * @param completion Optional completion handler with optional error if the request fails (Optional)
+     * @param after after field to get next list in pagination. Format is "<epoch_date>_<budget_period_id>"
+     * @param before before field to get previous list in pagination. Format is "<epoch_date>_<budget_period_id>"
+     * @param size Count of objects to returned from the API (page size)
+     * @param completion Optional completion handler with optional error if the request fails  else pagination data is success (Optional)
      */
-    fun refreshBudgetPeriods(budgetId: Long, fromDate: String? = null, toDate: String? = null, completion: OnFrolloSDKCompletionListener<Result>? = null) {
-        budgetsAPI.fetchBudgetPeriods(budgetId, fromDate, toDate).enqueue { resource ->
+    fun refreshBudgetPeriodsByBudgetIdWithPagination(
+        budgetId: Long,
+        fromDate: String? = null,
+        toDate: String? = null,
+        after: String? = null,
+        before: String? = null,
+        size: Long? = null,
+        completion: OnFrolloSDKCompletionListener<PaginatedResult<PaginationInfoDatedCursor>>? = null
+    ) {
+        refreshBudgetPeriodsWithPagination(
+            budgetId = budgetId,
+            fromDate = fromDate,
+            toDate = toDate,
+            before = before,
+            after = after,
+            size = size,
+            completion = completion
+        )
+    }
+
+    private fun refreshBudgetPeriodsWithPagination(
+        budgetId: Long? = null,
+        budgetStatus: BudgetStatus? = null,
+        fromDate: String? = null,
+        toDate: String? = null,
+        after: String? = null,
+        before: String? = null,
+        size: Long? = null,
+        completion: OnFrolloSDKCompletionListener<PaginatedResult<PaginationInfoDatedCursor>>? = null
+    ) {
+        budgetsAPI.fetchBudgetPeriods(
+            budgetId = budgetId,
+            budgetStatus = budgetStatus,
+            fromDate = fromDate,
+            toDate = toDate,
+            before = before,
+            after = after,
+            size = size
+        ).enqueue { resource ->
             when (resource.status) {
                 Resource.Status.ERROR -> {
-                    Log.e("$TAG#refreshBudgetPeriods", resource.error?.localizedDescription)
-                    completion?.invoke(Result.error(resource.error))
+                    Log.e("$TAG#refreshBudgetPeriodsWithPagination", resource.error?.localizedDescription)
+                    completion?.invoke(PaginatedResult.Error(resource.error))
                 }
                 Resource.Status.SUCCESS -> {
-                    handleBudgetPeriodsResponse(resource.data, budgetId, fromDate, toDate, completion)
+                    handleBudgetPeriodsWithPaginationResponse(
+                        paginatedResponse = resource.data,
+                        budgetId = budgetId,
+                        budgetStatus = budgetStatus,
+                        fromDate = fromDate,
+                        toDate = toDate,
+                        completion = completion
+                    )
                 }
             }
         }
@@ -711,23 +817,82 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
         }
     }
 
-    private fun handleBudgetPeriodsResponse(response: List<BudgetPeriodResponse>?, budgetId: Long, fromDate: String? = null, toDate: String? = null, completion: ((Result) -> Unit)?) {
-        response?.let {
+    private fun handleBudgetPeriodsWithPaginationResponse(
+        paginatedResponse: PaginatedResponse<BudgetPeriodResponse>?,
+        budgetId: Long? = null,
+        budgetStatus: BudgetStatus? = null,
+        fromDate: String? = null,
+        toDate: String? = null,
+        completion: OnFrolloSDKCompletionListener<PaginatedResult<PaginationInfoDatedCursor>>?
+    ) {
+        paginatedResponse?.data?.let { budgetPeriods ->
+            if (budgetPeriods.isEmpty()) {
+                completion?.invoke(PaginatedResult.Success())
+                return
+            }
+
             doAsync {
+                val firstBudgetPeriod = budgetPeriods.first()
+                val lastBudgetPeriod = budgetPeriods.last()
 
-                val models = response.map { it.toBudgetPeriod() }
-                db.budgetPeriods().insertAll(*models.toTypedArray())
-                val apiIds = models.map { it.budgetPeriodId }.toHashSet()
-                val allPeriodIds = db.budgetPeriods().getIds(sqlForBudgetPeriodIds(budgetId, fromDate, toDate)).toHashSet()
-                val staleIds = allPeriodIds.minus(apiIds)
+                var beforeDate: String? = null
+                var afterDate: String? = null
+                var beforeId: Long? = null
+                var afterId: Long? = null
 
-                if (staleIds.isNotEmpty()) {
-                    removeCachedBudgetPeriods(staleIds.toLongArray())
+                // Upper limit predicate if not first page
+                paginatedResponse.paging.cursors?.before?.let {
+                    beforeDate = firstBudgetPeriod.startDate
+                    beforeId = firstBudgetPeriod.budgetPeriodId
                 }
 
-                uiThread { completion?.invoke(Result.success()) }
+                // Lower limit predicate if not last page
+                paginatedResponse.paging.cursors?.after?.let {
+                    afterDate = lastBudgetPeriod.startDate
+                    afterId = lastBudgetPeriod.budgetPeriodId
+                }
+
+                // Insert all budget periods & fetch IDs from API response
+                val apiIds = insertBudgetPeriods(budgetPeriods)
+
+                // Get IDs from database
+                val localIds = db.budgetPeriods().getIdsByQuery(
+                    sqlForBudgetPeriodIdsToGetStaleIds(
+                        beforeDateString = beforeDate,
+                        afterDateString = afterDate,
+                        beforeId = beforeId,
+                        afterId = afterId,
+                        budgetId = budgetId,
+                        budgetStatus = budgetStatus,
+                        fromDate = fromDate,
+                        toDate = toDate
+                    )
+                )
+
+                // Get stale IDs that are not present in the API response
+                val staleIds = localIds.toHashSet().minus(apiIds.toHashSet())
+
+                // Delete the entries for these stale IDs from database if they exist
+                if (staleIds.isNotEmpty()) {
+                    removeBudgetPeriods(staleIds.toLongArray())
+                }
+
+                uiThread {
+                    val paginationInfo = PaginatedResult.Success(
+                        PaginationInfoDatedCursor(
+                            before = paginatedResponse.paging.cursors?.before,
+                            after = paginatedResponse.paging.cursors?.after,
+                            total = paginatedResponse.paging.total,
+                            beforeDate = firstBudgetPeriod.startDate,
+                            beforeId = firstBudgetPeriod.budgetPeriodId,
+                            afterDate = lastBudgetPeriod.startDate,
+                            afterId = lastBudgetPeriod.budgetPeriodId
+                        )
+                    )
+                    completion?.invoke(paginationInfo)
+                }
             }
-        } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+        } ?: run { completion?.invoke(PaginatedResult.Success()) } // Explicitly invoke completion callback if response is null.
     }
 
     private fun handleBudgetPeriodResponse(response: BudgetPeriodResponse?, completion: ((Result) -> Unit)?) {
@@ -737,5 +902,22 @@ class Budgets(network: NetworkService, internal val db: SDKDatabase) {
                 uiThread { completion?.invoke(Result.success()) }
             }
         } ?: run { completion?.invoke(Result.success()) } // Explicitly invoke completion callback if response is null.
+    }
+
+    private fun insertBudgetPeriods(response: List<BudgetPeriodResponse>): LongArray {
+        val models = response.map { it.toBudgetPeriod() }
+        db.budgetPeriods().insertAll(*models.toTypedArray())
+
+        return response.map { it.budgetPeriodId }.toLongArray()
+    }
+
+    // WARNING: Do not call this method on the main thread
+    private fun removeBudgetPeriods(budgetPeriodIds: LongArray) {
+        val chunked = budgetPeriodIds.toList().chunked(LIMIT.SQLITE_MAX_VARIABLE_NUMBER)
+        chunked.forEach { ids ->
+            if (ids.isNotEmpty()) {
+                db.budgetPeriods().deleteMany(ids.toLongArray())
+            }
+        }
     }
 }

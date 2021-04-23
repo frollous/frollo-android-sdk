@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.coredata.aggregation.transactions
+package us.frollo.frollosdk.base
 
 /**
  * Result with information of transaction pagination
  *
- * @param after After cursor. Format is "<epoch_date>_<transaction_id>" (Optional)
- * @param before Before cursor. Format is "<epoch_date>_<transaction_id>" (Optional)
+ * @param after After cursor. Format is "<epoch_date>_<id>" (Optional)
+ * @param before Before cursor. Format is "<epoch_date>_<id>" (Optional)
  * @param total Total count (Optional)
  * @param beforeId Before Id (Optional)
  * @param afterId After Id (Optional)
  * @param beforeDate Before Date for pagination (Optional)
  * @param afterDate After Date for pagination (Optional)
  */
-data class TransactionPaginationInfo(
+data class PaginationInfoDatedCursor(
     val before: String? = null,
     val after: String? = null,
     val total: Long? = null,

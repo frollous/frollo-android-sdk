@@ -34,13 +34,13 @@ internal interface CardsAPI {
     companion object {
         // Card URLs
         const val URL_CARDS = "cards"
-        const val URL_CARD = "cards/{card_id}"
+        const val URL_CARD = "$URL_CARDS/{card_id}"
         const val URL_CARD_REPLACE = "$URL_CARD/replace"
         const val URL_CARD_SET_PIN = "$URL_CARD/pin"
         const val URL_CARD_ACTIVATE = "$URL_CARD/activate"
         const val URL_CARD_LOCK = "$URL_CARD/lock"
         const val URL_CARD_UNLOCK = "$URL_CARD/unlock"
-        const val URL_CARD_PUBLIC_KEY = "cards/public_key"
+        const val URL_CARD_PUBLIC_KEY = "$URL_CARDS/pin/key"
     }
 
     // Card API

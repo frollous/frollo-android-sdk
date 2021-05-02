@@ -17,6 +17,7 @@
 package us.frollo.frollosdk.extensions
 
 import android.content.Intent
+import android.util.Base64
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
@@ -25,8 +26,11 @@ import okhttp3.Response
 import us.frollo.frollosdk.FrolloSDK
 import java.io.Serializable
 import java.nio.charset.Charset
+import java.security.KeyFactory
+import java.security.spec.X509EncodedKeySpec
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
+import javax.crypto.Cipher
 
 /* Kotlin extensions */
 /**
@@ -122,4 +126,14 @@ internal fun Set<Long>.compareToFindMissingItems(s2: Set<Long>): Set<Long> {
     }
 
     return missingElements
+}
+
+internal fun encryptValueBase64(publicKeyString: String, value: String): String {
+    val byteKey = Base64.decode(publicKeyString.toByteArray(), Base64.DEFAULT)
+    val kf = KeyFactory.getInstance("RSA")
+    val publicKey = kf.generatePublic(X509EncodedKeySpec(byteKey))
+    val cypher = Cipher.getInstance("RSA/ECB/PKCS1Padding")
+    cypher.init(Cipher.ENCRYPT_MODE, publicKey)
+    val bytes = cypher.doFinal(value.toByteArray())
+    return Base64.encodeToString(bytes, Base64.DEFAULT)
 }

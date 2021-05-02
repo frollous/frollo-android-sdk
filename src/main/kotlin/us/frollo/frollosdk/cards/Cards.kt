@@ -25,6 +25,7 @@ import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.extensions.encryptValueBase64
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.sqlForCards
 import us.frollo.frollosdk.logging.Log
@@ -369,6 +370,23 @@ class Cards(network: NetworkService, internal val db: SDKDatabase) {
                 Log.e("$TAG#getPublicKey", resource.error?.localizedDescription)
             }
             completion.invoke(resource)
+        }
+    }
+
+    /**
+     * Encrypt card pin using public key
+     *
+     * @param pin Card's PIN
+     * @param publicKey PEM formatted public key to use for encryption
+     *
+     * @return Encrypted value of the Card's PIN if success else null
+     */
+    fun encryptPin(pin: String, publicKey: String): String? {
+        return try {
+            encryptValueBase64(publicKey, pin)
+        } catch (e: Exception) {
+            Log.e("Cards#encryptPin", "Encryption failed: ${e.message}")
+            null
         }
     }
 

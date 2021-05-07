@@ -89,7 +89,7 @@ android {
 }
 
 buildscript {
-    ext.kotlin_version_internal = '1.4.31'
+    ext.kotlin_version_internal = '1.5.0'
 
     repositories {
         google()
@@ -132,9 +132,9 @@ dependencies {
 
     // Android Arch Components
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.3.1"
-    implementation "androidx.room:room-runtime:2.2.6"
-    implementation 'androidx.room:room-rxjava2:2.2.6'
-    kapt "androidx.room:room-compiler:2.2.6"
+    implementation "androidx.room:room-runtime:2.3.0"
+    implementation 'androidx.room:room-rxjava2:2.3.0'
+    kapt "androidx.room:room-compiler:2.3.0"
 
     // Anko (https://github.com/Kotlin/anko)
     implementation "org.jetbrains.anko:anko:0.10.8"

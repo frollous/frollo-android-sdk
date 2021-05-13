@@ -135,5 +135,5 @@ internal fun encryptValueBase64(publicKeyString: String, value: String): String 
     val cypher = Cipher.getInstance("RSA/ECB/PKCS1Padding")
     cypher.init(Cipher.ENCRYPT_MODE, publicKey)
     val bytes = cypher.doFinal(value.toByteArray())
-    return Base64.encodeToString(bytes, Base64.DEFAULT)
+    return Base64.encodeToString(bytes, Base64.NO_WRAP) // NO_WRAP is important to exclude new line characters in the encoded string
 }

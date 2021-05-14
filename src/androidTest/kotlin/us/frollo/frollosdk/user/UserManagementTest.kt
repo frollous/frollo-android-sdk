@@ -1179,4 +1179,42 @@ class UserManagementTest : BaseAndroidTest() {
 
         tearDown()
     }
+
+    @Test
+    fun testSendFeedback() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == DeviceAPI.URL_LOG) {
+                    return MockResponse()
+                        .setResponseCode(201)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        userManagement.sendFeedback(
+            message = "App with good user experience"
+        ) { resource ->
+            assertEquals(Result.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(DeviceAPI.URL_LOG, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
 }

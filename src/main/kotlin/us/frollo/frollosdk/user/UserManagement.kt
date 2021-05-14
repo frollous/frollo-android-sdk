@@ -38,6 +38,7 @@ import us.frollo.frollosdk.extensions.updateRequest
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.api.device.DeviceUpdateRequest
+import us.frollo.frollosdk.model.api.device.LogRequest
 import us.frollo.frollosdk.model.api.user.UserChangePasswordRequest
 import us.frollo.frollosdk.model.api.user.UserConfirmDetailsRequest
 import us.frollo.frollosdk.model.api.user.UserMigrationRequest
@@ -572,6 +573,37 @@ class UserManagement(
                 }
                 Resource.Status.SUCCESS -> {
                     completion.invoke(Result.success())
+                }
+            }
+        }
+    }
+
+    /**
+     * Send feedback
+     *
+     * @param message Value of the message sent as feedback
+     * @param completion Completion handler with optional error if the request fails
+     */
+    fun sendFeedback(
+        message: String,
+        completion: OnFrolloSDKCompletionListener<Result>? = null
+    ) {
+        deviceAPI.createLog(
+            LogRequest(
+                message = message,
+                score = 0, // 0 is the value for Feedback
+                deviceId = di.deviceId,
+                deviceType = di.deviceType,
+                deviceName = di.deviceName
+            )
+        ).enqueue { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> {
+                    Log.e("$TAG#sendFeedback", resource.error?.localizedDescription)
+                    completion?.invoke(Result.error(resource.error))
+                }
+                Resource.Status.SUCCESS -> {
+                    completion?.invoke(Result.success())
                 }
             }
         }

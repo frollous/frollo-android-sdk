@@ -579,7 +579,7 @@ class UserManagement(
     }
 
     /**
-     * Send feedback
+     * Send user feedback to the host
      *
      * @param message Value of the message sent as feedback
      * @param completion Completion handler with optional error if the request fails

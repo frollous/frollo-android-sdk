@@ -28,7 +28,10 @@ enum class SurveyAnswerType {
     @SerializedName("selection") SELECTION,
 
     /** Answer which can accept user entry */
-    @SerializedName("freeform") FREE_FORM;
+    @SerializedName("freeform") FREE_FORM,
+
+    /** Answer which can accept user entry - Numeric Only */
+    @SerializedName("numeric") NUMERIC;
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

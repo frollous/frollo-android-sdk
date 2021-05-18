@@ -33,10 +33,10 @@ data class SurveyAnswer(
     @SerializedName("title") val title: String?,
 
     /** Additional information for the answer. */
-    @SerializedName("display_text") val display_text: String?,
+    @SerializedName("display_text") val displayText: String?,
 
     /** Url of the icon associated to the answer. */
-    @SerializedName("icon_url") val icon_url: String?,
+    @SerializedName("icon_url") val iconUrl: String?,
 
     /** Value of the answer */
     @SerializedName("value") var value: String,

@@ -31,7 +31,10 @@ enum class SurveyQuestionType {
     @SerializedName("checkbox") CHECKBOX,
 
     /** Question with a slider view for answers */
-    @SerializedName("slider") SLIDER;
+    @SerializedName("slider") SLIDER,
+
+    /** Question with a text field for answers */
+    @SerializedName("text") TEXT;
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

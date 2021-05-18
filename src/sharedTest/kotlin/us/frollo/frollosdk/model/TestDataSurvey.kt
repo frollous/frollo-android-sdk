@@ -31,8 +31,8 @@ internal fun testSurveyData(): Survey {
         SurveyAnswer(
             id = 2,
             title = randomUUID(),
-            display_text = randomString(32),
-            icon_url = null,
+            displayText = randomString(32),
+            iconUrl = null,
             value = "5",
             selected = true,
             type = SurveyAnswerType.SELECTION

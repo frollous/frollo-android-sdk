@@ -1,5 +1,12 @@
 ## Changelog
 
+### 3.9.0
+
+#### Changes
+
+- Surveys - Support Freeform & Numeric types
+- User Feedback convenience method
+
 ### 3.8.0
 
 #### Features

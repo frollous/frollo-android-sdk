@@ -18,6 +18,11 @@ The Frollo Android SDK is broken down into multiple components that reflect the 
 * [Surveys](#surveys) - Questions and feedback from the user
 * [Payments](#payments) - Manages payments
 * [Images](#images) - Upload images for budgets, goals etc..
+* [Contacts](#contacts) - TBD
+* [Cards](#cards) - TBD
+* [KYC](#kyc) - TBD
+* [ManagedProducts](#managedproducts) - TBD
+* [Payday](#payday) - TBD
 
 ### Authentication
 
@@ -220,3 +225,9 @@ See [KYC](us.frollo.frollosdk.kyc/-kyc/index.html) for more details.
 TBD
 
 See [ManagedProducts](us.frollo.frollosdk.managedproducts/-managedproducts/index.html) for more details.
+
+### Payday
+
+TBD
+
+See [Paydays](us.frollo.frollosdk.paydays/-paydays/index.html) for more details.

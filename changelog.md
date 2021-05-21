@@ -2,6 +2,10 @@
 
 ### 3.9.0
 
+#### Features
+
+- Payday
+
 #### Changes
 
 - Surveys - Support Freeform & Numeric types

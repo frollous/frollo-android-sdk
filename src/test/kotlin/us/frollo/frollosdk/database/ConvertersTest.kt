@@ -76,6 +76,8 @@ import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.messages.OpenMode
+import us.frollo.frollosdk.model.coredata.payday.PaydayFrequency
+import us.frollo.frollosdk.model.coredata.payday.PaydayStatus
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
@@ -1395,5 +1397,37 @@ class ConvertersTest {
         assertEquals("VISA", str)
 
         assertNull(Converters.instance.stringFromCardIssuer(null))
+    }
+
+    @Test
+    fun testStringToPaydayStatus() {
+        val status = Converters.instance.stringToPaydayStatus("CONFIRMED")
+        assertEquals(PaydayStatus.CONFIRMED, status)
+
+        assertEquals(PaydayStatus.UNKNOWN, Converters.instance.stringToPaydayStatus(null))
+    }
+
+    @Test
+    fun testStringFromPaydayStatus() {
+        val str = Converters.instance.stringFromPaydayStatus(PaydayStatus.CONFIRMED)
+        assertEquals("CONFIRMED", str)
+
+        assertEquals("UNKNOWN", Converters.instance.stringFromPaydayStatus(null))
+    }
+
+    @Test
+    fun testStringToPaydayFrequency() {
+        val frequency = Converters.instance.stringToPaydayFrequency("MONTHLY")
+        assertEquals(PaydayFrequency.MONTHLY, frequency)
+
+        assertEquals(PaydayFrequency.UNKNOWN, Converters.instance.stringToPaydayFrequency(null))
+    }
+
+    @Test
+    fun testStringFromPaydayFrequency() {
+        val str = Converters.instance.stringFromPaydayFrequency(PaydayFrequency.MONTHLY)
+        assertEquals("MONTHLY", str)
+
+        assertEquals("UNKNOWN", Converters.instance.stringFromPaydayFrequency(null))
     }
 }

@@ -119,6 +119,7 @@ class FrolloSDKAndroidUnitTest {
             assertNotNull(FrolloSDK.kyc)
             assertNotNull(FrolloSDK.managedProducts)
             assertNotNull(FrolloSDK.cards)
+            assertNotNull(FrolloSDK.paydays)
         }
     }
 
@@ -304,6 +305,17 @@ class FrolloSDKAndroidUnitTest {
 
         try {
             FrolloSDK.cards
+        } catch (e: IllegalAccessException) {
+            assertEquals(FrolloSDK.SDK_NOT_SETUP, e.localizedMessage)
+        }
+    }
+
+    @Test
+    fun testSDKPaydaysThrowsErrorBeforeSetup() {
+        assertFalse(FrolloSDK.isSetup)
+
+        try {
+            FrolloSDK.paydays
         } catch (e: IllegalAccessException) {
             assertEquals(FrolloSDK.SDK_NOT_SETUP, e.localizedMessage)
         }

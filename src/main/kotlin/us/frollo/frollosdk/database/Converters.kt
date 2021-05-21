@@ -71,6 +71,8 @@ import us.frollo.frollosdk.model.coredata.goals.GoalTrackingStatus
 import us.frollo.frollosdk.model.coredata.goals.GoalTrackingType
 import us.frollo.frollosdk.model.coredata.messages.ContentType
 import us.frollo.frollosdk.model.coredata.messages.OpenMode
+import us.frollo.frollosdk.model.coredata.payday.PaydayFrequency
+import us.frollo.frollosdk.model.coredata.payday.PaydayStatus
 import us.frollo.frollosdk.model.coredata.reports.ReportGrouping
 import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
@@ -557,4 +559,18 @@ internal class Converters {
 
     @TypeConverter
     fun stringFromCardIssuer(value: CardIssuer?): String? = value?.name
+
+    // Payday
+
+    @TypeConverter
+    fun stringFromPaydayStatus(value: PaydayStatus?): String = value?.name ?: PaydayStatus.UNKNOWN.name
+
+    @TypeConverter
+    fun stringToPaydayStatus(value: String?): PaydayStatus = if (value == null) PaydayStatus.UNKNOWN else PaydayStatus.valueOf(value)
+
+    @TypeConverter
+    fun stringFromPaydayFrequency(value: PaydayFrequency?): String = value?.name ?: PaydayFrequency.UNKNOWN.name
+
+    @TypeConverter
+    fun stringToPaydayFrequency(value: String?): PaydayFrequency = if (value == null) PaydayFrequency.UNKNOWN else PaydayFrequency.valueOf(value)
 }

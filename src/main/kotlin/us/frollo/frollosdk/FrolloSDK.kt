@@ -63,6 +63,7 @@ import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.ResponseDataAPI
 import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.notifications.Notifications
+import us.frollo.frollosdk.paydays.Paydays
 import us.frollo.frollosdk.payments.Payments
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.reports.Reports
@@ -190,6 +191,12 @@ object FrolloSDK {
         get() = _cards ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
     /**
+     * Paydays - Managing all aspects of payday. See [Paydays] for details
+     */
+    val paydays: Paydays
+        get() = _paydays ?: throw IllegalAccessException(SDK_NOT_SETUP)
+
+    /**
      * Log Manager - Manages logging to the host. See [LogManager] for details
      */
     val logger: LogManager
@@ -213,6 +220,7 @@ object FrolloSDK {
     private var _kyc: KYC? = null
     private var _managedProducts: ManagedProducts? = null
     private var _cards: Cards? = null
+    private var _paydays: Paydays? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
@@ -347,6 +355,9 @@ object FrolloSDK {
 
             // 25. Setup Cards
             _cards = Cards(network, database)
+
+            // 26. Setup Paydays
+            _paydays = Paydays(network, database)
 
             if (version.migrationNeeded()) {
                 version.migrateVersion()

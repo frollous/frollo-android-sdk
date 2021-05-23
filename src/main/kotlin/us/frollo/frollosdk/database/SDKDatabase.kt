@@ -37,6 +37,7 @@ import us.frollo.frollosdk.database.dao.GoalPeriodDao
 import us.frollo.frollosdk.database.dao.ImageDao
 import us.frollo.frollosdk.database.dao.MerchantDao
 import us.frollo.frollosdk.database.dao.MessageDao
+import us.frollo.frollosdk.database.dao.PaydayDao
 import us.frollo.frollosdk.database.dao.ProviderAccountDao
 import us.frollo.frollosdk.database.dao.ProviderDao
 import us.frollo.frollosdk.database.dao.ReportAccountBalanceDao
@@ -63,6 +64,7 @@ import us.frollo.frollosdk.model.coredata.contacts.Contact
 import us.frollo.frollosdk.model.coredata.goals.Goal
 import us.frollo.frollosdk.model.coredata.goals.GoalPeriod
 import us.frollo.frollosdk.model.coredata.images.Image
+import us.frollo.frollosdk.model.coredata.payday.Payday
 import us.frollo.frollosdk.model.coredata.reports.ReportAccountBalance
 import us.frollo.frollosdk.model.coredata.user.User
 
@@ -88,9 +90,10 @@ import us.frollo.frollosdk.model.coredata.user.User
         Consent::class,
         CDRConfiguration::class,
         Contact::class,
-        Card::class
+        Card::class,
+        Payday::class
     ],
-    version = 12, exportSchema = true
+    version = 13, exportSchema = true
 )
 
 @TypeConverters(Converters::class)
@@ -117,6 +120,7 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun cdrConfiguration(): CDRConfigurationDao
     internal abstract fun contacts(): ContactDao
     internal abstract fun cards(): CardDao
+    internal abstract fun payday(): PaydayDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"
@@ -134,7 +138,21 @@ abstract class SDKDatabase : RoomDatabase() {
             Room.databaseBuilder(context, SDKDatabase::class.java, DATABASE_NAME)
                 .allowMainThreadQueries() // Needed for some tests
                 // .fallbackToDestructiveMigration()
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12)
+                .addMigrations(
+                    MIGRATION_1_2,
+                    MIGRATION_2_3,
+                    MIGRATION_3_4,
+                    MIGRATION_4_5,
+                    MIGRATION_5_6,
+                    MIGRATION_6_7,
+                    MIGRATION_6_8,
+                    MIGRATION_7_8,
+                    MIGRATION_8_9,
+                    MIGRATION_9_10,
+                    MIGRATION_10_11,
+                    MIGRATION_11_12,
+                    MIGRATION_12_13
+                )
                 .build()
 
         // Copy-paste of auto-generated SQLs from room schema json file
@@ -486,6 +504,14 @@ abstract class SDKDatabase : RoomDatabase() {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `card` (`card_id` INTEGER NOT NULL, `account_id` INTEGER NOT NULL, `status` TEXT NOT NULL, `design_type` TEXT NOT NULL, `created_at` TEXT NOT NULL, `cancelled_at` TEXT, `name` TEXT, `nick_name` TEXT, `pan_last_digits` TEXT, `expiry_date` TEXT, `cardholder_name` TEXT, `type` TEXT, `issuer` TEXT, `pin_set_at` TEXT, PRIMARY KEY(`card_id`))")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_card_card_id` ON `card` (`card_id`)")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_card_account_id` ON `card` (`account_id`)")
+            }
+        }
+
+        private val MIGRATION_12_13: Migration = object : Migration(12, 13) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // New changes in this migration:
+                // 1) New table - payday
+                database.execSQL("CREATE TABLE IF NOT EXISTS `payday` (`status` TEXT NOT NULL, `frequency` TEXT NOT NULL, `next_date` TEXT, `previous_date` TEXT, `payday_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
             }
         }
     }

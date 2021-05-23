@@ -44,6 +44,7 @@ import us.frollo.frollosdk.messages.Messages
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.TokenAPI
 import us.frollo.frollosdk.notifications.Notifications
+import us.frollo.frollosdk.paydays.Paydays
 import us.frollo.frollosdk.payments.Payments
 import us.frollo.frollosdk.preferences.Preferences
 import us.frollo.frollosdk.reports.Reports
@@ -86,6 +87,7 @@ abstract class BaseAndroidTest {
     lateinit var kyc: KYC
     lateinit var managedProducts: ManagedProducts
     lateinit var cards: Cards
+    lateinit var paydays: Paydays
     lateinit var appInfo: AppInfo
 
     val scopes = listOf("offline_access", "openid", "email")
@@ -141,6 +143,7 @@ abstract class BaseAndroidTest {
         kyc = KYC(network)
         managedProducts = ManagedProducts(network)
         cards = Cards(network, database)
+        paydays = Paydays(network, database)
 
         AndroidThreeTen.init(app)
     }

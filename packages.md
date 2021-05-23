@@ -164,6 +164,10 @@ Frollo SDK managed product models
 
 Frollo SDK message models
 
+# Package us.frollo.frollosdk.model.coredata.payday
+
+Frollo SDK payday models
+
 # Package us.frollo.frollosdk.model.coredata.reports
 
 Frollo SDK report models
@@ -199,6 +203,10 @@ Frollo SDK OAuth2 models
 # Package us.frollo.frollosdk.notifications
 
 Manages registration for and handling of incoming push notifications.
+
+# Package us.frollo.frollosdk.paydays
+
+Manages payday
 
 # Package us.frollo.frollosdk.payments
 

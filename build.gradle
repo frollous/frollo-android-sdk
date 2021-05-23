@@ -86,6 +86,43 @@ android {
             suppress = true
         }
     }
+
+    // TODO: Uncomment this when we upgrade dokka version.
+    //  Commented this for now as we are not able to add project description markup files
+    /*dokkaHtml {
+        dokkaSourceSets {
+            named("main") {
+                reportUndocumented.set(true)
+                includeNonPublic.set(false)
+                skipDeprecated.set(false)
+                skipEmptyPackages.set(true)
+
+                // includes.from("overview.md", "changelog.md", "README.md", "extras.md","packages.md")
+                includes.from("packages.md")
+
+                perPackageOption {
+                    matchingRegex.set("us.frollo.frollosdk.database")
+                    suppress.set(true)
+                }
+                perPackageOption {
+                    matchingRegex.set("us.frollo.frollosdk.keystore")
+                    suppress.set(true)
+                }
+                perPackageOption {
+                    matchingRegex.set("us.frollo.frollosdk.network")
+                    suppress.set(true)
+                }
+                perPackageOption {
+                    matchingRegex.set("us.frollo.frollosdk.preferences")
+                    suppress.set(true)
+                }
+                perPackageOption {
+                    matchingRegex.set("us.frollo.frollosdk.FrolloSDKInitProvider")
+                    suppress.set(true)
+                }
+            }
+        }
+    }*/
 }
 
 buildscript {

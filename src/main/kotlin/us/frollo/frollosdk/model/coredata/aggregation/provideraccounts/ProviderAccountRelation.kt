@@ -53,4 +53,11 @@ data class ProviderAccountRelation(
             val models = providers
             return if (models?.isNotEmpty() == true) models[0] else null
         }
+
+    /** Associated Consent */
+    val consent: Consent?
+        get() {
+            val models = consents
+            return if (models?.isNotEmpty() == true) models[0] else null
+        }
 }

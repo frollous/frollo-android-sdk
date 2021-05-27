@@ -30,6 +30,7 @@ import us.frollo.frollosdk.model.api.images.ImageResponse
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.ReportsResponse
 import us.frollo.frollosdk.model.api.shared.PaginatedResponse
+import us.frollo.frollosdk.model.api.user.AddressAutocomplete
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.CDRProduct
 import us.frollo.frollosdk.model.coredata.aggregation.providers.CDRProductCategory
@@ -55,6 +56,7 @@ import us.frollo.frollosdk.network.api.ImagesAPI
 import us.frollo.frollosdk.network.api.ManagedProductsAPI
 import us.frollo.frollosdk.network.api.ReportsAPI
 import us.frollo.frollosdk.network.api.SurveysAPI
+import us.frollo.frollosdk.network.api.UserAPI
 
 // Aggregation
 
@@ -325,4 +327,11 @@ internal fun ManagedProductsAPI.fetchManagedProducts(
     before?.let { queryMap.put("before", it.toString()) }
     size?.let { queryMap.put("size", it.toString()) }
     return fetchManagedProducts(queryMap)
+}
+
+internal fun UserAPI.addressAutocomplete(query: String, max: Int): Call<List<AddressAutocomplete>> {
+    val queryMap = mutableMapOf<String, String>()
+    queryMap["query"] = query
+    queryMap["max"] = max.toString()
+    return addressAutocomplete(queryMap)
 }

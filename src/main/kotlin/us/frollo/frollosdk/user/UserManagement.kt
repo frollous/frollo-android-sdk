@@ -31,6 +31,7 @@ import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
+import us.frollo.frollosdk.extensions.addressAutocomplete
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.notify
 import us.frollo.frollosdk.extensions.toString
@@ -39,6 +40,7 @@ import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.api.device.DeviceUpdateRequest
 import us.frollo.frollosdk.model.api.device.LogRequest
+import us.frollo.frollosdk.model.api.user.AddressAutocomplete
 import us.frollo.frollosdk.model.api.user.UserChangePasswordRequest
 import us.frollo.frollosdk.model.api.user.UserConfirmDetailsRequest
 import us.frollo.frollosdk.model.api.user.UserMigrationRequest
@@ -606,6 +608,44 @@ class UserManagement(
                     completion?.invoke(Result.success())
                 }
             }
+        }
+    }
+
+    /**
+     * Get addresses list that matches the query string
+     *
+     * @param query String to match address
+     * @param max Maximum number of items to fetch. Should be between 10 and 100; defaults to 20.
+     * @param completion Completion handler with optional error if the request fails or list of addresses is success
+     */
+    fun addressAutocomplete(
+        query: String,
+        max: Int = 20,
+        completion: OnFrolloSDKCompletionListener<Resource<List<AddressAutocomplete>>>
+    ) {
+        userAPI.addressAutocomplete(query, max).enqueue { resource ->
+            if (resource.status == Resource.Status.ERROR) {
+                Log.e("$TAG#addressAutocomplete", resource.error?.localizedDescription)
+            }
+            completion.invoke(resource)
+        }
+    }
+
+    /**
+     * Get address by ID
+     *
+     * @param addressId ID of the address to get the details
+     * @param completion Completion handler with optional error if the request fails or address details is success
+     */
+    fun fetchAddress(
+        addressId: String,
+        completion: OnFrolloSDKCompletionListener<Resource<Address>>
+    ) {
+        userAPI.fetchAddress(addressId).enqueue { resource ->
+            if (resource.status == Resource.Status.ERROR) {
+                Log.e("$TAG#fetchAddress", resource.error?.localizedDescription)
+            }
+            completion.invoke(resource)
         }
     }
 }

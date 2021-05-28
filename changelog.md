@@ -5,6 +5,7 @@
 #### Features
 
 - Payday
+- Address Autocomplete
 
 #### Changes
 

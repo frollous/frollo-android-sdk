@@ -1203,15 +1203,186 @@ class UserManagementTest : BaseAndroidTest() {
 
         userManagement.sendFeedback(
             message = "App with good user experience"
-        ) { resource ->
-            assertEquals(Result.Status.SUCCESS, resource.status)
-            assertNull(resource.error)
+        ) { result ->
+            assertEquals(Result.Status.SUCCESS, result.status)
+            assertNull(result.error)
 
             signal.countDown()
         }
 
         val request = mockServer.takeRequest()
         assertEquals(DeviceAPI.URL_LOG, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testSendFeedbackFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        userManagement.sendFeedback("App with good user experience") { result ->
+            assertEquals(Result.Status.ERROR, result.status)
+            assertNotNull(result.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        assertEquals(0, mockServer.requestCount)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testAddressAutocomplete() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        val requestPath = "${UserAPI.URL_ADDRESS_AUTOCOMPLETE}?query=ashmole&max=20"
+
+        val body = readStringFromJson(app, R.raw.address_autocomplete)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        userManagement.addressAutocomplete(query = "ashmole", max = 20) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val models = resource.data
+            assertEquals(20, models?.size)
+            assertEquals("c3a85816-a9c5-11eb-81f0-68c07153d52e", models?.first()?.id)
+            assertEquals("105 Ashmole Road, REDCLIFFE QLD 4020", models?.first()?.address)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testAddressAutocompleteFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        userManagement.addressAutocomplete(query = "ashmole", max = 20) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        assertEquals(0, mockServer.requestCount)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchAddress() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        preferences.loggedIn = true
+        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
+        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
+        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+
+        val addressId = "c3a85816-a9c5-11eb-81f0-68c07153d52e"
+        val requestPath = "user/addresses/autocomplete/$addressId"
+
+        val body = readStringFromJson(app, R.raw.address_by_id)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        userManagement.fetchAddress(addressId) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            assertEquals("105 Ashmole", resource.data?.buildingName)
+            assertEquals("", resource.data?.unitNumber)
+            assertEquals("105", resource.data?.streetNumber)
+            assertEquals("Ashmole", resource.data?.streetName)
+            assertEquals("Road", resource.data?.streetType)
+            assertEquals("Redcliffe", resource.data?.suburb)
+            assertEquals("", resource.data?.town)
+            assertEquals("", resource.data?.region)
+            assertEquals("QLD", resource.data?.state)
+            assertEquals("AU", resource.data?.country)
+            assertEquals("4020", resource.data?.postcode)
+            assertEquals("105 Ashmole Road, REDCLIFFE QLD 4020", resource.data?.longForm)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchAddressFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        userManagement.fetchAddress("c3a85816-a9c5-11eb-81f0-68c07153d52e") { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        assertEquals(0, mockServer.requestCount)
 
         signal.await(3, TimeUnit.SECONDS)
 

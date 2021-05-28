@@ -24,6 +24,8 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.QueryMap
+import us.frollo.frollosdk.model.api.user.AddressAutocomplete
 import us.frollo.frollosdk.model.api.user.UserChangePasswordRequest
 import us.frollo.frollosdk.model.api.user.UserConfirmDetailsRequest
 import us.frollo.frollosdk.model.api.user.UserMigrationRequest
@@ -39,6 +41,7 @@ import us.frollo.frollosdk.model.api.user.payid.UserPayIdOTPResponse
 import us.frollo.frollosdk.model.api.user.payid.UserPayIdRegisterRequest
 import us.frollo.frollosdk.model.api.user.payid.UserPayIdRemoveRequest
 import us.frollo.frollosdk.model.api.user.payid.UserPayIdResponse
+import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.network.NetworkHelper
 
 internal interface UserAPI {
@@ -55,6 +58,8 @@ internal interface UserAPI {
         const val URL_PAYID_REMOVE = "user/payid/remove"
         const val URL_PAYID_OTP = "user/payid/otp"
         const val URL_PAYID_ACCOUNT = "user/payid/account/{account_id}"
+        const val URL_ADDRESS_AUTOCOMPLETE = "user/addresses/autocomplete"
+        const val URL_ADDRESS = "user/addresses/autocomplete/{address_id}"
     }
 
     @POST(URL_REGISTER)
@@ -101,4 +106,10 @@ internal interface UserAPI {
 
     @GET(URL_PAYID_ACCOUNT)
     fun fetchPayIdsForAccount(@Path("account_id") id: Long): Call<List<UserPayIdAccountResponse>>
+
+    @POST(URL_ADDRESS_AUTOCOMPLETE)
+    fun addressAutocomplete(@QueryMap queryParams: Map<String, String>): Call<List<AddressAutocomplete>>
+
+    @GET(URL_ADDRESS)
+    fun fetchAddress(@Path("address_id") addressId: String): Call<Address>
 }

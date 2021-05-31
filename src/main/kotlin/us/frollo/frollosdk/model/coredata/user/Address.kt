@@ -17,7 +17,9 @@
 package us.frollo.frollosdk.model.coredata.user
 
 import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.model.IAdapterModel
 import us.frollo.frollosdk.model.coredata.kyc.AddressType
+import java.io.Serializable
 
 /**
  * Address of the user
@@ -51,5 +53,6 @@ data class Address(
     /** Address postcode. (Optional) */
     @SerializedName("postal_code") var postcode: String? = null,
     /** Full address in formatted form. (Optional) */
-    @SerializedName("long_form") var longForm: String? = null,
-)
+    @SerializedName("long_form") var longForm: String? = null
+
+) : IAdapterModel, Serializable

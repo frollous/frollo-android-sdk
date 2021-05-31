@@ -17,6 +17,7 @@
 package us.frollo.frollosdk.model.api.user
 
 import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.model.IAdapterModel
 
 /** Data representation of the address autocomplete response */
 data class AddressAutocomplete(
@@ -26,4 +27,5 @@ data class AddressAutocomplete(
 
     /** Address text */
     @SerializedName("address") val address: String
-)
+
+) : IAdapterModel

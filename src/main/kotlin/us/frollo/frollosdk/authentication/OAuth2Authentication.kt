@@ -39,6 +39,7 @@ import us.frollo.frollosdk.extensions.handleOAuth2Failure
 import us.frollo.frollosdk.extensions.notify
 import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.model.oauth.OAuth2Scope
+import us.frollo.frollosdk.model.oauth.OAuthGrantType
 import us.frollo.frollosdk.model.oauth.OAuthTokenRequest
 import us.frollo.frollosdk.model.oauth.OAuthTokenResponse
 import us.frollo.frollosdk.network.ApiResponse
@@ -191,9 +192,16 @@ class OAuth2Authentication(
      * @param email Email address of the user
      * @param password Password for the user
      * @param scopes OpenID Connect OAuth2 scopes to be sent. See [OAuth2Scope].
+     * @param grantType Optional OAuth Grant Type for the Authentication. By Default it is [OAuthGrantType.PASSWORD]
      * @param completion: Completion handler with any error that occurred
      */
-    fun loginUser(email: String, password: String, scopes: List<String>, completion: OnFrolloSDKCompletionListener<Result>) {
+    fun loginUser(
+        email: String,
+        password: String,
+        scopes: List<String>,
+        grantType: OAuthGrantType = OAuthGrantType.PASSWORD,
+        completion: OnFrolloSDKCompletionListener<Result>
+    ) {
         if (loggedIn) {
             val error = DataError(type = DataErrorType.AUTHENTICATION, subType = DataErrorSubType.ALREADY_LOGGED_IN)
             Log.e("$TAG#loginUser", error.localizedDescription)
@@ -201,12 +209,19 @@ class OAuth2Authentication(
             return
         }
 
-        if (!oAuth2Helper.config.validForROPC()) {
+        if (!oAuth2Helper.config.validForROPC() &&
+            grantType in listOf(OAuthGrantType.PASSWORD, OAuthGrantType.REALM_PASSWORD)
+        ) {
             completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
             return
         }
 
-        val request = oAuth2Helper.getLoginRequest(username = email, password = password, scopes = scopes)
+        val request = oAuth2Helper.getLoginRequest(
+            username = email,
+            password = password,
+            scopes = scopes,
+            grantType = grantType
+        )
         if (!request.valid) {
             completion.invoke(Result.error(DataError(DataErrorType.API, DataErrorSubType.INVALID_DATA)))
             return

@@ -19,10 +19,14 @@ package us.frollo.frollosdk.model.oauth
 import com.google.gson.annotations.SerializedName
 import us.frollo.frollosdk.extensions.serializedName
 
-internal enum class OAuthGrantType {
+/**
+ * OAuth Grant Type
+ */
+enum class OAuthGrantType {
     @SerializedName("authorization_code") AUTHORIZATION_CODE,
     @SerializedName("password") PASSWORD,
-    @SerializedName("refresh_token") REFRESH_TOKEN;
+    @SerializedName("refresh_token") REFRESH_TOKEN,
+    @SerializedName("http://auth0.com/oauth/grant-type/password-realm") REALM_PASSWORD;
 
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =

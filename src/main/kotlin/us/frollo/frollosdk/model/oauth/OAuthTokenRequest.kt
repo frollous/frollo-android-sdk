@@ -31,12 +31,14 @@ internal data class OAuthTokenRequest(
     @SerializedName("username") val username: String? = null,
     @SerializedName("password") val password: String? = null,
     @SerializedName("audience") val audience: String? = null,
-    @SerializedName("scope") val scope: String? = null
+    @SerializedName("scope") val scope: String? = null,
+    @SerializedName("realm") val realm: String? = null,
 ) {
     val valid: Boolean
         get() = when (grantType) {
             OAuthGrantType.AUTHORIZATION_CODE -> code != null && redirectUrl != null
-            OAuthGrantType.PASSWORD -> (password != null && username != null) || legacyToken != null
+            OAuthGrantType.PASSWORD,
+            OAuthGrantType.REALM_PASSWORD -> (password != null && username != null) || legacyToken != null
             OAuthGrantType.REFRESH_TOKEN -> refreshToken != null
         }
 }

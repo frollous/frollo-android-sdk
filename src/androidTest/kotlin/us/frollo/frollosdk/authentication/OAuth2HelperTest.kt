@@ -28,6 +28,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import us.frollo.frollosdk.core.testSDKConfig
+import us.frollo.frollosdk.model.oauth.OAuthGrantType
 import us.frollo.frollosdk.testutils.randomString
 
 class OAuth2HelperTest {
@@ -48,7 +49,7 @@ class OAuth2HelperTest {
     fun testGetLoginRequest() {
         val username = randomString(32)
         val password = randomString(8)
-        val request = oAuth.getLoginRequest(username = username, password = password, scopes = listOf("offline_access", "openid", "email"))
+        val request = oAuth.getLoginRequest(username = username, password = password, scopes = listOf("offline_access", "openid", "email"), grantType = OAuthGrantType.PASSWORD)
         assertNotNull(request)
         assertTrue(request.valid)
         assertEquals(username, request.username)
@@ -60,7 +61,7 @@ class OAuth2HelperTest {
     fun testGetRegisterRequest() {
         val username = randomString(32)
         val password = randomString(8)
-        val request = oAuth.getRegisterRequest(username = username, password = password, scopes = listOf("offline_access", "openid", "email"))
+        val request = oAuth.getRegisterRequest(username = username, password = password, scopes = listOf("offline_access", "openid", "email"), grantType = OAuthGrantType.PASSWORD)
         assertNotNull(request)
         assertTrue(request.valid)
         assertEquals(username, request.username)

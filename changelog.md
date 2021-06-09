@@ -11,6 +11,7 @@
 
 - Surveys - Support Freeform & Numeric types
 - User Feedback convenience method
+- Support custom OAuth Audience & Grant Type
 
 ### 3.8.0
 

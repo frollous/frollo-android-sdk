@@ -47,20 +47,21 @@ class OAuth2Helper(val config: FrolloSDKConfiguration) {
             refreshToken = refreshToken
         )
 
-    internal fun getLoginRequest(username: String, password: String, scopes: List<String>) =
+    internal fun getLoginRequest(username: String, password: String, scopes: List<String>, grantType: OAuthGrantType) =
         OAuthTokenRequest(
-            grantType = OAuthGrantType.PASSWORD,
+            grantType = grantType,
             clientId = config.clientId,
             domain = domain,
             username = username,
             password = password,
-            audience = config.serverUrl,
-            scope = scopes.joinToString(" ")
+            audience = oAuth2.audienceUrl ?: config.serverUrl,
+            scope = scopes.joinToString(" "),
+            realm = "Username-Password-Authentication" // Note: Needed for Volt
         )
 
-    internal fun getRegisterRequest(username: String, password: String, scopes: List<String>) =
+    internal fun getRegisterRequest(username: String, password: String, scopes: List<String>, grantType: OAuthGrantType) =
         OAuthTokenRequest(
-            grantType = OAuthGrantType.PASSWORD,
+            grantType = grantType,
             clientId = config.clientId,
             domain = domain,
             username = username,

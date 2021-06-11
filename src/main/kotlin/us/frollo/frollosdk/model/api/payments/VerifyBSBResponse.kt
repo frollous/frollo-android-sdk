@@ -26,13 +26,13 @@ import com.google.gson.annotations.SerializedName
 data class VerifyBSBResponse(
 
     /** BSB Number */
-    @SerializedName("bsb") val bsb: String,
+    @SerializedName("bsb") val bsb: String?,
 
     /** Institution Mnemonic */
-    @SerializedName("institution_mnemonic") val institutionMnemonic: String,
+    @SerializedName("institution_mnemonic") val institutionMnemonic: String?,
 
     /** Name of the bank */
-    @SerializedName("name") val name: String,
+    @SerializedName("name") val name: String?,
 
     /** Address of the bank */
     @SerializedName("street_address") val streetAddress: String?,

@@ -18,8 +18,10 @@ package us.frollo.frollosdk.network.api
 
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Path
 import us.frollo.frollosdk.model.api.payments.PayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.PayAnyoneResponse
 import us.frollo.frollosdk.model.api.payments.PaymentBPayRequest
@@ -28,6 +30,7 @@ import us.frollo.frollosdk.model.api.payments.PaymentPayIdRequest
 import us.frollo.frollosdk.model.api.payments.PaymentPayIdResponse
 import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
 import us.frollo.frollosdk.model.api.payments.PaymentTransferResponse
+import us.frollo.frollosdk.model.api.payments.VerifyBSBResponse
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneResponse
 import us.frollo.frollosdk.model.api.payments.VerifyPayIdRequest
@@ -52,6 +55,9 @@ internal interface PaymentsAPI {
         // PayID URLs
         const val URL_PAY_ID = "payments/payid"
         const val URL_VERIFY_PAY_ID = "payments/verify/payid"
+
+        // BSB URLs
+        const val URL_VERIFY_BSB = "bsb_details/{bsb}"
     }
 
     // Make Payment APIs
@@ -78,4 +84,7 @@ internal interface PaymentsAPI {
 
     @POST(URL_VERIFY_PAY_ID)
     fun verifyPayId(@Body request: VerifyPayIdRequest): Call<VerifyPayIdResponse>
+
+    @GET(URL_VERIFY_BSB)
+    fun verifyBSB(@Path("bsb") bsb: String): Call<VerifyBSBResponse>
 }

@@ -22,6 +22,7 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
@@ -640,6 +641,77 @@ class PaymentsTest : BaseAndroidTest() {
             payId = "+61411111111",
             type = PayIDType.MOBILE
         ) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testVerifyBSB() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val bsb = "517000"
+        val requestPath = "bsb_details/$bsb"
+
+        val body = readStringFromJson(app, R.raw.payment_verify_bsb_response)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        payments.verifyBSB(bsb) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val response = resource.data
+            assertNotNull(response)
+
+            assertEquals("517-000", response?.bsb)
+            assertEquals("VOL", response?.institutionMnemonic)
+            assertEquals("Volt Bank Limited", response?.name)
+            assertEquals("Level 3, 41 McLaren Street", response?.streetAddress)
+            assertEquals("North Sydney", response?.suburb)
+            assertEquals("NSW", response?.state)
+            assertEquals("2060", response?.postcode)
+            assertEquals("EH", response?.paymentsFlags)
+            assertTrue(response?.isNPPAllowed == true)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testVerifyBSBFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        payments.verifyBSB("517000") { resource ->
             assertEquals(Resource.Status.ERROR, resource.status)
             assertNotNull(resource.error)
             assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)

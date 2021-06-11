@@ -28,6 +28,7 @@ import us.frollo.frollosdk.model.api.payments.PaymentPayIdRequest
 import us.frollo.frollosdk.model.api.payments.PaymentPayIdResponse
 import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
 import us.frollo.frollosdk.model.api.payments.PaymentTransferResponse
+import us.frollo.frollosdk.model.api.payments.VerifyBSBResponse
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneResponse
 import us.frollo.frollosdk.model.api.payments.VerifyPayIdRequest
@@ -303,6 +304,21 @@ class Payments(network: NetworkService) {
         paymentsAPI.verifyPayId(request).enqueue { resource ->
             if (resource.status == Resource.Status.ERROR) {
                 Log.e("$TAG#verifyPayId", resource.error?.localizedDescription)
+            }
+            completion.invoke(resource)
+        }
+    }
+
+    /**
+     * Verify BSB
+     *
+     * @param bsb BSB number to be verified
+     * @param completion Optional completion handler with optional error if the request fails else VerifyBSBResponse if success
+     */
+    fun verifyBSB(bsb: String, completion: OnFrolloSDKCompletionListener<Resource<VerifyBSBResponse>>) {
+        paymentsAPI.verifyBSB(bsb).enqueue { resource ->
+            if (resource.status == Resource.Status.ERROR) {
+                Log.e("$TAG#verifyBSB", resource.error?.localizedDescription)
             }
             completion.invoke(resource)
         }

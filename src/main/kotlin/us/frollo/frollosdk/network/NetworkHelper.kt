@@ -35,7 +35,7 @@ internal class NetworkHelper(private val appInfo: AppInfo) {
         internal const val HEADER_API_VERSION = "X-Api-Version"
         internal const val HEADER_BACKGROUND = "X-Background"
         internal const val HEADER_OTP = "X-User-Otp"
-        internal const val API_VERSION = "2.13"
+        internal const val API_VERSION = "2.14"
     }
 
     internal val bundleId: String

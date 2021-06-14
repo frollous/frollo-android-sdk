@@ -24,5 +24,8 @@ import com.google.gson.annotations.SerializedName
 data class UserUnconfirmedDetailsResponse(
 
     /** Mobile number */
-    @SerializedName("mobile_number") val mobileNumber: String?
+    @SerializedName("mobile_number") val mobileNumber: String?,
+
+    /** Email */
+    @SerializedName("email") val email: String?
 )

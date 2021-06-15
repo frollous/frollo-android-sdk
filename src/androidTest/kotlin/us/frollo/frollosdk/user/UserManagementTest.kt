@@ -919,6 +919,7 @@ class UserManagementTest : BaseAndroidTest() {
             assertNull(resource.error)
 
             assertEquals("+64111111111", resource.data?.mobileNumber)
+            assertEquals("user@example.com", resource.data?.email)
 
             signal.countDown()
         }

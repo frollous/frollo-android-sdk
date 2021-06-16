@@ -25,7 +25,7 @@ internal data class UserRegisterRequest(
     @SerializedName("password") val password: String,
 
     @SerializedName("address") var address: Address? = null,
-    @SerializedName("date_of_birth") var dateOfBirth: String? = null, // yyyy-MM or yyyy-MM-dd
+    @SerializedName("date_of_birth") var dateOfBirth: String? = null, // yyyy-MM-dd
     @SerializedName("last_name") val lastName: String? = null,
     @SerializedName("mobile_number") val mobileNumber: String? = null,
     @SerializedName("client_id") val clientId: String

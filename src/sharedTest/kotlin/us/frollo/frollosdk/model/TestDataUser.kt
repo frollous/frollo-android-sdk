@@ -57,7 +57,7 @@ internal fun testUserResponseData(userId: Long? = null): UserResponse {
         householdType = HouseholdType.SINGLE,
         occupation = Occupation.COMMUNITY_AND_PERSONAL_SERVICE_WORKERS,
         industry = Industry.ELECTRICITY_GAS_WATER_AND_WASTE_SERVICES,
-        dateOfBirth = "1990-01",
+        dateOfBirth = "1990-01-10",
         driverLicense = "12345678",
         features = listOf(FeatureFlag(feature = "aggregation", enabled = true)),
         foreignTax = false,
@@ -123,7 +123,7 @@ internal fun testValidRegisterData(): UserRegisterRequest {
         lastName = randomUUID(),
         mobileNumber = "0411111111",
         address = Address(postcode = "2060"),
-        dateOfBirth = "1990-01",
+        dateOfBirth = "1990-01-10",
         email = "$name@frollo.us",
         password = randomString(8),
         clientId = randomString(50)

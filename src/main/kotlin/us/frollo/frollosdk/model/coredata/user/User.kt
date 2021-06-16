@@ -94,7 +94,7 @@ data class User(
     /** Industry the user works in (optional) */
     @ColumnInfo(name = "industry") var industry: Industry?,
 
-    /** Date of birth of the user (optional) (format pattern - yyyy-MM or yyyy-MM-dd) */
+    /** Date of birth of the user (optional) (format pattern - yyyy-MM-dd) */
     @ColumnInfo(name = "date_of_birth") var dateOfBirth: String?,
 
     /** Drivers license of the user */

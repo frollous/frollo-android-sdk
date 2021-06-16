@@ -218,7 +218,7 @@ class UserManagementTest : BaseAndroidTest() {
             assertEquals(UserStatus.ACTIVE, user?.status)
             assertEquals("AUD", user?.primaryCurrency)
             assertEquals(Gender.MALE, user?.gender)
-            assertEquals("1990-01", user?.dateOfBirth)
+            assertEquals("1990-01-10", user?.dateOfBirth)
             assertEquals("12345678", user?.tfn)
             assertEquals("AU", user?.taxResidency)
             assertEquals(false, user?.foreignTax)

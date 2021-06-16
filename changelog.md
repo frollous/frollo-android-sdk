@@ -13,6 +13,8 @@
 - User Feedback convenience method
 - Support custom OAuth Audience & Grant Type
 - Verify BSB support
+- Add email to user unconfirmed details response
+- User date of birth date format change from yyyy-MM to yyyy-MM-dd
 
 ### 3.8.0
 

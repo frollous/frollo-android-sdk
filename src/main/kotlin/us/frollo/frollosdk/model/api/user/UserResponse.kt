@@ -48,7 +48,7 @@ internal data class UserResponse(
     @SerializedName("marital_status") val householdType: HouseholdType?,
     @SerializedName("occupation") val occupation: Occupation?,
     @SerializedName("industry") val industry: Industry?,
-    @SerializedName("date_of_birth") val dateOfBirth: String?, // yyyy-MM or yyyy-MM-dd
+    @SerializedName("date_of_birth") val dateOfBirth: String?, // yyyy-MM-dd
     @SerializedName("driver_license") val driverLicense: String?,
     @SerializedName("features") val features: List<FeatureFlag>?,
     @SerializedName("foreign_tax") val foreignTax: Boolean?,

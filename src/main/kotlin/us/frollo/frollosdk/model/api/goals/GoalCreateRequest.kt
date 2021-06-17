@@ -43,6 +43,8 @@ internal data class GoalCreateRequest(
             GoalTarget.AMOUNT -> targetAmount != null && periodAmount != null
             GoalTarget.DATE -> endDate != null && targetAmount != null
             GoalTarget.OPEN_ENDED -> periodAmount != null && endDate != null
+            GoalTarget.CURRENT_BALANCE -> targetAmount != null && periodAmount != null
+            GoalTarget.AVAILABLE_BALANCE -> targetAmount != null && periodAmount != null
         }
     }
 }

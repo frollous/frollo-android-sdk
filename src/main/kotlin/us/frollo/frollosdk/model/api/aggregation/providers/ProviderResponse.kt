@@ -23,7 +23,6 @@ import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderEncrypti
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderLoginForm
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderMFAType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
-import us.frollo.frollosdk.model.coredata.cdr.CDRPermission
 
 internal data class ProviderResponse(
 
@@ -39,7 +38,7 @@ internal data class ProviderResponse(
     @SerializedName("large_logo_url") val largeLogoUrl: String?,
     @SerializedName("large_logo_revision") val largeLogoRevision: Int?,
     @SerializedName("aggregator_type") val aggregatorType: AggregatorType,
-    @SerializedName("permissions") val permissions: List<CDRPermission>?,
+    @SerializedName("permissions") val permissionIds: List<String>?,
     @SerializedName("products_available") val productsAvailable: Boolean?,
 
     // Fields that are specific to GET Provider API response

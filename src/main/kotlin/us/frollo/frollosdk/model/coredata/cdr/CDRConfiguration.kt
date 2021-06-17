@@ -43,5 +43,8 @@ data class CDRConfiguration(
     @ColumnInfo(name = "support_email") @SerializedName("support_email") val supportEmail: String,
 
     /** The sharing durations for the CDR configuration */
-    @ColumnInfo(name = "sharing_durations") @SerializedName("sharing_durations") val sharingDurations: List<SharingDuration>
+    @ColumnInfo(name = "sharing_durations") @SerializedName("sharing_durations") val sharingDurations: List<SharingDuration>,
+
+    /** Permissions for the CDR Configuration */
+    @ColumnInfo(name = "permissions") val permissions: List<CDRPermission>?
 )

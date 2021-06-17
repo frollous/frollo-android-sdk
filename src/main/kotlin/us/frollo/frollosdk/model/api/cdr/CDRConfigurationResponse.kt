@@ -17,11 +17,13 @@
 package us.frollo.frollosdk.model.api.cdr
 
 import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.model.coredata.cdr.CDRPermission
 import us.frollo.frollosdk.model.coredata.cdr.SharingDuration
 
 internal data class CDRConfigurationResponse(
     @SerializedName("adr_id") val adrId: String,
     @SerializedName("adr_name") val adrName: String,
     @SerializedName("support_email") val supportEmail: String,
-    @SerializedName("sharing_durations") val sharingDurations: List<SharingDuration>
+    @SerializedName("sharing_durations") val sharingDurations: List<SharingDuration>,
+    @SerializedName("permissions") val permissions: List<CDRPermission>?
 )

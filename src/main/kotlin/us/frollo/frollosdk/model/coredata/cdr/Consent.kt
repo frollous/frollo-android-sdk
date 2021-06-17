@@ -48,7 +48,7 @@ data class Consent(
     @ColumnInfo(name = "provider_account_id") val providerAccountId: Long?,
 
     /** The permissions requested for the consent */
-    @ColumnInfo(name = "permissions") val permissions: List<CDRPermission>,
+    @ColumnInfo(name = "permissions") val permissionIds: List<String>,
 
     /** Additional permissions (meta-data map of String:Boolean) that can be set (Optional) */
     @ColumnInfo(name = "additional_permissions") val additionalPermissions: JsonObject?,

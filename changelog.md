@@ -15,6 +15,8 @@
 - Verify BSB support
 - Add email to user unconfirmed details response
 - User date of birth date format change from yyyy-MM to yyyy-MM-dd
+- Replace permissions object cluster with permission IDs list in Consent and Provider models
+- Add permissions object cluster to CDR Configuration model
 
 ### 3.8.0
 

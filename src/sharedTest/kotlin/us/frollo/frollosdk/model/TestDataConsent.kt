@@ -45,7 +45,7 @@ internal fun testConsentResponseData(
         authorisationRequestURL = "",
         confirmationPDFURL = "",
         withdrawalPDFURL = "",
-        permissions = testCDRPermissionData(),
+        permissionIds = listOf("account_details", "transaction_details"),
         additionalPermissions = null,
         deleteRedundantData = true
     )
@@ -101,7 +101,8 @@ internal fun testCDRConfigurationData(adrId: String? = null): CDRConfigurationRe
         adrId = adrId ?: randomString(20),
         adrName = randomString(20),
         supportEmail = randomString(20),
-        sharingDurations = listOf(testSharingDurationData(), testSharingDurationData(), testSharingDurationData())
+        sharingDurations = listOf(testSharingDurationData(), testSharingDurationData(), testSharingDurationData()),
+        permissions = testCDRPermissionData()
     )
 }
 

@@ -21,7 +21,6 @@ import androidx.room.PrimaryKey
 import us.frollo.frollosdk.model.coredata.aggregation.providers.AggregatorType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderContainerName
 import us.frollo.frollosdk.model.coredata.aggregation.providers.ProviderStatus
-import us.frollo.frollosdk.model.coredata.cdr.CDRPermission
 
 /**
  * This is just an minimized model representing the response of
@@ -41,6 +40,6 @@ internal data class ProvidersResponse(
     @ColumnInfo(name = "large_logo_url") val largeLogoUrl: String?,
     @ColumnInfo(name = "large_logo_revision") val largeLogoRevision: Int?,
     @ColumnInfo(name = "aggregator_type") val aggregatorType: AggregatorType,
-    @ColumnInfo(name = "permissions") val permissions: List<CDRPermission>?,
+    @ColumnInfo(name = "permissions") val permissionIds: List<String>?,
     @ColumnInfo(name = "products_available") val productsAvailable: Boolean?
 )

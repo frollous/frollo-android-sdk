@@ -29,7 +29,13 @@ enum class GoalTarget {
     @SerializedName("date") DATE,
 
     /** Amount - target amount to be reached */
-    @SerializedName("amount") AMOUNT;
+    @SerializedName("amount") AMOUNT,
+
+    /** Current balance - current balance as target to track goal amount */
+    @SerializedName("current_balance") CURRENT_BALANCE,
+
+    /** Available balance - available balance as target to track goal amount */
+    @SerializedName("available_balance") AVAILABLE_BALANCE;
 
     /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters

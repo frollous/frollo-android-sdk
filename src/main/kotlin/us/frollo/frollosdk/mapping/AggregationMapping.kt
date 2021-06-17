@@ -66,7 +66,7 @@ internal fun ProviderResponse.toProvider(): Provider =
         loginForm = loginForm,
         encryption = encryption,
         aggregatorType = aggregatorType ?: AggregatorType.UNKNOWN, // This is a required field but sometimes backend sends null hence this workaround instead of making the column nullable in DB.
-        permissions = permissions,
+        permissionIds = permissionIds,
         productsAvailable = productsAvailable ?: false
     )
 
@@ -83,7 +83,7 @@ internal fun Provider.toProvidersResponse(): ProvidersResponse =
         largeLogoUrl = largeLogoUrl,
         largeLogoRevision = largeLogoRevision,
         aggregatorType = aggregatorType,
-        permissions = permissions,
+        permissionIds = permissionIds,
         productsAvailable = productsAvailable
     )
 
@@ -193,7 +193,7 @@ internal fun ConsentResponse.toConsent(): Consent =
         consentId = consentId,
         providerId = providerId,
         providerAccountId = providerAccountId,
-        permissions = permissions,
+        permissionIds = permissionIds,
         additionalPermissions = additionalPermissions,
         authorisationRequestURL = authorisationRequestURL,
         confirmationPDFURL = confirmationPDFURL,
@@ -227,5 +227,6 @@ internal fun CDRConfigurationResponse.toCDRConfiguration(): CDRConfiguration =
         adrId = adrId,
         adrName = adrName,
         supportEmail = supportEmail,
-        sharingDurations = sharingDurations
+        sharingDurations = sharingDurations,
+        permissions = permissions
     )

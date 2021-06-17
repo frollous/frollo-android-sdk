@@ -4162,6 +4162,7 @@ class AggregationTest : BaseAndroidTest() {
             assertEquals("ACME", model?.adrName)
             assertEquals("suppert@acme.com", model?.supportEmail)
             assertEquals(1, model?.sharingDurations?.size)
+            assertEquals(2, model?.permissions?.size)
 
             signal.countDown()
         }

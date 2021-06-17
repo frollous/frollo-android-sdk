@@ -22,7 +22,6 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import us.frollo.frollosdk.model.IAdapterModel
-import us.frollo.frollosdk.model.coredata.cdr.CDRPermission
 
 // Declaring the ColumnInfo allows for the renaming of variables without
 // implementing a database migration, as the column name would not change.
@@ -68,8 +67,8 @@ data class Provider(
     /** Specifies the aggregator with which this Provider get its data from */
     @ColumnInfo(name = "aggregator_type") val aggregatorType: AggregatorType,
 
-    /** The aggregator permissions on the provider (This value will be set for CDR aggregator) */
-    @ColumnInfo(name = "permissions") val permissions: List<CDRPermission>?,
+    /** The aggregator permission IDs on the provider */
+    @ColumnInfo(name = "permissions") val permissionIds: List<String>?,
 
     /** ProductsAvailable. True if CDR Products are available for this Provider */
     @ColumnInfo(name = "products_available") val productsAvailable: Boolean,

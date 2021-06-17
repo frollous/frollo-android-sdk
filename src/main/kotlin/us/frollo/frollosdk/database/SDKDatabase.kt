@@ -511,7 +511,11 @@ abstract class SDKDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // New changes in this migration:
                 // 1) New table - payday
+                // 2) Alter cdr_configuration table - add column permissions
+
                 database.execSQL("CREATE TABLE IF NOT EXISTS `payday` (`status` TEXT NOT NULL, `frequency` TEXT NOT NULL, `next_date` TEXT, `previous_date` TEXT, `payday_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
+
+                database.execSQL("ALTER TABLE `cdr_configuration` ADD COLUMN `permissions` TEXT")
             }
         }
     }

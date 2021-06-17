@@ -94,7 +94,7 @@ internal fun testProviderResponseData(providerId: Long? = null): ProviderRespons
         smallLogoUrl = "https://example.com/small_logo.png",
         smallLogoRevision = 1,
         aggregatorType = AggregatorType.YODLEE,
-        permissions = null,
+        permissionIds = null,
         productsAvailable = false
     )
 }

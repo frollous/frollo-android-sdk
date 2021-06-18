@@ -28,7 +28,6 @@ import us.frollo.frollosdk.model.api.payments.PaymentPayIdRequest
 import us.frollo.frollosdk.model.api.payments.PaymentPayIdResponse
 import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
 import us.frollo.frollosdk.model.api.payments.PaymentTransferResponse
-import us.frollo.frollosdk.model.api.payments.VerifyBSBResponse
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneResponse
 import us.frollo.frollosdk.model.api.payments.VerifyPayIdRequest
@@ -264,15 +263,15 @@ class Payments(network: NetworkService) {
     /**
      * Verify Pay Anyone
      *
-     * @param accountHolder Name of the payee's bank account
-     * @param accountNumber Account number of the payee
      * @param bsb BSB of payee's bank
-     * @param completion Optional completion handler with optional error if the request fails else VerifyPayAnyoneResponse if success
+     * @param accountHolder Name of the payee's bank account (Optional)
+     * @param accountNumber Account number of the payee (Optional)
+     * @param completion Optional completion handler with optional error if the request fails else [VerifyPayAnyoneResponse] if success
      */
     fun verifyPayAnyone(
-        accountHolder: String,
-        accountNumber: String,
         bsb: String,
+        accountHolder: String? = null,
+        accountNumber: String? = null,
         completion: OnFrolloSDKCompletionListener<Resource<VerifyPayAnyoneResponse>>
     ) {
         val request = VerifyPayAnyoneRequest(
@@ -304,21 +303,6 @@ class Payments(network: NetworkService) {
         paymentsAPI.verifyPayId(request).enqueue { resource ->
             if (resource.status == Resource.Status.ERROR) {
                 Log.e("$TAG#verifyPayId", resource.error?.localizedDescription)
-            }
-            completion.invoke(resource)
-        }
-    }
-
-    /**
-     * Verify BSB
-     *
-     * @param bsb BSB number to be verified
-     * @param completion Optional completion handler with optional error if the request fails else VerifyBSBResponse if success
-     */
-    fun verifyBSB(bsb: String, completion: OnFrolloSDKCompletionListener<Resource<VerifyBSBResponse>>) {
-        paymentsAPI.verifyBSB(bsb).enqueue { resource ->
-            if (resource.status == Resource.Status.ERROR) {
-                Log.e("$TAG#verifyBSB", resource.error?.localizedDescription)
             }
             completion.invoke(resource)
         }

@@ -17,6 +17,7 @@
 package us.frollo.frollosdk.model.api.payments
 
 import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.model.coredata.payments.BSBAddress
 
 /**
  * VerifyPayAnyoneResponse
@@ -31,12 +32,18 @@ data class VerifyPayAnyoneResponse(
     /** BSB number if valid is true null otherwise (Optional) */
     @SerializedName("bsb") val bsb: String?,
 
-    /** BSB name if valid is true nil otherwise (Optional) */
-    @SerializedName("bsb_name") val bsbName: String?,
+    /** Institution Mnemonic (Optional) */
+    @SerializedName("mnemonic") val institutionMnemonic: String?,
 
-    /** Account holder name if valid is true null otherwise (Optional) */
-    @SerializedName("account_holder") val accountHolder: String?,
+    /** Name of the bank (Optional) */
+    @SerializedName("name") val name: String?,
 
-    /** Account number if valid is true null otherwise (Optional) */
-    @SerializedName("account_number") val accountNumber: String?
+    /** Address of the bank (Optional) */
+    @SerializedName("address") val address: BSBAddress?,
+
+    /** Payment Flags */
+    @SerializedName("payments_flags") val paymentsFlags: String?,
+
+    /** Indicates if NPP is allowed for Payment */
+    @SerializedName("npp_allowed") val isNppAllowed: Boolean?
 )

@@ -207,13 +207,17 @@ private fun appendTransactionFilterToSqlQuery(sqlQueryBuilder: SimpleSQLiteQuery
     filter.maximumAmount?.let { if (it.isNotBlank()) sqlQueryBuilder.appendSelection(selection = "ABS(CAST(t.amount_amount AS DECIMAL)) <= $it") }
     filter.transactionIncluded?.let { sqlQueryBuilder.appendSelection(selection = "t.included = ${ it.toInt() }") }
     filter.accountIncluded?.let { sqlQueryBuilder.appendSelection(selection = "a.included = ${ it.toInt() }") }
-    filter.searchTerm?.let { if (it.isNotBlank()) sqlQueryBuilder.appendSelection(selection = " ( t.description_original LIKE '%$it%' OR t.description_user LIKE '%$it%' OR t.description_simple LIKE '%$it%' ) ") }
+    filter.searchTerm?.let {
+        val escapedSearchTerm = it.replace("'", "''")
+        if (it.isNotBlank()) sqlQueryBuilder.appendSelection(selection = " ( t.description_original LIKE '%$escapedSearchTerm%' OR t.description_user LIKE '%$escapedSearchTerm%' OR t.description_simple LIKE '%$escapedSearchTerm%' ) ")
+    }
     val filterTags = filter.tags
     if (filterTags != null && filterTags.isNotEmpty()) {
         val sb = StringBuilder()
         sb.append("(")
         filterTags.forEachIndexed { index, str ->
-            sb.append("(t.user_tags LIKE '%|$str|%')")
+            val escapedStr = str.replace("'", "''")
+            sb.append("(t.user_tags LIKE '%|$escapedStr|%')")
             if (index < filterTags.size - 1) sb.append(" OR ")
         }
         sb.append(")")
@@ -286,7 +290,11 @@ internal fun sqlForUserTags(searchTerm: String? = null, sortBy: TagsSortType? = 
     val sort = sortBy?.toString() ?: TagsSortType.NAME.toString()
     val order = orderBy?.toString() ?: OrderType.ASC.toString()
     sqlQueryBuilder.orderBy(orderBy = "$sort $order")
-    searchTerm?.let { sqlQueryBuilder.appendSelection(selection = "name LIKE '%$searchTerm%'") }
+
+    searchTerm?.let {
+        val escapedSearchTerm = it.replace("'", "''")
+        sqlQueryBuilder.appendSelection(selection = "name LIKE '%$escapedSearchTerm%'")
+    }
 
     return sqlQueryBuilder.create()
 }

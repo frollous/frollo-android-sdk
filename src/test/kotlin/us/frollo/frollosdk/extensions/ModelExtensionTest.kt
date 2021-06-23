@@ -133,8 +133,8 @@ class ModelExtensionTest {
 
     @Test
     fun testSQLForUserTags() {
-        var query = sqlForUserTags(searchTerm = "pub", sortBy = TagsSortType.CREATED_AT, orderBy = OrderType.ASC)
-        assertEquals("SELECT  *  FROM transaction_user_tags WHERE name LIKE '%pub%'  ORDER BY created_at asc", query.sql)
+        var query = sqlForUserTags(searchTerm = "pub's", sortBy = TagsSortType.CREATED_AT, orderBy = OrderType.ASC)
+        assertEquals("SELECT  *  FROM transaction_user_tags WHERE name LIKE '%pub''s%'  ORDER BY created_at asc", query.sql)
 
         query = sqlForUserTags()
         assertEquals("SELECT  *  FROM transaction_user_tags ORDER BY name asc", query.sql)
@@ -224,11 +224,11 @@ class ModelExtensionTest {
             transactionCategoryIds = listOf(300, 301),
             merchantIds = listOf(400, 401),
             budgetCategory = BudgetCategory.INCOME,
-            searchTerm = "Transfer",
+            searchTerm = "Transfer's",
             minimumAmount = "50.78",
             maximumAmount = "150.64",
             baseType = TransactionBaseType.CREDIT,
-            tags = listOf("pub", "holiday", "shopping"),
+            tags = listOf("pub's", "holiday's", "shopping's"),
             status = TransactionStatus.PENDING,
             fromDate = "2019-03-01",
             toDate = "2019-03-31",
@@ -249,7 +249,7 @@ class ModelExtensionTest {
             afterId = 300,
             transactionFilter = filter
         )
-        assertEquals("SELECT t.transaction_id  FROM transaction_model AS t LEFT JOIN account a ON t.account_id = a.account_id  WHERE (t.transaction_date <= '2018-12-31' OR (t.transaction_date = '2019-01-01' AND t.transaction_id <= 200)) AND (t.transaction_date >= '2019-02-02' OR (t.transaction_date = '2019-02-01' AND t.transaction_id >= 300)) AND t.transaction_id IN (100,101) AND t.account_id IN (200,201) AND t.merchant_id IN (400,401) AND t.category_id IN (300,301) AND t.bill_id = 45678 AND t.goal_id = 2048 AND t.budget_category = 'INCOME' AND t.base_type = 'CREDIT' AND t.status = 'PENDING' AND ABS(CAST(t.amount_amount AS DECIMAL)) >= 50.78 AND ABS(CAST(t.amount_amount AS DECIMAL)) <= 150.64 AND t.included = 0 AND a.included = 1 AND  ( t.description_original LIKE '%Transfer%' OR t.description_user LIKE '%Transfer%' OR t.description_simple LIKE '%Transfer%' )  AND ((t.user_tags LIKE '%|pub|%') OR (t.user_tags LIKE '%|holiday|%') OR (t.user_tags LIKE '%|shopping|%')) AND (t.transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
+        assertEquals("SELECT t.transaction_id  FROM transaction_model AS t LEFT JOIN account a ON t.account_id = a.account_id  WHERE (t.transaction_date <= '2018-12-31' OR (t.transaction_date = '2019-01-01' AND t.transaction_id <= 200)) AND (t.transaction_date >= '2019-02-02' OR (t.transaction_date = '2019-02-01' AND t.transaction_id >= 300)) AND t.transaction_id IN (100,101) AND t.account_id IN (200,201) AND t.merchant_id IN (400,401) AND t.category_id IN (300,301) AND t.bill_id = 45678 AND t.goal_id = 2048 AND t.budget_category = 'INCOME' AND t.base_type = 'CREDIT' AND t.status = 'PENDING' AND ABS(CAST(t.amount_amount AS DECIMAL)) >= 50.78 AND ABS(CAST(t.amount_amount AS DECIMAL)) <= 150.64 AND t.included = 0 AND a.included = 1 AND  ( t.description_original LIKE '%Transfer''s%' OR t.description_user LIKE '%Transfer''s%' OR t.description_simple LIKE '%Transfer''s%' )  AND ((t.user_tags LIKE '%|pub''s|%') OR (t.user_tags LIKE '%|holiday''s|%') OR (t.user_tags LIKE '%|shopping''s|%')) AND (t.transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
 
         // First page
         query = sqlForTransactionIdsToGetStaleIds(
@@ -257,7 +257,7 @@ class ModelExtensionTest {
             afterId = 300,
             transactionFilter = filter
         )
-        assertEquals("SELECT t.transaction_id  FROM transaction_model AS t LEFT JOIN account a ON t.account_id = a.account_id  WHERE (t.transaction_date >= '2019-01-02' OR (t.transaction_date = '2019-01-01' AND t.transaction_id >= 300)) AND t.transaction_id IN (100,101) AND t.account_id IN (200,201) AND t.merchant_id IN (400,401) AND t.category_id IN (300,301) AND t.bill_id = 45678 AND t.goal_id = 2048 AND t.budget_category = 'INCOME' AND t.base_type = 'CREDIT' AND t.status = 'PENDING' AND ABS(CAST(t.amount_amount AS DECIMAL)) >= 50.78 AND ABS(CAST(t.amount_amount AS DECIMAL)) <= 150.64 AND t.included = 0 AND a.included = 1 AND  ( t.description_original LIKE '%Transfer%' OR t.description_user LIKE '%Transfer%' OR t.description_simple LIKE '%Transfer%' )  AND ((t.user_tags LIKE '%|pub|%') OR (t.user_tags LIKE '%|holiday|%') OR (t.user_tags LIKE '%|shopping|%')) AND (t.transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
+        assertEquals("SELECT t.transaction_id  FROM transaction_model AS t LEFT JOIN account a ON t.account_id = a.account_id  WHERE (t.transaction_date >= '2019-01-02' OR (t.transaction_date = '2019-01-01' AND t.transaction_id >= 300)) AND t.transaction_id IN (100,101) AND t.account_id IN (200,201) AND t.merchant_id IN (400,401) AND t.category_id IN (300,301) AND t.bill_id = 45678 AND t.goal_id = 2048 AND t.budget_category = 'INCOME' AND t.base_type = 'CREDIT' AND t.status = 'PENDING' AND ABS(CAST(t.amount_amount AS DECIMAL)) >= 50.78 AND ABS(CAST(t.amount_amount AS DECIMAL)) <= 150.64 AND t.included = 0 AND a.included = 1 AND  ( t.description_original LIKE '%Transfer''s%' OR t.description_user LIKE '%Transfer''s%' OR t.description_simple LIKE '%Transfer''s%' )  AND ((t.user_tags LIKE '%|pub''s|%') OR (t.user_tags LIKE '%|holiday''s|%') OR (t.user_tags LIKE '%|shopping''s|%')) AND (t.transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
 
         // Last page
         query = sqlForTransactionIdsToGetStaleIds(
@@ -265,13 +265,13 @@ class ModelExtensionTest {
             beforeId = 200,
             transactionFilter = filter
         )
-        assertEquals("SELECT t.transaction_id  FROM transaction_model AS t LEFT JOIN account a ON t.account_id = a.account_id  WHERE (t.transaction_date <= '2019-01-31' OR (t.transaction_date = '2019-02-01' AND t.transaction_id <= 200)) AND t.transaction_id IN (100,101) AND t.account_id IN (200,201) AND t.merchant_id IN (400,401) AND t.category_id IN (300,301) AND t.bill_id = 45678 AND t.goal_id = 2048 AND t.budget_category = 'INCOME' AND t.base_type = 'CREDIT' AND t.status = 'PENDING' AND ABS(CAST(t.amount_amount AS DECIMAL)) >= 50.78 AND ABS(CAST(t.amount_amount AS DECIMAL)) <= 150.64 AND t.included = 0 AND a.included = 1 AND  ( t.description_original LIKE '%Transfer%' OR t.description_user LIKE '%Transfer%' OR t.description_simple LIKE '%Transfer%' )  AND ((t.user_tags LIKE '%|pub|%') OR (t.user_tags LIKE '%|holiday|%') OR (t.user_tags LIKE '%|shopping|%')) AND (t.transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
+        assertEquals("SELECT t.transaction_id  FROM transaction_model AS t LEFT JOIN account a ON t.account_id = a.account_id  WHERE (t.transaction_date <= '2019-01-31' OR (t.transaction_date = '2019-02-01' AND t.transaction_id <= 200)) AND t.transaction_id IN (100,101) AND t.account_id IN (200,201) AND t.merchant_id IN (400,401) AND t.category_id IN (300,301) AND t.bill_id = 45678 AND t.goal_id = 2048 AND t.budget_category = 'INCOME' AND t.base_type = 'CREDIT' AND t.status = 'PENDING' AND ABS(CAST(t.amount_amount AS DECIMAL)) >= 50.78 AND ABS(CAST(t.amount_amount AS DECIMAL)) <= 150.64 AND t.included = 0 AND a.included = 1 AND  ( t.description_original LIKE '%Transfer''s%' OR t.description_user LIKE '%Transfer''s%' OR t.description_simple LIKE '%Transfer''s%' )  AND ((t.user_tags LIKE '%|pub''s|%') OR (t.user_tags LIKE '%|holiday''s|%') OR (t.user_tags LIKE '%|shopping''s|%')) AND (t.transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
 
         // Single page with filters
         query = sqlForTransactionIdsToGetStaleIds(
             transactionFilter = filter
         )
-        assertEquals("SELECT t.transaction_id  FROM transaction_model AS t LEFT JOIN account a ON t.account_id = a.account_id  WHERE t.transaction_id IN (100,101) AND t.account_id IN (200,201) AND t.merchant_id IN (400,401) AND t.category_id IN (300,301) AND t.bill_id = 45678 AND t.goal_id = 2048 AND t.budget_category = 'INCOME' AND t.base_type = 'CREDIT' AND t.status = 'PENDING' AND ABS(CAST(t.amount_amount AS DECIMAL)) >= 50.78 AND ABS(CAST(t.amount_amount AS DECIMAL)) <= 150.64 AND t.included = 0 AND a.included = 1 AND  ( t.description_original LIKE '%Transfer%' OR t.description_user LIKE '%Transfer%' OR t.description_simple LIKE '%Transfer%' )  AND ((t.user_tags LIKE '%|pub|%') OR (t.user_tags LIKE '%|holiday|%') OR (t.user_tags LIKE '%|shopping|%')) AND (t.transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
+        assertEquals("SELECT t.transaction_id  FROM transaction_model AS t LEFT JOIN account a ON t.account_id = a.account_id  WHERE t.transaction_id IN (100,101) AND t.account_id IN (200,201) AND t.merchant_id IN (400,401) AND t.category_id IN (300,301) AND t.bill_id = 45678 AND t.goal_id = 2048 AND t.budget_category = 'INCOME' AND t.base_type = 'CREDIT' AND t.status = 'PENDING' AND ABS(CAST(t.amount_amount AS DECIMAL)) >= 50.78 AND ABS(CAST(t.amount_amount AS DECIMAL)) <= 150.64 AND t.included = 0 AND a.included = 1 AND  ( t.description_original LIKE '%Transfer''s%' OR t.description_user LIKE '%Transfer''s%' OR t.description_simple LIKE '%Transfer''s%' )  AND ((t.user_tags LIKE '%|pub''s|%') OR (t.user_tags LIKE '%|holiday''s|%') OR (t.user_tags LIKE '%|shopping''s|%')) AND (t.transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
 
         // Single page, No filters
         query = sqlForTransactionIdsToGetStaleIds()
@@ -286,11 +286,11 @@ class ModelExtensionTest {
             transactionCategoryIds = listOf(300, 301),
             merchantIds = listOf(400, 401),
             budgetCategory = BudgetCategory.INCOME,
-            searchTerm = "Transfer",
+            searchTerm = "Transfer's",
             minimumAmount = "50.78",
             maximumAmount = "150.64",
             baseType = TransactionBaseType.CREDIT,
-            tags = listOf("pub", "holiday", "shopping"),
+            tags = listOf("pub's", "holiday's", "shopping's"),
             status = TransactionStatus.PENDING,
             fromDate = "2019-03-01",
             toDate = "2019-03-31",
@@ -304,7 +304,7 @@ class ModelExtensionTest {
         )
 
         var query = sqlForTransactions(filter)
-        assertEquals("SELECT t.*  FROM transaction_model AS t LEFT JOIN account a ON t.account_id = a.account_id  WHERE t.transaction_id IN (100,101) AND t.account_id IN (200,201) AND t.merchant_id IN (400,401) AND t.category_id IN (300,301) AND t.bill_id = 45678 AND t.goal_id = 2048 AND t.budget_category = 'INCOME' AND t.base_type = 'CREDIT' AND t.status = 'PENDING' AND ABS(CAST(t.amount_amount AS DECIMAL)) >= 50.78 AND ABS(CAST(t.amount_amount AS DECIMAL)) <= 150.64 AND t.included = 0 AND a.included = 1 AND  ( t.description_original LIKE '%Transfer%' OR t.description_user LIKE '%Transfer%' OR t.description_simple LIKE '%Transfer%' )  AND ((t.user_tags LIKE '%|pub|%') OR (t.user_tags LIKE '%|holiday|%') OR (t.user_tags LIKE '%|shopping|%')) AND (t.transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
+        assertEquals("SELECT t.*  FROM transaction_model AS t LEFT JOIN account a ON t.account_id = a.account_id  WHERE t.transaction_id IN (100,101) AND t.account_id IN (200,201) AND t.merchant_id IN (400,401) AND t.category_id IN (300,301) AND t.bill_id = 45678 AND t.goal_id = 2048 AND t.budget_category = 'INCOME' AND t.base_type = 'CREDIT' AND t.status = 'PENDING' AND ABS(CAST(t.amount_amount AS DECIMAL)) >= 50.78 AND ABS(CAST(t.amount_amount AS DECIMAL)) <= 150.64 AND t.included = 0 AND a.included = 1 AND  ( t.description_original LIKE '%Transfer''s%' OR t.description_user LIKE '%Transfer''s%' OR t.description_simple LIKE '%Transfer''s%' )  AND ((t.user_tags LIKE '%|pub''s|%') OR (t.user_tags LIKE '%|holiday''s|%') OR (t.user_tags LIKE '%|shopping''s|%')) AND (t.transaction_date BETWEEN Date('2019-03-01') AND Date('2019-03-31')) ", query.sql)
 
         query = sqlForTransactions()
         assertEquals("SELECT t.*  FROM transaction_model AS t LEFT JOIN account a ON t.account_id = a.account_id ", query.sql)

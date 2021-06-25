@@ -113,5 +113,8 @@ data class User(
     @ColumnInfo(name = "tfn") var tfn: String?,
 
     /** Tax identification number (optional) */
-    @ColumnInfo(name = "tin") var tin: String?
+    @ColumnInfo(name = "tin") var tin: String?,
+
+    /** External ID (Optional) */
+    @ColumnInfo(name = "external_id") val externalId: String?
 )

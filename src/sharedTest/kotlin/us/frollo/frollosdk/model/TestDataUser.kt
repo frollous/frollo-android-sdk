@@ -63,7 +63,8 @@ internal fun testUserResponseData(userId: Long? = null): UserResponse {
         foreignTax = false,
         tin = "12345",
         tfn = "12345678",
-        taxResidency = "AU"
+        taxResidency = "AU",
+        externalId = "123456"
     )
 }
 
@@ -95,7 +96,8 @@ internal fun UserResponse.testModifyUserResponseData(firstName: String): UserRes
         foreignTax = false,
         tin = "12345",
         tfn = "12345678",
-        taxResidency = "AU"
+        taxResidency = "AU",
+        externalId = "123456"
     )
 }
 

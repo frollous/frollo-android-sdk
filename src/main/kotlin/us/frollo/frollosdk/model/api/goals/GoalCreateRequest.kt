@@ -40,11 +40,11 @@ internal data class GoalCreateRequest(
 ) {
     fun valid(): Boolean {
         return when (target) {
-            GoalTarget.AMOUNT -> targetAmount != null && periodAmount != null
+            GoalTarget.AMOUNT,
+            GoalTarget.AVAILABLE_BALANCE,
+            GoalTarget.CURRENT_BALANCE -> targetAmount != null && periodAmount != null
             GoalTarget.DATE -> endDate != null && targetAmount != null
             GoalTarget.OPEN_ENDED -> periodAmount != null && endDate != null
-            GoalTarget.CURRENT_BALANCE -> targetAmount != null && periodAmount != null
-            GoalTarget.AVAILABLE_BALANCE -> targetAmount != null && periodAmount != null
         }
     }
 }

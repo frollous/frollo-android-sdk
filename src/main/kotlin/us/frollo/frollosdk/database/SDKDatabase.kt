@@ -512,10 +512,13 @@ abstract class SDKDatabase : RoomDatabase() {
                 // New changes in this migration:
                 // 1) New table - payday
                 // 2) Alter cdr_configuration table - add column permissions
+                // 3) Alter user table - add column external_id
 
                 database.execSQL("CREATE TABLE IF NOT EXISTS `payday` (`status` TEXT NOT NULL, `frequency` TEXT NOT NULL, `next_date` TEXT, `previous_date` TEXT, `payday_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
 
                 database.execSQL("ALTER TABLE `cdr_configuration` ADD COLUMN `permissions` TEXT")
+
+                database.execSQL("ALTER TABLE `user` ADD COLUMN `external_id` TEXT")
             }
         }
     }

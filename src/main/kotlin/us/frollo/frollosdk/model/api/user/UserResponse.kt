@@ -54,5 +54,6 @@ internal data class UserResponse(
     @SerializedName("foreign_tax") val foreignTax: Boolean?,
     @SerializedName("tax_residency") val taxResidency: String?,
     @SerializedName("tfn") val tfn: String?,
-    @SerializedName("tin") val tin: String?
+    @SerializedName("tin") val tin: String?,
+    @SerializedName("external_id") val externalId: String?
 )

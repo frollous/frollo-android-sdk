@@ -17,7 +17,7 @@
 - User date of birth date format change from yyyy-MM to yyyy-MM-dd
 - Replace permissions object cluster with permission IDs list in Consent and Provider models
 - Add permissions object cluster to CDR Configuration model
-- Ad external_id to User model
+- Add external_id to User model
 - Remove addresses from UserKYC model
 - Update address fields in User model
 

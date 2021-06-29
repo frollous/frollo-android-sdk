@@ -29,5 +29,5 @@ internal data class AddressRequest(
     @SerializedName("region") var region: String? = null,
     @SerializedName("state") var state: String? = null,
     @SerializedName("country") var country: String,
-    @SerializedName("postal_code") var postcode: String
+    @SerializedName("postal_code") var postcode: String? = null
 )

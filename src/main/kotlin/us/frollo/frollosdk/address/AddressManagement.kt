@@ -131,7 +131,7 @@ class AddressManagement(network: NetworkService, internal val db: SDKDatabase) {
      * @param region Region (Optional)
      * @param state State (Optional)
      * @param country Country in short form Eg: AUS
-     * @param postcode Postcode
+     * @param postcode Postcode (Optional)
      * @param completion Optional completion handler with optional error if the request fails else ID of the Address created if success
      */
     fun createAddress(
@@ -145,7 +145,7 @@ class AddressManagement(network: NetworkService, internal val db: SDKDatabase) {
         region: String? = null,
         state: String? = null,
         country: String,
-        postcode: String,
+        postcode: String? = null,
         completion: OnFrolloSDKCompletionListener<Resource<Long>>? = null
     ) {
         val request = AddressRequest(
@@ -189,7 +189,7 @@ class AddressManagement(network: NetworkService, internal val db: SDKDatabase) {
      * @param region Region (Optional)
      * @param state State (Optional)
      * @param country Country in short form Eg: AUS
-     * @param postcode Postcode
+     * @param postcode Postcode (Optional)
      * @param completion Optional completion handler with optional error if the request fails
      */
     fun updateAddress(
@@ -204,7 +204,7 @@ class AddressManagement(network: NetworkService, internal val db: SDKDatabase) {
         region: String? = null,
         state: String? = null,
         country: String,
-        postcode: String,
+        postcode: String? = null,
         completion: OnFrolloSDKCompletionListener<Result>? = null
     ) {
         val request = AddressRequest(

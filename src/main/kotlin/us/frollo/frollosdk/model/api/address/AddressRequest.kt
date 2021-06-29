@@ -28,6 +28,6 @@ internal data class AddressRequest(
     @SerializedName("town") var town: String? = null,
     @SerializedName("region") var region: String? = null,
     @SerializedName("state") var state: String? = null,
-    @SerializedName("country") var country: String? = null,
-    @SerializedName("postal_code") var postcode: String? = null
+    @SerializedName("country") var country: String,
+    @SerializedName("postal_code") var postcode: String
 )

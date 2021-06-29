@@ -17,7 +17,6 @@
 package us.frollo.frollosdk.model.api.user
 
 import com.google.gson.annotations.SerializedName
-import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.coredata.user.Gender
 import us.frollo.frollosdk.model.coredata.user.HouseholdType
@@ -32,8 +31,9 @@ internal data class UserUpdateRequest(
     @SerializedName("last_name") val lastName: String? = null,
     @SerializedName("mobile_number") val mobileNumber: String? = null,
     @SerializedName("gender") val gender: Gender? = null,
-    @SerializedName("address") val address: Address? = null,
-    @SerializedName("mailing_address") val mailingAddress: Address? = null,
+    @SerializedName("residential_address_id") val residentialAddressId: Long? = null,
+    @SerializedName("mailing_address_id") val mailingAddressId: Long? = null,
+    @SerializedName("previous_address_id") val previousAddressId: Long? = null,
     @SerializedName("household_size") val householdSize: Int? = null,
     @SerializedName("marital_status") val householdType: HouseholdType? = null,
     @SerializedName("occupation") val occupation: Occupation? = null,

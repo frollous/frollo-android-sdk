@@ -23,11 +23,20 @@ import us.frollo.frollosdk.extensions.serializedName
  * OAuth Grant Type
  */
 enum class OAuthGrantType {
+
+    /** OAuth Grant Type based on Authorization Code */
     @SerializedName("authorization_code") AUTHORIZATION_CODE,
+
+    /** OAuth Grant Type based on Password */
     @SerializedName("password") PASSWORD,
+
+    /** OAuth Grant Type based on Refresh Token */
     @SerializedName("refresh_token") REFRESH_TOKEN,
+
+    /** OAuth Grant Type based on Realm Password */
     @SerializedName("http://auth0.com/oauth/grant-type/password-realm") REALM_PASSWORD;
 
+    /** Enum to serialized string */
     // This override MUST be used for this enum to work with Retrofit @Path or @Query parameters
     override fun toString(): String =
         // Try to get the annotation value if available instead of using plain .toString()

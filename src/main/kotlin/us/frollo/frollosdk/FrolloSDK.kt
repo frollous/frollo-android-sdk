@@ -25,6 +25,7 @@ import okhttp3.ResponseBody
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
+import us.frollo.frollosdk.address.AddressManagement
 import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.authentication.AuthenticationStatus
 import us.frollo.frollosdk.authentication.AuthenticationType.Custom
@@ -202,6 +203,12 @@ object FrolloSDK {
     val logger: LogManager
         get() = _logger ?: throw IllegalAccessException(SDK_NOT_SETUP)
 
+    /**
+     * Address Management - Managing all aspects of addresses. See [AddressManagement] for details
+     */
+    val addressManagement: AddressManagement
+        get() = _addressManagement ?: throw IllegalAccessException(SDK_NOT_SETUP)
+
     private var _setup = false
     private var _logger: LogManager? = null
     private var _aggregation: Aggregation? = null
@@ -221,6 +228,7 @@ object FrolloSDK {
     private var _managedProducts: ManagedProducts? = null
     private var _cards: Cards? = null
     private var _paydays: Paydays? = null
+    private var _addressManagement: AddressManagement? = null
     private lateinit var keyStore: Keystore
     private lateinit var preferences: Preferences
     private lateinit var version: Version
@@ -358,6 +366,9 @@ object FrolloSDK {
 
             // 26. Setup Paydays
             _paydays = Paydays(network, database)
+
+            // 27. Setup Address Management
+            _addressManagement = AddressManagement(network, database)
 
             if (version.migrationNeeded()) {
                 version.migrateVersion()
@@ -508,6 +519,7 @@ object FrolloSDK {
         bills.refreshBillPayments(fromDate = fromDate, toDate = toDate)
         goals.refreshGoals()
         cards.refreshCards()
+        addressManagement.refreshAddresses()
     }
 
     /**

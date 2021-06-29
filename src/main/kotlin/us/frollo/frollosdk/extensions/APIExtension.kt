@@ -17,6 +17,7 @@
 package us.frollo.frollosdk.extensions
 
 import retrofit2.Call
+import us.frollo.frollosdk.model.api.address.AddressAutocomplete
 import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
@@ -30,7 +31,6 @@ import us.frollo.frollosdk.model.api.images.ImageResponse
 import us.frollo.frollosdk.model.api.reports.AccountBalanceReportResponse
 import us.frollo.frollosdk.model.api.reports.ReportsResponse
 import us.frollo.frollosdk.model.api.shared.PaginatedResponse
-import us.frollo.frollosdk.model.api.user.AddressAutocomplete
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.AccountType
 import us.frollo.frollosdk.model.coredata.aggregation.providers.CDRProduct
 import us.frollo.frollosdk.model.coredata.aggregation.providers.CDRProductCategory
@@ -46,6 +46,7 @@ import us.frollo.frollosdk.model.coredata.reports.ReportPeriod
 import us.frollo.frollosdk.model.coredata.reports.TransactionReportPeriod
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.surveys.Survey
+import us.frollo.frollosdk.network.api.AddressAPI
 import us.frollo.frollosdk.network.api.AggregationAPI
 import us.frollo.frollosdk.network.api.BillsAPI
 import us.frollo.frollosdk.network.api.BudgetsAPI
@@ -56,7 +57,6 @@ import us.frollo.frollosdk.network.api.ImagesAPI
 import us.frollo.frollosdk.network.api.ManagedProductsAPI
 import us.frollo.frollosdk.network.api.ReportsAPI
 import us.frollo.frollosdk.network.api.SurveysAPI
-import us.frollo.frollosdk.network.api.UserAPI
 
 // Aggregation
 
@@ -329,9 +329,9 @@ internal fun ManagedProductsAPI.fetchManagedProducts(
     return fetchManagedProducts(queryMap)
 }
 
-internal fun UserAPI.addressAutocomplete(query: String, max: Int): Call<List<AddressAutocomplete>> {
+internal fun AddressAPI.fetchSuggestedAddresses(query: String, max: Int): Call<List<AddressAutocomplete>> {
     val queryMap = mutableMapOf<String, String>()
     queryMap["query"] = query
     queryMap["max"] = max.toString()
-    return addressAutocomplete(queryMap)
+    return fetchSuggestedAddresses(queryMap)
 }

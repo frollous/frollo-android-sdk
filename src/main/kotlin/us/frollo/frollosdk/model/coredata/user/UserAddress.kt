@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.user
+package us.frollo.frollosdk.model.coredata.user
 
+import androidx.room.ColumnInfo
 import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.model.IAdapterModel
+import java.io.Serializable
 
-internal data class UserRegisterRequest(
-    @SerializedName("email") val email: String,
-    @SerializedName("first_name") val firstName: String,
-    @SerializedName("password") val password: String,
-    @SerializedName("date_of_birth") var dateOfBirth: String? = null, // yyyy-MM-dd
-    @SerializedName("last_name") val lastName: String? = null,
-    @SerializedName("mobile_number") val mobileNumber: String? = null,
-    @SerializedName("client_id") val clientId: String
-)
+/**
+ * Address of the user
+ */
+data class UserAddress(
+
+    /** Unique ID of the address */
+    @ColumnInfo(name = "id") @SerializedName("id") var addressId: Long,
+
+    /** Full address in formatted form. (Optional) */
+    @ColumnInfo(name = "long_form") @SerializedName("long_form") var longForm: String? = null
+
+) : IAdapterModel, Serializable

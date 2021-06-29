@@ -23,6 +23,7 @@ The Frollo Android SDK is broken down into multiple components that reflect the 
 * [KYC](#kyc) - TBD
 * [ManagedProducts](#managedproducts) - TBD
 * [Payday](#payday) - TBD
+* [AddressManagement](#addressmanagement) - TBD
 
 ### Authentication
 
@@ -231,3 +232,9 @@ See [ManagedProducts](us.frollo.frollosdk.managedproducts/-managedproducts/index
 TBD
 
 See [Paydays](us.frollo.frollosdk.paydays/-paydays/index.html) for more details.
+
+### AddressManagement
+
+TBD
+
+See [AddressManagement](us.frollo.frollosdk.address/-address-management/index.html) for more details.

@@ -65,8 +65,9 @@ internal fun User.updateRequest(): UserUpdateRequest =
         lastName = lastName,
         mobileNumber = mobileNumber,
         gender = gender,
-        address = if (address?.postcode?.isNotBlank() == true) address else null, // This is to avoid the "Invalid postcode length" error from the host
-        mailingAddress = if (mailingAddress?.postcode?.isNotBlank() == true) address else null, // This is to avoid the "Invalid postcode length" error from the host
+        residentialAddressId = residentialAddress?.addressId,
+        mailingAddressId = mailingAddress?.addressId,
+        previousAddressId = previousAddress?.addressId,
         householdSize = householdSize,
         householdType = householdType,
         occupation = occupation,

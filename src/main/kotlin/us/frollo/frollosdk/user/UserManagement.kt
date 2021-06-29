@@ -31,7 +31,6 @@ import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
-import us.frollo.frollosdk.extensions.addressAutocomplete
 import us.frollo.frollosdk.extensions.enqueue
 import us.frollo.frollosdk.extensions.notify
 import us.frollo.frollosdk.extensions.toString
@@ -40,7 +39,6 @@ import us.frollo.frollosdk.logging.Log
 import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.api.device.DeviceUpdateRequest
 import us.frollo.frollosdk.model.api.device.LogRequest
-import us.frollo.frollosdk.model.api.user.AddressAutocomplete
 import us.frollo.frollosdk.model.api.user.UserChangePasswordRequest
 import us.frollo.frollosdk.model.api.user.UserConfirmDetailsRequest
 import us.frollo.frollosdk.model.api.user.UserMigrationRequest
@@ -57,10 +55,10 @@ import us.frollo.frollosdk.model.api.user.payid.UserPayIdRegisterRequest
 import us.frollo.frollosdk.model.api.user.payid.UserPayIdRemoveRequest
 import us.frollo.frollosdk.model.api.user.payid.UserPayIdResponse
 import us.frollo.frollosdk.model.coredata.contacts.PayIDType
-import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.coredata.user.OtpMethodType
 import us.frollo.frollosdk.model.coredata.user.User
+import us.frollo.frollosdk.model.coredata.user.UserRelation
 import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdOTPMethodType
 import us.frollo.frollosdk.network.NetworkService
 import us.frollo.frollosdk.network.api.DeviceAPI
@@ -98,6 +96,15 @@ class UserManagement(
         }
 
     /**
+     * Fetch the first available user model from the cache along with other associated data.
+     *
+     * @return LiveData object of UserRelation which can be observed using an Observer for future changes as well.
+     */
+    fun fetchUserWithRelation(): LiveData<UserRelation?> {
+        return db.users().loadWithRelation()
+    }
+
+    /**
      * Refreshes the latest details of the user from the server. This should be called on app launch and resuming after a set period of time if the user is already logged in. This returns the same data as login and register.
      *
      * @param completion A completion handler once the API has returned and the cache has been updated. Returns any error that occurred during the process. (Optional)
@@ -122,7 +129,6 @@ class UserManagement(
      * @param firstName Given name of the user
      * @param lastName Family name of the user, if provided (optional)
      * @param mobileNumber Mobile phone number of the user, if provided (optional)
-     * @param postcode Postcode of the user, if provided (optional)
      * @param dateOfBirth Date of birth of the user, if provided (optional)
      * @param email Email address of the user
      * @param password Password for the user
@@ -132,7 +138,6 @@ class UserManagement(
         firstName: String,
         lastName: String? = null,
         mobileNumber: String? = null,
-        postcode: String? = null,
         dateOfBirth: Date? = null,
         email: String,
         password: String,
@@ -144,7 +149,6 @@ class UserManagement(
             lastName = lastName,
             email = email,
             password = password,
-            address = if (postcode?.isNotBlank() == true) Address(postcode = postcode) else null,
             mobileNumber = mobileNumber,
             dateOfBirth = dateOfBirth?.toString("yyyy-MM"),
             clientId = clientId
@@ -608,44 +612,6 @@ class UserManagement(
                     completion?.invoke(Result.success())
                 }
             }
-        }
-    }
-
-    /**
-     * Get addresses list that matches the query string
-     *
-     * @param query String to match address
-     * @param max Maximum number of items to fetch. Should be between 10 and 100; defaults to 20.
-     * @param completion Completion handler with optional error if the request fails or list of addresses is success
-     */
-    fun addressAutocomplete(
-        query: String,
-        max: Int = 20,
-        completion: OnFrolloSDKCompletionListener<Resource<List<AddressAutocomplete>>>
-    ) {
-        userAPI.addressAutocomplete(query, max).enqueue { resource ->
-            if (resource.status == Resource.Status.ERROR) {
-                Log.e("$TAG#addressAutocomplete", resource.error?.localizedDescription)
-            }
-            completion.invoke(resource)
-        }
-    }
-
-    /**
-     * Get address by ID
-     *
-     * @param addressId ID of the address to get the details
-     * @param completion Completion handler with optional error if the request fails or address details is success
-     */
-    fun fetchAddress(
-        addressId: String,
-        completion: OnFrolloSDKCompletionListener<Resource<Address>>
-    ) {
-        userAPI.fetchAddress(addressId).enqueue { resource ->
-            if (resource.status == Resource.Status.ERROR) {
-                Log.e("$TAG#fetchAddress", resource.error?.localizedDescription)
-            }
-            completion.invoke(resource)
         }
     }
 }

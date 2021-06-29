@@ -17,13 +17,9 @@
 package us.frollo.frollosdk.model.coredata.kyc
 
 import com.google.gson.annotations.SerializedName
-import us.frollo.frollosdk.model.coredata.user.Address
 
 /** Data representation of User KYC model */
 data class UserKyc(
-
-    /** List of addresses */
-    @SerializedName("addresses") var addresses: MutableList<Address>? = null,
 
     /** Date of birth */
     @SerializedName("date_of_birth") var dateOfBirth: DateOfBirth? = null,

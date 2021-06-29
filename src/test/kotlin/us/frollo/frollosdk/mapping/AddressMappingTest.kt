@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.user
+package us.frollo.frollosdk.mapping
 
-import com.google.gson.annotations.SerializedName
-import us.frollo.frollosdk.model.IAdapterModel
+import org.junit.Assert.assertEquals
+import org.junit.Test
+import us.frollo.frollosdk.model.testAddressResponseData
 
-/** Data representation of the address autocomplete response */
-data class AddressAutocomplete(
+class AddressMappingTest {
 
-    /** Unique ID of the address */
-    @SerializedName("id") val id: String,
-
-    /** Address text */
-    @SerializedName("address") val address: String
-
-) : IAdapterModel
+    @Test
+    fun testAddressResponseToAddress() {
+        val response = testAddressResponseData(addressId = 12345)
+        val model = response.toAddress()
+        assertEquals(12345L, model.addressId)
+    }
+}

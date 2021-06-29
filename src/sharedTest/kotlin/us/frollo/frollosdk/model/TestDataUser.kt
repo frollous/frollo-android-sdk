@@ -19,7 +19,6 @@ package us.frollo.frollosdk.model
 import us.frollo.frollosdk.model.api.user.UserRegisterRequest
 import us.frollo.frollosdk.model.api.user.UserResetPasswordRequest
 import us.frollo.frollosdk.model.api.user.UserResponse
-import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.coredata.user.FeatureFlag
 import us.frollo.frollosdk.model.coredata.user.Gender
@@ -27,13 +26,19 @@ import us.frollo.frollosdk.model.coredata.user.HouseholdType
 import us.frollo.frollosdk.model.coredata.user.Industry
 import us.frollo.frollosdk.model.coredata.user.Occupation
 import us.frollo.frollosdk.model.coredata.user.RegisterStep
+import us.frollo.frollosdk.model.coredata.user.UserAddress
 import us.frollo.frollosdk.model.coredata.user.UserStatus
 import us.frollo.frollosdk.testutils.randomNumber
 import us.frollo.frollosdk.testutils.randomString
 import us.frollo.frollosdk.testutils.randomUUID
 import us.frollo.frollosdk.testutils.today
 
-internal fun testUserResponseData(userId: Long? = null): UserResponse {
+internal fun testUserResponseData(
+    userId: Long? = null,
+    residentialAddressId: Long? = null,
+    mailingAddressId: Long? = null,
+    previousAddressId: Long? = null,
+): UserResponse {
     val name = randomUUID()
 
     return UserResponse(
@@ -51,8 +56,9 @@ internal fun testUserResponseData(userId: Long? = null): UserResponse {
         lastName = randomUUID(),
         mobileNumber = "0411111111",
         gender = Gender.MALE,
-        address = testAddressData(),
-        mailingAddress = testAddressData(),
+        residentialAddress = testUserAddressData(residentialAddressId),
+        mailingAddress = testUserAddressData(mailingAddressId),
+        previousAddress = testUserAddressData(previousAddressId),
         householdSize = 1,
         householdType = HouseholdType.SINGLE,
         occupation = Occupation.COMMUNITY_AND_PERSONAL_SERVICE_WORKERS,
@@ -84,8 +90,9 @@ internal fun UserResponse.testModifyUserResponseData(firstName: String): UserRes
         lastName = lastName,
         mobileNumber = mobileNumber,
         gender = gender,
-        address = testAddressData(),
-        mailingAddress = testAddressData(),
+        residentialAddress = testUserAddressData(),
+        mailingAddress = testUserAddressData(),
+        previousAddress = testUserAddressData(),
         householdSize = householdSize,
         householdType = householdType,
         occupation = occupation,
@@ -101,20 +108,10 @@ internal fun UserResponse.testModifyUserResponseData(firstName: String): UserRes
     )
 }
 
-internal fun testAddressData(): Address {
-    return Address(
-        buildingName = "100 Mount",
-        unitNumber = "Unit 3, Level 33",
-        streetNumber = "100",
-        streetName = "Mount",
-        streetType = "street",
-        suburb = "North Sydney",
-        town = "Sydney",
-        region = "Greater Sydney",
-        state = "NSW",
-        country = "AU",
-        postcode = "2060",
-        longForm = "Frollo, Level 33, 100 Mount St, North Sydney, NSW, 2060, Australia"
+internal fun testUserAddressData(addressId: Long? = null): UserAddress {
+    return UserAddress(
+        addressId = addressId ?: randomNumber().toLong(),
+        longForm = randomString(50)
     )
 }
 
@@ -124,7 +121,6 @@ internal fun testValidRegisterData(): UserRegisterRequest {
         firstName = name,
         lastName = randomUUID(),
         mobileNumber = "0411111111",
-        address = Address(postcode = "2060"),
         dateOfBirth = "1990-01-10",
         email = "$name@frollo.us",
         password = randomString(8),

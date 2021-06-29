@@ -23,6 +23,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Rule
+import us.frollo.frollosdk.address.AddressManagement
 import us.frollo.frollosdk.aggregation.Aggregation
 import us.frollo.frollosdk.authentication.OAuth2Authentication
 import us.frollo.frollosdk.authentication.OAuth2Helper
@@ -88,6 +89,7 @@ abstract class BaseAndroidTest {
     lateinit var managedProducts: ManagedProducts
     lateinit var cards: Cards
     lateinit var paydays: Paydays
+    lateinit var addressManagement: AddressManagement
     lateinit var appInfo: AppInfo
 
     val scopes = listOf("offline_access", "openid", "email")
@@ -144,6 +146,7 @@ abstract class BaseAndroidTest {
         managedProducts = ManagedProducts(network)
         cards = Cards(network, database)
         paydays = Paydays(network, database)
+        addressManagement = AddressManagement(network, database)
 
         AndroidThreeTen.init(app)
     }

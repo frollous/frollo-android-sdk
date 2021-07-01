@@ -29,7 +29,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import us.frollo.frollosdk.database.SDKDatabase
+import us.frollo.frollosdk.mapping.toAddress
 import us.frollo.frollosdk.mapping.toUser
+import us.frollo.frollosdk.model.testAddressResponseData
 import us.frollo.frollosdk.model.testModifyUserResponseData
 import us.frollo.frollosdk.model.testUserResponseData
 
@@ -91,5 +93,29 @@ class UserDaoTest {
         val testObserver = db.users().load().test()
         testObserver.awaitValue()
         assertNull(testObserver.value())
+    }
+
+    @Test
+    fun testLoadWithRelation() {
+        db.addresses().insert(testAddressResponseData(addressId = 345).toAddress())
+        db.addresses().insert(testAddressResponseData(addressId = 346).toAddress())
+        db.users().insert(
+            testUserResponseData(
+                userId = 123,
+                residentialAddressId = 345,
+                mailingAddressId = 345,
+                previousAddressId = 346
+            ).toUser()
+        )
+
+        val testObserver = db.users().loadWithRelation().test()
+        testObserver.awaitValue()
+
+        val model = testObserver.value()
+        assertNotNull(model)
+        assertEquals(123L, model?.user?.userId)
+        assertEquals(345L, model?.residentialAddress?.addressId)
+        assertEquals(345L, model?.mailingAddress?.addressId)
+        assertEquals(346L, model?.previousAddress?.addressId)
     }
 }

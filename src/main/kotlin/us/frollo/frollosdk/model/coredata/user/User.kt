@@ -17,6 +17,7 @@
 package us.frollo.frollosdk.model.coredata.user
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -76,11 +77,14 @@ data class User(
     /** Gender of the user (optional) */
     @ColumnInfo(name = "gender") var gender: Gender?,
 
-    /** Address of the user */
-    @ColumnInfo(name = "address") var address: Address?,
+    /** Current residential address of the user */
+    @Embedded(prefix = "residential_address_") var residentialAddress: UserAddress?,
 
     /** Mailing address of the user */
-    @ColumnInfo(name = "mailing_address") var mailingAddress: Address?,
+    @Embedded(prefix = "mailing_address_") var mailingAddress: UserAddress?,
+
+    /** Previous residential address of the user */
+    @Embedded(prefix = "previous_address_") var previousAddress: UserAddress?,
 
     /** Number of people in the household (optional) */
     @ColumnInfo(name = "household_size") var householdSize: Int?,

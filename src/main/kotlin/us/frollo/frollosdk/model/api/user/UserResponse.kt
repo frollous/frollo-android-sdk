@@ -17,7 +17,6 @@
 package us.frollo.frollosdk.model.api.user
 
 import com.google.gson.annotations.SerializedName
-import us.frollo.frollosdk.model.coredata.user.Address
 import us.frollo.frollosdk.model.coredata.user.Attribution
 import us.frollo.frollosdk.model.coredata.user.FeatureFlag
 import us.frollo.frollosdk.model.coredata.user.Gender
@@ -25,6 +24,7 @@ import us.frollo.frollosdk.model.coredata.user.HouseholdType
 import us.frollo.frollosdk.model.coredata.user.Industry
 import us.frollo.frollosdk.model.coredata.user.Occupation
 import us.frollo.frollosdk.model.coredata.user.RegisterStep
+import us.frollo.frollosdk.model.coredata.user.UserAddress
 import us.frollo.frollosdk.model.coredata.user.UserStatus
 
 internal data class UserResponse(
@@ -42,8 +42,9 @@ internal data class UserResponse(
     @SerializedName("last_name") val lastName: String?,
     @SerializedName("mobile_number") val mobileNumber: String?,
     @SerializedName("gender") val gender: Gender?,
-    @SerializedName("address") val address: Address?,
-    @SerializedName("mailing_address") val mailingAddress: Address?,
+    @SerializedName("residential_address") val residentialAddress: UserAddress?,
+    @SerializedName("mailing_address") val mailingAddress: UserAddress?,
+    @SerializedName("previous_address") val previousAddress: UserAddress?,
     @SerializedName("household_size") val householdSize: Int?,
     @SerializedName("marital_status") val householdType: HouseholdType?,
     @SerializedName("occupation") val occupation: Occupation?,

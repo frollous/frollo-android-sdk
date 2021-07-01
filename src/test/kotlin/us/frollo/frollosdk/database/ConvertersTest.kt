@@ -91,7 +91,6 @@ import us.frollo.frollosdk.model.coredata.user.RegisterStep
 import us.frollo.frollosdk.model.coredata.user.UserStatus
 import us.frollo.frollosdk.model.testAccountFeatureDetailsData
 import us.frollo.frollosdk.model.testAccountFeaturesData
-import us.frollo.frollosdk.model.testAddressData
 import us.frollo.frollosdk.model.testCDRPermissionData
 import java.math.BigDecimal
 
@@ -271,33 +270,6 @@ class ConvertersTest {
         )
         val json = Converters.instance.stringFromListOfRegisterStep(steps)
         assertEquals("[{\"key\":\"kyc\",\"index\":0,\"required\":true,\"completed\":true},{\"key\":\"survey\",\"index\":1,\"required\":true,\"completed\":false}]", json)
-    }
-
-    @Test
-    fun testStringToAddress() {
-        val json = "{\"building_name\":\"100 Mount\",\"unit_number\":\"Unit 3, Level 33\",\"street_number\":\"100\",\"street_name\":\"Mount\",\"street_type\":\"street\",\"suburb\":\"North Sydney\",\"town\":\"Sydney\",\"region\":\"Greater Sydney\",\"state\":\"NSW\",\"country\":\"AU\",\"postal_code\":\"2060\",\"long_form\":\"Frollo, Level 33, 100 Mount St, North Sydney, NSW, 2060, Australia\"}"
-        val address = Converters.instance.stringToAddress(json)
-        assertNotNull(address)
-        assertEquals("100 Mount", address?.buildingName)
-        assertEquals("Unit 3, Level 33", address?.unitNumber)
-        assertEquals("100", address?.streetNumber)
-        assertEquals("Mount", address?.streetName)
-        assertEquals("street", address?.streetType)
-        assertEquals("North Sydney", address?.suburb)
-        assertEquals("Sydney", address?.town)
-        assertEquals("Greater Sydney", address?.region)
-        assertEquals("NSW", address?.state)
-        assertEquals("AU", address?.country)
-        assertEquals("2060", address?.postcode)
-
-        assertNull(Converters.instance.stringToAddress(null))
-    }
-
-    @Test
-    fun testStringFromAddress() {
-        val address = testAddressData()
-        val json = Converters.instance.stringFromAddress(address)
-        assertEquals("{\"building_name\":\"100 Mount\",\"unit_number\":\"Unit 3, Level 33\",\"street_number\":\"100\",\"street_name\":\"Mount\",\"street_type\":\"street\",\"suburb\":\"North Sydney\",\"town\":\"Sydney\",\"region\":\"Greater Sydney\",\"state\":\"NSW\",\"country\":\"AU\",\"postal_code\":\"2060\",\"long_form\":\"Frollo, Level 33, 100 Mount St, North Sydney, NSW, 2060, Australia\"}", json)
     }
 
     @Test

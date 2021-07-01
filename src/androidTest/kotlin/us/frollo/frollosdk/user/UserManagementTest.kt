@@ -39,6 +39,7 @@ import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
 import us.frollo.frollosdk.extensions.fromJson
+import us.frollo.frollosdk.mapping.toAddress
 import us.frollo.frollosdk.mapping.toUser
 import us.frollo.frollosdk.model.api.shared.APIErrorCode
 import us.frollo.frollosdk.model.api.user.UserResponse
@@ -53,6 +54,7 @@ import us.frollo.frollosdk.model.coredata.user.UserStatus
 import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdAccountStatus
 import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdOTPMethodType
 import us.frollo.frollosdk.model.coredata.user.payid.UserPayIdStatus
+import us.frollo.frollosdk.model.testAddressResponseData
 import us.frollo.frollosdk.model.testUserResponseData
 import us.frollo.frollosdk.network.api.DeviceAPI
 import us.frollo.frollosdk.network.api.UserAPI
@@ -103,7 +105,6 @@ class UserManagementTest : BaseAndroidTest() {
             firstName = "Frollo",
             lastName = "User",
             mobileNumber = "0412345678",
-            postcode = "2060",
             dateOfBirth = Date(),
             email = "user@frollo.us",
             password = "password"
@@ -151,7 +152,6 @@ class UserManagementTest : BaseAndroidTest() {
             firstName = "Frollo",
             lastName = "User",
             mobileNumber = "0412345678",
-            postcode = "2060",
             dateOfBirth = Date(),
             email = "user@frollo.us",
             password = "password"
@@ -223,30 +223,12 @@ class UserManagementTest : BaseAndroidTest() {
             assertEquals("AU", user?.taxResidency)
             assertEquals(false, user?.foreignTax)
             assertEquals("12345", user?.tin)
-            assertEquals("100 Mount", user?.address?.buildingName)
-            assertEquals("Unit 3, Level 33", user?.address?.unitNumber)
-            assertEquals("100", user?.address?.streetNumber)
-            assertEquals("Mount", user?.address?.streetName)
-            assertEquals("street", user?.address?.streetType)
-            assertEquals("North Sydney", user?.address?.suburb)
-            assertEquals("Sydney", user?.address?.town)
-            assertEquals("Greater Sydney", user?.address?.region)
-            assertEquals("NSW", user?.address?.state)
-            assertEquals("AU", user?.address?.country)
-            assertEquals("2060", user?.address?.postcode)
-            assertEquals("Frollo, Level 33, 100 Mount St, North Sydney, NSW, 2060, Australia", user?.address?.longForm)
-            assertEquals("100 Mount", user?.mailingAddress?.buildingName)
-            assertEquals("Unit 3, Level 33", user?.mailingAddress?.unitNumber)
-            assertEquals("100", user?.mailingAddress?.streetNumber)
-            assertEquals("Mount", user?.mailingAddress?.streetName)
-            assertEquals("street", user?.mailingAddress?.streetType)
-            assertEquals("North Sydney", user?.mailingAddress?.suburb)
-            assertEquals("Sydney", user?.mailingAddress?.town)
-            assertEquals("Greater Sydney", user?.mailingAddress?.region)
-            assertEquals("NSW", user?.mailingAddress?.state)
-            assertEquals("AU", user?.mailingAddress?.country)
-            assertEquals("2060", user?.mailingAddress?.postcode)
-            assertEquals("Frollo, Level 33, 100 Mount St, North Sydney, NSW, 2060, Australia", user?.mailingAddress?.longForm)
+            assertEquals(0L, user?.residentialAddress?.addressId)
+            assertEquals("Frollo, Level 33, 100 Mount St, North Sydney, NSW, 2060, Australia", user?.residentialAddress?.longForm)
+            assertEquals(1L, user?.mailingAddress?.addressId)
+            assertEquals("U 1 33 Harrow Road, Bexley, NSW, 2216", user?.mailingAddress?.longForm)
+            assertEquals(2L, user?.previousAddress?.addressId)
+            assertEquals("U 5 21 Hampton Court Road, Carlton, NSW, 2218", user?.previousAddress?.longForm)
             assertEquals(HouseholdType.SINGLE, user?.householdType)
             assertEquals(Occupation.COMMUNITY_AND_PERSONAL_SERVICE_WORKERS, user?.occupation)
             assertEquals(Industry.ELECTRICITY_GAS_WATER_AND_WASTE_SERVICES, user?.industry)
@@ -1244,148 +1226,29 @@ class UserManagementTest : BaseAndroidTest() {
     }
 
     @Test
-    fun testAddressAutocomplete() {
+    fun testUserLinkToAddress() {
         initSetup()
 
-        val signal = CountDownLatch(1)
+        database.addresses().insert(testAddressResponseData(addressId = 345).toAddress())
+        database.addresses().insert(testAddressResponseData(addressId = 346).toAddress())
+        database.users().insert(
+            testUserResponseData(
+                userId = 123,
+                residentialAddressId = 345,
+                mailingAddressId = 345,
+                previousAddressId = 346
+            ).toUser()
+        )
 
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
+        val testObserver = userManagement.fetchUserWithRelation().test()
 
-        val requestPath = "${UserAPI.URL_ADDRESS_AUTOCOMPLETE}?query=ashmole&max=20"
-
-        val body = readStringFromJson(app, R.raw.address_autocomplete)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == requestPath) {
-                    return MockResponse()
-                        .setResponseCode(200)
-                        .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        userManagement.addressAutocomplete(query = "ashmole", max = 20) { resource ->
-            assertEquals(Resource.Status.SUCCESS, resource.status)
-            assertNull(resource.error)
-
-            val models = resource.data
-            assertEquals(20, models?.size)
-            assertEquals("c3a85816-a9c5-11eb-81f0-68c07153d52e", models?.first()?.id)
-            assertEquals("105 Ashmole Road, REDCLIFFE QLD 4020", models?.first()?.address)
-
-            signal.countDown()
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(requestPath, request.trimmedPath)
-
-        signal.await(3, TimeUnit.SECONDS)
-
-        tearDown()
-    }
-
-    @Test
-    fun testAddressAutocompleteFailsIfLoggedOut() {
-        initSetup()
-
-        val signal = CountDownLatch(1)
-
-        clearLoggedInPreferences()
-
-        userManagement.addressAutocomplete(query = "ashmole", max = 20) { resource ->
-            assertEquals(Resource.Status.ERROR, resource.status)
-            assertNotNull(resource.error)
-            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
-            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
-
-            signal.countDown()
-        }
-
-        assertEquals(0, mockServer.requestCount)
-
-        signal.await(3, TimeUnit.SECONDS)
-
-        tearDown()
-    }
-
-    @Test
-    fun testFetchAddress() {
-        initSetup()
-
-        val signal = CountDownLatch(1)
-
-        preferences.loggedIn = true
-        preferences.encryptedAccessToken = keystore.encrypt("ExistingAccessToken")
-        preferences.encryptedRefreshToken = keystore.encrypt("ExistingRefreshToken")
-        preferences.accessTokenExpiry = LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC) + 900
-
-        val addressId = "c3a85816-a9c5-11eb-81f0-68c07153d52e"
-        val requestPath = "user/addresses/autocomplete/$addressId"
-
-        val body = readStringFromJson(app, R.raw.address_by_id)
-        mockServer.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                if (request?.trimmedPath == requestPath) {
-                    return MockResponse()
-                        .setResponseCode(200)
-                        .setBody(body)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
-
-        userManagement.fetchAddress(addressId) { resource ->
-            assertEquals(Resource.Status.SUCCESS, resource.status)
-            assertNull(resource.error)
-
-            assertEquals("105 Ashmole", resource.data?.buildingName)
-            assertEquals("", resource.data?.unitNumber)
-            assertEquals("105", resource.data?.streetNumber)
-            assertEquals("Ashmole", resource.data?.streetName)
-            assertEquals("Road", resource.data?.streetType)
-            assertEquals("Redcliffe", resource.data?.suburb)
-            assertEquals("", resource.data?.town)
-            assertEquals("", resource.data?.region)
-            assertEquals("QLD", resource.data?.state)
-            assertEquals("AU", resource.data?.country)
-            assertEquals("4020", resource.data?.postcode)
-            assertEquals("105 Ashmole Road, REDCLIFFE QLD 4020", resource.data?.longForm)
-
-            signal.countDown()
-        }
-
-        val request = mockServer.takeRequest()
-        assertEquals(requestPath, request.trimmedPath)
-
-        signal.await(3, TimeUnit.SECONDS)
-
-        tearDown()
-    }
-
-    @Test
-    fun testFetchAddressFailsIfLoggedOut() {
-        initSetup()
-
-        val signal = CountDownLatch(1)
-
-        clearLoggedInPreferences()
-
-        userManagement.fetchAddress("c3a85816-a9c5-11eb-81f0-68c07153d52e") { resource ->
-            assertEquals(Resource.Status.ERROR, resource.status)
-            assertNotNull(resource.error)
-            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
-            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
-
-            signal.countDown()
-        }
-
-        assertEquals(0, mockServer.requestCount)
-
-        signal.await(3, TimeUnit.SECONDS)
+        testObserver.awaitValue()
+        val model = testObserver.value()
+        assertNotNull(model)
+        assertEquals(123L, model?.user?.userId)
+        assertEquals(345L, model?.residentialAddress?.addressId)
+        assertEquals(345L, model?.mailingAddress?.addressId)
+        assertEquals(346L, model?.previousAddress?.addressId)
 
         tearDown()
     }

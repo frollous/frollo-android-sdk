@@ -24,6 +24,7 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import us.frollo.frollosdk.database.dao.AccountDao
+import us.frollo.frollosdk.database.dao.AddressDao
 import us.frollo.frollosdk.database.dao.BillDao
 import us.frollo.frollosdk.database.dao.BillPaymentDao
 import us.frollo.frollosdk.database.dao.BudgetDao
@@ -46,6 +47,7 @@ import us.frollo.frollosdk.database.dao.TransactionDao
 import us.frollo.frollosdk.database.dao.TransactionUserTagsDao
 import us.frollo.frollosdk.database.dao.UserDao
 import us.frollo.frollosdk.model.api.messages.MessageResponse
+import us.frollo.frollosdk.model.coredata.address.Address
 import us.frollo.frollosdk.model.coredata.aggregation.accounts.Account
 import us.frollo.frollosdk.model.coredata.aggregation.merchants.Merchant
 import us.frollo.frollosdk.model.coredata.aggregation.provideraccounts.ProviderAccount
@@ -91,7 +93,8 @@ import us.frollo.frollosdk.model.coredata.user.User
         CDRConfiguration::class,
         Contact::class,
         Card::class,
-        Payday::class
+        Payday::class,
+        Address::class
     ],
     version = 13, exportSchema = true
 )
@@ -121,6 +124,7 @@ abstract class SDKDatabase : RoomDatabase() {
     internal abstract fun contacts(): ContactDao
     internal abstract fun cards(): CardDao
     internal abstract fun payday(): PaydayDao
+    internal abstract fun addresses(): AddressDao
 
     companion object {
         private const val DATABASE_NAME = "frollosdk-db"
@@ -512,13 +516,26 @@ abstract class SDKDatabase : RoomDatabase() {
                 // New changes in this migration:
                 // 1) New table - payday
                 // 2) Alter cdr_configuration table - add column permissions
-                // 3) Alter user table - add column external_id
+                // 3) Alter user table - add columns - external_id, residential_address_*, mailing_address_*, previous_address_* & drop columns - address, mailing_address
+                // 4) New table - addresses
 
                 database.execSQL("CREATE TABLE IF NOT EXISTS `payday` (`status` TEXT NOT NULL, `frequency` TEXT NOT NULL, `next_date` TEXT, `previous_date` TEXT, `payday_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
 
                 database.execSQL("ALTER TABLE `cdr_configuration` ADD COLUMN `permissions` TEXT")
 
-                database.execSQL("ALTER TABLE `user` ADD COLUMN `external_id` TEXT")
+                // START - Drop columns - address, mailing_address & add columns - external_id, residential_address_*, mailing_address_*, previous_address_*
+                database.execSQL("BEGIN TRANSACTION")
+                database.execSQL("DROP INDEX IF EXISTS `index_user_user_id`")
+                database.execSQL("ALTER TABLE user RENAME TO original_user")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `user` (`user_id` INTEGER NOT NULL, `first_name` TEXT, `email` TEXT NOT NULL, `email_verified` INTEGER NOT NULL, `status` TEXT NOT NULL, `primary_currency` TEXT NOT NULL, `valid_password` INTEGER NOT NULL, `register_steps` TEXT, `registration_date` TEXT NOT NULL, `facebook_id` TEXT, `attribution` TEXT, `last_name` TEXT, `mobile_number` TEXT, `gender` TEXT, `household_size` INTEGER, `marital_status` TEXT, `occupation` TEXT, `industry` TEXT, `date_of_birth` TEXT, `driver_license` TEXT, `features` TEXT, `foreign_tax` INTEGER, `tax_residency` TEXT, `tfn` TEXT, `tin` TEXT, `external_id` TEXT, `residential_address_id` INTEGER, `residential_address_long_form` TEXT, `mailing_address_id` INTEGER, `mailing_address_long_form` TEXT, `previous_address_id` INTEGER, `previous_address_long_form` TEXT, PRIMARY KEY(`user_id`))")
+                database.execSQL("INSERT INTO user(user_id, first_name, email, email_verified, status, primary_currency, valid_password, register_steps, registration_date, facebook_id, attribution, last_name, mobile_number, gender, household_size, marital_status, occupation, industry, date_of_birth, driver_license, features) SELECT user_id, first_name, email, email_verified, status, primary_currency, valid_password, register_steps, registration_date, facebook_id, attribution, last_name, mobile_number, gender, household_size, marital_status, occupation, industry, date_of_birth, driver_license, features FROM original_user")
+                database.execSQL("DROP TABLE original_user")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_user_user_id` ON `user` (`user_id`)")
+                database.execSQL("COMMIT")
+                // END - Drop columns - address, mailing_address & add columns - external_id, residential_address_*, mailing_address_*, previous_address_*
+
+                database.execSQL("CREATE TABLE IF NOT EXISTS `addresses` (`address_id` INTEGER NOT NULL, `building_name` TEXT, `unit_number` TEXT, `street_number` TEXT, `street_name` TEXT, `street_type` TEXT, `suburb` TEXT, `town` TEXT, `region` TEXT, `state` TEXT, `country` TEXT, `postal_code` TEXT, `long_form` TEXT, PRIMARY KEY(`address_id`))")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_addresses_address_id` ON `addresses` (`address_id`)")
             }
         }
     }

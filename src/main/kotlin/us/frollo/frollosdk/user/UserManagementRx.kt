@@ -18,6 +18,7 @@ package us.frollo.frollosdk.user
 
 import io.reactivex.Observable
 import us.frollo.frollosdk.model.coredata.user.User
+import us.frollo.frollosdk.model.coredata.user.UserRelation
 
 /**
  * Fetch the first available user model from the cache
@@ -26,4 +27,13 @@ import us.frollo.frollosdk.model.coredata.user.User
  */
 fun UserManagement.fetchUserRx(): Observable<User?> {
     return db.users().loadRx()
+}
+
+/**
+ * Fetch the first available user model from the cache along with other associated data.
+ *
+ * @return Rx Observable object of UserRelation which can be observed using an Observer for future changes as well.
+ */
+fun UserManagement.fetchUserWithRelationRx(): Observable<UserRelation?> {
+    return db.users().loadWithRelationRx()
 }

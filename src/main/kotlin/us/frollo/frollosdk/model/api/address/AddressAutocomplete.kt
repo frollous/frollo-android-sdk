@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package us.frollo.frollosdk.model.api.user
+package us.frollo.frollosdk.model.api.address
 
 import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.model.IAdapterModel
 
-internal data class UserRegisterRequest(
-    @SerializedName("email") val email: String,
-    @SerializedName("first_name") val firstName: String,
-    @SerializedName("password") val password: String,
-    @SerializedName("date_of_birth") var dateOfBirth: String? = null, // yyyy-MM-dd
-    @SerializedName("last_name") val lastName: String? = null,
-    @SerializedName("mobile_number") val mobileNumber: String? = null,
-    @SerializedName("client_id") val clientId: String
-)
+/** Data representation of the address autocomplete response */
+data class AddressAutocomplete(
+
+    /** Unique ID of the address */
+    @SerializedName("id") val id: String,
+
+    /** Address text */
+    @SerializedName("address") val address: String
+
+) : IAdapterModel

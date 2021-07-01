@@ -4,6 +4,10 @@
 
 FrolloSDK manages the lifecycle of the SDK. Only one instance should be instantiated and then used (after setup completes) during the lifetime of the app.
 
+# Package us.frollo.frollosdk.address
+
+Manages all aspects of addresses.
+
 # Package us.frollo.frollosdk.aggregation
 
 Manages all aggregation data including accounts, transactions, categories and merchants.
@@ -76,6 +80,10 @@ Manages refreshing and caching of messages.
 
 Frollo SDK data models
 
+# Package us.frollo.frollosdk.model.api.address
+
+Frollo SDK address models
+
 # Package us.frollo.frollosdk.model.api.cards
 
 Frollo SDK card models
@@ -95,6 +103,10 @@ Frollo SDK user models
 # Package us.frollo.frollosdk.model.api.user.payid
 
 Frollo SDK PayID models
+
+# Package us.frollo.frollosdk.model.coredata.address
+
+Frollo SDK address models
 
 # Package us.frollo.frollosdk.model.coredata.aggregation.accounts
 
@@ -167,6 +179,10 @@ Frollo SDK message models
 # Package us.frollo.frollosdk.model.coredata.payday
 
 Frollo SDK payday models
+
+# Package us.frollo.frollosdk.model.coredata.payments
+
+Frollo SDK payment models
 
 # Package us.frollo.frollosdk.model.coredata.reports
 

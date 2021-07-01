@@ -30,7 +30,6 @@ import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.error.DataError
 import us.frollo.frollosdk.error.DataErrorSubType
 import us.frollo.frollosdk.error.DataErrorType
-import us.frollo.frollosdk.model.coredata.kyc.AddressType
 import us.frollo.frollosdk.model.coredata.kyc.IdentityDocumentType
 import us.frollo.frollosdk.model.coredata.kyc.KycStatus
 import us.frollo.frollosdk.model.testKycResponseData
@@ -79,7 +78,6 @@ class KYCTest : BaseAndroidTest() {
 
             assertEquals("drsheldon@frollo.us", response?.email)
             assertEquals(KycStatus.NON_EXISTENT, response?.status)
-            assertNull(response?.addresses)
             assertNull(response?.dateOfBirth)
             assertNull(response?.gender)
             assertNull(response?.mobileNumber)
@@ -121,23 +119,6 @@ class KYCTest : BaseAndroidTest() {
 
             val response = resource.data
             assertNotNull(response)
-
-            assertEquals(3, response?.addresses?.size)
-            val address = response?.addresses?.get(2)
-            assertEquals("ResStreet", address?.addressId)
-            assertEquals(AddressType.RESIDENTIAL1, address?.addressType)
-            assertEquals("voluptate", address?.buildingName)
-            assertEquals("1", address?.unitNumber)
-            assertEquals("2", address?.streetNumber)
-            assertEquals("Beaconsfield", address?.streetName)
-            assertEquals("Street", address?.streetType)
-            assertEquals("Carlton", address?.suburb)
-            assertEquals("Sydney", address?.town)
-            assertEquals("Carlton", address?.region)
-            assertEquals("NSW", address?.state)
-            assertEquals("AU", address?.country)
-            assertEquals("2217", address?.postcode)
-            assertEquals("20 beaconsfield street, Carlton, 2217, NSW", address?.longForm)
 
             assertEquals("1991", response?.dateOfBirth?.yearOfBirth)
             assertEquals("1991-01-01", response?.dateOfBirth?.dateOfBirth)
@@ -232,23 +213,6 @@ class KYCTest : BaseAndroidTest() {
             val response = resource.data
             assertNotNull(response)
 
-            assertEquals(3, response?.addresses?.size)
-            val address = response?.addresses?.get(2)
-            assertEquals("ResStreet", address?.addressId)
-            assertEquals(AddressType.RESIDENTIAL1, address?.addressType)
-            assertEquals("voluptate", address?.buildingName)
-            assertEquals("1", address?.unitNumber)
-            assertEquals("2", address?.streetNumber)
-            assertEquals("Beaconsfield", address?.streetName)
-            assertEquals("Street", address?.streetType)
-            assertEquals("Carlton", address?.suburb)
-            assertEquals("Sydney", address?.town)
-            assertEquals("Carlton", address?.region)
-            assertEquals("NSW", address?.state)
-            assertEquals("AU", address?.country)
-            assertEquals("2217", address?.postcode)
-            assertEquals("20 beaconsfield street, Carlton, 2217, NSW", address?.longForm)
-
             assertEquals("1991", response?.dateOfBirth?.yearOfBirth)
             assertEquals("1991-01-01", response?.dateOfBirth?.dateOfBirth)
 
@@ -319,19 +283,6 @@ class KYCTest : BaseAndroidTest() {
 
             val response = resource.data
             assertNotNull(response)
-
-            assertEquals(1, response?.addresses?.size)
-            val address = response?.addresses?.get(0)
-            assertEquals("78deb8c1-c7eb-e588-b36a-4e3547187227", address?.addressId)
-            assertEquals(AddressType.RESIDENTIAL1, address?.addressType)
-            assertEquals("U 1", address?.unitNumber)
-            assertEquals("35", address?.streetNumber)
-            assertEquals("CONN", address?.streetName)
-            assertEquals("STREET", address?.streetType)
-            assertEquals("FERNTREE GULLY", address?.town)
-            assertEquals("VIC", address?.state)
-            assertEquals("AUS", address?.country)
-            assertEquals("3156", address?.postcode)
 
             assertEquals("1950-01-01", response?.dateOfBirth?.dateOfBirth)
 

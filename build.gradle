@@ -32,6 +32,8 @@ android {
             debuggable true
         }
     }
+    lintOptions { checkReleaseBuilds false }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -148,7 +150,34 @@ repositories {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'sdk_libs', include: ['*.aar','*.jar'], exclude: [])
+
+    // Anko
+//    implementation(name:'anko-0.10.8', ext:'aar')
+//
+//    implementation(name:'anko-appcompat-v7-0.10.8', ext:'aar')
+//    implementation(name:'anko-appcompat-v7-commons-0.10.8', ext:'aar')
+//    implementation(name:'anko-appcompat-v7-coroutines-0.10.8', ext:'aar')
+//
+//    implementation(name:'anko-commons-0.10.8', ext:'aar')
+//    implementation(name:'anko-coroutines-0.10.8', ext:'aar')
+//    implementation(name:'anko-design-0.10.8', ext:'aar')
+//    implementation(name:'anko-design-coroutines-0.10.8', ext:'aar')
+//
+//    implementation(name:'anko-sdk27-0.10.8', ext:'aar')
+//    implementation(name:'anko-sdk27-coroutines-0.10.8', ext:'aar')
+//
+//    implementation(name:'anko-support-v4-0.10.8', ext:'aar')
+//    implementation(name:'anko-support-v4-commons-0.10.8', ext:'aar')
+//
+//
+//    implementation(name:'appcompatV7-base-0.10.8', ext:'aar')
+//    implementation(name:'commons-base-0.10.8', ext:'aar')
+//    implementation(name:'design-base-0.10.8', ext:'aar')
+//    implementation(name:'platform-base-0.10.8', ext:'aar')
+//    implementation(name:'supportV4-base-0.10.8', ext:'aar')
+
+    //anko ends
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version_internal"
@@ -164,8 +193,8 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-android:3.0.0"
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:3.14.4"
     androidTestImplementation "com.squareup.retrofit2:retrofit-mock:2.7.1"
-    androidTestImplementation "com.jraska.livedata:testing:0.6.0"
-    androidTestImplementation "com.jraska.livedata:testing-ktx:0.6.0"
+//    androidTestImplementation "com.jraska.livedata:testing:0.6.0"
+//    androidTestImplementation "com.jraska.livedata:testing-ktx:0.6.0"
 
     // Android KTX
     implementation "androidx.core:core-ktx:1.5.0"
@@ -175,33 +204,6 @@ dependencies {
     implementation "androidx.room:room-runtime:2.3.0"
     implementation 'androidx.room:room-rxjava2:2.3.0'
     kapt "androidx.room:room-compiler:2.3.0"
-
-    // Anko
-    implementation(name:'anko-0.10.8', ext:'aar')
-
-    implementation(name:'anko-appcompat-v7-0.10.8', ext:'aar')
-    implementation(name:'anko-appcompat-v7-commons-0.10.8', ext:'aar')
-    implementation(name:'anko-appcompat-v7-coroutines-0.10.8', ext:'aar')
-
-    implementation(name:'anko-commons-0.10.8', ext:'aar')
-    implementation(name:'anko-coroutines-0.10.8', ext:'aar')
-    implementation(name:'anko-design-0.10.8', ext:'aar')
-    implementation(name:'anko-design-coroutines-0.10.8', ext:'aar')
-
-    implementation(name:'anko-sdk27-0.10.8', ext:'aar')
-    implementation(name:'anko-sdk27-coroutines-0.10.8', ext:'aar')
-
-    implementation(name:'anko-support-v4-0.10.8', ext:'aar')
-    implementation(name:'anko-support-v4-commons-0.10.8', ext:'aar')
-
-
-    implementation(name:'appcompatV7-base-0.10.8', ext:'aar')
-    implementation(name:'commons-base-0.10.8', ext:'aar')
-    implementation(name:'design-base-0.10.8', ext:'aar')
-    implementation(name:'platform-base-0.10.8', ext:'aar')
-    implementation(name:'supportV4-base-0.10.8', ext:'aar')
-
-    //anko ends
 
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:2.7.1"

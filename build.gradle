@@ -130,7 +130,7 @@ buildscript {
 
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
@@ -173,8 +173,32 @@ dependencies {
     implementation 'androidx.room:room-rxjava2:2.3.0'
     kapt "androidx.room:room-compiler:2.3.0"
 
-    // Anko (https://github.com/Kotlin/anko)
-    implementation "org.jetbrains.anko:anko:0.10.8"
+    // Anko
+    implementation(name:'anko-0.10.8', ext:'aar')
+
+    implementation(name:'anko-appcompat-v7-0.10.8', ext:'aar')
+    implementation(name:'anko-appcompat-v7-commons-0.10.8', ext:'aar')
+    implementation(name:'anko-appcompat-v7-coroutines-0.10.8', ext:'aar')
+
+    implementation(name:'anko-commons-0.10.8', ext:'aar')
+    implementation(name:'anko-coroutines-0.10.8', ext:'aar')
+    implementation(name:'anko-design-0.10.8', ext:'aar')
+    implementation(name:'anko-design-coroutines-0.10.8', ext:'aar')
+
+    implementation(name:'anko-sdk27-0.10.8', ext:'aar')
+    implementation(name:'anko-sdk27-coroutines-0.10.8', ext:'aar')
+
+    implementation(name:'anko-support-v4-0.10.8', ext:'aar')
+    implementation(name:'anko-support-v4-commons-0.10.8', ext:'aar')
+
+
+    implementation(name:'appcompatV7-base-0.10.8', ext:'aar')
+    implementation(name:'commons-base-0.10.8', ext:'aar')
+    implementation(name:'design-base-0.10.8', ext:'aar')
+    implementation(name:'platform-base-0.10.8', ext:'aar')
+    implementation(name:'supportV4-base-0.10.8', ext:'aar')
+
+    //anko ends
 
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:2.7.1"
@@ -182,9 +206,6 @@ dependencies {
 
     // ThreeTenABP - Date-Time
     implementation "com.jakewharton.threetenabp:threetenabp:1.2.2"
-
-    // Android Debug SDKDatabase
-    debugImplementation "com.amitshekhar.android:debug-db:1.0.4"
 
     // Cryptography - SpongyCastle
     implementation "com.madgag.spongycastle:core:1.58.0.0"

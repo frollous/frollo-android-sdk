@@ -1,5 +1,12 @@
 ## Changelog
 
+### 3.10.0
+
+#### Changes
+
+- Updated koin version to 3.0.1
+- Removed jCenter dependency and added aar files temporarily in libs folder
+
 ### 3.9.0
 
 #### Features

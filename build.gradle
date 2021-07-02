@@ -11,7 +11,7 @@ android {
         minSdkVersion 23 // Android 6.0 (Marshmallow)
         targetSdkVersion 30
         versionCode 1
-        versionName "3.9.0"
+        versionName "3.10.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 'appAuthRedirectScheme': 'frollo-sdk-test'
@@ -131,7 +131,6 @@ buildscript {
 
     ext.kotlin_version_internal = '1.5.20'
     ext.koin_version_internal = '3.0.1'
-    ext.nav_version_internal = '2.3.4'
 
     repositories {
         google()
@@ -151,33 +150,7 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'sdk_libs', include: ['*.aar','*.jar'], exclude: [])
-
-    // Anko
-//    implementation(name:'anko-0.10.8', ext:'aar')
-//
-//    implementation(name:'anko-appcompat-v7-0.10.8', ext:'aar')
-//    implementation(name:'anko-appcompat-v7-commons-0.10.8', ext:'aar')
-//    implementation(name:'anko-appcompat-v7-coroutines-0.10.8', ext:'aar')
-//
-//    implementation(name:'anko-commons-0.10.8', ext:'aar')
-//    implementation(name:'anko-coroutines-0.10.8', ext:'aar')
-//    implementation(name:'anko-design-0.10.8', ext:'aar')
-//    implementation(name:'anko-design-coroutines-0.10.8', ext:'aar')
-//
-//    implementation(name:'anko-sdk27-0.10.8', ext:'aar')
-//    implementation(name:'anko-sdk27-coroutines-0.10.8', ext:'aar')
-//
-//    implementation(name:'anko-support-v4-0.10.8', ext:'aar')
-//    implementation(name:'anko-support-v4-commons-0.10.8', ext:'aar')
-//
-//
-//    implementation(name:'appcompatV7-base-0.10.8', ext:'aar')
-//    implementation(name:'commons-base-0.10.8', ext:'aar')
-//    implementation(name:'design-base-0.10.8', ext:'aar')
-//    implementation(name:'platform-base-0.10.8', ext:'aar')
-//    implementation(name:'supportV4-base-0.10.8', ext:'aar')
-
-    //anko ends
+    //todo need to fix test framework with libs in aar/jar
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version_internal"
@@ -193,8 +166,8 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-android:3.0.0"
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:3.14.4"
     androidTestImplementation "com.squareup.retrofit2:retrofit-mock:2.7.1"
-//    androidTestImplementation "com.jraska.livedata:testing:0.6.0"
-//    androidTestImplementation "com.jraska.livedata:testing-ktx:0.6.0"
+    androidTestImplementation 'com.jraska.livedata:testing-ktx:1.2.0'
+    androidTestImplementation 'com.jraska.livedata:testing:1.2.0'
 
     // Android KTX
     implementation "androidx.core:core-ktx:1.5.0"

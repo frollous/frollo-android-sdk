@@ -18,6 +18,9 @@ package us.frollo.frollosdk.user
 
 import com.google.gson.Gson
 import com.jraska.livedata.test
+import java.util.Date
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import okhttp3.Request
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -27,7 +30,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
-import org.junit.Ignore
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
@@ -64,9 +66,6 @@ import us.frollo.frollosdk.testutils.randomString
 import us.frollo.frollosdk.testutils.randomUUID
 import us.frollo.frollosdk.testutils.readStringFromJson
 import us.frollo.frollosdk.testutils.trimmedPath
-import java.util.Date
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 class UserManagementTest : BaseAndroidTest() {
 
@@ -1226,7 +1225,6 @@ class UserManagementTest : BaseAndroidTest() {
         tearDown()
     }
 
-    @Ignore("temp")
     @Test
     fun testUserLinkToAddress() {
         initSetup()

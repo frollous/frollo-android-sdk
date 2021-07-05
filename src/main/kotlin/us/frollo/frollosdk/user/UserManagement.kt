@@ -19,11 +19,11 @@ package us.frollo.frollosdk.user
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import okhttp3.Request
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.FrolloSDK
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
+import us.frollo.frollosdk.base.doAsync
+import us.frollo.frollosdk.base.uiThread
 import us.frollo.frollosdk.core.ACTION
 import us.frollo.frollosdk.core.DeviceInfo
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener

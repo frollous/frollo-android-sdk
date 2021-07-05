@@ -24,8 +24,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.sqlite.db.SimpleSQLiteQuery
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 import org.threeten.bp.LocalDate
 import org.threeten.bp.temporal.TemporalAdjusters
 import us.frollo.frollosdk.base.PaginatedResult
@@ -34,6 +32,8 @@ import us.frollo.frollosdk.base.PaginationInfoDatedCursor
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
+import us.frollo.frollosdk.base.doAsync
+import us.frollo.frollosdk.base.uiThread
 import us.frollo.frollosdk.core.ACTION.ACTION_REFRESH_TRANSACTIONS
 import us.frollo.frollosdk.core.ARGUMENT.ARG_TRANSACTION_IDS
 import us.frollo.frollosdk.core.LIMIT.SQLITE_MAX_VARIABLE_NUMBER

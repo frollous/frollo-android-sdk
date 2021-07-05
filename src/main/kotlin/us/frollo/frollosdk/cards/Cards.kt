@@ -18,11 +18,11 @@ package us.frollo.frollosdk.cards
 
 import androidx.lifecycle.LiveData
 import androidx.sqlite.db.SimpleSQLiteQuery
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 import us.frollo.frollosdk.base.Resource
 import us.frollo.frollosdk.base.Result
 import us.frollo.frollosdk.base.SimpleSQLiteQueryBuilder
+import us.frollo.frollosdk.base.doAsync
+import us.frollo.frollosdk.base.uiThread
 import us.frollo.frollosdk.core.OnFrolloSDKCompletionListener
 import us.frollo.frollosdk.database.SDKDatabase
 import us.frollo.frollosdk.extensions.encryptValueBase64

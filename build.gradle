@@ -149,9 +149,6 @@ repositories {
 }
 
 dependencies {
-    implementation fileTree(dir: 'sdk_libs', include: ['*.aar','*.jar'], exclude: [])
-    //todo need to fix test framework with libs in aar/jar
-
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version_internal"
 

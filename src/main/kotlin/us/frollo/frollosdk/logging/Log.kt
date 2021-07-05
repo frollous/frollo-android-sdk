@@ -16,7 +16,7 @@
 
 package us.frollo.frollosdk.logging
 
-import org.jetbrains.anko.doAsync
+import us.frollo.frollosdk.base.doAsync
 import us.frollo.frollosdk.network.NetworkService
 
 internal object Log {

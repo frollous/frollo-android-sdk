@@ -28,6 +28,8 @@ import us.frollo.frollosdk.model.api.payments.PaymentPayIdRequest
 import us.frollo.frollosdk.model.api.payments.PaymentPayIdResponse
 import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
 import us.frollo.frollosdk.model.api.payments.PaymentTransferResponse
+import us.frollo.frollosdk.model.api.payments.VerifyBPayRequest
+import us.frollo.frollosdk.model.api.payments.VerifyBPayResponse
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneResponse
 import us.frollo.frollosdk.model.api.payments.VerifyPayIdRequest
@@ -45,6 +47,7 @@ internal interface PaymentsAPI {
 
         // BPay URLs
         const val URL_BPAY = "payments/bpay"
+        const val URL_VERIFY_BPAY = "payments/verify/bpay"
 
         // NPP URLs
         const val URL_NPP = "payments/npp"
@@ -78,4 +81,7 @@ internal interface PaymentsAPI {
 
     @POST(URL_VERIFY_PAY_ID)
     fun verifyPayId(@Body request: VerifyPayIdRequest): Call<VerifyPayIdResponse>
+
+    @POST(URL_VERIFY_BPAY)
+    fun verifyBPay(@Body request: VerifyBPayRequest): Call<VerifyBPayResponse>
 }

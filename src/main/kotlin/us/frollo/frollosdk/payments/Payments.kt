@@ -28,6 +28,8 @@ import us.frollo.frollosdk.model.api.payments.PaymentPayIdRequest
 import us.frollo.frollosdk.model.api.payments.PaymentPayIdResponse
 import us.frollo.frollosdk.model.api.payments.PaymentTransferRequest
 import us.frollo.frollosdk.model.api.payments.PaymentTransferResponse
+import us.frollo.frollosdk.model.api.payments.VerifyBPayRequest
+import us.frollo.frollosdk.model.api.payments.VerifyBPayResponse
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneRequest
 import us.frollo.frollosdk.model.api.payments.VerifyPayAnyoneResponse
 import us.frollo.frollosdk.model.api.payments.VerifyPayIdRequest
@@ -303,6 +305,27 @@ class Payments(network: NetworkService) {
         paymentsAPI.verifyPayId(request).enqueue { resource ->
             if (resource.status == Resource.Status.ERROR) {
                 Log.e("$TAG#verifyPayId", resource.error?.localizedDescription)
+            }
+            completion.invoke(resource)
+        }
+    }
+
+    /**
+     * Verify BPay
+     *
+     * @param billerCode Biller code
+     * @param crn Customer Reference Number (Optional)
+     * @param completion Optional completion handler with optional error if the request fails else [VerifyBPayResponse] if success
+     */
+    fun verifyBPay(
+        billerCode: String,
+        crn: String? = null,
+        completion: OnFrolloSDKCompletionListener<Resource<VerifyBPayResponse>>
+    ) {
+        val request = VerifyBPayRequest(billerCode = billerCode, crn = crn)
+        paymentsAPI.verifyBPay(request).enqueue { resource ->
+            if (resource.status == Resource.Status.ERROR) {
+                Log.e("$TAG#verifyBPay", resource.error?.localizedDescription)
             }
             completion.invoke(resource)
         }

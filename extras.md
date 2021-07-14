@@ -279,17 +279,21 @@ Follow the steps [here](https://firebase.google.com/docs/android/setup) and [her
 - Register for push notifications at an appropriate point in the onboarding journey, for example after login/registration and at every app launch to register the device token for notifications.
 
 ```kotlin
-            FirebaseInstanceId.getInstance().instanceId
-                .addOnCompleteListener(OnCompleteListener { task ->
-                    if (!task.isSuccessful) {
-                        Log.w(TAG, "getInstanceId failed", task.exception)
-                        return@OnCompleteListener
-                    }
-
-                    // Get new Instance ID token
-                    val token = task.result?.token
+            FirebaseMessaging.getInstance().token
+                .addOnSuccessListener { token ->
                     token?.let { FrolloSDK.notifications.registerPushNotificationToken(it) }
-                })
+                }
+                .addOnFailureListener {
+                    it.printStackTrace()
+                }
+                .addOnCompleteListener(
+                    OnCompleteListener { task ->
+                        if (!task.isSuccessful) {
+                            Log.e(TAG, "getToken failed ${task.exception}")
+                            return@OnCompleteListener
+                        }
+                    }
+                )
 ```
 
 - Also register the new token in your FirebaseMessagingService instance inside onNewToken() method.

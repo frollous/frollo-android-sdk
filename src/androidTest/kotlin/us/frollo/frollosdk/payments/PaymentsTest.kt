@@ -660,4 +660,123 @@ class PaymentsTest : BaseAndroidTest() {
 
         tearDown()
     }
+
+    @Test
+    fun testVerifyBPayValid() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val body = readStringFromJson(app, R.raw.payment_verify_bpay_valid)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == PaymentsAPI.URL_VERIFY_BPAY) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        payments.verifyBPay(
+            billerCode = "123456",
+            crn = "98765432"
+        ) { resource ->
+
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val response = resource.data
+            assertNotNull(response)
+
+            assertEquals("123456", response?.billerCode)
+            assertEquals("AGL", response?.billerName)
+            assertEquals("98765432", response?.crn)
+            assertEquals("1.00", response?.billerMinAmount?.toString())
+            assertEquals("11111.00", response?.billerMaxAmount?.toString())
+            assertEquals(true, response?.valid)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(PaymentsAPI.URL_VERIFY_BPAY, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testVerifyBPayInvalid() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        val body = readStringFromJson(app, R.raw.payment_verify_bpay_invalid)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == PaymentsAPI.URL_VERIFY_BPAY) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        payments.verifyBPay(
+            billerCode = "123456",
+            crn = "98765432"
+        ) { resource ->
+
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val response = resource.data
+            assertNotNull(response)
+
+            assertNull(response?.billerCode)
+            assertNull(response?.billerName)
+            assertNull(response?.crn)
+            assertNull(response?.billerMinAmount)
+            assertNull(response?.billerMaxAmount)
+            assertEquals(false, response?.valid)
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(PaymentsAPI.URL_VERIFY_BPAY, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testVerifyBPayFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        payments.verifyBPay(
+            billerCode = "123456",
+            crn = "98765432"
+        ) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
 }

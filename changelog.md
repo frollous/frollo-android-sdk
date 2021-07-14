@@ -6,6 +6,7 @@
 
 - Updated koin version to 3.0.1
 - Removed jCenter dependency and added aar files temporarily in libs folder
+- Verify BPay
 
 ### 3.9.0
 

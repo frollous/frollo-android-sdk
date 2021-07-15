@@ -17,6 +17,7 @@
 package us.frollo.frollosdk.model.api.payments
 
 import com.google.gson.annotations.SerializedName
+import us.frollo.frollosdk.model.coredata.payments.PaymentMode
 import java.math.BigDecimal
 
 /**
@@ -60,6 +61,9 @@ data class PaymentBPayResponse(
     @SerializedName("transaction_reference") val transactionReference: String,
 
     /** Payment is duplicate (Optional) - returned only for NPP payment */
-    @SerializedName("is_duplicate") val isDuplicate: Boolean?
+    @SerializedName("is_duplicate") val isDuplicate: Boolean?,
+
+    /** Mode with which the payment was made (Optional) */
+    @SerializedName("payment_type") val paymentMode: PaymentMode?
 
 ) : PaymentResponse

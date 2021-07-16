@@ -40,6 +40,7 @@ import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionRespons
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionUpdateRequest
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
 import us.frollo.frollosdk.model.api.shared.PaginatedResponse
+import us.frollo.frollosdk.model.coredata.payments.PaymentLimit
 
 internal interface AggregationAPI {
     companion object {
@@ -71,6 +72,9 @@ internal interface AggregationAPI {
         // Merchant URLs
         const val URL_MERCHANTS = "aggregation/merchants"
         const val URL_MERCHANT = "aggregation/merchants/{merchant_id}"
+
+        // Payment Limits URL
+        const val URL_PAYMENT_LIMITS = "aggregation/accounts/{account_id}/limits"
     }
 
     // Provider API
@@ -158,4 +162,9 @@ internal interface AggregationAPI {
 
     @GET(URL_SUGGESTED_TAGS)
     fun fetchSuggestedTags(@QueryMap queryParams: Map<String, String>): Call<List<TransactionTagResponse>>
+
+    // Payment Limits
+
+    @GET(URL_PAYMENT_LIMITS)
+    fun fetchPaymentLimits(@Path("account_id") accountId: Long): Call<List<PaymentLimit>>
 }

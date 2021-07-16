@@ -8,6 +8,7 @@
 - Removed jCenter dependency and added aar files temporarily in libs folder
 - Verify BPay
 - Payment Limits APIs
+- Add new payment error codes
 
 ### 3.9.0
 

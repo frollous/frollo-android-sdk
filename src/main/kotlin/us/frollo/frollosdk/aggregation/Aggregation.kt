@@ -125,6 +125,7 @@ import us.frollo.frollosdk.model.coredata.cdr.ConsentCreateForm
 import us.frollo.frollosdk.model.coredata.cdr.ConsentRelation
 import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
 import us.frollo.frollosdk.model.coredata.cdr.ConsentUpdateForm
+import us.frollo.frollosdk.model.coredata.payments.PaymentLimit
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.network.NetworkService
@@ -2301,6 +2302,26 @@ class Aggregation(network: NetworkService, internal val db: SDKDatabase, localBr
                     completion.invoke(resource)
                 }
             }
+        }
+    }
+
+    // Payment Limits
+
+    /**
+     * Fetch payment limits of a specific account from the host
+     *
+     * @param accountId Account ID of the account to fetch payment limits
+     * @param completion Completion handler with optional error if the request fails or list of payment limits if succeeds
+     */
+    fun fetchAccountPaymentLimits(
+        accountId: Long,
+        completion: OnFrolloSDKCompletionListener<Resource<List<PaymentLimit>>>
+    ) {
+        aggregationAPI.fetchPaymentLimits(accountId).enqueue { resource ->
+            if (resource.status == Resource.Status.ERROR) {
+                Log.e("$TAG#fetchAccountPaymentLimits", resource.error?.localizedDescription)
+            }
+            completion.invoke(resource)
         }
     }
 

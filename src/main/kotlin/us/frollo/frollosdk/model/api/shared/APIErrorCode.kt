@@ -60,6 +60,10 @@ enum class APIErrorCode(val rawValue: String) {
     @SerializedName("F1013") PAYMENT_INVALID_DESTINATION_ACCOUNT("F1013"),
     /** Payment validation - Account restricted */
     @SerializedName("F1014") PAYMENT_ACCOUNT_RESTRICTED("F1014"),
+    /** Payment validation - Invalid Amount */
+    @SerializedName("F1015") PAYMENT_INVALID_AMOUNT("F1015"),
+    /** Payment validation - Character limit exceeded */
+    @SerializedName("F1016") PAYMENT_CHARACTER_LIMIT_EXCEEDED("F1016"),
     /** Payment validation - BPAY Other */
     @SerializedName("F1020") PAYMENT_INVALID_BPAY("F1020"),
     /** Payment validation - BPAY Biller Code */

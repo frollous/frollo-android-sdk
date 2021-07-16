@@ -61,6 +61,8 @@ import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionBa
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionDescription
 import us.frollo.frollosdk.model.coredata.aggregation.transactions.TransactionFilter
 import us.frollo.frollosdk.model.coredata.cdr.ConsentStatus
+import us.frollo.frollosdk.model.coredata.payments.PaymentLimitPeriod
+import us.frollo.frollosdk.model.coredata.payments.PaymentLimitType
 import us.frollo.frollosdk.model.coredata.shared.BudgetCategory
 import us.frollo.frollosdk.model.coredata.shared.OrderType
 import us.frollo.frollosdk.model.loginFormFilledData
@@ -4188,6 +4190,75 @@ class AggregationTest : BaseAndroidTest() {
             assertNotNull(result.error)
             assertEquals(DataErrorType.AUTHENTICATION, (result.error as DataError).type)
             assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (result.error as DataError).subType)
+
+            signal.countDown()
+        }
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchAccountPaymentLimits() {
+        initSetup()
+
+        val accountId = 542L
+        val requestPath = "aggregation/accounts/$accountId/limits"
+
+        val signal = CountDownLatch(1)
+
+        val body = readStringFromJson(app, R.raw.payment_limits)
+        mockServer.setDispatcher(object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest?): MockResponse {
+                if (request?.trimmedPath == requestPath) {
+                    return MockResponse()
+                        .setResponseCode(200)
+                        .setBody(body)
+                }
+                return MockResponse().setResponseCode(404)
+            }
+        })
+
+        aggregation.fetchAccountPaymentLimits(accountId) { resource ->
+            assertEquals(Resource.Status.SUCCESS, resource.status)
+            assertNull(resource.error)
+
+            val models = resource.data
+            assertEquals(2, models?.size)
+            assertEquals(PaymentLimitType.TRANSACTION, models?.first()?.type)
+            assertEquals(PaymentLimitPeriod.SINGULAR, models?.first()?.period)
+            assertEquals("20000.00", models?.first()?.limitAmount?.toString())
+
+            assertEquals(PaymentLimitType.NPP, models?.get(1)?.type)
+            assertEquals(PaymentLimitPeriod.DAILY, models?.get(1)?.period)
+            assertEquals("1000.00", models?.get(1)?.limitAmount?.toString())
+            assertEquals("93.47", models?.get(1)?.consumedAmount?.toString())
+
+            signal.countDown()
+        }
+
+        val request = mockServer.takeRequest()
+        assertEquals(requestPath, request.trimmedPath)
+
+        signal.await(3, TimeUnit.SECONDS)
+
+        tearDown()
+    }
+
+    @Test
+    fun testFetchAccountPaymentLimitsFailsIfLoggedOut() {
+        initSetup()
+
+        val signal = CountDownLatch(1)
+
+        clearLoggedInPreferences()
+
+        aggregation.fetchAccountPaymentLimits(542) { resource ->
+            assertEquals(Resource.Status.ERROR, resource.status)
+            assertNotNull(resource.error)
+            assertEquals(DataErrorType.AUTHENTICATION, (resource.error as DataError).type)
+            assertEquals(DataErrorSubType.MISSING_ACCESS_TOKEN, (resource.error as DataError).subType)
 
             signal.countDown()
         }

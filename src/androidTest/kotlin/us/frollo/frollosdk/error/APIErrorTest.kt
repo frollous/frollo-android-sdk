@@ -442,6 +442,16 @@ class APIErrorTest {
     }
 
     @Test
+    fun testAPIErrorPaymentInvalidAmount() {
+        validatePaymentErrors(R.raw.error_payment_invalid_amount, APIErrorCode.PAYMENT_INVALID_AMOUNT)
+    }
+
+    @Test
+    fun testAPIErrorPaymentCharacterLimitExceeded() {
+        validatePaymentErrors(R.raw.error_payment_character_limit_exceeded, APIErrorCode.PAYMENT_CHARACTER_LIMIT_EXCEEDED)
+    }
+
+    @Test
     fun testAPIErrorPaymentInsufficientFunds() {
         validatePaymentErrors(R.raw.error_payment_insufficient_funds, APIErrorCode.PAYMENT_INSUFFICIENT_FUNDS)
     }

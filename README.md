@@ -4,10 +4,10 @@
 
 - Android Studio 4.2.1+
 - Kotlin version 1.5.10+
-- Gradle tools plugin version 4.2.0+ - In your project level **build.gradle**
+- Gradle tools plugin version 4.2.2+ - In your project level **build.gradle**
     ```
     dependencies {
-        classpath "com.android.tools.build:gradle:4.2.0"
+        classpath "com.android.tools.build:gradle:4.2.2"
         //..
     }
     ```

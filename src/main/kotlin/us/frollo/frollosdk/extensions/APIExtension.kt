@@ -19,6 +19,7 @@ package us.frollo.frollosdk.extensions
 import retrofit2.Call
 import us.frollo.frollosdk.model.api.address.AddressAutocomplete
 import us.frollo.frollosdk.model.api.aggregation.merchants.MerchantResponse
+import us.frollo.frollosdk.model.api.aggregation.provideraccounts.ProviderAccountResponse
 import us.frollo.frollosdk.model.api.aggregation.tags.TransactionTagResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionResponse
 import us.frollo.frollosdk.model.api.aggregation.transactions.TransactionsSummaryResponse
@@ -334,4 +335,10 @@ internal fun AddressAPI.fetchSuggestedAddresses(query: String, max: Int): Call<L
     queryMap["query"] = query
     queryMap["max"] = max.toString()
     return fetchSuggestedAddresses(queryMap)
+}
+
+internal fun AggregationAPI.refreshProviderAccounts(providerAccountIds: LongArray): Call<List<ProviderAccountResponse>> {
+    val queryMap = mutableMapOf<String, String>()
+    queryMap["provideraccount_ids"] = providerAccountIds.joinToString(",")
+    return refreshProviderAccounts(queryMap)
 }

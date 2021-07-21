@@ -9,6 +9,7 @@
 - Verify BPay
 - Payment Limits APIs
 - Add new payment error codes
+- Fix sync provider accounts API query parameter
 
 ### 3.9.0
 

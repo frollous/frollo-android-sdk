@@ -52,6 +52,7 @@ import us.frollo.frollosdk.extensions.fetchTransactions
 import us.frollo.frollosdk.extensions.fetchTransactionsSummaryByIDs
 import us.frollo.frollosdk.extensions.fetchTransactionsSummaryByQuery
 import us.frollo.frollosdk.extensions.fetchUserTags
+import us.frollo.frollosdk.extensions.refreshProviderAccounts
 import us.frollo.frollosdk.extensions.sqlForAccounts
 import us.frollo.frollosdk.extensions.sqlForConsents
 import us.frollo.frollosdk.extensions.sqlForMerchants
